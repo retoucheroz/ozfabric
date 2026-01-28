@@ -1,0 +1,92 @@
+{
+    "1": {
+        "inputs": {
+            "image": "base64_human_image",
+            "upload": "image"
+        },
+        "class_type": "LoadImage",
+        "_meta": {
+            "title": "Load Human Image"
+        }
+    },
+    "2": {
+        "inputs": {
+            "image": "base64_garment_image",
+            "upload": "image"
+        },
+        "class_type": "LoadImage",
+        "_meta": {
+            "title": "Load Garment Image"
+        }
+    },
+    "3": {
+        "inputs": {
+            "text": "garment, clothing, attire, high quality, photorealistic",
+            "clip": [
+                "4",
+                1
+            ]
+        },
+        "class_type": "CLIPTextEncode",
+        "_meta": {
+            "title": "Positive Prompt"
+        }
+    },
+    "4": {
+        "inputs": {
+            "ckpt_name": "sd_xl_base_1.0.safetensors"
+        },
+        "class_type": "CheckpointLoaderSimple",
+        "_meta": {
+            "title": "Load Checkpoint"
+        }
+    },
+    "7": {
+        "inputs": {
+            "text": "bad quality, blurry, distorted, nsfw",
+            "clip": [
+                "4",
+                1
+            ]
+        },
+        "class_type": "CLIPTextEncode",
+        "_meta": {
+            "title": "Negative Prompt"
+        }
+    },
+    "10": {
+        "inputs": {
+            "pipeline": "IDM-VTON",
+            "category": "upper_body",
+            "image": [
+                "1",
+                0
+            ],
+            "garment": [
+                "2",
+                0
+            ],
+            "model": [
+                "4",
+                0
+            ]
+        },
+        "class_type": "IDM_VTON_Pipeline",
+        "_meta": {
+            "title": "IDM-VTON Inference"
+        }
+    },
+    "11": {
+        "inputs": {
+            "filename_prefix": "OzFabric_TryOn",
+            "images": [
+                "10",
+                0
+            ]
+        },
+        "class_type": "SaveImage",
+        "_meta": {
+            "title": "Save Result"
+        }
+    }
+}

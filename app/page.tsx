@@ -1,65 +1,155 @@
-import Image from "next/image";
+"use client"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { Loader2, Globe } from "lucide-react"
+import { useLanguage } from "@/context/language-context"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
-export default function Home() {
+const QUOTES = [
+  { id: 1, author: "Pierpaolo Piccioli", roleTr: "Kreatif Direktör, Valentino", roleEn: "Creative Director, Valentino", quoteTr: "Hayal gücümüzü genişletmek ve duyguları harekete geçirmek için kullanılan bu teknoloji, artık en güçlü yaratıcı aracımız.", quoteEn: "This technology, used to expand our imagination and evoke emotions, is now our most powerful creative tool." },
+  { id: 2, author: "Jörgen Andersson", roleTr: "Kreatif Direktör, H&M", roleEn: "Creative Director, H&M", quoteTr: "Yaratıcı alet çantamıza eklenen bu yeni enstrüman, tasarım süreçlerimizi bir üst seviyeye taşımak için heyecan verici.", quoteEn: "This new instrument added to our creative toolkit is exciting to take our design processes to the next level." },
+  { id: 3, author: "Bruno Pavlovsky", roleTr: "Moda Başkanı, Chanel", roleEn: "President of Fashion, Chanel", quoteTr: "Uygulama biçimleri tamamen değişse de tasarımın özündeki felsefe, bu dijital dönüşümle daha da güçleniyor.", quoteEn: "Although the forms of application change completely, the philosophy at the core of design is strengthened even more with this digital transformation." },
+  { id: 4, author: "Matthew Drinkwater", roleTr: "Moda İnovasyon Başkanı, LCF", roleEn: "Head of Fashion Innovation, LCF", quoteTr: "Moda dünyasında henüz her şeyin başındayız; bu teknolojik devrimin zirvesine giden yol daha yeni açılıyor.", quoteEn: "We are just at the beginning in the fashion world; the path to the peak of this technological revolution is just opening." },
+  { id: 5, author: "Norma Kamali", roleTr: "Moda Tasarımcısı", roleEn: "Fashion Designer", quoteTr: "Algoritmaların beklenmedik 'yanılsamaları' bile, modern tasarımlarımız için eşsiz bir ilham kaynağına dönüşebiliyor.", quoteEn: "Even the unexpected 'illusions' of algorithms can turn into a unique source of inspiration for our modern designs." },
+  { id: 6, author: "Tommy Hilfiger", roleTr: "Kurucu & Tasarımcı, Tommy Hilfiger", roleEn: "Founder & Designer, Tommy Hilfiger", quoteTr: "Modanın geleceği dijitalleşmede yatıyor; bu yeni akıllı sistemler tasarımın lojistik başarısını kalıcı kılacak.", quoteEn: "The future of fashion lies in digitalization; these new smart systems will make the logistical success of design permanent." },
+  { id: 7, author: "Lorenzo Bertelli", roleTr: "Pazarlama Direktörü, Prada Group", roleEn: "Marketing Director, Prada Group", quoteTr: "Zaman kazandıran bu teknolojik yardımcılar sayesinde, el işçiliğinin ve insan emeğinin değerini çok daha iyi anlayacağız.", quoteEn: "Thanks to these time-saving technological assistants, we will understand the value of craftsmanship and human labor much better." },
+  { id: 8, author: "Gonzague de Pirey", roleTr: "Veri Direktörü, LVMH", roleEn: "Chief Data Officer, LVMH", quoteTr: "Yaratıcı bir 'dış iskelet' gibi düşündüğümüz bu araç, insan dehasını koruyarak onu daha verimli kılıyor.", quoteEn: "This tool, which we think of as a creative 'exoskeleton', protects human genius while making it more efficient." },
+  { id: 9, author: "Soumia Hadjali", roleTr: "Dijital Başkan Yrd., Louis Vuitton", roleEn: "VP of Digital, Louis Vuitton", quoteTr: "Kreatif süreçlerin yerini almayan, aksine onları devasa boyutlara ulaştıran bir büyüteçle karşı karşıyayız.", quoteEn: "We are facing a magnifying glass that does not replace creative processes but rather magnifies them to enormous dimensions." },
+  { id: 10, author: "Michael Mente", roleTr: "CEO & Kurucu, REVOLVE", roleEn: "CEO & Founder, REVOLVE", quoteTr: "Benzersiz trendleri keşfetme yolunda, akıllı algoritmalar bize devrimsel bir rekabet avantajı sağlıyor.", quoteEn: "On the way to discovering unique trends, smart algorithms provide us with a revolutionary competitive advantage." },
+  { id: 11, author: "Jordi Alex", roleTr: "Teknoloji Direktörü, Mango", roleEn: "Technology Director, Mango", quoteTr: "Çalışanlarımızın yeteneklerini parlatan bir yardımcı pilot olarak, tasarım yolculuğumuza eşlik ediyor.", quoteEn: "It accompanies our design journey as a co-pilot that polishes the talents of our employees." },
+  { id: 12, author: "Olivier Rousteing", roleTr: "Kreatif Direktör, Balmain", roleEn: "Creative Director, Balmain", quoteTr: "Özgür ifadenin yeni platformu olan bu teknoloji, bizi bambaşka bir yaratıcılık perspektifine yükseltiyor.", quoteEn: "This technology, which is the new platform of free expression, elevates us to a completely different perspective of creativity." },
+  { id: 13, author: "José Neves", roleTr: "Kurucu & CEO, Farfetch", roleEn: "Founder & CEO, Farfetch", quoteTr: "İnsan zekasına asistanlık eden bu sistemler, modada yaratıcılığı daha önce hiç olmadığı kadar erişilebilir kılıyor.", quoteEn: "These systems assisting human intelligence make creativity in fashion more accessible than ever before." },
+  { id: 14, author: "Rankin", roleTr: "Moda Fotoğrafçısı", roleEn: "Fashion Photographer", quoteTr: "İşinde uzman olan vizyonerlerin, bu yeni çalışma biçimiyle çok daha görkemli eserler yaratacağına inanıyorum.", quoteEn: "I believe that visionaries who are experts in their work will create much more magnificent works with this new way of working." },
+  { id: 15, author: "Robert Gentz", roleTr: "CEO & Kurucu, Zalando", roleEn: "CEO & Founder, Zalando", quoteTr: "E-ticaret deneyimi artık sadece bir alışveriş değil; teknolojiyle harmanlanmış, ilham verici bir keşif yolculuğu.", quoteEn: "The e-commerce experience is no longer just shopping; it's an inspiring journey of discovery blended with technology." },
+  { id: 16, author: "Nelly Mensah", roleTr: "İnovasyon Başkan Yrd., LVMH", roleEn: "VP of Innovation, LVMH", quoteTr: "Lüks dünyasında kişiselleştirme, üretken sistemler sayesinde artık hayal bile edilemeyecek bir ölçeğe ulaştı.", quoteEn: "Personalization in the luxury world has now reached a scale unimaginable thanks to generative systems." },
+  { id: 17, author: "Charaf Tajer", roleTr: "Kreatif Direktör, Casablanca", roleEn: "Creative Director, Casablanca", quoteTr: "Dünyanın estetiğine bakış açımızı modern inovasyonla birleştirerek geleceğin uyumunu yakalıyoruz.", quoteEn: "We capture the harmony of the future by combining our perspective on the world's aesthetics with modern innovation." },
+  { id: 18, author: "Ian Rogers", roleTr: "Eski Dijital Direktör, LVMH", roleEn: "Former Chief Digital Officer, LVMH", quoteTr: "Markalarımızın hikayelerini daha güçlü anlatmak için karmaşıklığı yöneten en değerli yardımcımız dijital akıldır.", quoteEn: "Digital intelligence is our most valuable assistant in managing complexity to tell the stories of our brands more powerfully." },
+  { id: 19, author: "Peter Pernot-Day", roleTr: "Strateji Başkanı, Burberry", roleEn: "Head of Strategy, Burberry", quoteTr: "Talepleri öngören ileri teknolojiler, modanın sürdürülebilir geleceğinde en ön safta yer alıyor.", quoteEn: "Advanced technologies that predict demands are at the forefront of fashion's sustainable future." },
+  { id: 20, author: "Nicolas Ghesquière", roleTr: "Kreatif Direktör, Louis Vuitton", roleEn: "Creative Director, Louis Vuitton", quoteTr: "Moda bir oyun alanıdır ve modern enstrümanlar bu alanda kendi imzamızı bulmamıza rehberlik eder.", quoteEn: "Fashion is a playground and modern instruments guide us to find our own signature in this field." },
+];
+
+export default function LoginPage() {
+  const router = useRouter();
+  const { t, language, setLanguage } = useLanguage();
+  const [isLoading, setIsLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [randomQuote, setRandomQuote] = useState(QUOTES[0]);
+
+  useEffect(() => {
+    setMounted(true);
+    // Select random quote only on client side to avoid hydration mismatch
+    setRandomQuote(QUOTES[Math.floor(Math.random() * QUOTES.length)]);
+  }, []);
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setTimeout(() => {
+      router.push('/home');
+    }, 1500);
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2">
+      {/* Left side: Branding */}
+      <div className="hidden bg-stone-900 lg:flex flex-col justify-between p-12 text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1558769132-cb1aea458c5e?q=80&w=2400')] bg-cover bg-center opacity-40 mix-blend-overlay"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+
+        <div className="relative z-10">
+          <div className="flex items-center gap-2 font-bold text-2xl tracking-tighter">
+            <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full flex items-center justify-center">
+              <div className="w-4 h-4 bg-white rounded-full"></div>
+            </div>
+            <span className="bg-gradient-to-r from-violet-400 to-purple-500 bg-clip-text text-transparent">rawless</span>.ai
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div className="relative z-10 max-w-lg space-y-4">
+          <blockquote className="text-3xl font-medium leading-tight">
+            {language === "tr" ? `"${randomQuote.quoteTr}"` : `"${randomQuote.quoteEn || randomQuote.quoteTr}"`}
+          </blockquote>
+          <footer className="text-sm text-white/60">
+            <div className="font-semibold text-white">{randomQuote.author}</div>
+            {language === "tr" ? randomQuote.roleTr : (randomQuote.roleEn || randomQuote.roleTr)}
+          </footer>
         </div>
-      </main>
+      </div>
+
+      {/* Right side: Login Form */}
+      <div className="flex items-center justify-center py-12 px-8 bg-background relative">
+        {/* Language Switcher */}
+        {mounted && (
+          <div className="absolute top-4 right-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-1 text-xs">
+                  <Globe className="w-4 h-4" />
+                  {language.toUpperCase()}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setLanguage("en")} className={language === "en" ? "bg-accent" : ""}>
+                  🇬🇧 English
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage("tr")} className={language === "tr" ? "bg-accent" : ""}>
+                  🇹🇷 Türkçe
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
+
+        <div className="mx-auto grid w-full max-w-[350px] gap-6">
+          <div className="grid gap-2 text-center">
+            <h1 className="text-3xl font-bold tracking-tight">{t("login.welcome")}</h1>
+            <p className="text-muted-foreground">{t("login.enterEmail")}</p>
+          </div>
+          <form onSubmit={handleLogin} className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="email">{t("login.email")}</Label>
+              <Input id="email" type="email" placeholder="designer@rawless.ai" defaultValue="demo@rawless.ai" required disabled={isLoading} />
+            </div>
+            <div className="grid gap-2">
+              <div className="flex items-center">
+                <Label htmlFor="password">{t("login.password")}</Label>
+                <Link href="#" className="ml-auto inline-block text-sm underline text-muted-foreground hover:text-primary">{t("login.forgotPassword")}</Link>
+              </div>
+              <Input id="password" type="password" defaultValue="password" required disabled={isLoading} />
+            </div>
+            <Button type="submit" className="w-full bg-violet-500 text-white hover:bg-violet-600" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {t("login.signIn")}
+            </Button>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  {t("login.orContinue")}
+                </span>
+              </div>
+            </div>
+            <Button variant="outline" className="w-full" type="button" disabled={isLoading}>
+              <svg className="mr-2 h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="github" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3 .3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5 .3-6.2 2.3zm44.2-1.7c-2.9 .7-4.9 2.6-4.6 4.9 .3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3 .7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3 .3 2.9 2.3 3.9 1.6 1 3.6 .7 4.3-.7 .7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3 .7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3 .7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg>
+              {t("login.github")}
+            </Button>
+          </form>
+          <div className="mt-4 text-center text-sm">
+            {t("login.noAccount")}{" "}
+            <Link href="#" className="underline text-primary">{t("login.signUp")}</Link>
+          </div>
+        </div>
+      </div>
     </div>
-  );
+  )
 }
