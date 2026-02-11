@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { useLanguage } from "@/context/language-context"
 import {
     LayoutDashboard, // For Home
     Palette,
@@ -24,6 +25,7 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> { }
 
 export function AppSidebar({ className }: SidebarProps) {
     const pathname = usePathname()
+    const { language } = useLanguage()
 
     const sections = [
         {
@@ -75,14 +77,19 @@ export function AppSidebar({ className }: SidebarProps) {
                     href: "/photoshoot/ghost",
                 },
                 {
-                    label: "Mannequin",
+                    label: "MAVI EU",
                     icon: User,
                     href: "/photoshoot/mannequin",
                 },
                 {
-                    label: "Detail Create",
-                    icon: Camera, // Changed icon to Camera for detail feeling
+                    label: language === "tr" ? "Detay Oluştur" : "Detail Create",
+                    icon: Camera,
                     href: "/photoshoot/try-on",
+                },
+                {
+                    label: "E-Com",
+                    icon: Box,
+                    href: "/photoshoot/ecom",
                 },
             ],
         },

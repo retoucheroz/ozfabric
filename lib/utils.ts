@@ -23,3 +23,31 @@ export async function downloadImage(url: string, filename: string) {
     window.open(url, '_blank');
   }
 }
+
+export async function resizeImageToThumbnail(dataUrl: string, maxWidth = 150): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.src = dataUrl;
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      let width = img.width;
+      let height = img.height;
+
+      if (width > maxWidth) {
+        height = Math.round((height * maxWidth) / width);
+        width = maxWidth;
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        reject("No context");
+        return;
+      }
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL("image/jpeg", 0.7)); // Optimized JPEG
+    };
+    img.onerror = (e) => reject(e);
+  });
+}

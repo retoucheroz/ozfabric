@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from "react"
 
 export type Project = {
     id: string;
-    type: "Style" | "Pattern" | "Try-On" | "Ghost" | "Tech Pack" | "Expand" | "Upscale" | "Retexture" | "Photoshoot" | "Sketch";
+    type: "Style" | "Pattern" | "Try-On" | "Ghost" | "Tech Pack" | "Expand" | "Upscale" | "Retexture" | "Photoshoot" | "Sketch" | "Editorial";
     title: string;
     imageUrl: string;
     createdAt: number;

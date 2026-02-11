@@ -186,14 +186,14 @@ export default function DashboardHome() {
                 <div className="w-full space-y-4">
                     <div className="flex items-center justify-between">
                         <h2 className="text-xl font-semibold tracking-tight">{t("home.recentProjects")}</h2>
-                        <Button variant="ghost" size="sm" asChild><Link href="/studio">{t("home.viewAll")}</Link></Button>
+                        <Button variant="ghost" size="sm" asChild><Link href="/history">{t("home.viewAll")}</Link></Button>
                     </div>
                     <div className="space-y-1">
                         {recentProjects.map((project) => (
                             <div
                                 key={project.id}
                                 className="group flex items-center gap-4 p-2 rounded-lg hover:bg-accent/40 cursor-pointer transition-colors border border-transparent hover:border-border/50"
-                                onClick={() => router.push('/studio?image=' + encodeURIComponent(project.imageUrl))}
+                                onClick={() => router.push('/history?image=' + encodeURIComponent(project.imageUrl))}
                             >
                                 {/* Thumbnail */}
                                 <div className="h-10 w-10 rounded-md overflow-hidden shrink-0 bg-muted border border-border/50">

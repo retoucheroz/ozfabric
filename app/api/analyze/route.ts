@@ -9,35 +9,27 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await req.json();
-        const { image, language, type = 'techPack' } = body; // type: 'techPack' | 'pose'
+        const { image, images, language, type = 'techPack', workflowType } = body; // type: 'techPack' | 'pose'
 
-        if (!image) {
-            return NextResponse.json({ error: "Image is required" }, { status: 400 });
+        if (!image && (!images || !Array.isArray(images) || images.length === 0)) {
+            return NextResponse.json({ error: "Image or images array required" }, { status: 400 });
         }
 
         const genAI = new GoogleGenerativeAI(apiKey);
 
-        // Prioritize Gemini 1.5 Pro for TechPack (Fabric Details) as requested for better texture analysis
-        // Prioritize Gemini 2.0 Flash for Pose (Speed/Spatial reasoning)
+        // Prioritize Gemini 2.0 Flash Lite for all analysis tasks as requested
         let modelsToTry = [
+            "gemini-2.0-flash-lite",
             "gemini-2.0-flash",
-            "gemini-1.5-pro",
             "gemini-1.5-flash"
         ];
 
-        if (type === 'techPack' || type === 'pose') {
-            // User Request: Use 1.5 Pro for BOTH Fabric & Pose Analysis for max fidelity
+        if (type === 'techPack' || type === 'fabric' || type === 'fit' || type === 'pose') {
+            // User Request: Use 2.0 Flash Lite/Flash for all technical tasks
             modelsToTry = [
-                "gemini-1.5-pro",
+                "gemini-2.0-flash-lite",
                 "gemini-2.0-flash",
-                "gemini-2.0-flash-exp"
-            ];
-        } else {
-            // Fallback
-            modelsToTry = [
-                "gemini-2.0-flash",
-                "gemini-1.5-flash",
-                "gemini-1.5-pro"
+                "gemini-1.5-flash"
             ];
         }
 
@@ -45,16 +37,24 @@ export async function POST(req: NextRequest) {
         let usedModel = "";
         const errors: string[] = [];
 
-        // Helper to extract base64
-        let base64Data = image;
-        let mimeType = "image/png";
-
-        if (image.includes(",")) {
-            const parts = image.split(",");
-            const match = parts[0].match(/:(.*?);/);
-            if (match) mimeType = match[1];
-            base64Data = parts[1];
-        }
+        // Pre-process images
+        const inputImages = images && Array.isArray(images) ? images : [image];
+        const processedImages = inputImages.map((img: string) => {
+            let base64Data = img;
+            let mimeType = "image/png";
+            if (img.includes(",")) {
+                const parts = img.split(",");
+                const match = parts[0].match(/:(.*?);/);
+                if (match) mimeType = match[1];
+                base64Data = parts[1];
+            }
+            return {
+                inlineData: {
+                    data: base64Data,
+                    mimeType: mimeType
+                }
+            };
+        });
 
         for (const modelName of modelsToTry) {
             try {
@@ -70,72 +70,91 @@ export async function POST(req: NextRequest) {
                     ]
                 });
 
-                // FORCE ENGLISH for TechPack, Fit AND POSE analysis regardless of UI language. 
+                // FORCE ENGLISH for TechPack, Fabric, Fit AND POSE analysis regardless of UI language. 
                 // All AI prompts must be in English for best adherence.
-                const langInstruction = (type === 'techPack' || type === 'fit' || type === 'pose')
+                const langInstruction = (type === 'techPack' || type === 'fabric' || type === 'fit' || type === 'pose')
                     ? "RESPOND IN ENGLISH ONLY. TECHNICAL FASHION TERMINOLOGY."
                     : (language === "tr" ? "RESPOND IN TURKISH. Translate Technical Terms to professional Turkish fashion terminology." : "Respond in English.");
 
                 let prompt = "";
+                const multiImageContext = processedImages.length > 1 ? "You are shown multiple images of the same garment (front, back, details). Analyze them collectively for a single accurate description." : "";
+
 
                 if (type === 'pose') {
-                    prompt = `${langInstruction} You are an expert Fashion Pose Director for AI Image Generation.
-                    Your task is to describe the pose in this image with EXTREME PRECISION so that an AI can replicate it EXACTLY without seeing the image.
+                    prompt = `${langInstruction} ${multiImageContext} 
                     
-                    ANALYZE THESE SPECIFIC POINTS:
-                    1. HEAD & EYES: Exact head tilt and facing direction. Where are eyes looking?
-                    2. SHOULDERS & TORSO: Body angle relative to camera (front, 3/4, side). Leaning forward/back? Shoulders lifted or relaxed?
-                    3. ARMS & HANDS (CRITICAL): Precise position of EACH arm. Elbow bend angles. Hand gestures (in pockets, crossed, holding object, touching face).
-                    4. LEGS & FEET: Stance width. Weight distribution (on which leg?). Knee bends. Crossed legs?
-                    5. MOVEMENT: Is it static or dynamic (walking, running, jumping)?
+                    ### POSE_REFERENCE_POLICY (HARD RULE) ###
+                    EXTRACT POSE GEOMETRY ONLY.
                     
-                    OUTPUT REQUIREMENTS:
-                    - Create a dense, instructional paragraph starting with "Model is...".
-                    - Use anatomical terms if helpful (e.g. "hands akimbo").
-                    - DISREGARD clothing details. Focus ONLY on biomechanics and posture.
+                    The output must be structured exactly as follows:
+                    [POSE_GEOMETRY_ONLY]
+                    - Body orientation: [precise angle relative to camera]
+                    - Weight distribution: [supporting leg and balance notes]
+                    - Limb positions: [mathematical limb/joint placement]
+                    - Head angle: [tilt and rotation degrees]
+                    - Gaze direction: [gaze vector]
+                    [/POSE_GEOMETRY_ONLY]
+
+                    STRICT DISCARD RULE: If you see clothing, brands, materials, or style-related terms (e.g., "fashionable", "chic", "casual"), DISCARD THEM IMMEDIATELY. They MUST NOT appear in the output.
                     
                     JSON Response Format:
                     {
-                        "description": "Full detailed instructional prompt describing the pose."
+                        "description": "[The tagged structure above]"
                     }`;
                 } else {
-                    // TECH PACK MODE - Fabric & Detail Analysis
-                    prompt = `${langInstruction} You are a Textile Expert analyzing fabric details for AI image generation.
+                    // TECH PACK MODE - Comprehensive Technical Analysis
+                    const workflowStr = workflowType || 'upper';
 
-                    ANALYZE THIS FABRIC/GARMENT IMAGE:
+                    prompt = `${langInstruction} ${multiImageContext} You are a Senior Textile Engineer and Technical Designer. 
+                    Analyze the garment in the image(s) to create a professional Technical Specification (Tech Pack).
                     
-                    1. FABRIC TYPE: What is the main material? (Cotton, Linen, Denim, Polyester, Wool, etc.)
-                    2. TEXTURE: How does it feel? (Smooth, Rough, Soft, Crisp, Textured, Puckered, etc.)
-                    3. PATTERN: What pattern does it have? (Solid, Striped, Checkered, Printed, etc.)
-                       - IF CHECKED/STRIPED: Describe direction, width, colors.
-                       - IF SOLID: State "Solid color".
-                    4. COLOR: What are the exact colors? Be specific.
-                    5. SURFACE FINISH: How does light interact? (Matte, Shiny, Semi-gloss, etc.)
-                    6. SPECIAL FEATURES: Any unique details? (Visible stitching, logo, buttons, texture variation)
-                    7. CLOSURE TYPE: Does this garment have BUTTONS, ZIPPER, or NO CLOSURE (pullover/open)?
-
-                    OUTPUT a clean, prompt-ready description.
+                    The analysis must be EXTREMELY PRECISE for manufacturing. 
                     
-                    EXAMPLE OUTPUT (FORMAT REFERENCE ONLY - DO NOT COPY CONTENT):
-                    "Medium-wash indigo denim fabric with subtle cross-hatch texture. Solid blue color with natural fading at seams. Heavyweight cotton twill weave. Matte finish with contrast orange stitching."
+                    FIELD REQUIREMENTS:
+                    - "productName": Concise English corporate name.
+                    - "sku": Generate a realistic SKU (e.g., OZ-2024-XP-01).
+                    - "category": Garment category (e.g., Mens Outwear, Womens Denim).
+                    - "fabric": Detailed main material analysis.
+                    - "measurements": Provide at least 5 key measurement points (POM) for a sample size 36 (small).
+                    - "colors": Extract 2-3 primary colors with precise HEX codes and matching PANTONE numbers.
+                    - "constructionDetails": List 4-5 specific manufacturing assembly notes (seams, stitches, hardware).
                     
-                    JSON Response:
+                    JSON Response Structure:
                     {
-                        "visualPrompt": "Clean, detailed fabric description as shown in example (ONE paragraph, DESCRIBE ACTUAL IMAGE ONLY)",
-                        "productName": "Generic English Product Name (NO BRANDS)",
+                        "productName": "...",
+                        "sku": "...",
+                        "category": "...",
+                        "visualPrompt": "One paragraph description optimized for AI image generation (dalle/midjourney style).",
+                        "fit": "Specific fit description (e.g., Oversized Boxy Fit)",
+                        "fitDescription": "Detailed explanation of the silhouette.",
                         "fabric": {
-                            "main": "Primary fabric type",
-                            "finish": "Surface finish"
+                            "main": "Primary material name",
+                            "composition": "Percentage breakdown (e.g., 98% Cotton 2% Elastane)",
+                            "weight": "GSM or oz (e.g., 320 GSM / 11.5 oz)",
+                            "finish": "Fabric treatment (e.g., Enzyme Wash, Silicone Finish)"
                         },
-                        "pattern": "Pattern description",
-                        "colors": "Color description",
-                        "closureType": "buttons OR zipper OR none"
+                        "measurements": {
+                            "points": [
+                                { "label": "Chest Width", "value": "52" },
+                                { "label": "Body Length", "value": "68" }
+                            ]
+                        },
+                        "colors": [
+                            { "name": "Raw Indigo", "hex": "#1A237E", "pantone": "19-4025 TCX" }
+                        ],
+                        "constructionDetails": [
+                            "Twin needle topstitching on seams",
+                            "Nickel-free copper rivets at stress points"
+                        ],
+                        "designNotes": "General aesthetic and functional overview.",
+                        "closureType": "buttons OR zipper OR none",
+                        "pattern": "Solid / Striped / etc."
                     }`;
                 }
 
                 // FIT/PATTERN ANALYSIS for ALL GARMENTS - shirts, jackets, pants, etc.
                 if (type === 'fit') {
-                    prompt = `${langInstruction} You are an EXPERT Garment Pattern & Fit Analyst. Your analysis will be used to recreate this EXACT fit in AI image generation. BE EXTREMELY PRECISE about silhouette details.
+                    prompt = `${langInstruction} ${multiImageContext} You are an EXPERT Garment Pattern & Fit Analyst. Your analysis will be used to recreate this EXACT fit in AI image generation. BE EXTREMELY PRECISE about silhouette details.
 
                     FIRST: Identify the garment type:
                     - Is it a TOP (shirt, blouse, t-shirt, sweater, jacket, coat)?
@@ -202,12 +221,7 @@ export async function POST(req: NextRequest) {
 
                 const result = await model.generateContent([
                     prompt,
-                    {
-                        inlineData: {
-                            data: base64Data,
-                            mimeType: mimeType
-                        }
-                    }
+                    ...processedImages
                 ]);
 
                 let responseText = result.response.text();

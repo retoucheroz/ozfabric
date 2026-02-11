@@ -18,6 +18,8 @@ import {
     Sparkles,
     ChevronLeft,
     ChevronRight,
+    ShoppingBag,
+    Clock,
 } from "lucide-react"
 import { useLanguage } from "@/context/language-context"
 import { Separator } from "@/components/ui/separator"
@@ -29,7 +31,7 @@ interface LeftSidebarProps {
 
 export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
     const pathname = usePathname();
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const [mounted, setMounted] = useState(false);
     const [isExpanded, setIsExpanded] = useState(true); // Default: expanded
 
@@ -52,17 +54,19 @@ export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
         <aside className="w-[240px] h-full border-r bg-white dark:bg-zinc-950 hidden md:flex" />
     ) : null;
 
-    const designItems = [
-        { label: t("sidebar.styles"), href: "/design/styles", icon: Wand2 },
-        { label: t("sidebar.sketch"), href: "/sketch", icon: Palette },
-        { label: t("sidebar.patterns"), href: "/design/patterns", icon: Layers },
-        { label: t("sidebar.retexture"), href: "/design/retexture", icon: Palette },
+    const designItems: { label: string; href: string; icon: any }[] = [
     ];
 
     const photoshootItems = [
         { label: t("sidebar.aiModel"), href: "/photoshoot", icon: Camera },
-        { label: "Detail Create", href: "/photoshoot/try-on", icon: Camera },
+        { label: language === "tr" ? "Detay Oluştur" : "Detail Create", href: "/photoshoot/try-on", icon: Camera },
+        { label: language === "tr" ? "Editorial" : "Editorial", href: "/editorial", icon: Camera },
         { label: t("sidebar.ghost"), href: "/photoshoot/ghost", icon: UserSquare2 },
+    ];
+
+    // E-Com as a separate main page
+    const ecomItems = [
+        { label: language === "tr" ? "E-Com Stüdyo" : "E-Com Studio", href: "/ecom", icon: ShoppingBag },
     ];
 
     const toolItems = [
@@ -72,8 +76,7 @@ export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
     ];
 
     const libraryItems = [
-        { label: t("sidebar.collections"), href: "/collections", icon: Folder },
-        { label: t("sidebar.community"), href: "/community", icon: Globe },
+        { label: t("sidebar.history"), href: "/history", icon: Clock },
     ];
 
     const renderItem = (item: { label: string; href: string; icon: any }) => {
@@ -135,14 +138,25 @@ export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
                 </button>
             )}
 
+
+            {designItems.length > 0 && (
+                <>
+                    <div className="flex flex-col gap-1 md:gap-1">
+                        {designItems.map(renderItem)}
+                    </div>
+                    <Separator className="my-2 opacity-50" />
+                </>
+            )}
+
             <div className="flex flex-col gap-1 md:gap-1">
-                {designItems.map(renderItem)}
+                {photoshootItems.map(renderItem)}
             </div>
 
             <Separator className="my-2 opacity-50" />
 
+            {/* E-Com Studio - Separate Section */}
             <div className="flex flex-col gap-1 md:gap-1">
-                {photoshootItems.map(renderItem)}
+                {ecomItems.map(renderItem)}
             </div>
 
             <Separator className="my-2 opacity-50" />

@@ -157,7 +157,11 @@ function StudioPageContent() {
       const response = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image: imageData, language })
+        body: JSON.stringify({
+          image: imageData,
+          language,
+          type: 'techPack'
+        })
       });
 
       const result = await response.json();
@@ -556,7 +560,7 @@ function StudioPageContent() {
                           <TableCell className="font-medium text-gray-900">{language === 'tr' ? 'Kalıp' : 'Fit Type'}</TableCell>
                           <TableCell className="text-gray-700 p-2">
                             <Input
-                              value={data.fit}
+                              value={data?.fit || ""}
                               onChange={(e) => handleFitChange(e.target.value)}
                               className="h-8 border-transparent hover:border-gray-200 focus:border-violet-500 font-normal shadow-none px-2 -ml-2 w-full"
                             />
@@ -582,24 +586,32 @@ function StudioPageContent() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {data.measurements.points.map((m: any, i: number) => (
-                          <TableRow key={i} className="border-gray-100 hover:bg-transparent">
-                            <TableCell className="text-gray-700 p-2">
-                              <Input
-                                value={m.label}
-                                onChange={(e) => handleMeasurementChange(i, 'label', e.target.value)}
-                                className="h-8 border-transparent hover:border-gray-200 focus:border-violet-500 font-normal shadow-none px-2 -ml-2 w-full"
-                              />
-                            </TableCell>
-                            <TableCell className="text-right font-mono text-gray-700 p-2">
-                              <Input
-                                value={m.value}
-                                onChange={(e) => handleMeasurementChange(i, 'value', e.target.value)}
-                                className="h-8 text-right border-transparent hover:border-gray-200 focus:border-violet-500 font-normal shadow-none px-2 -ml-2 w-full"
-                              />
+                        {data?.measurements?.points ? (
+                          data.measurements.points.map((m: any, i: number) => (
+                            <TableRow key={i} className="border-gray-100 hover:bg-transparent">
+                              <TableCell className="text-gray-700 p-2">
+                                <Input
+                                  value={m.label}
+                                  onChange={(e) => handleMeasurementChange(i, 'label', e.target.value)}
+                                  className="h-8 border-transparent hover:border-gray-200 focus:border-violet-500 font-normal shadow-none px-2 -ml-2 w-full"
+                                />
+                              </TableCell>
+                              <TableCell className="text-right font-mono text-gray-700 p-2">
+                                <Input
+                                  value={m.value}
+                                  onChange={(e) => handleMeasurementChange(i, 'value', e.target.value)}
+                                  className="h-8 text-right border-transparent hover:border-gray-200 focus:border-violet-500 font-normal shadow-none px-2 -ml-2 w-full"
+                                />
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={2} className="text-center py-4 text-muted-foreground italic">
+                              {language === 'tr' ? 'Ölçü verisi bulunamadı' : 'No measurement data found'}
                             </TableCell>
                           </TableRow>
-                        ))}
+                        )}
                       </TableBody>
                     </Table>
                   </Card>
@@ -612,18 +624,24 @@ function StudioPageContent() {
                     <h3 className="text-lg font-semibold text-black">{language === 'tr' ? 'Renkler & Pantone' : 'Colorway & Pantone'}</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    {data.colors.map((c: any, i: number) => (
-                      <Card key={i} className="p-3 flex items-center gap-4 bg-white border-gray-200 shadow-none">
-                        <div
-                          className="w-12 h-12 rounded-full border border-gray-200 shadow-sm"
-                          style={{ backgroundColor: c.hex }}
-                        />
-                        <div>
-                          <div className="font-bold text-sm text-black">{c.name}</div>
-                          <div className="text-xs text-gray-500 font-mono">{c.pantone}</div>
-                        </div>
-                      </Card>
-                    ))}
+                    {data?.colors ? (
+                      data.colors.map((c: any, i: number) => (
+                        <Card key={i} className="p-3 flex items-center gap-4 bg-white border-gray-200 shadow-none">
+                          <div
+                            className="w-12 h-12 rounded-full border border-gray-200 shadow-sm"
+                            style={{ backgroundColor: c.hex }}
+                          />
+                          <div>
+                            <div className="font-bold text-sm text-black">{c.name}</div>
+                            <div className="text-xs text-gray-500 font-mono">{c.pantone}</div>
+                          </div>
+                        </Card>
+                      ))
+                    ) : (
+                      <p className="text-sm text-muted-foreground italic col-span-2">
+                        {language === 'tr' ? 'Renk verisi bulunamadı' : 'No color data found'}
+                      </p>
+                    )}
                   </div>
                 </section>
 
@@ -631,9 +649,13 @@ function StudioPageContent() {
                 <section>
                   <h3 className="text-lg font-semibold mb-4 text-black">{language === 'tr' ? 'Üretim Notları' : 'Assembly Notes'}</h3>
                   <ul className="list-disc list-inside space-y-1 text-sm text-gray-600 border-l-2 border-gray-200 pl-4">
-                    {data.constructionDetails.map((note: string, i: number) => (
-                      <li key={i}>{note}</li>
-                    ))}
+                    {data?.constructionDetails ? (
+                      data.constructionDetails.map((note: string, i: number) => (
+                        <li key={i}>{note}</li>
+                      ))
+                    ) : (
+                      <li className="italic text-muted-foreground">{language === 'tr' ? 'Üretim notu bulunamadı' : 'No construction notes found'}</li>
+                    )}
                   </ul>
                 </section>
 
@@ -713,15 +735,19 @@ function StudioPageContent() {
               <div>
                 <h3 className="font-bold uppercase text-sm border-b border-gray-300 pb-1 mb-2">{language === 'tr' ? 'RENKLER' : 'COLORWAY'}</h3>
                 <div className="space-y-2">
-                  {data.colors.map((c: any, i: number) => (
-                    <div key={i} className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full border border-gray-200" style={{ backgroundColor: c.hex, printColorAdjust: 'exact', WebkitPrintColorAdjust: 'exact' } as any} />
-                      <div>
-                        <div className="font-bold text-sm">{c.name}</div>
-                        <div className="text-xs text-gray-500">{c.pantone}</div>
+                  {data?.colors ? (
+                    data.colors.map((c: any, i: number) => (
+                      <div key={i} className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full border border-gray-200" style={{ backgroundColor: c.hex, printColorAdjust: 'exact', WebkitPrintColorAdjust: 'exact' } as any} />
+                        <div>
+                          <div className="font-bold text-sm">{c.name}</div>
+                          <div className="text-xs text-gray-500">{c.pantone}</div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <p className="text-xs text-gray-400 italic">No colors identified</p>
+                  )}
                 </div>
               </div>
 
@@ -729,9 +755,13 @@ function StudioPageContent() {
               <div>
                 <h3 className="font-bold uppercase text-sm border-b border-gray-300 pb-1 mb-2">{language === 'tr' ? 'NOTLAR' : 'NOTES'}</h3>
                 <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
-                  {data.constructionDetails.slice(0, 4).map((note: string, i: number) => (
-                    <li key={i}>{note}</li>
-                  ))}
+                  {data?.constructionDetails ? (
+                    data.constructionDetails.slice(0, 4).map((note: string, i: number) => (
+                      <li key={i}>{note}</li>
+                    ))
+                  ) : (
+                    <li className="italic text-gray-400">No notes available</li>
+                  )}
                 </ul>
               </div>
             </div>
@@ -748,12 +778,20 @@ function StudioPageContent() {
                 </tr>
               </thead>
               <tbody>
-                {data.measurements.points.map((m: any, i: number) => (
-                  <tr key={i}>
-                    <td className="py-2 px-3 border border-gray-200">{m.label}</td>
-                    <td className="py-2 px-3 border border-gray-200 text-right font-mono">{m.value}</td>
+                {data?.measurements?.points ? (
+                  data.measurements.points.map((m: any, i: number) => (
+                    <tr key={i}>
+                      <td className="py-2 px-3 border border-gray-200">{m.label}</td>
+                      <td className="py-2 px-3 border border-gray-200 text-right font-mono">{m.value}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={2} className="py-4 text-center text-gray-400 italic border border-gray-200">
+                      No measurements available
+                    </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>

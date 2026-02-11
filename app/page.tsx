@@ -52,10 +52,18 @@ export default function LoginPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    setTimeout(() => {
-      router.push('/home');
-    }, 1500);
+    const formData = new FormData(e.target as HTMLFormElement);
+    const username = formData.get("username") as string;
+    const password = formData.get("password") as string;
+
+    if (username === "ozgur" && password === "ozgur") {
+      setIsLoading(true);
+      setTimeout(() => {
+        router.push('/home');
+      }, 1500);
+    } else {
+      alert(language === "tr" ? "Hatalı kullanıcı adı veya şifre!" : "Invalid username or password!");
+    }
   }
 
   return (
@@ -115,15 +123,15 @@ export default function LoginPage() {
           </div>
           <form onSubmit={handleLogin} className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="email">{t("login.email")}</Label>
-              <Input id="email" type="email" placeholder="designer@rawless.ai" defaultValue="demo@rawless.ai" required disabled={isLoading} />
+              <Label htmlFor="username">{language === 'tr' ? 'Kullanıcı Adı' : 'Username'}</Label>
+              <Input id="username" name="username" type="text" placeholder="ozgur" defaultValue="ozgur" required disabled={isLoading} />
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">
                 <Label htmlFor="password">{t("login.password")}</Label>
                 <Link href="#" className="ml-auto inline-block text-sm underline text-muted-foreground hover:text-primary">{t("login.forgotPassword")}</Link>
               </div>
-              <Input id="password" type="password" defaultValue="password" required disabled={isLoading} />
+              <Input id="password" name="password" type="password" defaultValue="ozgur" required disabled={isLoading} />
             </div>
             <Button type="submit" className="w-full bg-violet-500 text-white hover:bg-violet-600" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

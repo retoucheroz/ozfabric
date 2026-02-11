@@ -35,7 +35,9 @@ const translations: Translations = {
     "sidebar.aiModel": { en: "Photoshoot", tr: "Fotoğraf Çek" },
     "sidebar.tryOn": { en: "Try-On", tr: "Deneme Kabini" },
     "sidebar.ghost": { en: "Ghost", tr: "Hayalet Manken" },
+    "sidebar.editorial": { en: "Editorial", tr: "Editorial" },
     "sidebar.collections": { en: "Collections", tr: "Koleksiyonlar" },
+    "sidebar.history": { en: "History", tr: "Geçmiş" },
     "sidebar.community": { en: "Community", tr: "Topluluk" },
     "sidebar.settings": { en: "Settings", tr: "Ayarlar" },
 

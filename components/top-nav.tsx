@@ -31,7 +31,6 @@ export function TopNav() {
         { label: t("nav.create"), href: "/photoshoot", icon: Plus, isPrimary: true },
         { label: t("nav.edit"), href: "/design/retexture", icon: Edit3 },
         { label: t("nav.train"), href: "/train", icon: BrainCircuit },
-        { label: t("nav.myCreations"), href: "/collections", icon: LayoutGrid },
     ];
 
     return (
