@@ -1,5 +1,5 @@
 "use client"
-
+import { uploadToR2 } from "@/lib/uploadToR2";
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -1073,16 +1073,32 @@ export default function PhotoshootPage() {
                 }
             }
 
+            const useR2 = process.env.NEXT_PUBLIC_USE_R2_UPLOAD === "true";
+
+            let uploadedImages: any;
+
+            if (useR2) {
+                uploadedImages = {};
+                for (const key of Object.keys(assets)) {
+                    const imageData = assetsHighRes[key] || assets[key];
+                    if (imageData) {
+                        uploadedImages[key] = await uploadToR2(imageData, `${key}.png`);
+                    }
+                }
+            } else {
+                uploadedImages = Object.keys(assets).reduce((acc, k) => {
+                    acc[k] = assetsHighRes[k] || assets[k];
+                    return acc;
+                }, {} as any);
+            }
+
             const response = await fetch("/api/generate", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     productName: currentProductName || productName, // Use analyzed or manual name
                     workflowType, // Use STATE
-                    uploadedImages: Object.keys(assets).reduce((acc, k) => {
-                        acc[k] = assetsHighRes[k] || assets[k];
-                        return acc;
-                    }, {} as any),
+                    uploadedImages,
                     detailImages,
                     gender: gender || modelGender,
                     prompt: assets.prompt,
