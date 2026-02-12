@@ -36,10 +36,10 @@ const AVAILABLE_PAGES = [
 // Helper to add admin auth headers
 const getAdminHeaders = () => {
     const headers: HeadersInit = { 'Content-Type': 'application/json' };
-    // Add ADMIN_SECRET if available (for production without KV)
-    const adminSecret = process.env.NEXT_PUBLIC_ADMIN_SECRET;
-    if (adminSecret) {
-        headers['x-admin-secret'] = adminSecret;
+    // Add ADMIN_PASSWORD if available (for production without KV)
+    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
+    if (adminPassword) {
+        headers['x-admin-secret'] = adminPassword;
     }
     return headers;
 };

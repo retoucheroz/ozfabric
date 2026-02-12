@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession, getUser, getAllUsers, saveUser } from '@/lib/auth';
 
 async function checkAdmin(req?: NextRequest) {
-    // Fallback: Allow admin operations via ADMIN_SECRET header when KV is unavailable
-    const adminSecret = process.env.ADMIN_SECRET;
-    if (adminSecret && req) {
+    // Fallback: Allow admin operations via ADMIN_PASSWORD header when KV is unavailable
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    if (adminPassword && req) {
         const providedSecret = req.headers.get('x-admin-secret');
-        if (providedSecret === adminSecret) {
+        if (providedSecret === adminPassword) {
             return { username: 'admin', role: 'admin' } as any;
         }
     }
