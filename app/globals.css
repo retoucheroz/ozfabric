@@ -83,37 +83,60 @@
 }
 
 .dark {
-  --background: hsl(240 10% 3.9%);
-  --foreground: hsl(0 0% 98%);
-  --card: hsl(240 10% 3.9%);
-  --card-foreground: hsl(0 0% 98%);
-  --popover: hsl(240 10% 3.9%);
-  --popover-foreground: hsl(0 0% 98%);
-  --primary: hsl(0 0% 98%);
-  --primary-foreground: hsl(240 5.9% 10%);
-  --secondary: hsl(240 3.7% 15.9%);
-  --secondary-foreground: hsl(0 0% 98%);
-  --muted: hsl(240 3.7% 15.9%);
-  --muted-foreground: hsl(240 5% 64.9%);
-  --accent: hsl(240 3.7% 15.9%);
-  --accent-foreground: hsl(0 0% 98%);
-  --destructive: hsl(0 62.8% 30.6%);
-  --border: hsl(240 3.7% 15.9%);
-  --input: hsl(240 3.7% 15.9%);
-  --ring: hsl(240 4.9% 83.9%);
-  --chart-1: hsl(220 70% 50%);
-  --chart-2: hsl(160 60% 45%);
-  --chart-3: hsl(30 80% 55%);
-  --chart-4: hsl(280 65% 60%);
-  --chart-5: hsl(340 75% 55%);
-  --sidebar: hsl(240 5.9% 10%);
-  --sidebar-foreground: hsl(240 4.8% 95.9%);
-  --sidebar-primary: hsl(224.3 76.3% 48%);
+  /* Deep Navy Background - Rawless.ai inspired */
+  --background: hsl(220 25% 10%);
+  --foreground: hsl(210 20% 98%);
+
+  /* Glassmorphic Cards */
+  --card: hsla(220 20% 15% / 0.6);
+  --card-foreground: hsl(210 20% 98%);
+
+  /* Popovers with glass effect */
+  --popover: hsla(220 20% 12% / 0.95);
+  --popover-foreground: hsl(210 20% 98%);
+
+  /* Purple Primary - Vibrant accent */
+  --primary: hsl(262 83% 58%);
+  --primary-foreground: hsl(0 0% 100%);
+
+  /* Subtle secondary surfaces */
+  --secondary: hsla(220 15% 18% / 0.5);
+  --secondary-foreground: hsl(210 20% 98%);
+
+  /* Muted elements */
+  --muted: hsla(220 15% 20% / 0.4);
+  --muted-foreground: hsl(215 15% 65%);
+
+  /* Accent with purple glow */
+  --accent: hsla(262 83% 58% / 0.15);
+  --accent-foreground: hsl(262 83% 70%);
+
+  /* Destructive states */
+  --destructive: hsl(0 72% 51%);
+
+  /* Borders - subtle with transparency */
+  --border: hsla(220 15% 25% / 0.3);
+  --input: hsla(220 15% 25% / 0.4);
+
+  /* Ring - purple glow */
+  --ring: hsl(262 83% 58%);
+
+  /* Chart colors - vibrant and modern */
+  --chart-1: hsl(262 83% 58%);
+  --chart-2: hsl(190 80% 50%);
+  --chart-3: hsl(280 70% 60%);
+  --chart-4: hsl(30 90% 60%);
+  --chart-5: hsl(340 80% 60%);
+
+  /* Sidebar - darker glass */
+  --sidebar: hsla(220 25% 8% / 0.8);
+  --sidebar-foreground: hsl(210 20% 90%);
+  --sidebar-primary: hsl(262 83% 58%);
   --sidebar-primary-foreground: hsl(0 0% 100%);
-  --sidebar-accent: hsl(240 3.7% 15.9%);
-  --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
-  --sidebar-border: hsl(240 3.7% 15.9%);
-  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+  --sidebar-accent: hsla(262 83% 58% / 0.1);
+  --sidebar-accent-foreground: hsl(262 83% 70%);
+  --sidebar-border: hsla(220 15% 25% / 0.2);
+  --sidebar-ring: hsl(262 83% 58%);
 }
 
 .pdf-mode {
@@ -152,6 +175,29 @@
     @apply bg-background text-foreground;
   }
 
+  /* Glassmorphism utilities */
+  .glass {
+    @apply backdrop-blur-xl bg-card/60 border border-white/10;
+  }
+
+  .glass-strong {
+    @apply backdrop-blur-2xl bg-card/80 border border-white/15;
+  }
+
+  .glass-subtle {
+    @apply backdrop-blur-md bg-card/40 border border-white/5;
+  }
+
+  /* Purple glow effects */
+  .glow-purple {
+    box-shadow: 0 0 20px hsla(262 83% 58% / 0.3);
+  }
+
+  .glow-purple-sm {
+    box-shadow: 0 0 10px hsla(262 83% 58% / 0.2);
+  }
+
+  /* Scrollbar styling */
   .scrollbar-none::-webkit-scrollbar {
     display: none;
   }
@@ -159,5 +205,25 @@
   .scrollbar-none {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  /* Custom scrollbar for dark theme */
+  .dark ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .dark ::-webkit-scrollbar-track {
+    background: hsla(220 15% 15% / 0.3);
+    border-radius: 4px;
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: hsla(262 83% 58% / 0.3);
+    border-radius: 4px;
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: hsla(262 83% 58% / 0.5);
   }
 }
