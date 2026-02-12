@@ -33,6 +33,17 @@ const AVAILABLE_PAGES = [
     { label: 'Train', path: '/train' },
 ];
 
+// Helper to add admin auth headers
+const getAdminHeaders = () => {
+    const headers: HeadersInit = { 'Content-Type': 'application/json' };
+    // Add ADMIN_SECRET if available (for production without KV)
+    const adminSecret = process.env.NEXT_PUBLIC_ADMIN_SECRET;
+    if (adminSecret) {
+        headers['x-admin-secret'] = adminSecret;
+    }
+    return headers;
+};
+
 export default function AdminPage() {
     const [users, setUsers] = useState<Omit<User, 'passwordHash'>[]>([]);
     const [onlineStats, setOnlineStats] = useState<{ onlineCount: number, users: string[] }>({ onlineCount: 0, users: [] });
@@ -41,9 +52,10 @@ export default function AdminPage() {
     const fetchData = async () => {
         setIsLoading(true);
         try {
+            const headers = getAdminHeaders();
             const [usersRes, onlineRes] = await Promise.all([
-                fetch('/api/admin/users'),
-                fetch('/api/admin/online')
+                fetch('/api/admin/users', { headers }),
+                fetch('/api/admin/online', { headers })
             ]);
 
             if (usersRes.ok) setUsers(await usersRes.json());
@@ -65,7 +77,7 @@ export default function AdminPage() {
         try {
             const res = await fetch('/api/admin/users', {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAdminHeaders(),
                 body: JSON.stringify({ username, updates })
             });
             if (res.ok) {
@@ -129,7 +141,7 @@ export default function AdminPage() {
                         try {
                             const res = await fetch('/api/admin/users', {
                                 method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
+                                headers: getAdminHeaders(),
                                 body: JSON.stringify({ username, password, role })
                             });
                             if (res.ok) {

@@ -1,7 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession, getUser, getAllUsers, saveUser } from '@/lib/auth';
 
-async function checkAdmin() {
+async function checkAdmin(req?: NextRequest) {
+    // Fallback: Allow admin operations via ADMIN_SECRET header when KV is unavailable
+    const adminSecret = process.env.ADMIN_SECRET;
+    if (adminSecret && req) {
+        const providedSecret = req.headers.get('x-admin-secret');
+        if (providedSecret === adminSecret) {
+            return { username: 'admin', role: 'admin' } as any;
+        }
+    }
+
     const session = await getSession();
     if (!session) return null;
     const user = await getUser(session.username);
@@ -9,8 +18,8 @@ async function checkAdmin() {
     return user;
 }
 
-export async function GET() {
-    if (!await checkAdmin()) {
+export async function GET(req: NextRequest) {
+    if (!await checkAdmin(req)) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     const users = await getAllUsers();
@@ -18,7 +27,7 @@ export async function GET() {
 }
 
 export async function PATCH(req: NextRequest) {
-    if (!await checkAdmin()) {
+    if (!await checkAdmin(req)) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     const { username, updates } = await req.json();
@@ -31,7 +40,7 @@ export async function PATCH(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-    if (!await checkAdmin()) {
+    if (!await checkAdmin(req)) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
