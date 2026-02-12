@@ -124,7 +124,7 @@ export default function LoginPage() {
           <form onSubmit={handleLogin} className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="username">{language === 'tr' ? 'Kullanıcı Adı' : 'Username'}</Label>
-              <Input id="username" name="username" type="text" placeholder="ozgur" required disabled={isLoading} />
+              <Input id="username" name="username" type="text" placeholder={language === 'tr' ? 'Kullanıcı Adı' : 'Username'} required disabled={isLoading} />
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">

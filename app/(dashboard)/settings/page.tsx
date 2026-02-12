@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
-import { User, Key, CreditCard, Bell, Shield, LogOut, Moon, Sun } from "lucide-react"
+import { User, Key, CreditCard, Bell, Shield, LogOut, Moon, Sun, Bot } from "lucide-react"
 import { toast } from "sonner"
 import { useProjects } from "@/context/projects-context"
 import { useLanguage } from "@/context/language-context"
@@ -26,11 +26,14 @@ export default function SettingsPage() {
     const [emailUpdates, setEmailUpdates] = useState(true);
     const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const [ozzieEnabled, setOzzieEnabled] = useState(false);
 
     useEffect(() => {
         setMounted(true);
         const stored = localStorage.getItem("retoucheroz_runpod_key");
         if (stored) setApiKey(stored);
+        const ozzieStored = localStorage.getItem("ozzie-chat-enabled");
+        setOzzieEnabled(ozzieStored === "true");
     }, []);
 
     const handleSaveKey = () => {
@@ -120,6 +123,27 @@ export default function SettingsPage() {
                                         />
                                         <Moon className="w-4 h-4" />
                                     </div>
+                                </div>
+                            </Card>
+
+                            {/* Ozzie Chat Toggle */}
+                            <Card className="p-6">
+                                <div className="flex items-center justify-between">
+                                    <div className="space-y-0.5">
+                                        <Label className="flex items-center gap-2">
+                                            <Bot className="w-4 h-4 text-violet-500" />
+                                            {t("settings.ozzieChat")}
+                                        </Label>
+                                        <div className="text-sm text-muted-foreground">{t("settings.ozzieChatDesc")}</div>
+                                    </div>
+                                    <Switch
+                                        checked={ozzieEnabled}
+                                        onCheckedChange={(checked) => {
+                                            setOzzieEnabled(checked);
+                                            localStorage.setItem("ozzie-chat-enabled", checked ? "true" : "false");
+                                            window.dispatchEvent(new Event("ozzie-toggle"));
+                                        }}
+                                    />
                                 </div>
                             </Card>
                         </section>

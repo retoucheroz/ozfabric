@@ -104,7 +104,7 @@ function DrumColumn({ items, activeIndex, onChange, render }: { items: any[], ac
 }
 
 export default function EditorialPage() {
-    const { language } = useLanguage();
+    const { language, t } = useLanguage();
     const { addProject } = useProjects();
     const [isProcessing, setIsProcessing] = useState(false);
 
@@ -340,7 +340,7 @@ export default function EditorialPage() {
                         <Camera className="w-5 h-5 text-white dark:text-zinc-900" />
                     </div>
                     <div>
-                        <h1 className="font-black text-xl tracking-tighter uppercase italic">{language === "tr" ? "EDITORIAL STUDIO" : "EDITORIAL STUDIO"}</h1>
+                        <h1 className="font-black text-xl tracking-tighter uppercase italic">{language === "tr" ? t("sidebar.editorial") : "IMAGE STUDIO"}</h1>
                         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] -mt-1 leading-none shadow-sm shadow-white/10">PROFESSIONAL OPTICS ENGINE</p>
                     </div>
                 </div>
@@ -498,7 +498,7 @@ export default function EditorialPage() {
 
                                         <div className="space-y-6">
                                             {/* PRO PRECISION DRUM PICKER - Solid Dashboard with Direct Controls */}
-                                            <div className="relative h-[210px] bg-zinc-950 rounded-[30px] border border-white/5 overflow-hidden shadow-2xl">
+                                            <div className="relative h-[210px] bg-muted/40 dark:bg-zinc-950 rounded-[30px] border border-border dark:border-white/5 overflow-hidden shadow-2xl">
                                                 {/* HUD Backdrop - Lower Layer */}
                                                 <div className="absolute top-1/2 left-0 -translate-y-1/2 w-full h-[110px] pointer-events-none z-10">
                                                     <div className="absolute inset-0 bg-white/[0.03] border-y border-white/10" />
@@ -610,7 +610,7 @@ export default function EditorialPage() {
                                     <button
                                         onClick={handleGenerate}
                                         disabled={isProcessing}
-                                        className="w-full h-14 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-2xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:grayscale group shadow-2xl shadow-violet-500/20"
+                                        className="w-full h-14 bg-violet-600 hover:bg-violet-700 text-white rounded-2xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:grayscale group shadow-2xl shadow-violet-500/30"
                                     >
                                         {isProcessing ? (
                                             <Loader2 className="w-5 h-5 animate-spin" />

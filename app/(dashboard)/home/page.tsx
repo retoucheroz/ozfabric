@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus, Shirt, Zap, Layers, Sparkles, TrendingUp, Palette, ArrowRight, CreditCard, Wand2, Camera } from "lucide-react"
+import { Plus, Shirt, Zap, Layers, Sparkles, TrendingUp, Palette, ArrowRight, CreditCard, Wand2, Camera, Video as VideoIcon } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { useProjects } from "@/context/projects-context"
@@ -79,7 +79,7 @@ export default function DashboardHome() {
             {/* Quick Actions */}
             <div>
                 <h2 className="text-xl font-semibold tracking-tight mb-4">{t("home.createVisualize")}</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                     {/* 1. Photoshoot */}
                     <Link href="/photoshoot" className="group">
                         <Card className="p-5 hover:bg-accent hover:border-primary/50 transition-all cursor-pointer border-dashed border-2 relative overflow-hidden h-full">
@@ -88,7 +88,7 @@ export default function DashboardHome() {
                                     <div className="p-3 bg-violet-100 dark:bg-violet-900/30 text-violet-600 rounded-xl group-hover:scale-110 transition-transform shrink-0">
                                         <Camera className="w-6 h-6" />
                                     </div>
-                                    <h3 className="font-bold text-lg md:text-xl leading-none tracking-tight">{t("home.photoshootTitle")}</h3>
+                                    <h3 className="font-bold text-lg leading-none tracking-tight">{t("home.photoshootTitle")}</h3>
                                 </div>
                                 <p className="text-sm text-muted-foreground line-clamp-2 pl-1">{t("home.photoshootDesc")}</p>
                             </div>
@@ -96,7 +96,23 @@ export default function DashboardHome() {
                         </Card>
                     </Link>
 
-                    {/* 2. Virtual Try-On */}
+                    {/* 2. Video Studio */}
+                    <Link href="/video" className="group">
+                        <Card className="p-5 hover:bg-accent hover:border-primary/50 transition-all cursor-pointer border-dashed border-2 relative overflow-hidden h-full">
+                            <div className="flex flex-col gap-3">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 bg-lime-100 dark:bg-lime-900/30 text-lime-600 rounded-xl group-hover:scale-110 transition-transform shrink-0">
+                                        <VideoIcon className="w-6 h-6" />
+                                    </div>
+                                    <h3 className="font-bold text-lg leading-none tracking-tight">{t("home.videoTitle")}</h3>
+                                </div>
+                                <p className="text-sm text-muted-foreground line-clamp-2 pl-1">{t("home.videoDesc")}</p>
+                            </div>
+                            <ArrowRight className="absolute top-5 right-5 w-5 h-5 opacity-0 group-hover:opacity-100 transition-all text-lime-500" />
+                        </Card>
+                    </Link>
+
+                    {/* 3. Virtual Try-On */}
                     <Link href="/photoshoot/try-on" className="group">
                         <Card className="p-5 hover:bg-accent hover:border-primary/50 transition-all cursor-pointer border-dashed border-2 relative overflow-hidden h-full">
                             <div className="flex flex-col gap-3">
@@ -104,7 +120,7 @@ export default function DashboardHome() {
                                     <div className="p-3 bg-pink-100 dark:bg-pink-900/30 text-pink-600 rounded-xl group-hover:scale-110 transition-transform shrink-0">
                                         <Sparkles className="w-6 h-6" />
                                     </div>
-                                    <h3 className="font-bold text-lg md:text-xl leading-none tracking-tight">{t("home.virtualTryOn")}</h3>
+                                    <h3 className="font-bold text-lg leading-none tracking-tight">{t("home.virtualTryOn")}</h3>
                                 </div>
                                 <p className="text-sm text-muted-foreground line-clamp-2 pl-1">{t("home.virtualTryOnDesc")}</p>
                             </div>
@@ -112,7 +128,7 @@ export default function DashboardHome() {
                         </Card>
                     </Link>
 
-                    {/* 3. Ghost Model */}
+                    {/* 4. Ghost Model */}
                     <Link href="/photoshoot/ghost" className="group">
                         <Card className="p-5 hover:bg-accent hover:border-primary/50 transition-all cursor-pointer border-dashed border-2 relative overflow-hidden h-full">
                             <div className="flex flex-col gap-3">
@@ -120,7 +136,7 @@ export default function DashboardHome() {
                                     <div className="p-3 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-xl group-hover:scale-110 transition-transform shrink-0">
                                         <Shirt className="w-6 h-6" />
                                     </div>
-                                    <h3 className="font-bold text-lg md:text-xl leading-none tracking-tight">{t("home.ghostModelTitle")}</h3>
+                                    <h3 className="font-bold text-lg leading-none tracking-tight">{t("home.ghostModelTitle")}</h3>
                                 </div>
                                 <p className="text-sm text-muted-foreground line-clamp-2 pl-1">{t("home.ghostModelDesc")}</p>
                             </div>
@@ -128,7 +144,7 @@ export default function DashboardHome() {
                         </Card>
                     </Link>
 
-                    {/* 4. Train */}
+                    {/* 5. Train */}
                     <Link href="/train" className="group">
                         <Card className="p-5 hover:bg-accent hover:border-primary/50 transition-all cursor-pointer border-dashed border-2 relative overflow-hidden h-full">
                             <div className="flex flex-col gap-3">
@@ -136,7 +152,7 @@ export default function DashboardHome() {
                                     <div className="p-3 bg-amber-100 dark:bg-amber-900/30 text-amber-600 rounded-xl group-hover:scale-110 transition-transform shrink-0">
                                         <Zap className="w-6 h-6" />
                                     </div>
-                                    <h3 className="font-bold text-lg md:text-xl leading-none tracking-tight">{t("home.trainTitle")}</h3>
+                                    <h3 className="font-bold text-lg leading-none tracking-tight">{t("home.trainTitle")}</h3>
                                 </div>
                                 <p className="text-sm text-muted-foreground line-clamp-2 pl-1">{t("home.trainDesc")}</p>
                             </div>

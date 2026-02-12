@@ -323,7 +323,7 @@ export default function DetailCreatePage() {
       {/* --- LEFT SIDEBAR (SETTINGS) --- */}
       <div className="w-full lg:w-[420px] lg:border-r border-b lg:border-b-0 bg-background p-4 lg:overflow-y-auto space-y-4 shrink-0 scrollbar-thin scrollbar-thumb-muted-foreground/20">
         <div>
-          <h2 className="text-xl font-bold tracking-tight">{language === "tr" ? "Detay Oluştur" : "Detail Create"}</h2>
+          <h2 className="text-xl font-bold tracking-tight">{t("sidebar.tryOn")}</h2>
           <p className="text-sm text-muted-foreground">{language === "tr" ? "Teknik detay çekimleri ve close-up görseller." : "Technical detail shots and close-ups."}</p>
         </div>
 

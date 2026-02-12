@@ -15,11 +15,13 @@ import {
     Folder,
     Globe,
     Settings,
+    Search,
     Sparkles,
     ChevronLeft,
     ChevronRight,
     ShoppingBag,
     Clock,
+    MonitorPlay,
 } from "lucide-react"
 import { useLanguage } from "@/context/language-context"
 import { Separator } from "@/components/ui/separator"
@@ -59,17 +61,19 @@ export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
 
     const photoshootItems = [
         { label: t("sidebar.aiModel"), href: "/photoshoot", icon: Camera },
-        { label: language === "tr" ? "Detay Oluştur" : "Detail Create", href: "/photoshoot/try-on", icon: Camera },
-        { label: language === "tr" ? "Editorial" : "Editorial", href: "/editorial", icon: Camera },
+        { label: t("sidebar.tryOn"), href: "/photoshoot/try-on", icon: Camera },
+        { label: t("sidebar.editorial"), href: "/editorial", icon: Camera },
+        { label: t("sidebar.video"), href: "/video", icon: MonitorPlay },
         { label: t("sidebar.ghost"), href: "/photoshoot/ghost", icon: UserSquare2 },
     ];
 
     // E-Com as a separate main page
     const ecomItems = [
-        { label: language === "tr" ? "E-Com Stüdyo" : "E-Com Studio", href: "/ecom", icon: ShoppingBag },
+        { label: t("sidebar.ecom"), href: "/ecom", icon: ShoppingBag },
     ];
 
     const toolItems = [
+        { label: t("sidebar.analysis"), href: "/analysis", icon: Search },
         { label: t("sidebar.resize"), href: "/resize", icon: Maximize },
         { label: t("sidebar.techPack"), href: "/studio", icon: FileText },
         { label: t("sidebar.train"), href: "/train", icon: Sparkles },

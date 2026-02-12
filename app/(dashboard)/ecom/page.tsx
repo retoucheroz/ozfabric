@@ -104,7 +104,7 @@ function StudioLoading({ language }: { language: string }) {
                 </div>
             </div>
             <div className="space-y-2">
-                <h3 className="text-xl font-bold text-white">{steps[currentStep].text}</h3>
+                <h3 className="text-xl font-bold text-foreground">{steps[currentStep].text}</h3>
                 <p className="text-muted-foreground">{steps[currentStep].detail}</p>
             </div>
             <div className="flex gap-2">
@@ -113,7 +113,7 @@ function StudioLoading({ language }: { language: string }) {
                         key={i}
                         className={cn(
                             "w-2 h-2 rounded-full transition-all duration-500",
-                            i === currentStep ? "w-8 bg-violet-500" : "bg-zinc-700"
+                            i === currentStep ? "w-8 bg-violet-500" : "bg-muted-foreground/30"
                         )}
                     />
                 ))}
@@ -273,7 +273,7 @@ export default function EComPage() {
                         "aspect-[3/4] rounded-2xl border-2 border-dashed transition-all duration-300 flex flex-col items-center justify-center p-4 cursor-pointer overflow-hidden",
                         hasImage
                             ? "border-violet-500 bg-violet-500/5 shadow-[0_0_20px_rgba(139,92,246,0.1)]"
-                            : "border-zinc-800 bg-zinc-900/50 hover:border-violet-500/50 hover:bg-zinc-800/50"
+                            : "border-border bg-muted/30 hover:border-violet-500/50 hover:bg-muted/50"
                     )}
                     onClick={() => {
                         if (!hasImage) {
@@ -312,12 +312,12 @@ export default function EComPage() {
                         </div>
                     ) : (
                         <>
-                            <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                                <Icon className="w-6 h-6 text-zinc-400 group-hover:text-violet-400" />
+                            <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                <Icon className="w-6 h-6 text-muted-foreground group-hover:text-violet-400" />
                             </div>
-                            <span className="text-xs font-medium text-zinc-500 group-hover:text-zinc-300 text-center">{label}</span>
+                            <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground text-center">{label}</span>
                             <div className="mt-4 flex gap-1">
-                                <Button size="icon" variant="ghost" className="h-7 w-7 rounded-lg bg-zinc-800/50" onClick={(e) => {
+                                <Button size="icon" variant="ghost" className="h-7 w-7 rounded-lg bg-muted/50" onClick={(e) => {
                                     e.stopPropagation();
                                     setLibraryType(type);
                                     setShowLibrary(true);
@@ -340,27 +340,27 @@ export default function EComPage() {
     if (!mounted) return null;
 
     return (
-        <div className="flex flex-col h-[calc(100vh-4rem)] bg-zinc-950 text-zinc-100 overflow-hidden">
-            <div className="h-16 border-b border-zinc-900 bg-zinc-950/80 backdrop-blur-md flex items-center justify-between px-6 shrink-0 z-20">
+        <div className="flex flex-col h-[calc(100vh-4rem)] bg-background text-foreground overflow-hidden">
+            <div className="h-16 border-b border-border bg-background/80 backdrop-blur-md flex items-center justify-between px-6 shrink-0 z-20">
                 <div className="flex items-center gap-4">
                     <div className="p-2 bg-violet-500/10 rounded-xl">
                         <ShoppingBag className="w-5 h-5 text-violet-500" />
                     </div>
                     <div>
                         <h1 className="text-base font-bold tracking-tight">E-Com Studio</h1>
-                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold">Professional Marketplace Assets</p>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">Professional Marketplace Assets</p>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900 rounded-lg border border-zinc-800">
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-lg border border-border">
                         <Zap className="w-4 h-4 text-amber-400 fill-amber-400" />
                         <span className="text-sm font-bold">128</span>
-                        <span className="text-[10px] text-zinc-500 uppercase">Credits</span>
+                        <span className="text-[10px] text-muted-foreground uppercase">Credits</span>
                     </div>
-                    <Separator orientation="vertical" className="h-8 bg-zinc-800" />
+                    <Separator orientation="vertical" className="h-8 bg-border" />
                     <Link href="/history">
-                        <Button variant="outline" size="sm" className="bg-zinc-900 border-zinc-800 hover:bg-zinc-800">
+                        <Button variant="outline" size="sm" className="border-border">
                             <History className="w-4 h-4 mr-2" />
                             {language === "tr" ? "Geçmiş" : "History"}
                         </Button>
@@ -369,21 +369,21 @@ export default function EComPage() {
             </div>
 
             <div className="flex flex-1 overflow-hidden">
-                <div className="w-80 border-r border-zinc-900 flex flex-col shrink-0 bg-zinc-950">
+                <div className="w-80 border-r border-border flex flex-col shrink-0 bg-background">
                     <div className="p-4 flex-1 overflow-y-auto space-y-6 scrollbar-none">
                         <section className="space-y-3">
-                            <Label className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold px-1">Settings</Label>
-                            <div className="space-y-4 bg-zinc-900/30 p-4 rounded-2xl border border-zinc-800/50">
+                            <Label className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold px-1">Settings</Label>
+                            <div className="space-y-4 bg-muted/20 p-4 rounded-2xl border border-border/50">
                                 <div className="space-y-2">
                                     <Label className="text-xs">{language === "tr" ? "Görünüm" : "Aspect Ratio"}</Label>
                                     <Select
                                         value={apiOptions.aspectRatio}
                                         onValueChange={(v) => setApiOptions(p => ({ ...p, aspectRatio: v }))}
                                     >
-                                        <SelectTrigger className="bg-zinc-950 border-zinc-800 rounded-xl h-10">
+                                        <SelectTrigger className="bg-background border-border rounded-xl h-10">
                                             <SelectValue />
                                         </SelectTrigger>
-                                        <SelectContent className="bg-zinc-900 border-zinc-800">
+                                        <SelectContent className="bg-popover border-border">
                                             {ASPECT_RATIOS.map(ar => (
                                                 <SelectItem key={ar.value} value={ar.value}>{ar.label}</SelectItem>
                                             ))}
@@ -399,7 +399,7 @@ export default function EComPage() {
                                                 size="sm"
                                                 variant={apiOptions.resolution === res ? "default" : "outline"}
                                                 onClick={() => setApiOptions(p => ({ ...p, resolution: res as any }))}
-                                                className={cn("h-9 rounded-lg text-[10px] font-bold", apiOptions.resolution === res ? "bg-violet-600 hover:bg-violet-700" : "bg-transparent border-zinc-800")}
+                                                className={cn("h-9 rounded-lg text-[10px] font-bold", apiOptions.resolution === res ? "bg-violet-600 hover:bg-violet-700" : "bg-transparent border-border")}
                                             >
                                                 {res}
                                             </Button>
@@ -407,31 +407,31 @@ export default function EComPage() {
                                     </div>
                                 </div>
 
-                                <div className="space-y-2 pt-2 border-t border-zinc-800/50">
-                                    <Label className="text-[10px] uppercase text-zinc-500 font-bold">{language === "tr" ? "Gelişmiş Ayarlar" : "Advanced Settings"}</Label>
+                                <div className="space-y-2 pt-2 border-t border-border/50">
+                                    <Label className="text-[10px] uppercase text-muted-foreground font-bold">{language === "tr" ? "Gelişmiş Ayarlar" : "Advanced Settings"}</Label>
                                     <div className="grid grid-cols-2 gap-2">
                                         <div className="space-y-1.5">
-                                            <Label className="text-[10px] text-zinc-400">Seed</Label>
+                                            <Label className="text-[10px] text-muted-foreground">Seed</Label>
                                             <input
                                                 type="number"
                                                 placeholder="Random"
-                                                className="w-full h-8 bg-zinc-950 border border-zinc-800 rounded-lg px-2 text-[10px] focus:outline-none focus:border-violet-500/50"
+                                                className="w-full h-8 bg-background border border-border rounded-lg px-2 text-[10px] focus:outline-none focus:border-violet-500/50"
                                                 value={apiOptions.seed || ""}
                                                 onChange={(e) => setApiOptions(p => ({ ...p, seed: e.target.value === "" ? undefined : Number(e.target.value) }))}
                                             />
                                         </div>
                                         <div className="space-y-1.5">
-                                            <Label className="text-[10px] text-zinc-400">Web Search</Label>
+                                            <Label className="text-[10px] text-muted-foreground">Web Search</Label>
                                             <Button
                                                 variant="outline"
                                                 size="sm"
                                                 onClick={() => setApiOptions(p => ({ ...p, enableWebSearch: !p.enableWebSearch }))}
                                                 className={cn(
-                                                    "w-full h-8 rounded-lg text-[10px] font-bold border-zinc-800 transition-all",
+                                                    "w-full h-8 rounded-lg text-[10px] font-bold border-border transition-all",
                                                     apiOptions.enableWebSearch ? "bg-violet-500/10 border-violet-500/50 text-violet-400" : "bg-transparent"
                                                 )}
                                             >
-                                                <Globe className={cn("w-3 h-3 mr-1.5", apiOptions.enableWebSearch ? "text-violet-400" : "text-zinc-500")} />
+                                                <Globe className={cn("w-3 h-3 mr-1.5", apiOptions.enableWebSearch ? "text-violet-400" : "text-muted-foreground")} />
                                                 {apiOptions.enableWebSearch ? "ON" : "OFF"}
                                             </Button>
                                         </div>
@@ -441,16 +441,16 @@ export default function EComPage() {
                         </section>
 
                         <section className="space-y-3">
-                            <Label className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold px-1">Concept Generator</Label>
+                            <Label className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold px-1">Concept Generator</Label>
                             <div className="space-y-3">
                                 <Textarea
-                                    className="min-h-[140px] bg-zinc-900/50 border-zinc-800 rounded-2xl resize-none text-sm placeholder:text-zinc-700 focus:border-violet-500/50 transition-colors"
+                                    className="min-h-[140px] bg-muted/30 border-border rounded-2xl resize-none text-sm placeholder:text-muted-foreground/50 focus:border-violet-500/50 transition-colors"
                                     placeholder={language === "tr" ? "Kıyafetinizi ve sahneyi hayal edin..." : "Imagine your outfit and scene..."}
                                     value={userPrompt}
                                     onChange={(e) => setUserPrompt(e.target.value)}
                                 />
                                 <Button
-                                    className="w-full bg-white text-black hover:bg-zinc-200 h-11 rounded-xl font-bold transition-all active:scale-95"
+                                    className="w-full bg-violet-600 hover:bg-violet-700 text-white h-11 rounded-xl font-bold transition-all active:scale-95"
                                     disabled={isAnalyzing}
                                     onClick={handleAnalyze}
                                 >
@@ -467,7 +467,7 @@ export default function EComPage() {
                                         <Sparkles className="w-4 h-4" />
                                         <span className="text-xs font-bold uppercase tracking-wider">AI Insight</span>
                                     </div>
-                                    <p className="text-xs text-zinc-400 leading-relaxed italic">
+                                    <p className="text-xs text-muted-foreground leading-relaxed italic">
                                         "{structuredPrompt.intent}"
                                     </p>
                                     <Button
@@ -475,7 +475,7 @@ export default function EComPage() {
                                         size="sm"
                                         className={cn(
                                             "w-full h-8 flex items-center justify-between text-[10px] font-bold transition-colors",
-                                            isEditingPrompt ? "text-violet-400" : "text-zinc-500"
+                                            isEditingPrompt ? "text-violet-400" : "text-muted-foreground"
                                         )}
                                         onClick={() => setIsEditingPrompt(!isEditingPrompt)}
                                     >
@@ -489,13 +489,13 @@ export default function EComPage() {
                                         <Textarea
                                             value={promptJsonString}
                                             onChange={(e) => setPromptJsonString(e.target.value)}
-                                            className="font-mono text-[10px] min-h-[300px] bg-zinc-950 border-zinc-800 rounded-xl leading-relaxed custom-scrollbar"
+                                            className="font-mono text-[10px] min-h-[300px] bg-background border-border rounded-xl leading-relaxed custom-scrollbar"
                                         />
                                         <div className="flex gap-2">
                                             <Button
                                                 size="sm"
                                                 variant="outline"
-                                                className="flex-1 bg-zinc-900 border-zinc-800 text-xs rounded-xl"
+                                                className="flex-1 border-border text-xs rounded-xl"
                                                 onClick={() => setIsEditingPrompt(false)}
                                             >
                                                 {language === "tr" ? "Vazgeç" : "Cancel"}
@@ -516,12 +516,12 @@ export default function EComPage() {
                     </div>
                 </div>
 
-                <div className="flex-1 flex flex-col bg-zinc-900/20 relative overflow-hidden">
+                <div className="flex-1 flex flex-col bg-muted/10 relative overflow-hidden">
                     <div className="flex-1 overflow-y-auto p-12 custom-scrollbar">
                         <div className="max-w-4xl mx-auto space-y-12">
                             <div className="text-center space-y-2 mb-12 animate-in fade-in zoom-in duration-700">
-                                <h2 className="text-3xl font-black tracking-tight text-white">{language === "tr" ? "Ürün Konuşlandırma" : "Asset Orchestration"}</h2>
-                                <p className="text-sm text-zinc-500">{language === "tr" ? "Çekim için gerekli tüm bileşenleri yerleştirin" : "Arrange all essential components for the shoot"}</p>
+                                <h2 className="text-3xl font-black tracking-tight text-foreground">{language === "tr" ? "Ürün Konuşlandırma" : "Asset Orchestration"}</h2>
+                                <p className="text-sm text-muted-foreground">{language === "tr" ? "Çekim için gerekli tüm bileşenleri yerleştirin" : "Arrange all essential components for the shoot"}</p>
                             </div>
 
                             <div className="grid grid-cols-4 gap-6">
@@ -537,7 +537,7 @@ export default function EComPage() {
                                     className={cn(
                                         "px-12 h-16 rounded-2xl text-lg font-black tracking-tight transition-all duration-500 shadow-[0_0_30px_rgba(139,92,246,0.2)]",
                                         isGenerating
-                                            ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
+                                            ? "bg-muted text-muted-foreground cursor-not-allowed"
                                             : "bg-violet-600 hover:bg-violet-500 text-white hover:scale-105 active:scale-95"
                                     )}
                                     onClick={handleGenerate}
@@ -560,30 +560,30 @@ export default function EComPage() {
                     </div>
 
                     {isGenerating && (
-                        <div className="absolute inset-0 z-50 bg-black/90 backdrop-blur-xl animate-in fade-in duration-500 flex items-center justify-center">
+                        <div className="absolute inset-0 z-50 bg-background/90 backdrop-blur-xl animate-in fade-in duration-500 flex items-center justify-center">
                             <StudioLoading language={language} />
                         </div>
                     )}
                 </div>
 
-                <div className="w-96 border-l border-zinc-900 bg-zinc-950 flex flex-col shrink-0 overflow-hidden">
+                <div className="w-96 border-l border-border bg-background flex flex-col shrink-0 overflow-hidden">
                     <div className="h-full flex flex-col">
-                        <div className="p-4 border-b border-zinc-900">
+                        <div className="p-4 border-b border-border">
                             <div className="flex items-center justify-between mb-4">
-                                <Label className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold">Studio Output</Label>
+                                <Label className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Studio Output</Label>
                                 {generatedImage && (
                                     <div className="flex gap-1">
-                                        <Button size="icon" variant="ghost" className="h-8 w-8 text-zinc-400 hover:text-white">
+                                        <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-foreground">
                                             <RefreshCw className="w-4 h-4" />
                                         </Button>
-                                        <Button size="icon" variant="ghost" className="h-8 w-8 text-zinc-400 hover:text-white">
+                                        <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-foreground">
                                             <Download className="w-4 h-4" />
                                         </Button>
                                     </div>
                                 )}
                             </div>
 
-                            <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800 flex flex-col items-center justify-center relative group">
+                            <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-muted border border-border flex flex-col items-center justify-center relative group">
                                 {generatedImage ? (
                                     <>
                                         <img src={generatedImage} alt="Result" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
@@ -596,12 +596,12 @@ export default function EComPage() {
                                     </>
                                 ) : (
                                     <div className="flex flex-col items-center gap-4 px-12 text-center">
-                                        <div className="w-16 h-16 rounded-full bg-zinc-800/50 flex items-center justify-center border border-zinc-700/50">
-                                            <Eye className="w-8 h-8 text-zinc-600" />
+                                        <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center border border-border/50">
+                                            <Eye className="w-8 h-8 text-muted-foreground" />
                                         </div>
                                         <div className="space-y-1">
-                                            <p className="text-sm font-bold text-zinc-400">{language === "tr" ? "Stüdyo Hazır" : "Studio Ready"}</p>
-                                            <p className="text-[10px] text-zinc-600 leading-relaxed uppercase tracking-wider">{language === "tr" ? "Çekim bittiğinde sonuçlar burada kalibre edilecektir" : "Results will be calibrated here after production"}</p>
+                                            <p className="text-sm font-bold text-muted-foreground">{language === "tr" ? "Stüdyo Hazır" : "Studio Ready"}</p>
+                                            <p className="text-[10px] text-muted-foreground/60 leading-relaxed uppercase tracking-wider">{language === "tr" ? "Çekim bittiğinde sonuçlar burada kalibre edilecektir" : "Results will be calibrated here after production"}</p>
                                         </div>
                                     </div>
                                 )}
@@ -621,12 +621,12 @@ export default function EComPage() {
                         </div>
 
                         <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                            <Label className="text-[10px] uppercase tracking-widest text-zinc-600 font-bold px-1">Session History</Label>
+                            <Label className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-bold px-1">Session History</Label>
                             <div className="grid grid-cols-2 gap-3">
                                 {[...Array(4)].map((_, i) => (
-                                    <div key={i} className="aspect-square rounded-xl bg-zinc-900 border border-zinc-800/50 opacity-20 hover:opacity-100 transition-opacity cursor-not-allowed">
+                                    <div key={i} className="aspect-square rounded-xl bg-muted border border-border/50 opacity-20 hover:opacity-100 transition-opacity cursor-not-allowed">
                                         <div className="w-full h-full flex items-center justify-center">
-                                            <ImageIcon className="w-5 h-5 text-zinc-700" />
+                                            <ImageIcon className="w-5 h-5 text-muted-foreground" />
                                         </div>
                                     </div>
                                 ))}
@@ -637,12 +637,12 @@ export default function EComPage() {
             </div>
 
             <Dialog open={showLibrary} onOpenChange={setShowLibrary}>
-                <DialogContent className="max-w-4xl bg-zinc-950 border-zinc-900 p-0 overflow-hidden h-[80vh] flex flex-col">
-                    <DialogHeader className="p-6 border-b border-zinc-900 flex flex-row items-center justify-between space-y-0">
+                <DialogContent className="max-w-4xl bg-background border-border p-0 overflow-hidden h-[80vh] flex flex-col">
+                    <DialogHeader className="p-6 border-b border-border flex flex-row items-center justify-between space-y-0">
                         <div className="flex items-center gap-3">
                             <Library className="w-5 h-5 text-violet-500" />
                             <DialogTitle className="text-lg font-bold">
-                                Asset Library / <span className="text-zinc-500 capitalize">{libraryType}</span>
+                                Asset Library / <span className="text-muted-foreground capitalize">{libraryType}</span>
                             </DialogTitle>
                             <DialogDescription className="sr-only">
                                 Manage and select assets for your e-commerce shoot
@@ -652,10 +652,10 @@ export default function EComPage() {
                             <X className="w-5 h-5" />
                         </Button>
                     </DialogHeader>
-                    <div className="flex-1 overflow-y-auto p-6 flex flex-col items-center justify-center text-zinc-500 gap-4">
+                    <div className="flex-1 overflow-y-auto p-6 flex flex-col items-center justify-center text-muted-foreground gap-4">
                         <FolderOpen className="w-12 h-12 opacity-20" />
                         <p className="text-sm font-medium uppercase tracking-widest">No assets found in target directory</p>
-                        <Button variant="outline" className="border-zinc-800 rounded-xl">Upload New Asset</Button>
+                        <Button variant="outline" className="border-border rounded-xl">Upload New Asset</Button>
                     </div>
                 </DialogContent>
             </Dialog>

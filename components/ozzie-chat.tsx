@@ -22,7 +22,29 @@ export function OzzieChat() {
     const [input, setInput] = useState("");
     const [messages, setMessages] = useState<Message[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [enabled, setEnabled] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
+
+    // Check localStorage for enabled state
+    useEffect(() => {
+        const stored = localStorage.getItem("ozzie-chat-enabled");
+        setEnabled(stored === "true");
+    }, []);
+
+    // Listen for changes from settings page
+    useEffect(() => {
+        const handleStorage = () => {
+            const stored = localStorage.getItem("ozzie-chat-enabled");
+            setEnabled(stored === "true");
+        };
+        window.addEventListener("storage", handleStorage);
+        // Also listen for custom event from same tab
+        window.addEventListener("ozzie-toggle", handleStorage);
+        return () => {
+            window.removeEventListener("storage", handleStorage);
+            window.removeEventListener("ozzie-toggle", handleStorage);
+        };
+    }, []);
 
     // Set initial message
     useEffect(() => {
@@ -80,6 +102,9 @@ export function OzzieChat() {
             setIsLoading(false);
         }
     };
+
+    // Don't render if not enabled
+    if (!enabled) return null;
 
     return (
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
