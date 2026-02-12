@@ -1993,16 +1993,29 @@ export default function PhotoshootPage() {
             if (genderValue !== 'skip') {
                 const optimizedThumb = await resizeImageToThumbnail(tempPoseData.original);
 
-                // Upload to R2 if enabled
+                // Upload to R2 if enabled - Using the Server Bridge for reliability
                 let finalUrl = tempPoseData.original;
                 let finalStickmanUrl = stickmanUrl;
 
                 if (process.env.NEXT_PUBLIC_USE_R2_UPLOAD === "true") {
                     try {
                         toast.info(language === "tr" ? "Poz buluta kaydediliyor..." : "Saving pose to cloud...");
+
+                        // Universal Server Upload helper
+                        const serverUpload = async (b64: string, name: string) => {
+                            const res = await fetch("/api/r2/upload", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ base64: b64, fileName: name, folder: "poses" })
+                            });
+                            if (!res.ok) throw new Error("Server upload failed");
+                            const data = await res.json();
+                            return data.url;
+                        };
+
                         const [r2Url, r2Stickman] = await Promise.all([
-                            uploadToR2(tempPoseData.original, "pose_original.png"),
-                            uploadToR2(stickmanUrl, "pose_stickman.png")
+                            serverUpload(tempPoseData.original, "pose_original.png"),
+                            serverUpload(stickmanUrl, "pose_stickman.png")
                         ]);
                         finalUrl = r2Url;
                         finalStickmanUrl = r2Stickman;
@@ -2053,7 +2066,14 @@ export default function PhotoshootPage() {
         if (process.env.NEXT_PUBLIC_USE_R2_UPLOAD === "true") {
             try {
                 toast.info(language === "tr" ? "Model buluta kaydediliyor..." : "Saving model to cloud...");
-                finalUrl = await uploadToR2(tempModelData.url, "model.png");
+                const res = await fetch("/api/r2/upload", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ base64: tempModelData.url, fileName: "model.png", folder: "models" })
+                });
+                if (!res.ok) throw new Error("Server upload failed");
+                const data = await res.json();
+                finalUrl = data.url;
             } catch (r2Error) {
                 console.error("R2 Model Upload Error:", r2Error);
                 toast.error(language === "tr" ? "Buluta yükleme başarısız." : "Cloud upload failed.");
@@ -2095,7 +2115,14 @@ export default function PhotoshootPage() {
         if (process.env.NEXT_PUBLIC_USE_R2_UPLOAD === "true") {
             try {
                 toast.info(language === "tr" ? "Öğe buluta kaydediliyor..." : "Saving item to cloud...");
-                finalUrl = await uploadToR2(url, `${key}.png`);
+                const res = await fetch("/api/r2/upload", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ base64: url, fileName: `${key}.png`, folder: key })
+                });
+                if (!res.ok) throw new Error("Server upload failed");
+                const data = await res.json();
+                finalUrl = data.url;
             } catch (r2Error) {
                 console.error(`R2 ${key} Upload Error:`, r2Error);
                 toast.error(language === "tr" ? "Buluta yükleme başarısız." : "Cloud upload failed.");
