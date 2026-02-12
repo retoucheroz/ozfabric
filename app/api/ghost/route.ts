@@ -93,9 +93,19 @@ export async function POST(req: NextRequest) {
         }
 
         const data = await response.json();
-        const imageUrl = data.images?.[0]?.url;
+        let imageUrl = data.images?.[0]?.url;
 
         if (imageUrl) {
+            // Persist to R2 if configured
+            if (process.env.R2_BUCKET) {
+                try {
+                    const { uploadFromUrl } = await import("@/lib/r2");
+                    imageUrl = await uploadFromUrl(imageUrl, "ghost");
+                    console.log('Ghost Persisted to R2:', imageUrl);
+                } catch (r2Error) {
+                    console.error('R2 ghost persistence error:', r2Error);
+                }
+            }
             return NextResponse.json({ status: "completed", imageUrl: imageUrl });
         }
 

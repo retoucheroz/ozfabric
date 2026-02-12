@@ -63,8 +63,22 @@ export async function POST(req: NextRequest) {
         }
 
         const data = await response.json();
+        const falUrls = data.images?.map((img: any) => img.url) || [];
+
+        // Persist to R2 if configured
+        let finalUrls = falUrls;
+        if (falUrls.length > 0 && process.env.R2_BUCKET) {
+            try {
+                const { uploadFromUrl } = await import("@/lib/r2");
+                finalUrls = await Promise.all(falUrls.map((url: string) => uploadFromUrl(url, "editorial")));
+                console.log('Editorial Persisted to R2:', finalUrls);
+            } catch (r2Error) {
+                console.error('R2 editorial persistence error:', r2Error);
+            }
+        }
+
         return NextResponse.json({
-            images: data.images?.map((img: any) => img.url) || [],
+            images: finalUrls,
             prompt: finalPrompt,
             seed: finalSeed
         });

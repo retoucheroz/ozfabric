@@ -147,8 +147,20 @@ export async function POST(req: NextRequest) {
 
         console.log('Generated image URL:', imageUrl)
 
+        // Persist to R2 if configured
+        let finalImageUrl = imageUrl;
+        if (process.env.R2_BUCKET) {
+            try {
+                const { uploadFromUrl } = await import("@/lib/r2");
+                finalImageUrl = await uploadFromUrl(imageUrl, "ecom");
+                console.log('Persisted to R2:', finalImageUrl);
+            } catch (r2Error) {
+                console.error('R2 persistence error:', r2Error);
+            }
+        }
+
         return NextResponse.json({
-            imageUrl,
+            imageUrl: finalImageUrl,
             success: true
         })
 

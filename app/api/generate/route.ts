@@ -843,7 +843,16 @@ export async function POST(req: NextRequest) {
                 throw new Error(`Fal API Error (${view}): ${err}`);
             }
             const data = await response.json();
-            return data.images?.[0]?.url;
+            const falUrl = data.images?.[0]?.url;
+
+            // If R2 is configured, persist the image to R2
+            if (falUrl && process.env.R2_BUCKET) {
+                const { uploadFromUrl } = await import("@/lib/r2");
+                const r2Url = await uploadFromUrl(falUrl);
+                return r2Url;
+            }
+
+            return falUrl;
         };
 
         // === PREVIEW MODE ===

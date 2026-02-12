@@ -56,8 +56,21 @@ export async function POST(req: NextRequest) {
         }
 
         const data = await response.json();
+        let imageUrl = data.images?.[0]?.url;
+
+        // Persist to R2 if configured
+        if (imageUrl && process.env.R2_BUCKET) {
+            try {
+                const { uploadFromUrl } = await import("@/lib/r2");
+                imageUrl = await uploadFromUrl(imageUrl, "face-swap");
+                console.log('FaceSwap Persisted to R2:', imageUrl);
+            } catch (r2Error) {
+                console.error('R2 faceswap persistence error:', r2Error);
+            }
+        }
+
         return NextResponse.json({
-            image: data.images?.[0]?.url,
+            image: imageUrl,
             status: "success"
         });
 
