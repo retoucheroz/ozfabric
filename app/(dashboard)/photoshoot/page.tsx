@@ -1991,13 +1991,24 @@ export default function PhotoshootPage() {
 
             if (genderValue !== 'skip') {
                 const optimizedThumb = await resizeImageToThumbnail(tempPoseData.original);
+
+                // Upload to R2 if enabled
+                let finalUrl = tempPoseData.original;
+                let finalStickmanUrl = stickmanUrl;
+
+                if (process.env.NEXT_PUBLIC_USE_R2_UPLOAD === "true") {
+                    toast.info(language === "tr" ? "Buluta kaydediliyor..." : "Saving to cloud...");
+                    finalUrl = await uploadToR2(tempPoseData.original, "pose_original.png");
+                    finalStickmanUrl = await uploadToR2(stickmanUrl, "pose_stickman.png");
+                }
+
                 const newPose: SavedPose = {
                     id: crypto.randomUUID(),
-                    url: tempPoseData.original,
+                    url: finalUrl,
                     name: language === "tr" ? "Yeni Poz" : "New Pose",
                     thumbUrl: optimizedThumb,
                     originalThumb: optimizedThumb,
-                    stickmanUrl: stickmanUrl,
+                    stickmanUrl: finalStickmanUrl,
                     gender: genderValue,
                     createdAt: Date.now()
                 };
@@ -2005,6 +2016,10 @@ export default function PhotoshootPage() {
                 setSavedPoses(updated);
                 await dbOperations.add(STORES.POSES, newPose);
                 toast.success(language === "tr" ? "Poz kütüphaneye kaydedildi" : "Pose saved to library");
+
+                // Update active assets to use R2 link
+                setAssets(prev => ({ ...prev, pose: finalStickmanUrl }));
+                setPoseStickman(finalStickmanUrl);
             }
             setTempPoseData(null);
         } catch (e) {
@@ -2023,12 +2038,20 @@ export default function PhotoshootPage() {
     // MODEL HANDLERS
     const handleSaveModel = async () => {
         if (!tempModelData) return;
+
+        // Upload to R2 if enabled
+        let finalUrl = tempModelData.url;
+        if (process.env.NEXT_PUBLIC_USE_R2_UPLOAD === "true") {
+            toast.info(language === "tr" ? "Model buluta kaydediliyor..." : "Saving model to cloud...");
+            finalUrl = await uploadToR2(tempModelData.url, "model.png");
+        }
+
         const newModel: SavedModel = {
             id: crypto.randomUUID(),
-            url: tempModelData.url,
+            url: finalUrl,
             name: tempModelData.name || (language === "tr" ? "Yeni Model" : "New Model"),
             gender: tempModelData.gender,
-            thumbUrl: tempModelData.url,
+            thumbUrl: finalUrl,
             createdAt: Date.now()
         };
         const updated = [newModel, ...savedModels];
@@ -2053,11 +2076,19 @@ export default function PhotoshootPage() {
     const handleSaveAsset = async () => {
         if (!tempAssetData) return;
         const { key, url, name } = tempAssetData;
+
+        // Upload to R2 if enabled
+        let finalUrl = url;
+        if (process.env.NEXT_PUBLIC_USE_R2_UPLOAD === "true") {
+            toast.info(language === "tr" ? "Öğe buluta kaydediliyor..." : "Saving item to cloud...");
+            finalUrl = await uploadToR2(url, `${key}.png`);
+        }
+
         const newItem: LibraryItem = {
             id: crypto.randomUUID(),
-            url,
+            url: finalUrl,
             name: name || (language === "tr" ? "Yeni Öğe" : "New Item"),
-            thumbUrl: url,
+            thumbUrl: finalUrl,
             createdAt: Date.now()
         };
 
@@ -2100,7 +2131,7 @@ export default function PhotoshootPage() {
         }
 
         toast.success(language === "tr" ? "Öğe kütüphaneye kaydedildi" : "Item saved to library");
-        setAssets(prev => ({ ...prev, [key]: url }));
+        setAssets(prev => ({ ...prev, [key]: finalUrl }));
         setAssetsHighRes(prev => ({ ...prev, [key]: null }));
         setTempAssetData(null);
         setShowSaveAssetDialog(false);
@@ -2149,9 +2180,17 @@ export default function PhotoshootPage() {
 
     const handleSaveLighting = async () => {
         if (!tempLightingData) return;
+
+        // Upload to R2 if enabled
+        let finalUrl = tempLightingData.url;
+        if (process.env.NEXT_PUBLIC_USE_R2_UPLOAD === "true" && finalUrl.startsWith('data:')) {
+            toast.info(language === "tr" ? "Işık referansı buluta kaydediliyor..." : "Saving lighting reference to cloud...");
+            finalUrl = await uploadToR2(tempLightingData.url, "lighting_setup.png");
+        }
+
         const newLighting: SavedLighting = {
             id: `lighting-${Date.now()}`,
-            url: tempLightingData.url,
+            url: finalUrl,
             name: tempLightingData.name || (language === "tr" ? "Yeni Işık" : "New Lighting"),
             positivePrompt: tempLightingData.positivePrompt,
             negativePrompt: tempLightingData.negativePrompt,
