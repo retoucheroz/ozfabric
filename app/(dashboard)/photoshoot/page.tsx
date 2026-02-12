@@ -2066,10 +2066,19 @@ export default function PhotoshootPage() {
         if (process.env.NEXT_PUBLIC_USE_R2_UPLOAD === "true") {
             try {
                 toast.info(language === "tr" ? "Model buluta kaydediliyor..." : "Saving model to cloud...");
+
+                // Models should be high quality (2048px)
+                // If the temp data has lowRes, we find the highRes version from assetsHighRes
+                const uploadSource = assetsHighRes.model || tempModelData.url;
+
                 const res = await fetch("/api/r2/upload", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ base64: tempModelData.url, fileName: "model.png", folder: "models" })
+                    body: JSON.stringify({
+                        base64: uploadSource,
+                        fileName: "model.png",
+                        folder: "models"
+                    })
                 });
                 if (!res.ok) throw new Error("Server upload failed");
                 const data = await res.json();
@@ -2115,10 +2124,18 @@ export default function PhotoshootPage() {
         if (process.env.NEXT_PUBLIC_USE_R2_UPLOAD === "true") {
             try {
                 toast.info(language === "tr" ? "Öğe buluta kaydediliyor..." : "Saving item to cloud...");
+
+                // Use the highest available resolution for the library
+                const uploadSource = assetsHighRes[key] || url;
+
                 const res = await fetch("/api/r2/upload", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ base64: url, fileName: `${key}.png`, folder: key })
+                    body: JSON.stringify({
+                        base64: uploadSource,
+                        fileName: `${key}.png`,
+                        folder: key
+                    })
                 });
                 if (!res.ok) throw new Error("Server upload failed");
                 const data = await res.json();
