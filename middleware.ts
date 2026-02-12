@@ -15,8 +15,11 @@ export async function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
-    const isKvMissing = !process.env.KV_REST_API_URL && !process.env.KV_URL;
-    if (process.env.NODE_ENV === 'development' && isKvMissing) {
+    const isKvConfigured = !!(process.env.KV_REST_API_URL || process.env.KV_URL);
+
+    // If KV is not configured, we allow access in dev or show a warning in prod
+    if (!isKvConfigured) {
+        console.warn('⚠️ Middleware: KV is not configured. Authentication is bypassed.');
         return NextResponse.next();
     }
 
@@ -29,11 +32,13 @@ export async function middleware(request: NextRequest) {
         // We use KV directly here because Middleware handles KV well
         const session = await kv.get<{ username: string }>(`session:${sessionId}`);
         if (!session) {
+            console.log('🚫 Middleware: Session not found');
             return NextResponse.redirect(new URL('/', request.url));
         }
 
         const user = await kv.get<{ role: string, status: string, authorizedPages: string[] }>(`user:${session.username}`);
         if (!user || user.status !== 'active') {
+            console.log(`🚫 Middleware: User ${session.username} not found or inactive`);
             return NextResponse.redirect(new URL('/', request.url));
         }
 
