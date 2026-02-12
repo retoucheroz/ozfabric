@@ -39,6 +39,7 @@ export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
     const [isExpanded, setIsExpanded] = useState(true);
     const [user, setUser] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isKvActive, setIsKvActive] = useState(true);
 
     useEffect(() => {
         setMounted(true);
@@ -51,6 +52,7 @@ export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
         fetch('/api/auth/session')
             .then(res => res.json())
             .then(data => {
+                setIsKvActive(data.isKvActive);
                 if (data.authenticated) {
                     setUser(data.user);
                 }
@@ -70,6 +72,9 @@ export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
     ) : null;
 
     const isAuthorized = (path: string) => {
+        // If KV is not active, we are in bypass mode (either local or initial setup)
+        if (!isKvActive) return true;
+
         // While loading, show everything to prevent flicker
         if (isLoading) return true;
 
@@ -107,7 +112,7 @@ export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
         { label: t("sidebar.history"), href: "/history", icon: Clock },
     ].filter(item => isAuthorized(item.href));
 
-    const showAdminLink = user?.role === 'admin' || (process.env.NODE_ENV === 'development' && (isLoading || !user));
+    const showAdminLink = user?.role === 'admin' || !isKvActive || (process.env.NODE_ENV === 'development' && (isLoading || !user));
 
     const adminItems = showAdminLink ? [
         { label: 'Admin Panel', href: '/admin', icon: Shield },
