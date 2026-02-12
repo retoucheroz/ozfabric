@@ -29,11 +29,17 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Both images are required" }, { status: 400 });
         }
 
+        const { ensureR2Url } = await import("@/lib/r2");
+        const [sanitizedRef, sanitizedBase] = await Promise.all([
+            ensureR2Url(referenceImageUrl, "face-swap/ref"),
+            ensureR2Url(baseImageUrl, "face-swap/base")
+        ]);
+
         const prompt = swapMode === 'head_swap' ? HEAD_SWAP_PROMPT : FACE_SWAP_PROMPT;
         const negative_prompt = swapMode === 'head_swap' ? HEAD_SWAP_NEGATIVE : FACE_SWAP_NEGATIVE;
 
         const falPayload = {
-            image_urls: [referenceImageUrl, baseImageUrl],
+            image_urls: [sanitizedRef, sanitizedBase],
             prompt,
             negative_prompt,
             output_format: "png",

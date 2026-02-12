@@ -60,53 +60,13 @@ export async function POST(req: NextRequest) {
 
         // Add images if provided
         if (images && images.length > 0) {
-            // Filter valid images
-            const validImages = images.filter(img => img && img.length > 0)
+            const { ensureR2Url } = await import("@/lib/r2");
+            const imageUrls: string[] = await Promise.all(
+                images.filter(img => img && img.length > 0).map(img => ensureR2Url(img, "ecom/inputs"))
+            );
 
-            if (validImages.length > 0) {
-                // For base64 images, we'll need to upload them first
-                const imageUrls: string[] = []
-
-                for (const img of validImages) {
-                    if (img.startsWith('data:')) {
-                        // Upload base64 to fal storage
-                        try {
-                            // Convert base64 to blob
-                            const base64Data = img.split(',')[1]
-                            const mimeType = img.split(':')[1].split(';')[0]
-
-                            // Upload to fal storage
-                            const uploadResponse = await fetch('https://fal.run/fal-ai/nanobanana-pro/storage/upload', {
-                                method: 'POST',
-                                headers: {
-                                    'Authorization': `Key ${process.env.FAL_KEY}`,
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({
-                                    file_data: base64Data,
-                                    content_type: mimeType
-                                })
-                            })
-
-                            if (uploadResponse.ok) {
-                                const uploadData = await uploadResponse.json()
-                                if (uploadData.url) {
-                                    imageUrls.push(uploadData.url)
-                                }
-                            }
-                        } catch (uploadError) {
-                            console.error('Image upload error:', uploadError)
-                            // Fallback: use base64 directly
-                            imageUrls.push(img)
-                        }
-                    } else if (img.startsWith('http')) {
-                        imageUrls.push(img)
-                    }
-                }
-
-                if (imageUrls.length > 0) {
-                    falRequest.image_urls = imageUrls
-                }
+            if (imageUrls.length > 0) {
+                falRequest.image_urls = imageUrls;
             }
         }
 

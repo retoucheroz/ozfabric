@@ -34,10 +34,14 @@ export async function POST(req: NextRequest) {
 
         const finalSeed = seed !== null ? Number(seed) : Math.floor(Math.random() * 1000000000);
 
+        // Sanitize input image
+        const { ensureR2Url } = await import("@/lib/r2");
+        const sanitizedImage = await ensureR2Url(image, "editorial/inputs");
+
         const falPayload = {
             prompt: finalPrompt,
             image_urls: {
-                model: image
+                model: sanitizedImage
             },
             aspect_ratio: aspectRatio,
             resolution: resolution === "4K" ? "4K" : resolution === "2K" ? "2K" : "1K",

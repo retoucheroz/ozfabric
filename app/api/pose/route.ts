@@ -11,6 +11,10 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Image URL is required" }, { status: 400 });
         }
 
+        // Sanitize input
+        const { ensureR2Url } = await import("@/lib/r2");
+        const sanitizedUrl = await ensureR2Url(image_url, "poses/extraction");
+
         const falKey = process.env.FAL_KEY;
         if (!falKey) {
             return NextResponse.json({ error: "FAL_KEY is not configured" }, { status: 500 });
@@ -26,7 +30,7 @@ export async function POST(req: Request) {
         // Use fal-ai/dwpose for better skeletal extraction
         const result: any = await fal.run("fal-ai/dwpose", {
             input: {
-                image_url: image_url
+                image_url: sanitizedUrl
             }
         });
 

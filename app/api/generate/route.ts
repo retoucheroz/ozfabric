@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
         const {
             productName,
             workflowType: requestedWorkflowType,
-            uploadedImages,
+            uploadedImages: rawUploadedImages,
             gender,
             prompt: customPrompt,
             poseFocus,
@@ -99,6 +99,19 @@ export async function POST(req: NextRequest) {
 
         // One-time random seed for consistency across angles
         const requestSeed = (seed !== null && seed !== undefined) ? Number(seed) : Math.floor(Math.random() * 1000000000);
+
+        // === R2 INPUT SANITIZATION ===
+        // Ensure all input images are R2 URLs, not base64 strings
+        const { ensureR2Url } = await import("@/lib/r2");
+        const sanitizedData = await Promise.all(
+            Object.entries(rawUploadedImages || {}).map(async ([key, value]) => {
+                if (typeof value === 'string' && value) {
+                    return [key, await ensureR2Url(value, "inputs")];
+                }
+                return [key, value];
+            })
+        );
+        const uploadedImages = Object.fromEntries(sanitizedData);
 
         // Determine derived shot role if not explicitly provided
         const effectiveRole = shotRole || (isStylingShot && !isAngles && poseFocus !== 'detail' && poseFocus !== 'closeup' ? 'styling' : 'technical');

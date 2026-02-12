@@ -71,6 +71,11 @@ export async function POST(req: NextRequest) {
             });
         }
 
+        const { ensureR2Url } = await import("@/lib/r2");
+        const sanitizedImages = await Promise.all(
+            images.filter(Boolean).map((img: string) => ensureR2Url(img, "ghost/inputs"))
+        );
+
         // fal.ai/nano-banana-pro/edit (Exact schema based on docs)
         const response = await fetch("https://fal.run/fal-ai/nano-banana-pro/edit", {
             method: "POST",
@@ -80,7 +85,7 @@ export async function POST(req: NextRequest) {
             },
             body: JSON.stringify({
                 prompt: selectedPrompt,
-                image_urls: images.filter(Boolean), // Array of URLs (supports up to 14)
+                image_urls: sanitizedImages, // Array of URLs (supports up to 14)
                 aspect_ratio: "2:3",
                 resolution: resolution || "1K"
             }),

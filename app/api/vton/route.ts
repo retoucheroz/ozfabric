@@ -21,6 +21,12 @@ export async function POST(req: NextRequest) {
             });
         }
 
+        const { ensureR2Url } = await import("@/lib/r2");
+        const [sanitizedHuman, sanitizedGarment] = await Promise.all([
+            ensureR2Url(humanImage, "vton/human"),
+            ensureR2Url(garmentImage, "vton/garment")
+        ]);
+
         // fal-ai/fashn/tryon is the FASHN Virtual Try-On
         const response = await fetch("https://fal.run/fal-ai/fashn-vton-v1.5", {
             method: "POST",
@@ -29,8 +35,8 @@ export async function POST(req: NextRequest) {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                human_image_url: humanImage,
-                garment_image_url: garmentImage,
+                human_image_url: sanitizedHuman,
+                garment_image_url: sanitizedGarment,
                 category: category || "tops", // fashn uses "tops", "bottoms", "one-pieces"
                 garment_description: garmentDescription || "fashion garment"
             }),
