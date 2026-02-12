@@ -10,7 +10,7 @@ import {
     Sparkles, User, Image as ImageIcon, Camera, RotateCw, X, Maximize2,
     Video as VideoIcon, Music, Layers, Settings, Globe, CheckCircle2,
     AlertCircle, Play, Info, Volume2, VolumeX, Clapperboard, ShieldAlert, Zap,
-    ArrowLeftRight, ArrowUpDown, Wand2, Download, CreditCard
+    ArrowLeftRight, ArrowUpDown, Wand2, Download, CreditCard, Check
 } from "lucide-react"
 import { useLanguage } from "@/context/language-context"
 import { toast } from "sonner"
@@ -160,6 +160,10 @@ export default function VideoPage() {
 
     const [isProcessing, setIsProcessing] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
+
+    // Video Result State
+    const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string | null>(null);
+    const [generationProgress, setGenerationProgress] = useState<string>("");
 
     // End Frame Generator State
     const [showEndFrameDialog, setShowEndFrameDialog] = useState(false);
@@ -486,7 +490,19 @@ export default function VideoPage() {
             return;
         }
 
+        if (!prompt && !multiShot) {
+            toast.error(language === 'tr' ? "Lütfen bir video promptu girin." : "Please enter a video prompt.");
+            return;
+        }
+
+        if (multiShot && shots.every(s => !s.prompt.trim())) {
+            toast.error(language === 'tr' ? "Lütfen en az bir sahne promptu girin." : "Please enter at least one shot prompt.");
+            return;
+        }
+
         setIsProcessing(true);
+        setGeneratedVideoUrl(null);
+        setGenerationProgress(language === 'tr' ? 'Görseller hazırlanıyor...' : 'Preparing images...');
 
         try {
             // Resize images to max 3000px before sending
@@ -500,23 +516,71 @@ export default function VideoPage() {
                 resizedEndFrame = await resizeImageToMax(endFrame, 3000);
             }
 
-            if (productionModel === 'custom' && storyboard) {
-                // Simulate 5-shot generation
-                for (let i = 1; i <= 5; i++) {
-                    toast.info(`${language === 'tr' ? 'Sahne' : 'Shot'} ${i} ${language === 'tr' ? 'hazırlanıyor...' : 'is being prepared...'}`);
-                    await new Promise(r => setTimeout(r, 2000));
-                }
-                toast.success(language === 'tr' ? "Tüm sahneler başarıyla üretildi ve birleştirildi!" : "All shots generated and merged successfully!");
-            } else {
-                // Standard generation
-                toast.info(language === 'tr' ? "Video üretimi başlatıldı..." : "Video generation started...");
-                await new Promise(r => setTimeout(r, 3000));
+            setGenerationProgress(language === 'tr'
+                ? `Kling 3.0 ${resolution === '1080p' ? 'Pro' : 'Standard'} ile video üretiliyor... Bu işlem birkaç dakika sürebilir.`
+                : `Generating video with Kling 3.0 ${resolution === '1080p' ? 'Pro' : 'Standard'}... This may take a few minutes.`);
+
+            toast.info(language === 'tr'
+                ? `Video üretimi başlatıldı (${resolution}). Lütfen bekleyin...`
+                : `Video generation started (${resolution}). Please wait...`);
+
+            const response = await fetch('/api/video/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    firstFrame: resizedFirstFrame,
+                    endFrame: resizedEndFrame,
+                    prompt: multiShot ? undefined : prompt,
+                    duration: duration,
+                    generateAudio: isSoundOn,
+                    resolution: resolution,
+                    aspectRatio: aspectRatio,
+                    multiShot: multiShot,
+                    shots: multiShot ? shots.filter(s => s.prompt.trim()).map(s => ({
+                        prompt: s.prompt,
+                        duration: s.duration,
+                    })) : undefined,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Video generation failed');
+            }
+
+            if (data.video?.url) {
+                setGeneratedVideoUrl(data.video.url);
+                setGenerationProgress('');
                 toast.success(language === 'tr' ? "Video başarıyla üretildi!" : "Video generated successfully!");
+            } else {
+                throw new Error('No video URL in response');
             }
         } catch (error: any) {
-            toast.error(language === 'tr' ? 'Video oluşturulamadı.' : 'Video generation failed.');
+            console.error('Video generation error:', error);
+            setGenerationProgress('');
+            toast.error(language === 'tr' ? `Video oluşturulamadı: ${error.message}` : `Video generation failed: ${error.message}`);
         } finally {
             setIsProcessing(false);
+        }
+    };
+
+    const handleDownloadVideo = async () => {
+        if (!generatedVideoUrl) return;
+        try {
+            const response = await fetch(generatedVideoUrl);
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.download = `ozfabric_video_${Date.now()}.mp4`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(downloadUrl);
+        } catch {
+            // Fallback: open in new tab
+            window.open(generatedVideoUrl, '_blank');
         }
     };
 
@@ -1164,6 +1228,78 @@ export default function VideoPage() {
                                         )}
                                     </div>
                                 </Card>
+
+                                {/* Video Generation Progress */}
+                                {isProcessing && generationProgress && (
+                                    <Card className="bg-card border-border overflow-hidden">
+                                        <div className="p-6 flex flex-col items-center justify-center gap-4">
+                                            <div className="relative w-16 h-16">
+                                                <div className="absolute inset-0 rounded-full border-4 border-border" />
+                                                <div className="absolute inset-0 rounded-full border-4 border-violet-500 border-t-transparent animate-spin" />
+                                                <div className="absolute inset-2 rounded-full bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 flex items-center justify-center">
+                                                    <VideoIcon className="w-5 h-5 text-violet-400" />
+                                                </div>
+                                            </div>
+                                            <div className="text-center space-y-1">
+                                                <p className="text-sm font-bold text-foreground">
+                                                    {language === 'tr' ? 'Video Üretiliyor...' : 'Generating Video...'}
+                                                </p>
+                                                <p className="text-xs text-muted-foreground max-w-sm">
+                                                    {generationProgress}
+                                                </p>
+                                            </div>
+                                            <div className="w-full max-w-xs h-1.5 bg-muted rounded-full overflow-hidden">
+                                                <div className="h-full bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-full animate-pulse" style={{ width: '60%' }} />
+                                            </div>
+                                        </div>
+                                    </Card>
+                                )}
+
+                                {/* Generated Video Result */}
+                                {generatedVideoUrl && !isProcessing && (
+                                    <Card className="bg-card border-border overflow-hidden">
+                                        <div className="px-5 py-3 flex items-center justify-between border-b bg-muted/20">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-6 h-6 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center">
+                                                    <Check className="w-3.5 h-3.5 text-white" />
+                                                </div>
+                                                <span className="text-sm font-bold uppercase tracking-wider text-foreground">
+                                                    {language === 'tr' ? 'Üretilen Video' : 'Generated Video'}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={handleDownloadVideo}
+                                                    className="h-8 gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground"
+                                                >
+                                                    <Download className="w-3.5 h-3.5" />
+                                                    {language === 'tr' ? 'İndir' : 'Download'}
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => setGeneratedVideoUrl(null)}
+                                                    className="h-8 gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground"
+                                                >
+                                                    <X className="w-3.5 h-3.5" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                        <div className="p-4">
+                                            <div className="relative rounded-xl overflow-hidden bg-black aspect-video">
+                                                <video
+                                                    src={generatedVideoUrl}
+                                                    controls
+                                                    autoPlay
+                                                    loop
+                                                    className="w-full h-full object-contain"
+                                                />
+                                            </div>
+                                        </div>
+                                    </Card>
+                                )}
                             </div>
                         )}
 
