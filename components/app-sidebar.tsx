@@ -91,6 +91,11 @@ export function AppSidebar({ className }: SidebarProps) {
                     icon: Box,
                     href: "/photoshoot/ecom",
                 },
+                {
+                    label: "Face/Head Swap",
+                    icon: Camera,
+                    href: "/face-head-swap",
+                },
             ],
         },
         {

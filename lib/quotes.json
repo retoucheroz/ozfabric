@@ -1,0 +1,162 @@
+[
+    {
+        "id": 1,
+        "author": "Pierpaolo Piccioli",
+        "roleTr": "Kreatif Direktör, Valentino",
+        "roleEn": "Creative Director, Valentino",
+        "quoteTr": "Hayal gücümüzü genişletmek ve duyguları harekete geçirmek için kullanılan bu teknoloji, artık en güçlü yaratıcı aracımız.",
+        "quoteEn": "This technology, used to expand our imagination and evoke emotions, is now our most powerful creative tool."
+    },
+    {
+        "id": 2,
+        "author": "Jörgen Andersson",
+        "roleTr": "Kreatif Direktör, H&M",
+        "roleEn": "Creative Director, H&M",
+        "quoteTr": "Yaratıcı alet çantamıza eklenen bu yeni enstrüman, tasarım süreçlerimizi bir üst seviyeye taşımak için heyecan verici.",
+        "quoteEn": "This new instrument added to our creative toolkit is exciting to take our design processes to the next level."
+    },
+    {
+        "id": 3,
+        "author": "Bruno Pavlovsky",
+        "roleTr": "Moda Başkanı, Chanel",
+        "roleEn": "President of Fashion, Chanel",
+        "quoteTr": "Uygulama biçimleri tamamen değişse de tasarımın özündeki felsefe, bu dijital dönüşümle daha da güçleniyor.",
+        "quoteEn": "Although the forms of application change completely, the philosophy at the core of design is strengthened even more with this digital transformation."
+    },
+    {
+        "id": 4,
+        "author": "Matthew Drinkwater",
+        "roleTr": "Moda İnovasyon Başkanı, LCF",
+        "roleEn": "Head of Fashion Innovation, LCF",
+        "quoteTr": "Moda dünyasında henüz her şeyin başındayız; bu teknolojik devrimin zirvesine giden yol daha yeni açılıyor.",
+        "quoteEn": "We are just at the beginning in the fashion world; the path to the peak of this technological revolution is just opening."
+    },
+    {
+        "id": 5,
+        "author": "Norma Kamali",
+        "roleTr": "Moda Tasarımcısı",
+        "roleEn": "Fashion Designer",
+        "quoteTr": "Algoritmaların beklenmedik 'yanılsamaları' bile, modern tasarımlarımız için eşsiz bir ilham kaynağına dönüşebiliyor.",
+        "quoteEn": "Even the unexpected 'illusions' of algorithms can turn into a unique source of inspiration for our modern designs."
+    },
+    {
+        "id": 6,
+        "author": "Tommy Hilfiger",
+        "roleTr": "Kurucu & Tasarımcı, Tommy Hilfiger",
+        "roleEn": "Founder & Designer, Tommy Hilfiger",
+        "quoteTr": "Modanın geleceği dijitalleşmede yatıyor; bu yeni akıllı sistemler tasarımın lojistik başarısını kalıcı kılacak.",
+        "quoteEn": "The future of fashion lies in digitalization; these new smart systems will make the logistical success of design permanent."
+    },
+    {
+        "id": 7,
+        "author": "Lorenzo Bertelli",
+        "roleTr": "Pazarlama Direktörü, Prada Group",
+        "roleEn": "Marketing Director, Prada Group",
+        "quoteTr": "Zaman kazandıran bu teknolojik yardımcılar sayesinde, el işçiliğinin ve insan emeğinin değerini çok daha iyi anlayacağız.",
+        "quoteEn": "Thanks to these time-saving technological assistants, we will understand the value of craftsmanship and human labor much better."
+    },
+    {
+        "id": 8,
+        "author": "Gonzague de Pirey",
+        "roleTr": "Veri Direktörü, LVMH",
+        "roleEn": "Chief Data Officer, LVMH",
+        "quoteTr": "Yaratıcı bir 'dış iskelet' gibi düşündüğümüz bu araç, insan dehasını koruyarak onu daha verimli kılıyor.",
+        "quoteEn": "This tool, which we think of as a creative 'exoskeleton', protects human genius while making it more efficient."
+    },
+    {
+        "id": 9,
+        "author": "Soumia Hadjali",
+        "roleTr": "Dijital Başkan Yrd., Louis Vuitton",
+        "roleEn": "VP of Digital, Louis Vuitton",
+        "quoteTr": "Kreatif süreçlerin yerini almayan, aksine onları devasa boyutlara ulaştıran bir büyüteçle karşı karşıyayız.",
+        "quoteEn": "We are facing a magnifying glass that does not replace creative processes but rather magnifies them to enormous dimensions."
+    },
+    {
+        "id": 10,
+        "author": "Michael Mente",
+        "roleTr": "CEO & Kurucu, REVOLVE",
+        "roleEn": "CEO & Founder, REVOLVE",
+        "quoteTr": "Benzersiz trendleri keşfetme yolunda, akıllı algoritmalar bize devrimsel bir rekabet avantajı sağlıyor.",
+        "quoteEn": "On the way to discovering unique trends, smart algorithms provide us with a revolutionary competitive advantage."
+    },
+    {
+        "id": 11,
+        "author": "Jordi Alex",
+        "roleTr": "Teknoloji Direktörü, Mango",
+        "roleEn": "Technology Director, Mango",
+        "quoteTr": "Çalışanlarımızın yeteneklerini parlatan bir yardımcı pilot olarak, tasarım yolculuğumuza eşlik ediyor.",
+        "quoteEn": "It accompanies our design journey as a co-pilot that polishes the talents of our employees."
+    },
+    {
+        "id": 12,
+        "author": "Olivier Rousteing",
+        "roleTr": "Kreatif Direktör, Balmain",
+        "roleEn": "Creative Director, Balmain",
+        "quoteTr": "Özgür ifadenin yeni platformu olan bu teknoloji, bizi bambaşka bir yaratıcılık perspektifine yükseltiyor.",
+        "quoteEn": "This technology, which is the new platform of free expression, elevates us to a completely different perspective of creativity."
+    },
+    {
+        "id": 13,
+        "author": "José Neves",
+        "roleTr": "Kurucu & CEO, Farfetch",
+        "roleEn": "Founder & CEO, Farfetch",
+        "quoteTr": "İnsan zekasına asistanlık eden bu sistemler, modada yaratıcılığı daha önce hiç olmadığı kadar erişilebilir kılıyor.",
+        "quoteEn": "These systems assisting human intelligence make creativity in fashion more accessible than ever before."
+    },
+    {
+        "id": 14,
+        "author": "Rankin",
+        "roleTr": "Moda Fotoğrafçısı",
+        "roleEn": "Fashion Photographer",
+        "quoteTr": "İşinde uzman olan vizyonerlerin, bu yeni çalışma biçimiyle çok daha görkemli eserler yaratacağına inanıyorum.",
+        "quoteEn": "I believe that visionaries who are experts in their work will create much more magnificent works with this new way of working."
+    },
+    {
+        "id": 15,
+        "author": "Robert Gentz",
+        "roleTr": "CEO & Kurucu, Zalando",
+        "roleEn": "CEO & Founder, Zalando",
+        "quoteTr": "E-ticaret deneyimi artık sadece bir alışveriş değil; teknolojiyle harmanlanmış, ilham verici bir keşif yolculuğu.",
+        "quoteEn": "The e-commerce experience is no longer just shopping; it's an inspiring journey of discovery blended with technology."
+    },
+    {
+        "id": 16,
+        "author": "Nelly Mensah",
+        "roleTr": "İnovasyon Başkan Yrd., LVMH",
+        "roleEn": "VP of Innovation, LVMH",
+        "quoteTr": "Lüks dünyasında kişiselleştirme, üretken sistemler sayesinde artık hayal bile edilemeyecek bir ölçeğe ulaştı.",
+        "quoteEn": "Personalization in the luxury world has now reached a scale unimaginable thanks to generative systems."
+    },
+    {
+        "id": 17,
+        "author": "Charaf Tajer",
+        "roleTr": "Kreatif Direktör, Casablanca",
+        "roleEn": "Creative Director, Casablanca",
+        "quoteTr": "Dünyanın estetiğine bakış açımızı modern inovasyonla birleştirerek geleceğin uyumunu yakalıyoruz.",
+        "quoteEn": "We capture the harmony of the future by combining our perspective on the world's aesthetics with modern innovation."
+    },
+    {
+        "id": 18,
+        "author": "Ian Rogers",
+        "roleTr": "Eski Dijital Direktör, LVMH",
+        "roleEn": "Former Chief Digital Officer, LVMH",
+        "quoteTr": "Markalarımızın hikayelerini daha güçlü anlatmak için karmaşıklığı yöneten en değerli yardımcımız dijital akıldır.",
+        "quoteEn": "Digital intelligence is our most valuable assistant in managing complexity to tell the stories of our brands more powerfully."
+    },
+    {
+        "id": 19,
+        "author": "Peter Pernot-Day",
+        "roleTr": "Strateji Başkanı, Burberry",
+        "roleEn": "Head of Strategy, Burberry",
+        "quoteTr": "Talepleri öngören ileri teknolojiler, modanın sürdürülebilir geleceğinde en ön safta yer alıyor.",
+        "quoteEn": "Advanced technologies that predict demands are at the forefront of fashion's sustainable future."
+    },
+    {
+        "id": 20,
+        "author": "Nicolas Ghesquière",
+        "roleTr": "Kreatif Direktör, Louis Vuitton",
+        "roleEn": "Creative Director, Louis Vuitton",
+        "quoteTr": "Moda bir oyun alanıdır ve modern enstrümanlar bu alanda kendi imzamızı bulmamıza rehberlik eder.",
+        "quoteEn": "Fashion is a playground and modern instruments guide us to find our own signature in this field."
+    }
+]

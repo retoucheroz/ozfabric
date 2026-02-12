@@ -186,7 +186,13 @@ export function TopNav() {
                                     <span>{t("settings.security")}</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={() => router.push('/')} className="cursor-pointer text-red-500 focus:text-red-500">
+                                <DropdownMenuItem
+                                    onClick={async () => {
+                                        await fetch('/api/auth/logout', { method: 'POST' });
+                                        router.replace('/');
+                                    }}
+                                    className="cursor-pointer text-red-500 focus:text-red-500"
+                                >
                                     <LogOut className="mr-2 h-4 w-4" />
                                     <span>{t("settings.logOut")}</span>
                                 </DropdownMenuItem>

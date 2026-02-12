@@ -25,9 +25,7 @@ import { Upload, FileText, Ruler, Palette, Loader2, Download, Printer, FolderPlu
 import { Input } from "@/components/ui/input"
 import { useProjects } from "@/context/projects-context"
 import { toast } from "sonner"
-// html2canvas replaced by html-to-image for better styling support
-import { toPng } from "html-to-image"
-import jsPDF from "jspdf"
+
 
 
 
@@ -242,185 +240,7 @@ function StudioPageContent() {
     setIsCollectionOpen(false);
   }
 
-  const handleExportExcel = async () => {
-    if (!data) return;
 
-    try {
-      const toastId = toast.loading(language === "tr" ? "Excel Hazırlanıyor..." : "Preparing Excel...");
-
-      // Dynamic import to avoid SSR issues if any
-      const ExcelJS = (await import('exceljs')).default;
-      const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet('Tech Pack');
-
-      // 1. Define Columns & Headers based on Language
-      const isTr = language === "tr";
-
-      worksheet.columns = [
-        { header: 'SKU', key: 'sku', width: 25 },
-        { header: isTr ? 'ÜRÜN ADI' : 'PRODUCT NAME', key: 'productName', width: 35 },
-        { header: isTr ? 'KATEGORİ' : 'CATEGORY', key: 'category', width: 20 },
-        { header: isTr ? 'KOLEKSİYON' : 'COLLECTION', key: 'collection', width: 20 },
-        { header: isTr ? 'KALIP' : 'FIT', key: 'fit', width: 20 },
-        { header: isTr ? 'ANA KUMAŞ' : 'MAIN FABRIC', key: 'fabric', width: 35 },
-        { header: isTr ? 'RENKLER' : 'COLORS', key: 'colors', width: 35 },
-        { header: isTr ? 'ÖLÇÜLER (36)' : 'MEASUREMENTS (36)', key: 'measurements', width: 35 },
-        { header: isTr ? 'TASARIMCI NOTLARI' : 'DESIGNER NOTES', key: 'notes', width: 50 },
-        { header: isTr ? 'GÖRSEL' : 'VISUAL', key: 'image', width: 30 },
-      ];
-
-      // 2. Add Data Row (Row 2) - Summary Data
-      const fabricSummary = `${data.fabric.main} (${data.fabric.composition})`;
-      const measurementsSummary = isTr ? "Detaylar için üzerine gelin" : "Hover for details";
-      const colorsSummary = data.colors.map((c: any) => c.name).join(", ");
-
-      const row = worksheet.addRow({
-        sku: data.sku,
-        productName: data.productName,
-        category: data.category,
-        collection: `${new Date().getFullYear()} Collection`,
-        fit: data.fit,
-        fabric: fabricSummary,
-        colors: colorsSummary,
-        measurements: measurementsSummary,
-        notes: notes,
-        image: ''
-      });
-
-      // 3. Add Comments (The "Popup" details)
-
-      // Fabric Details Comment
-      const fabricDetails = [
-        `${isTr ? 'Ana Kumaş' : 'Main'}: ${data.fabric.main}`,
-        `${isTr ? 'İçerik' : 'Composition'}: ${data.fabric.composition}`,
-        `${isTr ? 'Gramaj' : 'Weight'}: ${data.fabric.weight}`,
-        `${isTr ? 'Bitiş' : 'Finish'}: ${data.fabric.finish}`
-      ].join('\n');
-
-      row.getCell('fabric').note = {
-        texts: [{ font: { size: 12, name: 'Calibri', color: { argb: '222222' } }, text: fabricDetails }],
-      };
-
-      // Measurement Details Comment
-      const measurementDetails = data.measurements.points.map((m: any) =>
-        `${m.label}: ${m.value}`
-      ).join('\n');
-
-      row.getCell('measurements').note = {
-        texts: [{ font: { size: 12, name: 'Calibri' }, text: measurementDetails }],
-      };
-
-      // Color Details Comment
-      const colorDetails = data.colors.map((c: any) =>
-        `${c.name} (${c.hex}) - Pantone: ${c.pantone}`
-      ).join('\n');
-
-      row.getCell('colors').note = {
-        texts: [{ font: { size: 12, name: 'Calibri' }, text: colorDetails }],
-      };
-
-      // Design Notes Comment
-      if (notes) {
-        row.getCell('notes').note = {
-          texts: [{ font: { size: 12, name: 'Calibri' }, text: notes }],
-        };
-      }
-
-      // 4. Styling
-
-      // Header Style
-      worksheet.getRow(1).height = 30;
-      worksheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFF' }, size: 12 };
-      worksheet.getRow(1).fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: '2F2F2F' } // Dark Grey Corporate Look
-      };
-      worksheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'center' };
-
-      // Data Row Style
-      row.height = 100; // Tall row for image
-      row.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
-      row.font = { size: 11 };
-
-      // Borders
-      worksheet.eachRow((r) => {
-        r.eachCell((cell) => {
-          cell.border = {
-            top: { style: 'thin' },
-            left: { style: 'thin' },
-            bottom: { style: 'thin' },
-            right: { style: 'thin' }
-          };
-        });
-      });
-
-      // 5. Add Image
-      if (preview) {
-        try {
-          // Fetch to get buffer (needed for ExcelJS)
-          const response = await fetch(preview);
-          const buffer = await response.arrayBuffer();
-          const imageId = workbook.addImage({
-            buffer: buffer,
-            extension: 'png',
-          });
-
-          // Calculate aspect ratio in browser
-          await new Promise<void>((resolve) => {
-            const img = new Image();
-            img.onload = () => {
-              const MAX_WIDTH = 200;
-              const MAX_HEIGHT = 130;
-              let w = img.width;
-              let h = img.height;
-
-              // Scale logic
-              if (w > MAX_WIDTH || h > MAX_HEIGHT) {
-                const ratio = Math.min(MAX_WIDTH / w, MAX_HEIGHT / h);
-                w *= ratio;
-                h *= ratio;
-              }
-
-              // Col 9 is the 10th column (0-indexed) -> 'image' key
-              worksheet.addImage(imageId, {
-                tl: { col: 9.1, row: 1.1 },
-                ext: { width: w, height: h },
-                editAs: 'oneCell'
-              });
-              resolve();
-            };
-            img.onerror = () => resolve();
-            img.src = preview;
-          });
-
-          // Clear text in image cell just in case
-          row.getCell('image').value = '';
-
-        } catch (imgErr) {
-          console.error("Image embed failed", imgErr);
-        }
-      }
-
-      // 6. Write File
-      const buffer = await workbook.xlsx.writeBuffer();
-      const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-
-      // Helper for download
-      const url = window.URL.createObjectURL(blob);
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      anchor.download = `${data.sku}_TechPack.xlsx`;
-      anchor.click();
-      window.URL.revokeObjectURL(url);
-
-      toast.success(isTr ? "Excel Başarıyla İndirildi" : "Excel Exported Successfully", { id: toastId });
-
-    } catch (err) {
-      console.error(err);
-      toast.error(language === "tr" ? "Excel oluşturulamadı" : "Failed to export Excel");
-    }
-  };
 
   if (!mounted) return null;
 
@@ -491,9 +311,7 @@ function StudioPageContent() {
                   <Button variant="outline" className="w-full justify-start" disabled={!data} onClick={() => window.print()}>
                     <Printer className="w-4 h-4 mr-2" /> {t("studio.print")}
                   </Button>
-                  <Button className="w-full justify-start" disabled={!data} onClick={handleExportExcel}>
-                    <Download className="w-4 h-4 mr-2" /> {t("studio.exportExcel")}
-                  </Button>
+
                 </div>
               </div>
             )}

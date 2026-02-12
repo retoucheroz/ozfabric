@@ -361,16 +361,16 @@ export default function VideoPage() {
     };
 
     // --- END FRAME GENERATOR ---
-    const resizeImageToMax = (base64: string, maxEdge: number): Promise<string> => {
+    const resizeImageToMax = (base64: string, maxEdge: number, format: string = 'image/png', quality: number = 1.0): Promise<string> => {
         return new Promise((resolve) => {
             const img = new window.Image();
             img.onload = () => {
                 const { width, height } = img;
-                if (width <= maxEdge && height <= maxEdge) {
+                if (width <= maxEdge && height <= maxEdge && format === 'image/png') {
                     resolve(base64);
                     return;
                 }
-                const scale = maxEdge / Math.max(width, height);
+                const scale = Math.min(1, maxEdge / Math.max(width, height));
                 const newW = Math.round(width * scale);
                 const newH = Math.round(height * scale);
                 const canvas = document.createElement('canvas');
@@ -378,7 +378,7 @@ export default function VideoPage() {
                 canvas.height = newH;
                 const ctx = canvas.getContext('2d')!;
                 ctx.drawImage(img, 0, 0, newW, newH);
-                resolve(canvas.toDataURL('image/png'));
+                resolve(canvas.toDataURL(format, quality));
             };
             img.src = base64;
         });
@@ -505,17 +505,52 @@ export default function VideoPage() {
         setGenerationProgress(language === 'tr' ? 'Görseller hazırlanıyor...' : 'Preparing images...');
 
         try {
-            // Resize images to max 3000px before sending
+            // Resize images to max 1280px with compression (Kling generates at 720p/1080p max)
             let resizedFirstFrame = firstFrame;
             let resizedEndFrame = endFrame;
 
             if (firstFrame) {
-                resizedFirstFrame = await resizeImageToMax(firstFrame, 3000);
+                resizedFirstFrame = await resizeImageToMax(firstFrame, 1280, 'image/jpeg', 0.85);
             }
             if (endFrame) {
-                resizedEndFrame = await resizeImageToMax(endFrame, 3000);
+                resizedEndFrame = await resizeImageToMax(endFrame, 1280, 'image/jpeg', 0.85);
             }
 
+            // Step 1: Upload images to fal storage via our upload endpoint
+            let startImageUrl: string | undefined;
+            let endImageUrl: string | undefined;
+
+            if (resizedFirstFrame) {
+                setGenerationProgress(language === 'tr' ? 'İlk kare yükleniyor...' : 'Uploading start frame...');
+                const uploadRes = await fetch('/api/video/upload', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image: resizedFirstFrame, filename: 'start_frame.png' }),
+                });
+                if (!uploadRes.ok) {
+                    const errData = await uploadRes.json().catch(() => ({ error: 'Upload failed' }));
+                    throw new Error(errData.error || 'Failed to upload start frame');
+                }
+                const uploadData = await uploadRes.json();
+                startImageUrl = uploadData.url;
+            }
+
+            if (resizedEndFrame) {
+                setGenerationProgress(language === 'tr' ? 'Son kare yükleniyor...' : 'Uploading end frame...');
+                const uploadRes = await fetch('/api/video/upload', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image: resizedEndFrame, filename: 'end_frame.png' }),
+                });
+                if (!uploadRes.ok) {
+                    const errData = await uploadRes.json().catch(() => ({ error: 'Upload failed' }));
+                    throw new Error(errData.error || 'Failed to upload end frame');
+                }
+                const uploadData = await uploadRes.json();
+                endImageUrl = uploadData.url;
+            }
+
+            // Step 2: Send only URLs to the video generation endpoint
             setGenerationProgress(language === 'tr'
                 ? `Kling 3.0 ${resolution === '1080p' ? 'Pro' : 'Standard'} ile video üretiliyor... Bu işlem birkaç dakika sürebilir.`
                 : `Generating video with Kling 3.0 ${resolution === '1080p' ? 'Pro' : 'Standard'}... This may take a few minutes.`);
@@ -528,13 +563,12 @@ export default function VideoPage() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    firstFrame: resizedFirstFrame,
-                    endFrame: resizedEndFrame,
+                    startImageUrl,
+                    endImageUrl,
                     prompt: multiShot ? undefined : prompt,
                     duration: duration,
                     generateAudio: isSoundOn,
                     resolution: resolution,
-                    aspectRatio: aspectRatio,
                     multiShot: multiShot,
                     shots: multiShot ? shots.filter(s => s.prompt.trim()).map(s => ({
                         prompt: s.prompt,
@@ -543,7 +577,13 @@ export default function VideoPage() {
                 }),
             });
 
-            const data = await response.json();
+            let data: any;
+            try {
+                data = await response.json();
+            } catch {
+                const text = await response.text().catch(() => '');
+                throw new Error(text || 'Server returned an invalid response');
+            }
 
             if (!response.ok) {
                 throw new Error(data.error || 'Video generation failed');

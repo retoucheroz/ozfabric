@@ -22,6 +22,7 @@ import {
     ShoppingBag,
     Clock,
     MonitorPlay,
+    Shield,
 } from "lucide-react"
 import { useLanguage } from "@/context/language-context"
 import { Separator } from "@/components/ui/separator"
@@ -35,15 +36,27 @@ export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
     const pathname = usePathname();
     const { t, language } = useLanguage();
     const [mounted, setMounted] = useState(false);
-    const [isExpanded, setIsExpanded] = useState(true); // Default: expanded
+    const [isExpanded, setIsExpanded] = useState(true);
+    const [user, setUser] = useState<any>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         setMounted(true);
-        // Load saved state from localStorage
         const saved = localStorage.getItem('sidebar-expanded');
         if (saved !== null) {
             setIsExpanded(saved === 'true');
         }
+
+        // Fetch user session for RBAC
+        fetch('/api/auth/session')
+            .then(res => res.json())
+            .then(data => {
+                if (data.authenticated) {
+                    setUser(data.user);
+                }
+            })
+            .catch(err => console.error("Session fetch failed", err))
+            .finally(() => setIsLoading(false));
     }, []);
 
     const toggleSidebar = () => {
@@ -56,32 +69,49 @@ export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
         <aside className="w-[240px] h-full border-r bg-white dark:bg-zinc-950 hidden md:flex" />
     ) : null;
 
-    const designItems: { label: string; href: string; icon: any }[] = [
-    ];
+    const isAuthorized = (path: string) => {
+        // While loading, show everything to prevent flicker
+        if (isLoading) return true;
+
+        // In local development, if session check fails, we might be in "bypass" mode
+        if (process.env.NODE_ENV === 'development' && !user) return true;
+
+        if (!user) return false;
+        if (user.role === 'admin') return true;
+        return user.authorizedPages?.includes(path) || user.authorizedPages?.includes('*');
+    };
+
+    const designItems: { label: string; href: string; icon: any }[] = [];
 
     const photoshootItems = [
         { label: t("sidebar.aiModel"), href: "/photoshoot", icon: Camera },
         { label: t("sidebar.tryOn"), href: "/photoshoot/try-on", icon: Camera },
         { label: t("sidebar.editorial"), href: "/editorial", icon: Camera },
         { label: t("sidebar.video"), href: "/video", icon: MonitorPlay },
+        { label: t("sidebar.faceHeadSwap"), href: "/face-head-swap", icon: UserSquare2 },
         { label: t("sidebar.ghost"), href: "/photoshoot/ghost", icon: UserSquare2 },
-    ];
+    ].filter(item => isAuthorized(item.href));
 
-    // E-Com as a separate main page
     const ecomItems = [
         { label: t("sidebar.ecom"), href: "/ecom", icon: ShoppingBag },
-    ];
+    ].filter(item => isAuthorized(item.href));
 
     const toolItems = [
         { label: t("sidebar.analysis"), href: "/analysis", icon: Search },
         { label: t("sidebar.resize"), href: "/resize", icon: Maximize },
         { label: t("sidebar.techPack"), href: "/studio", icon: FileText },
         { label: t("sidebar.train"), href: "/train", icon: Sparkles },
-    ];
+    ].filter(item => isAuthorized(item.href));
 
     const libraryItems = [
         { label: t("sidebar.history"), href: "/history", icon: Clock },
-    ];
+    ].filter(item => isAuthorized(item.href));
+
+    const showAdminLink = user?.role === 'admin' || (process.env.NODE_ENV === 'development' && (isLoading || !user));
+
+    const adminItems = showAdminLink ? [
+        { label: 'Admin Panel', href: '/admin', icon: Shield },
+    ] : [];
 
     const renderItem = (item: { label: string; href: string; icon: any }) => {
         const isActive = pathname === item.href;
@@ -103,7 +133,6 @@ export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
             );
         }
 
-        // Desktop Item
         return (
             <Link key={item.href} href={item.href} className="flex-shrink-0 block w-full">
                 <div className={cn(
@@ -127,7 +156,6 @@ export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
 
     const sidebarContent = (
         <>
-            {/* Toggle Button - Desktop Only */}
             {variant === "default" && (
                 <button
                     onClick={toggleSidebar}
@@ -142,11 +170,10 @@ export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
                 </button>
             )}
 
-
-            {designItems.length > 0 && (
+            {adminItems.length > 0 && (
                 <>
                     <div className="flex flex-col gap-1 md:gap-1">
-                        {designItems.map(renderItem)}
+                        {adminItems.map(renderItem)}
                     </div>
                     <Separator className="my-2 opacity-50" />
                 </>
@@ -158,7 +185,6 @@ export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
 
             <Separator className="my-2 opacity-50" />
 
-            {/* E-Com Studio - Separate Section */}
             <div className="flex flex-col gap-1 md:gap-1">
                 {ecomItems.map(renderItem)}
             </div>
@@ -179,7 +205,6 @@ export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
 
             <Separator className="my-2 opacity-50" />
 
-            {/* Settings Item */}
             {variant === "mobile" ? (
                 <Link href="/settings">
                     <div className={cn(
@@ -222,7 +247,6 @@ export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
         );
     }
 
-    // Desktop Container - Width based on isExpanded state
     return (
         <aside className={cn(
             "h-full border-r bg-white dark:bg-zinc-950 flex flex-col py-4 px-3 gap-1 shrink-0 overflow-y-auto overflow-x-hidden transition-[width] duration-300 ease-in-out z-50 relative shadow-sm",
