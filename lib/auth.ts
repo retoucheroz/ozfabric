@@ -17,25 +17,33 @@ let redisClient: any = null;
 
 async function getRedis() {
     if (useMemoryFallback) return null;
+
     if (redisClient?.isOpen) return redisClient;
 
     try {
-        console.log('🔌 Redis: Attempting to connect...');
+        if (!REDIS_URL) {
+            console.error('❌ Redis: REDIS_URL is not defined');
+            return null;
+        }
+
+        console.log('🔌 Redis: Connecting to:', REDIS_URL.split('@')[1] || 'URL');
+
         redisClient = createClient({
             url: REDIS_URL,
             socket: {
                 reconnectStrategy: (retries) => Math.min(retries * 50, 2000),
-                connectTimeout: 5000,
+                connectTimeout: 10000,
+                keepAlive: 5000,
             }
         });
 
         redisClient.on('error', (err: any) => console.error('❌ Redis Client Error:', err));
 
         await redisClient.connect();
-        console.log('✅ Redis: Connected successfully');
+        console.log('✅ Redis: Connection established');
         return redisClient;
     } catch (e) {
-        console.error('❌ Redis Connection Failed:', e);
+        console.error('❌ Redis Connection Error:', e);
         redisClient = null;
         return null;
     }
@@ -52,7 +60,7 @@ const parseValue = (val: any) => {
     if (!val) return null;
     if (typeof val === 'object') return val;
     try {
-        return JSON.parse(val);
+        return typeof val === 'string' ? JSON.parse(val) : val;
     } catch (e) {
         return val;
     }
@@ -65,10 +73,10 @@ export async function getUser(username: string): Promise<User | null> {
         if (!client) return null;
 
         const data = await client.get(`user:${username}`);
-        console.log(`👤 Auth: GetUser [${username}] -> ${data ? 'Found' : 'Not Found'}`);
+        console.log(`👤 Auth: getUser(${username}) -> ${data ? 'Found' : 'NULL'}`);
         return parseValue(data);
     } catch (e) {
-        console.error('Redis Get User Error:', e);
+        console.error('Redis getUser Error:', e);
         return null;
     }
 }
@@ -82,10 +90,10 @@ export async function saveUser(user: User): Promise<void> {
         const client = await getRedis();
         if (client) {
             await client.set(`user:${user.username}`, JSON.stringify(user));
-            console.log(`💾 Auth: Saved User [${user.username}]`);
+            console.log(`💾 Auth: saveUser(${user.username})`);
         }
     } catch (e) {
-        console.error('Redis Save User Error:', e);
+        console.error('Redis saveUser Error:', e);
     }
 }
 
@@ -108,11 +116,11 @@ export async function createSession(username: string): Promise<string> {
                     EX: SESSION_TTL
                 });
                 await client.sAdd('active_sessions', sessionId);
-                console.log(`🔑 Auth: Session Created [${username}]`);
+                console.log(`🔑 Auth: createSession(${username}) [${sessionId}]`);
             }
         }
     } catch (e) {
-        console.error('Redis Session Error:', e);
+        console.error('Redis createSession Error:', e);
     }
 
     const cookieStore = await cookies();
@@ -140,6 +148,7 @@ export async function getSession(): Promise<Session | null> {
             const client = await getRedis();
             if (client) {
                 const data = await client.get(`session:${sessionId}`);
+                console.log(`🔑 Auth: getSession(${sessionId}) -> ${data ? 'Found' : 'NULL'}`);
                 session = parseValue(data);
             }
         }
@@ -150,7 +159,7 @@ export async function getSession(): Promise<Session | null> {
         }
         return session;
     } catch (e) {
-        console.error('Redis GetSession Error:', e);
+        console.error('Redis getSession Error:', e);
         return null;
     }
 }
@@ -185,41 +194,27 @@ export async function logout() {
 
 export async function getOnlineUsers(): Promise<string[]> {
     try {
-        if (useMemoryFallback) {
-            const now = Date.now();
-            return Array.from(memoryStore.entries())
-                .filter(([key, time]) => key.startsWith('heartbeat:') && (now - time) < 300000)
-                .map(([key]) => key.split(':')[1]);
-        }
         const client = await getRedis();
         if (!client) return [];
         const heartbeats = await client.keys('heartbeat:*');
         return heartbeats.map((key: string) => key.split(':')[1]);
     } catch (e) {
-        console.error('Online users error:', e);
         return [];
     }
 }
 
 export async function getAllUsers(): Promise<Omit<User, 'passwordHash'>[]> {
     try {
-        let users: User[] = [];
-        if (useMemoryFallback) {
-            users = Array.from(memoryStore.values()).filter(v => v.username && v.passwordHash);
-        } else {
-            const client = await getRedis();
-            if (!client) return [];
-            const keys = await client.keys('user:*');
-            if (keys.length === 0) return [];
-            const values = await client.mGet(keys);
-            users = values.map(parseValue).filter(Boolean);
-        }
-        return users.map(u => {
+        const client = await getRedis();
+        if (!client) return [];
+        const keys = await client.keys('user:*');
+        if (keys.length === 0) return [];
+        const values = await client.mGet(keys);
+        return values.map(parseValue).filter(Boolean).map((u: User) => {
             const { passwordHash, ...rest } = u;
             return rest;
         });
     } catch (e) {
-        console.error('All users error:', e);
         return [];
     }
 }
