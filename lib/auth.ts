@@ -7,7 +7,7 @@ const SESSION_COOKIE_NAME = 'ozfabric_session';
 const SESSION_TTL = 60 * 60 * 24 * 7; // 1 week
 
 // Local memory fallback for development when KV is not configured
-const isKvConfigured = !!(process.env.KV_REST_API_URL || process.env.KV_URL);
+const isKvConfigured = !!(process.env.KV_REST_API_URL || process.env.KV_URL || process.env.REDIS_URL);
 export const isKvActive = isKvConfigured;
 const useMemoryFallback = !isKvConfigured && process.env.NODE_ENV === 'development';
 
