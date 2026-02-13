@@ -116,7 +116,7 @@ export default function AdminPage() {
             </header>
 
             {/* Quick Create User Section */}
-            <Card className="border-violet-500/20 bg-zinc-50/50 dark:bg-zinc-900/50">
+            <Card className="border-violet-500/20 bg-zinc-50/50 dark:bg-background/50">
                 <CardHeader className="pb-4">
                     <CardTitle className="text-sm font-bold flex items-center gap-2">
                         <Users className="w-4 h-4 text-violet-500" /> Yeni Kullanıcı Oluştur

@@ -68,7 +68,7 @@ export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
     };
 
     if (!mounted) return variant === "default" ? (
-        <aside className="w-[240px] h-full border-r bg-white dark:bg-zinc-950 hidden md:flex" />
+        <aside className="w-[240px] h-full border-r bg-white dark:bg-background/80 dark:backdrop-blur-xl hidden md:flex" />
     ) : null;
 
     const isAuthorized = (path: string) => {
@@ -254,7 +254,7 @@ export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
 
     return (
         <aside className={cn(
-            "h-full border-r bg-white dark:bg-zinc-950 flex flex-col py-4 px-3 gap-1 shrink-0 overflow-y-auto overflow-x-hidden transition-[width] duration-300 ease-in-out z-50 relative shadow-sm",
+            "h-full border-r bg-white dark:bg-background/80 dark:backdrop-blur-xl flex flex-col py-4 px-3 gap-1 shrink-0 overflow-y-auto overflow-x-hidden transition-[width] duration-300 ease-in-out z-50 relative shadow-sm",
             isExpanded ? "w-[220px]" : "w-[72px]"
         )}>
             {sidebarContent}

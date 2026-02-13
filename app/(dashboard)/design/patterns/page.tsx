@@ -113,7 +113,7 @@ function PatternsPageContent() {
                 </div>
               </Card>
             </DialogTrigger>
-            <DialogContent className="max-w-4xl w-full h-[80vh] flex flex-col p-0 overflow-hidden bg-zinc-950 border-zinc-800">
+            <DialogContent className="max-w-4xl w-full h-[80vh] flex flex-col p-0 overflow-hidden bg-background border-card">
               <DialogTitle className="sr-only">Pattern Preview</DialogTitle>
               <div className="flex-1 overflow-hidden relative group/tile">
                 <div className="w-full h-full" style={{ backgroundImage: `url(${p.url})`, backgroundSize: '300px', backgroundRepeat: 'repeat' }} />
@@ -121,7 +121,7 @@ function PatternsPageContent() {
                   {t("patterns.tilingPreview") || "Seamless Tiling Preview"}
                 </div>
               </div>
-              <div className="p-4 bg-zinc-900 border-t border-zinc-800 flex justify-between items-center">
+              <div className="p-4 bg-background border-t border-card flex justify-between items-center">
                 <div className="text-white font-medium">{p.prompt}</div>
                 <Button variant="secondary" size="sm" onClick={() => downloadImage(p.url, `pattern-${p.id}.png`)}>
                   <Download className="w-4 h-4 mr-2" /> {t("common.download")}

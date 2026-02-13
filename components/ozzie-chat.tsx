@@ -161,7 +161,7 @@ export function OzzieChat() {
                     )}
                 </div>
 
-                <div className="p-4 border-t bg-white dark:bg-zinc-950 shrink-0">
+                <div className="p-4 border-t bg-white dark:bg-background shrink-0">
                     <form
                         className="flex gap-2 relative"
                         onSubmit={(e) => {

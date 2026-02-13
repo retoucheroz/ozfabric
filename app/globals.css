@@ -83,16 +83,16 @@
 }
 
 .dark {
-  /* Deep Navy Background - Rawless.ai inspired */
-  --background: hsl(220 25% 10%);
+  /* Custom Dark Background - #14171f */
+  --background: #14171f;
   --foreground: hsl(210 20% 98%);
 
   /* Glassmorphic Cards */
-  --card: hsla(220 20% 15% / 0.6);
+  --card: rgba(20, 23, 31, 0.6);
   --card-foreground: hsl(210 20% 98%);
 
   /* Popovers with glass effect */
-  --popover: hsla(220 20% 12% / 0.95);
+  --popover: rgba(20, 23, 31, 0.95);
   --popover-foreground: hsl(210 20% 98%);
 
   /* Purple Primary - Vibrant accent */
@@ -100,11 +100,11 @@
   --primary-foreground: hsl(0 0% 100%);
 
   /* Subtle secondary surfaces */
-  --secondary: hsla(220 15% 18% / 0.5);
+  --secondary: rgba(20, 23, 31, 0.5);
   --secondary-foreground: hsl(210 20% 98%);
 
   /* Muted elements */
-  --muted: hsla(220 15% 20% / 0.4);
+  --muted: rgba(20, 23, 31, 0.4);
   --muted-foreground: hsl(215 15% 65%);
 
   /* Accent with purple glow */
@@ -128,8 +128,8 @@
   --chart-4: hsl(30 90% 60%);
   --chart-5: hsl(340 80% 60%);
 
-  /* Sidebar - darker glass */
-  --sidebar: hsla(220 25% 8% / 0.8);
+  /* Sidebar - darker glass based on #14171f */
+  --sidebar: rgba(20, 23, 31, 0.9);
   --sidebar-foreground: hsl(210 20% 90%);
   --sidebar-primary: hsl(262 83% 58%);
   --sidebar-primary-foreground: hsl(0 0% 100%);

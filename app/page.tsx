@@ -102,7 +102,7 @@ export default function LoginPage() {
   return (
     <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2">
       {/* Left side: Branding */}
-      <div className="hidden bg-stone-900 lg:flex flex-col justify-between p-12 text-white relative overflow-hidden">
+      <div className="hidden bg-[#14171f] lg:flex flex-col justify-between p-12 text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1558769132-cb1aea458c5e?q=80&w=2400')] bg-cover bg-center opacity-40 mix-blend-overlay"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
 

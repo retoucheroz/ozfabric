@@ -202,7 +202,7 @@ export default function SketchPage() {
                     </div>
                 ) : (
                     <div className="text-center text-muted-foreground max-w-sm">
-                        <div className="w-24 h-24 bg-white dark:bg-stone-900 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+                        <div className="w-24 h-24 bg-white dark:bg-background rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
                             <Wand2 className="w-10 h-10 opacity-20" />
                         </div>
                         <h3 className="font-semibold text-lg">{language === "tr" ? "Henüz görsel yok" : "No image yet"}</h3>

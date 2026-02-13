@@ -129,7 +129,7 @@ function StudioSteps({ language }: { language: string }) {
 
             {/* Progress Bar */}
             <div className="w-full space-y-2">
-                <div className="h-2 w-full bg-zinc-800 overflow-hidden rounded-full">
+                <div className="h-2 w-full bg-card overflow-hidden rounded-full">
                     <div
                         className="h-full bg-gradient-to-r from-violet-600 via-pink-500 to-violet-600 rounded-full transition-all duration-500 ease-out"
                         style={{ width: `${progress}%` }}
@@ -2346,7 +2346,7 @@ export default function PhotoshootPage() {
                         {/* Studio Icon */}
                         <div className="relative">
                             <div className="absolute inset-0 bg-gradient-to-r from-violet-500/30 to-pink-500/30 rounded-full blur-xl animate-pulse"></div>
-                            <div className="relative w-24 h-24 bg-gradient-to-br from-zinc-900 to-zinc-800 rounded-2xl shadow-2xl flex items-center justify-center border border-zinc-700">
+                            <div className="relative w-24 h-24 bg-gradient-to-br from-background to-card rounded-2xl shadow-2xl flex items-center justify-center border border-zinc-700">
                                 <Camera className="w-10 h-10 text-white" />
                                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full animate-pulse shadow-lg shadow-red-500/50"></div>
                             </div>
@@ -2357,7 +2357,7 @@ export default function PhotoshootPage() {
 
                         {/* Progress Ring */}
                         <div className="w-full max-w-xs">
-                            <div className="h-1 w-full bg-zinc-800 overflow-hidden rounded-full">
+                            <div className="h-1 w-full bg-card overflow-hidden rounded-full">
                                 <div
                                     className="h-full bg-gradient-to-r from-violet-600 via-pink-500 to-violet-600 rounded-full"
                                     style={{

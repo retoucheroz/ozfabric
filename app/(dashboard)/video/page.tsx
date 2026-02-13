@@ -681,7 +681,7 @@ export default function VideoPage() {
             </header>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
+            <main className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-card scrollbar-track-transparent">
                 <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
 
                     {/* LEFT COLUMN: EDITOR */}
@@ -692,7 +692,7 @@ export default function VideoPage() {
                             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     {/* Story Selection */}
-                                    <Card className="md:col-span-2 bg-zinc-900/40 border-white/5 p-6 backdrop-blur-sm space-y-6">
+                                    <Card className="md:col-span-2 bg-background/40 border-white/5 p-6 backdrop-blur-sm space-y-6">
                                         <div className="flex items-center justify-between">
                                             <h2 className="text-lg font-semibold flex items-center gap-2">
                                                 <Clapperboard className="w-5 h-5 text-violet-400" />
@@ -724,7 +724,7 @@ export default function VideoPage() {
                                                     <button
                                                         key={t.id}
                                                         onClick={() => setUserStory(language === 'tr' ? t.contentTr : t.contentEn)}
-                                                        className="p-3 text-xs text-left bg-zinc-800/50 border border-white/5 rounded-xl hover:bg-zinc-700/50 hover:border-violet-500/50 transition-all group"
+                                                        className="p-3 text-xs text-left bg-card/50 border border-white/5 rounded-xl hover:bg-zinc-700/50 hover:border-violet-500/50 transition-all group"
                                                     >
                                                         <div className="font-semibold text-zinc-200 group-hover:text-white mb-1">
                                                             {language === 'tr' ? t.labelTr : t.label}
@@ -739,7 +739,7 @@ export default function VideoPage() {
                                     </Card>
 
                                     {/* Model/Subject Selection */}
-                                    <Card className="bg-zinc-900/40 border-white/5 p-6 backdrop-blur-sm space-y-6">
+                                    <Card className="bg-background/40 border-white/5 p-6 backdrop-blur-sm space-y-6">
                                         <h2 className="text-lg font-semibold flex items-center gap-2">
                                             <User className="w-5 h-5 text-fuchsia-400" />
                                             {language === 'tr' ? 'Model & Karakter' : 'Model & Character'}
@@ -750,7 +750,7 @@ export default function VideoPage() {
                                                 <button
                                                     key={src}
                                                     onClick={() => setModelSource(src)}
-                                                    className={`py-2 text-[10px] font-bold rounded-md transition-all ${modelSource === src ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                                    className={`py-2 text-[10px] font-bold rounded-md transition-all ${modelSource === src ? 'bg-card text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
                                                 >
                                                     {src.toUpperCase()}
                                                 </button>
@@ -781,7 +781,7 @@ export default function VideoPage() {
                                                     <img src={firstFrame} alt="Model" className="w-full h-full object-cover rounded-xl" />
                                                 ) : (
                                                     <>
-                                                        <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center mb-4 group-hover:scale-110 transition-all">
+                                                        <div className="w-12 h-12 rounded-full bg-card flex items-center justify-center mb-4 group-hover:scale-110 transition-all">
                                                             <Upload className="w-6 h-6 text-zinc-400" />
                                                         </div>
                                                         <span className="text-xs text-zinc-500 text-center font-medium">Model görseli yükle</span>
@@ -792,7 +792,7 @@ export default function VideoPage() {
 
                                         <div className="flex items-center justify-between pt-4">
                                             <div className="flex items-center gap-2 cursor-pointer" onClick={() => setIsSoundOn(!isSoundOn)}>
-                                                <div className={`w-10 h-6 rounded-full relative transition-all ${isSoundOn ? 'bg-violet-500' : 'bg-zinc-800'}`}>
+                                                <div className={`w-10 h-6 rounded-full relative transition-all ${isSoundOn ? 'bg-violet-500' : 'bg-card'}`}>
                                                     <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${isSoundOn ? 'left-5' : 'left-1'}`} />
                                                 </div>
                                                 <span className="text-xs font-semibold flex items-center gap-1.5">
@@ -818,12 +818,12 @@ export default function VideoPage() {
 
                                         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                                             {storyboard.shots.map((shot: any, idx: number) => (
-                                                <div key={idx} className="bg-zinc-900 border border-white/10 rounded-2xl p-4 space-y-3 relative group overflow-hidden">
-                                                    <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-[10px] font-bold text-violet-400">
+                                                <div key={idx} className="bg-background border border-white/10 rounded-2xl p-4 space-y-3 relative group overflow-hidden">
+                                                    <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-card flex items-center justify-center text-[10px] font-bold text-violet-400">
                                                         {idx + 1}
                                                     </div>
                                                     <div className="aspect-[3/4] rounded-lg bg-black/40 border border-white/5 flex items-center justify-center">
-                                                        <VideoIcon className="w-8 h-8 text-zinc-800" />
+                                                        <VideoIcon className="w-8 h-8 text-card" />
                                                     </div>
                                                     <div className="space-y-1">
                                                         <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{shot.title}</div>
@@ -850,7 +850,7 @@ export default function VideoPage() {
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="p-8 border-2 border-dashed border-white/10 rounded-3xl bg-zinc-900/20 text-center space-y-4">
+                                    <div className="p-8 border-2 border-dashed border-white/10 rounded-3xl bg-background/20 text-center space-y-4">
                                         <div className="w-16 h-16 bg-violet-500/10 rounded-full flex items-center justify-center mx-auto">
                                             <Sparkles className="w-8 h-8 text-violet-400" />
                                         </div>
@@ -1080,9 +1080,9 @@ export default function VideoPage() {
                                         {multiShot ? (
                                             <div className="space-y-4">
                                                 {/* MULTI SHOT LIST */}
-                                                <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-zinc-800">
+                                                <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-card">
                                                     {shots.map((shot, index) => (
-                                                        <div key={shot.id} className="relative p-4 rounded-2xl bg-zinc-900/60 border border-white/5 animate-in slide-in-from-right-2">
+                                                        <div key={shot.id} className="relative p-4 rounded-2xl bg-background/60 border border-white/5 animate-in slide-in-from-right-2">
                                                             <div className="flex items-center justify-between mb-3">
                                                                 <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
                                                                     <div className="w-5 h-5 rounded-full bg-violet-600 text-white flex items-center justify-center text-[10px]">{index + 1}</div>
@@ -1121,7 +1121,7 @@ export default function VideoPage() {
                                                                 />
                                                                 {/* Mention Menu for Multi-shot */}
                                                                 {mention.visible && mention.shotId === shot.id && (
-                                                                    <Card className="absolute left-0 bottom-full mb-2 w-48 bg-zinc-900 border-zinc-800 shadow-2xl z-50 overflow-hidden">
+                                                                    <Card className="absolute left-0 bottom-full mb-2 w-48 bg-background border-card shadow-2xl z-50 overflow-hidden">
                                                                         <div className="p-2 border-b border-white/5 bg-black/40 text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
                                                                             <Layers className="w-3 h-3 text-violet-400" />
                                                                             {language === 'tr' ? 'Element Seçin' : 'Select Element'}
@@ -1135,7 +1135,7 @@ export default function VideoPage() {
                                                                                         onClick={() => handleMentionSelect(el.name)}
                                                                                         className="w-full text-left px-3 py-2 rounded-lg hover:bg-violet-500/10 hover:text-white text-sm text-zinc-400 transition-all flex items-center gap-3 group"
                                                                                     >
-                                                                                        <div className="w-6 h-6 rounded-md overflow-hidden bg-zinc-800">
+                                                                                        <div className="w-6 h-6 rounded-md overflow-hidden bg-card">
                                                                                             <img src={el.images[0]} className="w-full h-full object-cover" />
                                                                                         </div>
                                                                                         <span className="font-medium group-hover:translate-x-1 transition-transform">@{el.name}</span>
@@ -1151,7 +1151,7 @@ export default function VideoPage() {
                                                                     variant="ghost"
                                                                     size="sm"
                                                                     onClick={() => setShowElementsDialog(true)}
-                                                                    className="h-8 gap-2 text-[10px] font-bold bg-zinc-800/50 hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-lg border border-white/5"
+                                                                    className="h-8 gap-2 text-[10px] font-bold bg-card/50 hover:bg-card text-zinc-400 hover:text-white rounded-lg border border-white/5"
                                                                 >
                                                                     <Layers className="w-3.5 h-3.5" />
                                                                     {language === 'tr' ? 'ELEMENTLER' : 'ELEMENTS'}
@@ -1181,7 +1181,7 @@ export default function VideoPage() {
 
                                                     <div className="flex items-center gap-4">
                                                         <div className="flex items-center gap-2 cursor-pointer" onClick={() => setIsSoundOn(!isSoundOn)}>
-                                                            <div className={`w-10 h-6 rounded-full relative transition-all ${isSoundOn ? 'bg-violet-500' : 'bg-zinc-800'}`}>
+                                                            <div className={`w-10 h-6 rounded-full relative transition-all ${isSoundOn ? 'bg-violet-500' : 'bg-card'}`}>
                                                                 <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${isSoundOn ? 'left-5' : 'left-1'}`} />
                                                             </div>
                                                             <span className="text-xs font-bold text-zinc-400">
@@ -1206,7 +1206,7 @@ export default function VideoPage() {
                                                 />
                                                 {/* Mention Menu */}
                                                 {mention.visible && (
-                                                    <Card className="absolute left-4 bottom-full mb-2 w-48 bg-zinc-900 border-zinc-800 shadow-2xl z-50 overflow-hidden">
+                                                    <Card className="absolute left-4 bottom-full mb-2 w-48 bg-background border-card shadow-2xl z-50 overflow-hidden">
                                                         <div className="p-2 border-b border-white/5 bg-black/40 text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
                                                             <Layers className="w-3 h-3 text-violet-400" />
                                                             {language === 'tr' ? 'Element Seçin' : 'Select Element'}
@@ -1220,7 +1220,7 @@ export default function VideoPage() {
                                                                         onClick={() => handleMentionSelect(el.name)}
                                                                         className="w-full text-left px-3 py-2 rounded-lg hover:bg-violet-500/10 hover:text-white text-sm text-zinc-400 transition-all flex items-center gap-3 group"
                                                                     >
-                                                                        <div className="w-6 h-6 rounded-md overflow-hidden bg-zinc-800">
+                                                                        <div className="w-6 h-6 rounded-md overflow-hidden bg-card">
                                                                             <img src={el.images[0]} className="w-full h-full object-cover" />
                                                                         </div>
                                                                         <span className="font-medium group-hover:translate-x-1 transition-transform">@{el.name}</span>
@@ -1241,14 +1241,14 @@ export default function VideoPage() {
                                                             variant="ghost"
                                                             size="sm"
                                                             onClick={() => setShowElementsDialog(true)}
-                                                            className="h-9 gap-2 text-xs font-bold bg-zinc-900 border border-white/10 text-zinc-300 hover:text-white rounded-xl hover:bg-violet-900/20"
+                                                            className="h-9 gap-2 text-xs font-bold bg-background border border-white/10 text-zinc-300 hover:text-white rounded-xl hover:bg-violet-900/20"
                                                         >
                                                             <Layers className="w-4 h-4" />
                                                             {language === 'tr' ? 'Elementler' : 'Elements'}
                                                         </Button>
                                                         <Separator orientation="vertical" className="h-4 bg-white/10" />
                                                         <div className="flex items-center gap-2 cursor-pointer" onClick={() => setIsSoundOn(!isSoundOn)}>
-                                                            <div className={`w-8 h-5 rounded-full relative transition-all ${isSoundOn ? 'bg-violet-500' : 'bg-zinc-800'}`}>
+                                                            <div className={`w-8 h-5 rounded-full relative transition-all ${isSoundOn ? 'bg-violet-500' : 'bg-card'}`}>
                                                                 <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${isSoundOn ? 'left-4' : 'left-1'}`} />
                                                             </div>
                                                             <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
@@ -1349,7 +1349,7 @@ export default function VideoPage() {
 
             {/* Elements Dialog */}
             <Dialog open={showElementsDialog} onOpenChange={(open) => { setShowElementsDialog(open); if (!open) setIsCreatingElement(false); }}>
-                <DialogContent className="bg-[#0f0f0f] border-zinc-800 text-white max-w-2xl rounded-[32px] p-0 overflow-hidden">
+                <DialogContent className="bg-[#0f0f0f] border-card text-white max-w-2xl rounded-[32px] p-0 overflow-hidden">
                     {!isCreatingElement ? (
                         <div className="p-8">
                             <DialogHeader>
@@ -1367,7 +1367,7 @@ export default function VideoPage() {
                             <div className="grid grid-cols-3 md:grid-cols-4 gap-4 mt-8">
                                 <div
                                     onClick={() => setIsCreatingElement(true)}
-                                    className="aspect-square rounded-[24px] border-2 border-dashed border-zinc-800 bg-zinc-900/40 flex flex-col items-center justify-center cursor-pointer hover:border-violet-500/50 hover:bg-violet-500/5 transition-all group"
+                                    className="aspect-square rounded-[24px] border-2 border-dashed border-card bg-background/40 flex flex-col items-center justify-center cursor-pointer hover:border-violet-500/50 hover:bg-violet-500/5 transition-all group"
                                 >
                                     <Plus className="w-6 h-6 text-zinc-500 group-hover:scale-110 transition-all" />
                                     <span className="text-[10px] text-zinc-600 font-bold mt-2">
@@ -1379,7 +1379,7 @@ export default function VideoPage() {
                                         key={el.id}
                                         draggable
                                         onDragStart={(e) => e.dataTransfer.setData("elementName", el.name)}
-                                        className="relative aspect-square rounded-[24px] border border-zinc-800 overflow-hidden group cursor-pointer"
+                                        className="relative aspect-square rounded-[24px] border border-card overflow-hidden group cursor-pointer"
                                         onClick={() => handleElementInsert(el.name)}
                                     >
                                         <img src={el.images[0]} className="w-full h-full object-cover" alt={el.name} />
@@ -1394,7 +1394,7 @@ export default function VideoPage() {
                                         </div>
                                         <div className="absolute bottom-2 right-2 flex -space-x-1.5">
                                             {el.images.map((img, i) => (
-                                                <div key={i} className="w-4 h-4 rounded-full border border-black overflow-hidden bg-zinc-800 shadow-sm">
+                                                <div key={i} className="w-4 h-4 rounded-full border border-black overflow-hidden bg-card shadow-sm">
                                                     <img src={img} className="w-full h-full object-cover" />
                                                 </div>
                                             ))}
@@ -1404,7 +1404,7 @@ export default function VideoPage() {
                             </div>
 
                             <div className="flex justify-end mt-8">
-                                <Button onClick={() => setShowElementsDialog(false)} className="bg-zinc-800 border border-zinc-700 text-white hover:bg-zinc-700 h-11 px-8 rounded-2xl font-bold">
+                                <Button onClick={() => setShowElementsDialog(false)} className="bg-card border border-zinc-700 text-white hover:bg-zinc-700 h-11 px-8 rounded-2xl font-bold">
                                     {language === 'tr' ? 'Kapat' : 'Close'}
                                 </Button>
                             </div>
@@ -1434,7 +1434,7 @@ export default function VideoPage() {
                                     {newElement.images.length < 3 && (
                                         <div
                                             onClick={() => elementInputRef.current?.click()}
-                                            className="w-24 h-24 rounded-2xl border-2 border-dashed border-zinc-800 bg-zinc-900/40 flex flex-col items-center justify-center cursor-pointer hover:border-violet-500/50 hover:bg-violet-500/5 transition-all text-zinc-500"
+                                            className="w-24 h-24 rounded-2xl border-2 border-dashed border-card bg-background/40 flex flex-col items-center justify-center cursor-pointer hover:border-violet-500/50 hover:bg-violet-500/5 transition-all text-zinc-500"
                                         >
                                             <Plus className="w-5 h-5 mb-1" />
                                             <span className="text-[10px] font-bold text-center px-2">
@@ -1453,7 +1453,7 @@ export default function VideoPage() {
                                                 value={newElement.name}
                                                 onChange={(e) => setNewElement(prev => ({ ...prev, name: e.target.value }))}
                                                 placeholder="a1"
-                                                className="w-full h-12 bg-zinc-900 border border-zinc-800 rounded-2xl pl-8 pr-4 text-sm font-bold focus:border-violet-500/50 outline-none transition-all"
+                                                className="w-full h-12 bg-background border border-card rounded-2xl pl-8 pr-4 text-sm font-bold focus:border-violet-500/50 outline-none transition-all"
                                             />
                                         </div>
                                     </div>
@@ -1464,13 +1464,13 @@ export default function VideoPage() {
                                             value={newElement.description}
                                             onChange={(e) => setNewElement(prev => ({ ...prev, description: e.target.value }))}
                                             placeholder={language === 'tr' ? "Objenin önemli özelliklerini tanımlayın..." : "Describe the subject's key features..."}
-                                            className="min-h-[120px] bg-zinc-900 border-zinc-800 rounded-2xl text-sm resize-none"
+                                            className="min-h-[120px] bg-background border-card rounded-2xl text-sm resize-none"
                                         />
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="px-8 py-6 bg-zinc-900/40 border-t border-zinc-800 flex justify-end gap-3">
+                            <div className="px-8 py-6 bg-background/40 border-t border-card flex justify-end gap-3">
                                 <Button onClick={() => setIsCreatingElement(false)} variant="ghost" className="h-11 px-8 rounded-2xl font-bold text-zinc-400">
                                     {language === 'tr' ? 'İptal' : 'Cancel'}
                                 </Button>

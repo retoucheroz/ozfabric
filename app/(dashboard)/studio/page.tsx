@@ -318,7 +318,7 @@ function StudioPageContent() {
           </div>
 
           {/* Right: Technical Spec Sheet */}
-          <div className="flex-1 bg-white dark:bg-zinc-950 overflow-y-auto p-8 lg:px-12">
+          <div className="flex-1 bg-white dark:bg-background overflow-y-auto p-8 lg:px-12">
             {isAnalyzing ? (
               <div className="h-full flex flex-col items-center justify-center space-y-4">
                 <Loader2 className="w-10 h-10 animate-spin text-primary" />

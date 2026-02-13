@@ -95,7 +95,7 @@ function StudioSteps({ language, isSuccess }: { language: string, isSuccess?: bo
 
             {/* Progress Bar */}
             <div className="w-full space-y-2">
-                <div className="h-2 w-full bg-zinc-800 overflow-hidden rounded-full">
+                <div className="h-2 w-full bg-card overflow-hidden rounded-full">
                     <div
                         className={`h-full bg-gradient-to-r from-violet-600 via-pink-500 to-violet-600 rounded-full transition-all ease-out ${isSuccess ? 'duration-1000' : 'duration-500'}`}
                         style={{ width: `${progress}%` }}
@@ -3330,7 +3330,7 @@ export default function PhotoshootPage() {
                             <div className="space-y-3 animate-in slide-in-from-top-1 duration-200">
                                 <input
                                     type="text"
-                                    className="w-full text-xs p-2.5 rounded-lg border border-blue-200 dark:border-blue-800 bg-white dark:bg-zinc-900 placeholder:text-muted-foreground/60 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                    className="w-full text-xs p-2.5 rounded-lg border border-blue-200 dark:border-blue-800 bg-white dark:bg-background placeholder:text-muted-foreground/60 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                     value={productCode}
                                     onChange={(e) => setProductCode(e.target.value.toUpperCase())}
                                     placeholder="Product Code (e.g. MAV-01)"
@@ -3347,7 +3347,7 @@ export default function PhotoshootPage() {
                                                 onClick={() => setBatchShotSelection(prev => ({ ...prev, [shot.id]: !isSelected }))}
                                                 className={`flex items-center gap-2.5 p-2 rounded-lg cursor-pointer transition-all duration-200 group ${isSelected
                                                     ? 'bg-blue-950/40 border border-blue-700/40'
-                                                    : 'bg-zinc-900/30 border border-transparent opacity-50 hover:opacity-70'
+                                                    : 'bg-background/30 border border-transparent opacity-50 hover:opacity-70'
                                                     }`}
                                             >
                                                 <input
@@ -3654,7 +3654,7 @@ export default function PhotoshootPage() {
                         {/* Studio Icon */}
                         <div className="relative">
                             <div className="absolute inset-0 bg-gradient-to-r from-violet-500/30 to-pink-500/30 rounded-full blur-xl animate-pulse"></div>
-                            <div className="relative w-24 h-24 bg-gradient-to-br from-zinc-900 to-zinc-800 rounded-2xl shadow-2xl flex items-center justify-center border border-zinc-700">
+                            <div className="relative w-24 h-24 bg-gradient-to-br from-background to-card rounded-2xl shadow-2xl flex items-center justify-center border border-zinc-700">
                                 <Camera className="w-10 h-10 text-white" />
                                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full animate-pulse shadow-lg shadow-red-500/50"></div>
                             </div>
@@ -3665,7 +3665,7 @@ export default function PhotoshootPage() {
 
                         {/* Progress Ring */}
                         <div className="w-full max-w-xs">
-                            <div className="h-1 w-full bg-zinc-800 overflow-hidden rounded-full">
+                            <div className="h-1 w-full bg-card overflow-hidden rounded-full">
                                 <div
                                     className="h-full bg-gradient-to-r from-violet-600 via-pink-500 to-violet-600 rounded-full"
                                     style={{
@@ -3770,7 +3770,7 @@ export default function PhotoshootPage() {
                 {/* Micro-feedback Hint Area */}
                 <div className="absolute top-6 left-1/2 -translate-x-1/2 z-30 pointer-events-none h-8 flex items-center justify-center">
                     {microFeedback && (
-                        <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border border-violet-200/50 dark:border-violet-800/50 px-4 py-1 rounded-full shadow-sm">
+                        <div className="bg-white/90 dark:bg-background/90 backdrop-blur-md border border-violet-200/50 dark:border-violet-800/50 px-4 py-1 rounded-full shadow-sm">
                             <p className="text-[10px] font-bold text-violet-600 dark:text-violet-400 uppercase tracking-tighter flex items-center gap-2">
                                 <Sparkles size={10} className="animate-pulse" />
                                 {microFeedback}
