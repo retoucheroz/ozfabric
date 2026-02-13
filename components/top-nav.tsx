@@ -21,9 +21,18 @@ export function TopNav() {
     const { language, setLanguage, t } = useLanguage();
     const { theme, setTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
+    const [user, setUser] = useState<any>(null);
 
     useEffect(() => {
         setMounted(true);
+        fetch('/api/auth/session')
+            .then(res => res.json())
+            .then(data => {
+                if (data.authenticated) {
+                    setUser(data.user);
+                }
+            })
+            .catch(err => console.error("Session fetch failed", err));
     }, []);
 
     const navItems = [
@@ -51,7 +60,13 @@ export function TopNav() {
                             </SheetHeader>
                             <div className="p-6 border-b">
                                 <Link href="/home" className="flex items-center font-bold text-xl tracking-tight">
-                                    <span className="bg-gradient-to-r from-violet-500 to-purple-600 bg-clip-text text-transparent font-black">rawless</span><span className="font-black">.ai</span>
+                                    {user?.customTitle ? (
+                                        <span className="bg-gradient-to-r from-violet-500 to-purple-600 bg-clip-text text-transparent font-black">{user.customTitle}</span>
+                                    ) : (
+                                        <>
+                                            <span className="bg-gradient-to-r from-violet-500 to-purple-600 bg-clip-text text-transparent font-black">rawless</span><span className="font-black">.ai</span>
+                                        </>
+                                    )}
                                 </Link>
                             </div>
                             <div className="flex flex-col py-4 h-full">
@@ -63,7 +78,13 @@ export function TopNav() {
 
                 {/* Logo */}
                 <Link href="/home" className="flex items-center font-bold text-xl tracking-tight hover:opacity-80 transition-opacity">
-                    <span className="bg-gradient-to-r from-violet-500 to-purple-600 bg-clip-text text-transparent font-black">rawless</span><span className="font-black">.ai</span>
+                    {user?.customTitle ? (
+                        <span className="bg-gradient-to-r from-violet-500 to-purple-600 bg-clip-text text-transparent font-black">{user.customTitle}</span>
+                    ) : (
+                        <>
+                            <span className="bg-gradient-to-r from-violet-500 to-purple-600 bg-clip-text text-transparent font-black">rawless</span><span className="font-black">.ai</span>
+                        </>
+                    )}
                 </Link>
             </div>
 

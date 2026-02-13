@@ -12,6 +12,7 @@ export interface User {
     role: UserRole;
     status: 'active' | 'pending' | 'disabled';
     authorizedPages: string[];
+    customTitle?: string;
     customSettings?: Record<string, any>;
     createdAt: number;
     lastLogin?: number;

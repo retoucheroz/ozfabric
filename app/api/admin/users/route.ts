@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-        const { username, password, role } = await req.json();
+        const { username, password, role, customTitle } = await req.json();
 
         if (!username || !password) {
             return NextResponse.json({ error: 'Missing credentials' }, { status: 400 });
@@ -63,6 +63,7 @@ export async function POST(req: NextRequest) {
             role: role || 'user',
             status: 'active',
             authorizedPages: ['/home'],
+            customTitle: customTitle || '',
             createdAt: Date.now(),
         };
 

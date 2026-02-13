@@ -129,6 +129,7 @@ export default function AdminPage() {
                         const username = formData.get('username') as string;
                         const password = formData.get('password') as string;
                         const role = formData.get('role') as string;
+                        const customTitle = formData.get('customTitle') as string;
 
                         if (!username || !password) return toast.error("Kullanıcı adı ve şifre zorunludur");
 
@@ -136,7 +137,7 @@ export default function AdminPage() {
                             const res = await fetch('/api/admin/users', {
                                 method: 'POST',
                                 headers: getAdminHeaders(),
-                                body: JSON.stringify({ username, password, role })
+                                body: JSON.stringify({ username, password, role, customTitle })
                             });
                             if (res.ok) {
                                 toast.success("Kullanıcı başarıyla oluşturuldu");
@@ -157,6 +158,10 @@ export default function AdminPage() {
                         <div className="space-y-1.5 flex-1 min-w-[200px]">
                             <Label htmlFor="password">Şifre</Label>
                             <Input id="password" name="password" type="password" placeholder="••••••••" required />
+                        </div>
+                        <div className="space-y-1.5 flex-1 min-w-[200px]">
+                            <Label htmlFor="customTitle">Başlık (Branding)</Label>
+                            <Input id="customTitle" name="customTitle" placeholder="örn: Autography" />
                         </div>
                         <div className="space-y-1.5 w-[140px]">
                             <Label htmlFor="role">Yetki</Label>
@@ -230,6 +235,23 @@ export default function AdminPage() {
                                         </Button>
                                     </>
                                 )}
+                            </div>
+
+                            {/* Branding Title */}
+                            <div className="space-y-1.5">
+                                <Label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
+                                    <Layout className="w-3 h-3" /> Branded Title
+                                </Label>
+                                <Input
+                                    value={user.customTitle || ''}
+                                    onChange={(e) => {
+                                        const newUsers = users.map(u => u.username === user.username ? { ...u, customTitle: e.target.value } : u);
+                                        setUsers(newUsers);
+                                    }}
+                                    onBlur={(e) => updateUser(user.username, { customTitle: e.target.value })}
+                                    placeholder="e.g. Autography"
+                                    className="h-8 text-xs bg-muted/20"
+                                />
                             </div>
 
                             {/* Permissions */}
