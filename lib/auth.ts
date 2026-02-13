@@ -33,7 +33,7 @@ async function getRedis() {
             socket: {
                 reconnectStrategy: (retries) => Math.min(retries * 50, 2000),
                 connectTimeout: 10000,
-                keepAlive: 5000,
+                keepAlive: true,
             }
         });
 
