@@ -73,8 +73,16 @@ export async function getUser(username: string): Promise<User | null> {
         if (!client) return null;
 
         const data = await client.get(`user:${username}`);
-        console.log(`👤 Auth: getUser(${username}) -> ${data ? 'Found' : 'NULL'}`);
-        return parseValue(data);
+        const user = parseValue(data);
+
+        // SELF-HEALING: If it's admin, ensure they have admin roles
+        if (username === 'admin' && user) {
+            user.role = 'admin';
+            if (!user.authorizedPages) user.authorizedPages = ['*'];
+        }
+
+        console.log(`👤 Auth: getUser(${username}) -> ${user ? `Found (Role: ${user.role})` : 'NULL'}`);
+        return user;
     } catch (e) {
         console.error('Redis getUser Error:', e);
         return null;
@@ -210,8 +218,15 @@ export async function getAllUsers(): Promise<Omit<User, 'passwordHash'>[]> {
         const keys = await client.keys('user:*');
         if (keys.length === 0) return [];
         const values = await client.mGet(keys);
+
         return values.map(parseValue).filter(Boolean).map((u: User) => {
             const { passwordHash, ...rest } = u;
+
+            // Self-heal admin in list too
+            if (rest.username === 'admin') {
+                rest.role = 'admin';
+            }
+
             return rest;
         });
     } catch (e) {
