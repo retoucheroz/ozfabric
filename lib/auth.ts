@@ -1,4 +1,4 @@
-import { kv } from '@vercel/kv';
+import Redis from 'ioredis';
 import { User, Session } from './auth-types';
 import { cookies } from 'next/headers';
 import { hashPassword, comparePasswords } from '@/lib/crypto';
@@ -6,30 +6,56 @@ import { hashPassword, comparePasswords } from '@/lib/crypto';
 const SESSION_COOKIE_NAME = 'ozfabric_session';
 const SESSION_TTL = 60 * 60 * 24 * 7; // 1 week
 
-// Local memory fallback for development when KV is not configured
-const isKvConfigured = !!(process.env.KV_REST_API_URL || process.env.KV_URL || process.env.REDIS_URL);
+// Check for Redis configuration
+const REDIS_URL = process.env.REDIS_URL || process.env.KV_URL;
+const isKvConfigured = !!REDIS_URL;
 export const isKvActive = isKvConfigured;
 const useMemoryFallback = !isKvConfigured && process.env.NODE_ENV === 'development';
 
-// Persist memory store across HMR (Hot Module Replacement) in development
+// Singleton Redis client
+let redisClient: Redis | null = null;
+
+function getRedis() {
+    if (useMemoryFallback) return null;
+    if (redisClient) return redisClient;
+
+    if (REDIS_URL) {
+        redisClient = new Redis(REDIS_URL, {
+            maxRetriesPerRequest: null,
+        });
+        return redisClient;
+    }
+    return null;
+}
+
+// Persist memory store across HMR
 const memoryStore: Map<string, any> = (global as any)._ozMemoryStore || new Map<string, any>();
 if (useMemoryFallback) {
     (global as any)._ozMemoryStore = memoryStore;
-    console.log(`🚀 Auth: Using local memory fallback (Sessions: ${Array.from(memoryStore.keys()).filter(k => k.startsWith('session:')).length})`);
+    console.log(`🚀 Auth: Using local memory fallback`);
 }
 
-async function getKv() {
-    if (useMemoryFallback) return null;
-    return kv;
-}
+// Helper to parse JSON from Redis
+const parseValue = (val: any) => {
+    if (!val) return null;
+    if (typeof val === 'object') return val;
+    try {
+        return JSON.parse(val);
+    } catch (e) {
+        return val;
+    }
+};
 
 export async function getUser(username: string): Promise<User | null> {
     try {
         if (useMemoryFallback) return memoryStore.get(`user:${username}`) || null;
-        const _kv = await getKv();
-        return _kv ? await _kv.get<User>(`user:${username}`) : null;
+        const client = getRedis();
+        if (!client) return null;
+
+        const data = await client.get(`user:${username}`);
+        return parseValue(data);
     } catch (e) {
-        console.error('KV Get Error:', e);
+        console.error('Redis Get User Error:', e);
         return null;
     }
 }
@@ -40,10 +66,10 @@ export async function saveUser(user: User): Promise<void> {
             memoryStore.set(`user:${user.username}`, user);
             return;
         }
-        const _kv = await getKv();
-        if (_kv) await _kv.set(`user:${user.username}`, user);
+        const client = getRedis();
+        if (client) await client.set(`user:${user.username}`, JSON.stringify(user));
     } catch (e) {
-        console.error('KV Save Error:', e);
+        console.error('Redis Save User Error:', e);
     }
 }
 
@@ -60,14 +86,14 @@ export async function createSession(username: string): Promise<string> {
                 memoryStore.set(`active_sessions`, [...active, sessionId]);
             }
         } else {
-            const _kv = await getKv();
-            if (_kv) {
-                await _kv.set(`session:${sessionId}`, session, { ex: SESSION_TTL });
-                await _kv.sadd('active_sessions', sessionId);
+            const client = getRedis();
+            if (client) {
+                await client.set(`session:${sessionId}`, JSON.stringify(session), 'EX', SESSION_TTL);
+                await client.sadd('active_sessions', sessionId);
             }
         }
     } catch (e) {
-        console.error('KV Session Error:', e);
+        console.error('Redis Session Error:', e);
     }
 
     const cookieStore = await cookies();
@@ -92,21 +118,24 @@ export async function getSession(): Promise<Session | null> {
         if (useMemoryFallback) {
             session = memoryStore.get(`session:${sessionId}`) || null;
         } else {
-            const _kv = await getKv();
-            session = _kv ? await _kv.get<Session>(`session:${sessionId}`) : null;
+            const client = getRedis();
+            if (client) {
+                const data = await client.get(`session:${sessionId}`);
+                session = parseValue(data);
+            }
         }
 
         if (session) {
             if (useMemoryFallback) {
                 memoryStore.set(`heartbeat:${session.username}`, Date.now());
             } else {
-                const _kv = await getKv();
-                if (_kv) await _kv.set(`heartbeat:${session.username}`, Date.now(), { ex: 300 });
+                const client = getRedis();
+                if (client) await client.set(`heartbeat:${session.username}`, Date.now(), 'EX', 300);
             }
         }
         return session;
     } catch (e) {
-        console.error('KV GetSession Error:', e);
+        console.error('Redis GetSession Error:', e);
         return null;
     }
 }
@@ -123,12 +152,13 @@ export async function logout() {
                 const active = (memoryStore.get('active_sessions') || []).filter((id: string) => id !== sessionId);
                 memoryStore.set('active_sessions', active);
             } else {
-                const _kv = await getKv();
-                if (_kv) {
-                    const session = await _kv.get<Session>(`session:${sessionId}`);
-                    if (session) await _kv.del(`heartbeat:${session.username}`);
-                    await _kv.del(`session:${sessionId}`);
-                    await _kv.srem('active_sessions', sessionId);
+                const client = getRedis();
+                if (client) {
+                    const data = await client.get(`session:${sessionId}`);
+                    const session = parseValue(data);
+                    if (session) await client.del(`heartbeat:${session.username}`);
+                    await client.del(`session:${sessionId}`);
+                    await client.srem('active_sessions', sessionId);
                 }
             }
         }
@@ -146,9 +176,9 @@ export async function getOnlineUsers(): Promise<string[]> {
                 .filter(([key, time]) => key.startsWith('heartbeat:') && (now - time) < 300000)
                 .map(([key]) => key.split(':')[1]);
         }
-        const _kv = await getKv();
-        if (!_kv) return [];
-        const heartbeats = await _kv.keys('heartbeat:*');
+        const client = getRedis();
+        if (!client) return [];
+        const heartbeats = await client.keys('heartbeat:*');
         return heartbeats.map(key => key.split(':')[1]);
     } catch (e) {
         console.error('Online users error:', e);
@@ -162,11 +192,12 @@ export async function getAllUsers(): Promise<Omit<User, 'passwordHash'>[]> {
         if (useMemoryFallback) {
             users = Array.from(memoryStore.values()).filter(v => v.username && v.passwordHash);
         } else {
-            const _kv = await getKv();
-            if (!_kv) return [];
-            const keys = await _kv.keys('user:*');
+            const client = getRedis();
+            if (!client) return [];
+            const keys = await client.keys('user:*');
             if (keys.length === 0) return [];
-            users = await _kv.mget<User[]>(...keys);
+            const values = await client.mget(...keys);
+            users = values.map(parseValue).filter(Boolean);
         }
         return users.map(u => {
             const { passwordHash, ...rest } = u;
