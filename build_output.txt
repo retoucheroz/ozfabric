@@ -1,0 +1,88 @@
+
+> ozfabric@0.1.0 build
+> next build
+
+   ▲ Next.js 15.5.10
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 2.6s
+   Skipping linting
+   Checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/47) ...
+   Generating static pages (11/47) 
+   Generating static pages (23/47) 
+   Generating static pages (35/47) 
+ ✓ Generating static pages (47/47)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                 Size  First Load JS
+┌ ○ /                                    7.94 kB         174 kB
+├ ○ /_not-found                             1 kB         103 kB
+├ ○ /admin                                5.5 kB         141 kB
+├ ○ /analysis                            8.96 kB         212 kB
+├ ƒ /api/admin/online                      210 B         102 kB
+├ ƒ /api/admin/users                       210 B         102 kB
+├ ƒ /api/analysis                          210 B         102 kB
+├ ƒ /api/analyze                           210 B         102 kB
+├ ƒ /api/analyze-pose                      210 B         102 kB
+├ ƒ /api/auth/login                        210 B         102 kB
+├ ƒ /api/auth/logout                       210 B         102 kB
+├ ƒ /api/auth/register                     210 B         102 kB
+├ ƒ /api/auth/session                      210 B         102 kB
+├ ƒ /api/chat                              210 B         102 kB
+├ ƒ /api/detail                            210 B         102 kB
+├ ƒ /api/ecom/analyze                      210 B         102 kB
+├ ƒ /api/ecom/generate                     210 B         102 kB
+├ ƒ /api/editorial                         210 B         102 kB
+├ ƒ /api/editorial/analyze                 210 B         102 kB
+├ ƒ /api/face-head-swap                    210 B         102 kB
+├ ƒ /api/generate                          210 B         102 kB
+├ ƒ /api/ghost                             210 B         102 kB
+├ ƒ /api/patterns                          210 B         102 kB
+├ ƒ /api/photoshoot/generate               210 B         102 kB
+├ ƒ /api/pose                              210 B         102 kB
+├ ƒ /api/r2/presign                        210 B         102 kB
+├ ƒ /api/r2/upload                         210 B         102 kB
+├ ƒ /api/resize                            210 B         102 kB
+├ ƒ /api/retexture                         210 B         102 kB
+├ ƒ /api/sketch                            210 B         102 kB
+├ ƒ /api/video/analyze                     210 B         102 kB
+├ ƒ /api/video/generate                    210 B         102 kB
+├ ƒ /api/video/generate-endframe           210 B         102 kB
+├ ƒ /api/video/upload                      210 B         102 kB
+├ ƒ /api/vton                              210 B         102 kB
+├ ○ /collections                         3.18 kB         126 kB
+├ ƒ /collections/[id]                    5.78 kB         161 kB
+├ ○ /community                           2.96 kB         135 kB
+├ ○ /design/patterns                     5.04 kB         150 kB
+├ ○ /design/retexture                    3.96 kB         136 kB
+├ ○ /design/styles                       13.5 kB         184 kB
+├ ○ /ecom                                9.95 kB         181 kB
+├ ○ /editorial                           14.6 kB         199 kB
+├ ○ /face-head-swap                      7.39 kB         174 kB
+├ ○ /history                             6.92 kB         170 kB
+├ ○ /home                                 4.4 kB         131 kB
+├ ○ /photoshoot                          34.7 kB         186 kB
+├ ○ /photoshoot/ghost                    9.13 kB         154 kB
+├ ○ /photoshoot/mannequin                6.16 kB         152 kB
+├ ○ /photoshoot/try-on                   9.17 kB         176 kB
+├ ○ /resize                              7.47 kB         179 kB
+├ ○ /settings                            6.95 kB         142 kB
+├ ○ /sketch                               5.7 kB         145 kB
+├ ○ /studio                              8.24 kB         153 kB
+├ ○ /train                               9.57 kB         148 kB
+└ ○ /video                               25.2 kB         197 kB
++ First Load JS shared by all             102 kB
+  ├ chunks/1255-7f732c419c6a4bd8.js        46 kB
+  ├ chunks/4bd1b696-f785427dddbba9fb.js  54.2 kB
+  └ other shared chunks (total)          1.97 kB
+
+
+ƒ Middleware                               34 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

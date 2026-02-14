@@ -13,13 +13,8 @@ import { useLanguage } from "@/context/language-context"
 import { useTheme } from "next-themes"
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet"
 import { LeftSidebar } from "@/components/left-sidebar"
-import { TbLayoutSidebar } from "react-icons/tb"
 
-interface TopNavProps {
-    onToggleSidebar?: () => void;
-}
-
-export function TopNav({ onToggleSidebar }: TopNavProps) {
+export function TopNav() {
     const pathname = usePathname();
     const router = useRouter();
     const { credits } = useProjects();
@@ -47,9 +42,9 @@ export function TopNav({ onToggleSidebar }: TopNavProps) {
     ];
 
     return (
-        <header className="h-16 border-b bg-background flex items-center justify-between px-4 sticky top-0 z-50">
+        <header className="h-16 border-b bg-background flex items-center justify-between px-4 md:px-6 sticky top-0 z-50">
             {/* Left Section: Mobile Menu & Logo */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
                 {mounted && (
                     <Sheet>
                         <SheetTrigger asChild>
@@ -80,18 +75,6 @@ export function TopNav({ onToggleSidebar }: TopNavProps) {
                             </div>
                         </SheetContent>
                     </Sheet>
-                )}
-
-                {/* Desktop Sidebar Toggle */}
-                {mounted && (
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="hidden md:flex text-muted-foreground hover:text-foreground shrink-0 ml-px"
-                        onClick={onToggleSidebar}
-                    >
-                        <TbLayoutSidebar className="size-5" />
-                    </Button>
                 )}
 
                 {/* Logo */}
@@ -136,7 +119,7 @@ export function TopNav({ onToggleSidebar }: TopNavProps) {
                 {mounted && (
                     <div
                         className="flex items-center gap-3 px-4 py-1.5 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-lg cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/20 transition-all group"
-                        onClick={() => router.push('/settings?section=billing')}
+                        onClick={() => router.push('/settings')}
                     >
                         <div className="flex items-center gap-2">
                             <div className="p-1 rounded-md bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 group-hover:bg-amber-200 dark:group-hover:bg-amber-900/60 transition-colors">

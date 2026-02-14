@@ -31,20 +31,25 @@ import { useState, useEffect } from "react"
 import { Separator } from "@/components/ui/separator"
 
 interface LeftSidebarProps {
-    variant?: "default" | "mobile";
-    isExpanded?: boolean;
+    variant?: "default" | "mobile"
 }
 
-export function LeftSidebar({ variant = "default", isExpanded = true }: LeftSidebarProps) {
+export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
     const pathname = usePathname();
     const { t } = useLanguage();
     const [mounted, setMounted] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(true);
     const [user, setUser] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isKvActive, setIsKvActive] = useState(true);
 
     useEffect(() => {
         setMounted(true);
+        const saved = localStorage.getItem('sidebar-expanded');
+        if (saved !== null) {
+            setIsExpanded(saved === 'true');
+        }
+
         // Fetch user session for RBAC
         fetch('/api/auth/session')
             .then(res => res.json())
@@ -57,6 +62,12 @@ export function LeftSidebar({ variant = "default", isExpanded = true }: LeftSide
             .catch(err => console.error("Session fetch failed", err))
             .finally(() => setIsLoading(false));
     }, []);
+
+    const toggleSidebar = () => {
+        const newState = !isExpanded;
+        setIsExpanded(newState);
+        localStorage.setItem('sidebar-expanded', String(newState));
+    };
 
     if (!mounted) return variant === "default" ? (
         <aside className="w-[240px] h-full border-r bg-[var(--bg-sidebar)] hidden md:flex" />
@@ -169,7 +180,17 @@ export function LeftSidebar({ variant = "default", isExpanded = true }: LeftSide
                 <div className="flex items-center justify-between mb-4 px-3 pt-2">
                     {/* Logo Area or just toggle */}
                     {isExpanded && <div className="w-4" />} {/* Spacer to center toggle if needed, or just keep it simple */}
-
+                    <button
+                        onClick={toggleSidebar}
+                        className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-[var(--sidebar-hover-bg)] transition-colors text-[var(--text-muted)] hover:text-[var(--text-primary)] ml-auto"
+                        title={isExpanded ? "Daralt" : "Genişlet"}
+                    >
+                        {isExpanded ? (
+                            <ChevronLeft className="w-5 h-5" />
+                        ) : (
+                            <ChevronRight className="w-5 h-5" />
+                        )}
+                    </button>
                 </div>
             )}
 
