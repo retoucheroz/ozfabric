@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -17,7 +17,7 @@ import { useTheme } from "next-themes"
 
 type SettingsSection = "profile" | "api" | "billing" | "notifications" | "security";
 
-export default function SettingsPage() {
+function SettingsContent() {
     const { credits, addCredits } = useProjects();
     const { t } = useLanguage();
     const { theme, setTheme } = useTheme();
@@ -316,5 +316,13 @@ export default function SettingsPage() {
                 </div>
             </div>
         </div>
+    )
+}
+
+export default function SettingsPage() {
+    return (
+        <Suspense fallback={<div>Loading settings...</div>}>
+            <SettingsContent />
+        </Suspense>
     )
 }
