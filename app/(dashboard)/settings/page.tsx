@@ -1,8 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
@@ -13,14 +14,17 @@ import { toast } from "sonner"
 import { useProjects } from "@/context/projects-context"
 import { useLanguage } from "@/context/language-context"
 import { useTheme } from "next-themes"
+import { useSearchParams } from "next/navigation"
 
 type SettingsSection = "profile" | "api" | "billing" | "notifications" | "security";
 
-export default function SettingsPage() {
+function SettingsContent() {
     const { credits, addCredits } = useProjects();
     const { t } = useLanguage();
     const { theme, setTheme } = useTheme();
-    const [activeSection, setActiveSection] = useState<SettingsSection>("profile");
+    const searchParams = useSearchParams();
+    const initialSection = (searchParams.get("tab") as SettingsSection) || "profile";
+    const [activeSection, setActiveSection] = useState<SettingsSection>(initialSection);
     const [apiKey, setApiKey] = useState("")
     const [notificationsEnabled, setNotificationsEnabled] = useState(true);
     const [emailUpdates, setEmailUpdates] = useState(true);
@@ -34,7 +38,13 @@ export default function SettingsPage() {
         if (stored) setApiKey(stored);
         const ozzieStored = localStorage.getItem("ozzie-chat-enabled");
         setOzzieEnabled(ozzieStored === "true");
-    }, []);
+
+        // Sync section with URL if it changes
+        const tab = searchParams.get("tab") as SettingsSection;
+        if (tab && ["profile", "api", "billing", "notifications", "security"].includes(tab)) {
+            setActiveSection(tab);
+        }
+    }, [searchParams]);
 
     const handleSaveKey = () => {
         localStorage.setItem("retoucheroz_runpod_key", apiKey);
@@ -62,10 +72,15 @@ export default function SettingsPage() {
                     <Button
                         key={section.id}
                         variant="ghost"
-                        className={`w-full justify-start ${activeSection === section.id ? 'font-semibold bg-accent/50' : ''}`}
+                        className={cn(
+                            "w-full justify-start transition-all",
+                            activeSection === section.id
+                                ? "bg-[var(--accent-soft)] text-[var(--accent-primary)] font-bold shadow-sm"
+                                : "text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
+                        )}
                         onClick={() => setActiveSection(section.id)}
                     >
-                        <section.icon className="w-4 h-4 mr-2" />
+                        <section.icon className={cn("w-4 h-4 mr-2", activeSection === section.id ? "text-[var(--accent-primary)]" : "text-[var(--text-muted)]")} />
                         {section.label}
                     </Button>
                 ))}
@@ -307,5 +322,13 @@ export default function SettingsPage() {
                 </div>
             </div>
         </div>
+    )
+}
+
+export default function SettingsPage() {
+    return (
+        <Suspense fallback={<div className="p-8">Loading settings...</div>}>
+            <SettingsContent />
+        </Suspense>
     )
 }

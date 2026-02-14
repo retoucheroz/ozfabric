@@ -116,40 +116,7 @@ export default function DashboardHome() {
                 </div>
             </div>
 
-            {/* Pro Plan Banner - Only show if not Pro */}
-            {!isPro && (
-                <Card className="relative overflow-hidden border-0 bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/20 w-full rounded-xl mt-8">
-                    <CardContent className="p-0">
-                        <div className="flex items-center justify-between p-5 gap-4 relative z-10">
-                            <div className="flex items-center gap-3">
-                                <div className="hidden sm:flex items-center justify-center w-10 h-10 rounded-full bg-white/20 shrink-0">
-                                    <Sparkles className="w-5 h-5 text-amber-300" />
-                                </div>
-                                <div className="flex flex-col gap-1">
-                                    <div className="flex items-center gap-2">
-                                        <h2 className="text-base font-bold leading-none">{t("home.proPlan")}</h2>
-                                        <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-400/90 text-black text-[10px] font-bold uppercase tracking-wide shrink-0">
-                                            PRO
-                                        </span>
-                                    </div>
-                                    <p className="text-white/80 text-xs md:text-sm">
-                                        {t("home.proPlanDesc")}
-                                    </p>
-                                </div>
-                            </div>
-                            <Button
-                                size="sm"
-                                className="bg-white text-purple-700 font-semibold rounded-lg px-5 py-2.5 h-auto hover:bg-gray-100 shadow-sm transition-transform hover:scale-105 shrink-0"
-                                onClick={() => router.push('/settings')}
-                            >
-                                {t("home.upgradeNow")}
-                            </Button>
-                        </div>
-                        {/* Abstract background shapes simplified */}
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none" />
-                    </CardContent>
-                </Card>
-            )}
+
 
             {/* Recent & Trending Grid */}
             <div className="flex flex-col gap-8 pb-12">

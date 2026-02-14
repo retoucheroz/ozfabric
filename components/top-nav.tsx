@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Home, Plus, Edit3, BrainCircuit, LayoutGrid, Settings, CreditCard, User, LogOut, Sparkles, Globe, Moon, Sun, Menu } from "lucide-react"
+import { Home, Plus, Edit3, BrainCircuit, LayoutGrid, Settings, CreditCard, User, LogOut, Sparkles, Globe, Moon, Sun, Menu, Zap } from "lucide-react"
 import { useProjects } from "@/context/projects-context"
 import { useLanguage } from "@/context/language-context"
 import { useTheme } from "next-themes"
@@ -115,11 +115,23 @@ export function TopNav() {
 
             {/* Right Actions */}
             <div className="flex items-center gap-1 md:gap-3">
+                {/* Pro Upgrade Pill */}
+                {mounted && (
+                    <div
+                        className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-violet-600/90 to-indigo-600/90 hover:from-violet-600 hover:to-indigo-600 text-white rounded-lg cursor-pointer transition-all shadow-sm hover:shadow-violet-500/20 group border border-violet-400/20"
+                        onClick={() => router.push('/pricing')}
+                    >
+                        <Zap className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
+                        <span className="text-xs font-bold tracking-tight">{t("home.upgradeNow")}</span>
+                        <div className="bg-amber-400 text-black text-[9px] font-black px-1.5 py-0.5 rounded-md leading-none">PRO</div>
+                    </div>
+                )}
+
                 {/* Credit Display */}
                 {mounted && (
                     <div
                         className="flex items-center gap-3 px-4 py-1.5 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-lg cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/20 transition-all group"
-                        onClick={() => router.push('/settings')}
+                        onClick={() => router.push('/settings?tab=billing')}
                     >
                         <div className="flex items-center gap-2">
                             <div className="p-1 rounded-md bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 group-hover:bg-amber-200 dark:group-hover:bg-amber-900/60 transition-colors">

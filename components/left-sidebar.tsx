@@ -24,7 +24,9 @@ import {
     TbClipboardText,
     TbHistory,
     TbSettings,
-    TbGhost2
+    TbGhost2,
+    TbLayoutSidebarLeftCollapse,
+    TbLayoutSidebarLeftExpand
 } from "react-icons/tb"
 import { useLanguage } from "@/context/language-context"
 import { useState, useEffect } from "react"
@@ -177,18 +179,19 @@ export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
     const sidebarContent = (
         <>
             {variant === "default" && (
-                <div className="flex items-center justify-between mb-4 px-3 pt-2">
-                    {/* Logo Area or just toggle */}
-                    {isExpanded && <div className="w-4" />} {/* Spacer to center toggle if needed, or just keep it simple */}
+                <div className="flex items-center mb-4 pt-2 px-[15px]">
                     <button
                         onClick={toggleSidebar}
-                        className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-[var(--sidebar-hover-bg)] transition-colors text-[var(--text-muted)] hover:text-[var(--text-primary)] ml-auto"
+                        className={cn(
+                            "flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-300",
+                            "bg-transparent hover:bg-[var(--accent-soft)] text-[var(--text-muted)] hover:text-[var(--accent-primary)] border border-transparent hover:border-[var(--accent-soft)] shadow-none hover:shadow-sm"
+                        )}
                         title={isExpanded ? "Daralt" : "Genişlet"}
                     >
                         {isExpanded ? (
-                            <ChevronLeft className="w-5 h-5" />
+                            <TbLayoutSidebarLeftCollapse className="w-6 h-6" />
                         ) : (
-                            <ChevronRight className="w-5 h-5" />
+                            <TbLayoutSidebarLeftExpand className="w-6 h-6" />
                         )}
                     </button>
                 </div>
