@@ -13,14 +13,16 @@ import { useLanguage } from "@/context/language-context"
 import { useTheme } from "next-themes"
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet"
 import { LeftSidebar } from "@/components/left-sidebar"
-import { useSidebar } from "@/context/sidebar-context"
 import { TbLayoutSidebar } from "react-icons/tb"
 
-export function TopNav() {
+interface TopNavProps {
+    onToggleSidebar?: () => void;
+}
+
+export function TopNav({ onToggleSidebar }: TopNavProps) {
     const pathname = usePathname();
     const router = useRouter();
     const { credits } = useProjects();
-    const { toggleSidebar } = useSidebar();
     const { language, setLanguage, t } = useLanguage();
     const { theme, setTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
@@ -86,7 +88,7 @@ export function TopNav() {
                         variant="ghost"
                         size="icon"
                         className="hidden md:flex text-muted-foreground hover:text-foreground shrink-0 ml-px"
-                        onClick={toggleSidebar}
+                        onClick={onToggleSidebar}
                     >
                         <TbLayoutSidebar className="size-5" />
                     </Button>

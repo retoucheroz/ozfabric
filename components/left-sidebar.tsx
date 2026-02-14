@@ -28,17 +28,16 @@ import {
 } from "react-icons/tb"
 import { useLanguage } from "@/context/language-context"
 import { useState, useEffect } from "react"
-import { useSidebar } from "@/context/sidebar-context"
 import { Separator } from "@/components/ui/separator"
 
 interface LeftSidebarProps {
-    variant?: "default" | "mobile"
+    variant?: "default" | "mobile";
+    isExpanded?: boolean;
 }
 
-export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
+export function LeftSidebar({ variant = "default", isExpanded = true }: LeftSidebarProps) {
     const pathname = usePathname();
     const { t } = useLanguage();
-    const { isExpanded } = useSidebar();
     const [mounted, setMounted] = useState(false);
     const [user, setUser] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
