@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSession, getUser, getAllUsers, saveUser } from '@/lib/auth';
+import { getSession, getUser, getAllUsers, saveUser, deleteUser } from '@/lib/auth';
 
 async function checkAdmin(req?: NextRequest) {
     // Fallback: Allow admin operations via ADMIN_PASSWORD header when KV is unavailable
@@ -34,8 +34,26 @@ export async function PATCH(req: NextRequest) {
     const user = await getUser(username);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
+    // Handle logo upload if provided as base64
+    if (updates.customLogo && updates.customLogo.startsWith('data:image')) {
+        const { ensureR2Url } = await import('@/lib/r2');
+        updates.customLogo = await ensureR2Url(updates.customLogo, 'branding/logos');
+    }
+
     const updatedUser = { ...user, ...updates };
     await saveUser(updatedUser);
+    return NextResponse.json({ success: true });
+}
+
+export async function DELETE(req: NextRequest) {
+    if (!await checkAdmin(req)) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const { username } = await req.json();
+    if (!username) return NextResponse.json({ error: 'Missing username' }, { status: 400 });
+    if (username === 'admin') return NextResponse.json({ error: 'Cannot delete admin' }, { status: 400 });
+
+    await deleteUser(username);
     return NextResponse.json({ success: true });
 }
 
@@ -45,7 +63,7 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-        const { username, password, role, customTitle } = await req.json();
+        let { username, password, role, customTitle, customLogo } = await req.json();
 
         if (!username || !password) {
             return NextResponse.json({ error: 'Missing credentials' }, { status: 400 });
@@ -56,6 +74,12 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Username already taken' }, { status: 400 });
         }
 
+        // Handle logo upload if provided as base64
+        if (customLogo && customLogo.startsWith('data:image')) {
+            const { ensureR2Url } = await import('@/lib/r2');
+            customLogo = await ensureR2Url(customLogo, 'branding/logos');
+        }
+
         const { hashPassword } = await import('@/lib/crypto');
         const newUser = {
             username,
@@ -64,6 +88,7 @@ export async function POST(req: NextRequest) {
             status: 'active',
             authorizedPages: ['/home'],
             customTitle: customTitle || '',
+            customLogo: customLogo || '',
             createdAt: Date.now(),
         };
 

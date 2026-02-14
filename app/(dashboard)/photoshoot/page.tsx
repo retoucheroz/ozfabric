@@ -15,7 +15,7 @@ import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
-import { resizeImageToThumbnail } from "@/lib/utils"
+import { resizeImageToThumbnail, cn } from "@/lib/utils"
 import { dbOperations, STORES } from "@/lib/db"
 import { buildBatchSpecs, extractDominantColor, generateColorPaletteSVG, type BatchSpec } from "@/lib/batch-helpers"
 import {
@@ -120,15 +120,19 @@ function StudioSteps({ language, isSuccess }: { language: string, isSuccess?: bo
                 {steps.map((_, idx) => (
                     <div
                         key={idx}
-                        className={`w-2 h-2 rounded-full transition-all duration-300 ${isSuccess ? 'bg-green-500' : (idx === currentStep
-                            ? 'bg-violet-500 scale-150'
-                            : idx < currentStep
-                                ? 'bg-green-500'
-                                : 'bg-zinc-700'
-                        )}`}
+                        className={cn(
+                            "w-2 h-2 rounded-full transition-all duration-300",
+                            isSuccess
+                                ? "bg-[var(--success)]"
+                                : idx === currentStep
+                                    ? "bg-[var(--accent-primary)] scale-150"
+                                    : idx < currentStep
+                                        ? "bg-[var(--success)]"
+                                        : "bg-[var(--bg-elevated)]"
+                        )}
                     />
                 ))}
-                <div className={`w-2 h-2 rounded-full transition-all duration-300 ${isSuccess ? 'bg-violet-500 scale-150' : 'bg-zinc-700'}`} />
+                <div className={cn("w-2 h-2 rounded-full transition-all duration-300", isSuccess ? "bg-[var(--accent-primary)] scale-150" : "bg-[var(--bg-elevated)]")} />
             </div>
 
             {/* Elapsed Time */}
@@ -217,6 +221,8 @@ export default function PhotoshootPage() {
     const router = useRouter();
     const [showExpert, setShowExpert] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const [showAdvanced, setShowAdvanced] = useState(false);
+    const [showGarmentDetails, setShowGarmentDetails] = useState(true);
 
     useEffect(() => {
         setMounted(true);
@@ -2683,12 +2689,15 @@ export default function PhotoshootPage() {
 
         return (
             <div
-                className={`asset-card-trigger relative group h-14 rounded-lg border flex items-center gap-0 overflow-hidden transition-all
-                ${assets[id] ? 'border-violet-500 bg-violet-50/10' : 'border-border hover:border-violet-400 hover:bg-muted/50'}
-                ${required && !assets[id] ? 'ring-1 ring-red-400/50' : ''}
-                ${activeLibraryAsset === id ? 'ring-2 ring-violet-500 border-violet-500 bg-violet-50/20' : ''}
-                ${isDragOver ? 'ring-2 ring-green-500 border-green-500 bg-green-50/20 scale-105' : ''}
-            `}
+                className={cn(
+                    "relative group h-14 rounded-lg border flex items-center gap-0 overflow-hidden transition-all",
+                    assets[id]
+                        ? "border-[var(--accent-primary)] bg-[var(--accent-soft)]"
+                        : "border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--accent-primary)] hover:bg-[var(--bg-elevated)]",
+                    required && !assets[id] && "ring-1 ring-red-400/50",
+                    activeLibraryAsset === id && "ring-2 ring-[var(--accent-primary)] border-[var(--accent-primary)]",
+                    isDragOver && "ring-2 ring-emerald-500 border-emerald-500 bg-emerald-50/20 scale-105"
+                )}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
@@ -2711,7 +2720,7 @@ export default function PhotoshootPage() {
 
                 {/* LEFT: Direct Upload / Preview Area */}
                 <div
-                    className="h-full w-14 flex items-center justify-center border-r bg-muted/30 cursor-pointer hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors relative"
+                    className="h-full w-14 flex items-center justify-center border-r border-[var(--border-subtle)] bg-[var(--bg-elevated)] cursor-pointer hover:bg-[var(--accent-soft)] transition-colors relative text-[var(--text-muted)] hover:text-[var(--accent-primary)]"
                     onClick={handleDirectUploadClick}
                     title={language === "tr" ? "Direkt Yükle veya Sürükle-Bırak" : "Direct Upload or Drag & Drop"}
                 >
@@ -2742,8 +2751,8 @@ export default function PhotoshootPage() {
                     }}
                 >
                     <div className="flex flex-col">
-                        <span className="text-xs font-medium text-foreground truncate">{label}</span>
-                        {assets[id] && <span className="text-[10px] text-violet-500 font-medium">{language === "tr" ? "Seçildi" : "Selected"}</span>}
+                        <span className="text-xs font-medium text-[var(--text-primary)] truncate">{label}</span>
+                        {assets[id] && <span className="text-[10px] text-[var(--accent-primary)] font-medium">{language === "tr" ? "Seçildi" : "Selected"}</span>}
                     </div>
 
                     <div className="flex items-center gap-1">
@@ -2754,7 +2763,7 @@ export default function PhotoshootPage() {
                                     e.stopPropagation();
                                     convertToStickman();
                                 }}
-                                className="text-muted-foreground hover:text-violet-500 transition-colors p-1"
+                                className="text-[var(--text-muted)] hover:text-[var(--accent-primary)] transition-colors p-1"
                                 title={language === "tr" ? "Çöp Adam'a (Stickman) Çevir" : "Convert to Stickman"}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-person-standing"><circle cx="12" cy="5" r="1" /><path d="m9 20 3-6 3 6" /><path d="m6 8 6 2 6-2" /><path d="M12 10v4" /></svg>
@@ -2768,7 +2777,7 @@ export default function PhotoshootPage() {
                                     e.stopPropagation();
                                     setLightingSendImage(!lightingSendImage);
                                 }}
-                                className={`transition-all p-1 rounded ${lightingSendImage ? 'text-violet-500 hover:text-violet-600' : 'text-zinc-400 hover:text-zinc-500'}`}
+                                className={cn("transition-all p-1 rounded", lightingSendImage ? "text-[var(--accent-primary)] hover:text-[var(--accent-hover)]" : "text-[var(--text-disabled)] hover:text-[var(--text-muted)]")}
                                 title={lightingSendImage ? (language === "tr" ? "Görsel Referans Aktif" : "Visual Reference Active") : (language === "tr" ? "Sadece Prompt Aktif" : "Prompt Only Active")}
                             >
                                 {lightingSendImage ? <Eye size={16} /> : <EyeOff size={16} />}
@@ -2778,7 +2787,7 @@ export default function PhotoshootPage() {
                         {assets[id] ? (
                             <button
                                 onClick={(e) => handleAssetRemove(id, e)}
-                                className="text-muted-foreground hover:text-red-500 transition-colors p-1"
+                                className="text-[var(--text-muted)] hover:text-red-500 transition-colors p-1"
                                 title={language === "tr" ? "Kaldır" : "Remove"}
                             >
                                 <Trash2 className="w-4 h-4" />
@@ -2786,7 +2795,7 @@ export default function PhotoshootPage() {
                         ) : (
                             <>
                                 {required && <span className="text-[10px] text-red-500 font-bold">*</span>}
-                                <ChevronRight className="w-4 h-4 text-muted-foreground opacity-50" />
+                                <ChevronRight className="w-4 h-4 text-[var(--text-muted)] opacity-50" />
                             </>
                         )}
                     </div>
@@ -2803,33 +2812,33 @@ export default function PhotoshootPage() {
             {/* Library Sidebar (Expanded Slide-out) */}
             <div
                 // ref={drawerRef} // Ref removed
-                className={`absolute lg:left-[600px] left-0 top-0 bottom-0 w-80 lg:w-80 bg-background border-r shadow-2xl z-10 flex flex-col transition-all duration-300 ease-in-out
-                    ${activeLibraryAsset ? 'translate-x-0 opacity-100' : 'translate-x-[-100%] opacity-0 pointer-events-none'}
-                `}
+                className={cn(
+                    "absolute lg:left-[400px] xl:left-[440px] left-0 top-0 bottom-0 w-80 lg:w-80 bg-[var(--bg-sidebar)] border-r border-[var(--border-subtle)] shadow-2xl z-10 flex flex-col transition-all duration-300 ease-in-out",
+                    activeLibraryAsset ? "translate-x-0 opacity-100" : "translate-x-[-100%] opacity-0 pointer-events-none"
+                )}
             >
                 {/* Header */}
-                <div className="p-3 border-b flex items-center justify-between bg-muted/30">
+                <div className="p-3 border-b border-[var(--border-subtle)] flex items-center justify-between bg-[var(--bg-elevated)]">
                     <div className="flex items-center gap-2">
                         {/* Back Button for Nested Navigation */}
                         {(activeLibraryAsset && !['product_group', 'accessories_group'].includes(activeLibraryAsset) && activeGroup) && (
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-6 w-6 -ml-1 mr-1"
+                                className="h-6 w-6 -ml-1 mr-1 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]"
                                 onClick={() => setActiveLibraryAsset(activeGroup === 'product' ? 'product_group' : 'accessories_group')}
                             >
                                 <ChevronLeft className="w-4 h-4" />
                             </Button>
                         )}
 
-                        <span className="text-sm font-bold truncate max-w-[150px]">
+                        <span className="text-sm font-bold truncate max-w-[150px] text-[var(--text-primary)]">
                             {activeLibraryAsset === 'product_group' ? (language === "tr" ? "Ürün" : "Product") :
                                 activeLibraryAsset === 'accessories_group' ? (language === "tr" ? "Aksesuarlar" : "Accessories") :
                                     (language === "tr" ? "Seçim Yap" : "Select Asset")}
                         </span>
-                        {/* Removed Group Badge as requested */}
                     </div>
-                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => { setActiveLibraryAsset(null); setActiveGroup(null); }}>
+                    <Button variant="ghost" size="icon" className="h-6 w-6 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]" onClick={() => { setActiveLibraryAsset(null); setActiveGroup(null); }}>
                         <X className="w-4 h-4" />
                     </Button>
                 </div>
@@ -2882,18 +2891,28 @@ export default function PhotoshootPage() {
                         {/* POSE FOCUS TOGGLE (Only for Pose) */}
                         {/* POSE FOCUS TOGGLE (Only for Pose) */}
                         {internalAsset === 'pose' && (
-                            <div className="px-3 py-2 border-b bg-muted/20 flex items-center justify-between">
-                                <span className="text-xs font-medium text-muted-foreground">{language === "tr" ? "Odak Alanı" : "Focus Area"}</span>
-                                <div className="flex items-center gap-2 bg-muted p-1 rounded-lg">
+                            <div className="px-3 py-2 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)] flex items-center justify-between">
+                                <span className="text-xs font-medium text-[var(--text-muted)]">{language === "tr" ? "Odak Alanı" : "Focus Area"}</span>
+                                <div className="flex items-center gap-2 bg-[var(--bg-elevated)] p-1 rounded-lg">
                                     <button
                                         onClick={() => { setPoseFocus('full'); setUpperFraming('full'); }}
-                                        className={`text-[10px] px-2 py-1 rounded-md transition-all ${poseFocus === 'full' ? 'bg-background shadow text-foreground font-bold' : 'text-muted-foreground hover:text-foreground'}`}
+                                        className={cn(
+                                            "text-[10px] px-2 py-1 rounded-md transition-all",
+                                            poseFocus === 'full'
+                                                ? "bg-[var(--bg-surface)] shadow text-[var(--text-primary)] font-bold"
+                                                : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                                        )}
                                     >
                                         {language === "tr" ? "Tam Boy" : "Full Body"}
                                     </button>
                                     <button
                                         onClick={() => { setPoseFocus('upper'); setUpperFraming('medium_full'); }}
-                                        className={`text-[10px] px-2 py-1 rounded-md transition-all ${poseFocus === 'upper' ? 'bg-background shadow text-foreground font-bold' : 'text-muted-foreground hover:text-foreground'}`}
+                                        className={cn(
+                                            "text-[10px] px-2 py-1 rounded-md transition-all",
+                                            poseFocus === 'upper'
+                                                ? "bg-[var(--bg-surface)] shadow text-[var(--text-primary)] font-bold"
+                                                : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                                        )}
                                     >
                                         {language === "tr" ? "Üst Beden" : "Upper Body"}
                                     </button>
@@ -2948,7 +2967,7 @@ export default function PhotoshootPage() {
                                                             <img src={pose.thumbUrl || pose.originalThumb} className="w-full h-full object-cover" onClick={() => handleSavedPoseClick(pose)} />
                                                             <div className="absolute top-1 right-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                                 <button onClick={(e) => { e.stopPropagation(); deleteSavedPose(pose.id); }} className="p-1 bg-red-500 text-white rounded hover:bg-red-600"><X size={10} /></button>
-                                                                <button onClick={(e) => { e.stopPropagation(); handleEditItemClick('pose', pose.id); }} className="p-1 bg-violet-500 text-white rounded hover:bg-violet-600"><Edit2 size={10} /></button>
+                                                                <button onClick={(e) => { e.stopPropagation(); handleEditItemClick('pose', pose.id); }} className="p-1 bg-[var(--accent-primary)] text-white rounded hover:bg-[var(--accent-hover)]"><Edit2 size={10} /></button>
                                                             </div>
                                                         </div>
                                                     ))}
@@ -2971,7 +2990,7 @@ export default function PhotoshootPage() {
                                                             <div className="absolute bottom-0 inset-x-0 p-1 bg-black/60 text-[9px] text-white truncate">{model.name}</div>
                                                             <div className="absolute top-1 right-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                                 <button onClick={(e) => { e.stopPropagation(); deleteSavedModel(model.id); }} className="p-1 bg-red-500 text-white rounded hover:bg-red-600"><X size={10} /></button>
-                                                                <button onClick={(e) => { e.stopPropagation(); handleEditItemClick('model', model.id); }} className="p-1 bg-violet-500 text-white rounded hover:bg-violet-600"><Edit2 size={10} /></button>
+                                                                <button onClick={(e) => { e.stopPropagation(); handleEditItemClick('model', model.id); }} className="p-1 bg-[var(--accent-primary)] text-white rounded hover:bg-[var(--accent-hover)]"><Edit2 size={10} /></button>
                                                             </div>
                                                         </div>
                                                     ))}
@@ -3031,7 +3050,7 @@ export default function PhotoshootPage() {
                                                                                                 />
                                                                                             ) : (
                                                                                                 <div
-                                                                                                    className="w-full h-full flex flex-col items-center justify-center bg-violet-100 text-violet-600 font-bold text-[10px] p-2 text-center"
+                                                                                                    className="w-full h-full flex flex-col items-center justify-center bg-[var(--bg-elevated)] text-[var(--accent-primary)] font-bold text-[10px] p-2 text-center"
                                                                                                     onClick={() => {
                                                                                                         if (internalAsset === 'lighting') {
                                                                                                             const l = item as SavedLighting;
@@ -3075,11 +3094,11 @@ export default function PhotoshootPage() {
                                                                                                 {(!LIGHTING_PRESETS.some(lp => lp.id === item.id)) ? (
                                                                                                     <>
                                                                                                         <button onClick={(e) => { e.stopPropagation(); deleteSavedAsset(internalAsset!, item.id); }} className="p-1 bg-red-500 text-white rounded hover:bg-red-600"><X size={10} /></button>
-                                                                                                        <button onClick={(e) => { e.stopPropagation(); handleEditItemClick(internalAsset!, item.id); }} className="p-1 bg-violet-500 text-white rounded hover:bg-violet-600"><Edit2 size={10} /></button>
+                                                                                                        <button onClick={(e) => { e.stopPropagation(); handleEditItemClick(internalAsset!, item.id); }} className="p-1 bg-[var(--accent-primary)] text-white rounded hover:bg-[var(--accent-hover)]"><Edit2 size={10} /></button>
                                                                                                     </>
                                                                                                 ) : (
                                                                                                     (internalAsset === 'lighting' || internalAsset === 'shoes') && (
-                                                                                                        <button onClick={(e) => { e.stopPropagation(); handleEditItemClick(internalAsset!, item.id); }} className="p-1 bg-violet-500 text-white rounded hover:bg-violet-600"><Edit2 size={10} /></button>
+                                                                                                        <button onClick={(e) => { e.stopPropagation(); handleEditItemClick(internalAsset!, item.id); }} className="p-1 bg-[var(--accent-primary)] text-white rounded hover:bg-[var(--accent-hover)]"><Edit2 size={10} /></button>
                                                                                                     )
                                                                                                 )}
                                                                                             </div>
@@ -3096,14 +3115,14 @@ export default function PhotoshootPage() {
                                                                             internalAsset === 'jewelry' ? savedJewelry :
                                                                                 internalAsset === 'belt' ? savedBelts :
                                                                                     []).length === 0 && (
-                                                    <div className="col-span-2 text-center text-[10px] text-muted-foreground py-10 bg-muted/20 border border-dashed rounded-lg">No saved items.</div>
+                                                    <div className="col-span-2 text-center text-[10px] text-[var(--text-muted)] py-10 bg-[var(--bg-surface)] border border-dashed border-[var(--border-subtle)] rounded-lg">No saved items.</div>
                                                 )}
                                         </div>
                                     </div>
                                 ) : (
                                     <div className="grid grid-cols-2 gap-2">
                                         {sessionLibrary.map((item, idx) => (
-                                            <div key={idx} onClick={() => handleLibrarySelect({ src: item })} className="aspect-[3/4] rounded-lg border bg-muted overflow-hidden cursor-pointer hover:ring-2 hover:ring-violet-500 transition-all">
+                                            <div key={idx} onClick={() => handleLibrarySelect({ src: item })} className="aspect-[3/4] rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-elevated)] overflow-hidden cursor-pointer hover:ring-2 hover:ring-[var(--accent-primary)] transition-all">
                                                 <img src={item} className="w-full h-full object-cover" />
                                             </div>
                                         ))}
@@ -3125,7 +3144,7 @@ export default function PhotoshootPage() {
                                 <div className="space-y-2">
                                     <label className="text-xs font-medium">{language === "tr" ? "Özel İstem" : "Custom Prompt"}</label>
                                     <textarea
-                                        className="w-full h-32 p-2 text-xs rounded-lg border bg-background resize-none focus:ring-1 focus:ring-violet-500"
+                                        className="w-full h-32 p-2 text-xs rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-primary)] resize-none focus:ring-1 focus:ring-[var(--accent-primary)]"
                                         placeholder={language === "tr" ? "Tam olarak ne istediğinizi tarif edin..." : "Describe exactly what you want..."}
                                     ></textarea>
                                     <Button size="sm" className="w-full text-xs">{language === "tr" ? "İstemi Uygula" : "Apply Prompt"}</Button>
@@ -3136,7 +3155,7 @@ export default function PhotoshootPage() {
                             </TabsContent>
 
                             <TabsContent value="assets" className="flex-1 overflow-y-auto p-3 space-y-4">
-                                <div className="border-2 border-dashed border-muted-foreground/20 rounded-xl p-4 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-muted/30 hover:border-violet-500/50 transition-all relative">
+                                <div className="border-2 border-dashed border-[var(--border-subtle)] rounded-xl p-4 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-[var(--bg-surface)] hover:border-[var(--accent-primary)] transition-all relative">
                                     <input
                                         type="file"
                                         className="absolute inset-0 opacity-0 cursor-pointer"
@@ -3151,7 +3170,7 @@ export default function PhotoshootPage() {
                                             }
                                         }}
                                     />
-                                    <div className="p-3 bg-violet-100 dark:bg-violet-900/20 rounded-full">
+                                    <div className="p-3 bg-[var(--bg-elevated)] rounded-full">
                                         <Upload className="w-5 h-5 text-violet-600 dark:text-violet-400" />
                                     </div>
                                     <div className="text-center">
@@ -3176,12 +3195,12 @@ export default function PhotoshootPage() {
                                                         }
                                                         setActiveLibraryAsset(null);
                                                     }}
-                                                    className="aspect-square rounded-lg border bg-muted overflow-hidden relative cursor-pointer hover:ring-2 hover:ring-violet-500"
+                                                    className="aspect-square rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-elevated)] overflow-hidden relative cursor-pointer hover:ring-2 hover:ring-[var(--accent-primary)]"
                                                 >
                                                     {model.thumbnailUrl ? (
                                                         <img src={model.thumbnailUrl} className="w-full h-full object-cover" />
                                                     ) : (
-                                                        <div className="w-full h-full flex items-center justify-center bg-violet-100 text-violet-600 font-bold text-xs p-2 text-center">
+                                                        <div className="w-full h-full flex items-center justify-center bg-[var(--bg-elevated)] text-[var(--accent-primary)] font-bold text-xs p-2 text-center">
                                                             {model.name}
                                                         </div>
                                                     )}
@@ -3197,29 +3216,28 @@ export default function PhotoshootPage() {
             </div>
 
             {/* COLUMN 1: Settings & Uploads (Sidebar) */}
-            <div className="w-full lg:w-[600px] lg:h-full lg:border-r border-b lg:border-b-0 bg-background flex flex-col shrink-0 relative z-20 overflow-hidden">
+            <div className="w-full lg:w-[400px] xl:w-[440px] lg:h-full lg:border-r border-b lg:border-b-0 bg-[var(--bg-sidebar)] flex flex-col shrink-0 relative z-20 overflow-hidden border-[var(--border-subtle)]">
                 <div className="p-4 flex-1 overflow-y-auto custom-scrollbar space-y-6">
 
                     {/* Page Title */}
-                    {/* 0. Page Header */}
                     <div className="mb-4">
-                        <h1 className="text-xl font-bold">{t("home.photoshootTitle")}</h1>
-                        <p className="text-[10px] text-muted-foreground">{t("home.photoshootDesc")}</p>
+                        <h1 className="text-xl font-bold text-[var(--text-primary)]">{t("home.photoshootTitle")}</h1>
+                        <p className="text-[10px] text-[var(--text-secondary)]">{t("home.photoshootDesc")}</p>
                     </div>
 
                     {/* --- LEVEL 1: BASIC (Always Visible) --- */}
                     <div className="space-y-4">
                         <div className="flex items-center gap-2 mb-2">
-                            <div className="h-4 w-1 bg-violet-500 rounded-full" />
-                            <label className="text-[10px] uppercase font-bold text-foreground">{language === "tr" ? "TEMEL AYARLAR" : "BASIC SETTINGS"}</label>
+                            <div className="h-4 w-1 bg-[var(--accent-primary)] rounded-full" />
+                            <label className="text-[10px] uppercase font-bold text-[var(--text-primary)]">{language === "tr" ? "TEMEL AYARLAR" : "BASIC SETTINGS"}</label>
                         </div>
 
                         <div className="grid grid-cols-3 gap-3">
                             {/* Product Type Selector */}
                             <div className="space-y-1">
-                                <label className="text-[10px] uppercase font-bold text-muted-foreground">{language === "tr" ? "Ürün Tipi" : "Product Type"}</label>
+                                <label className="text-[10px] uppercase font-bold text-[var(--text-muted)]">{language === "tr" ? "Ürün Tipi" : "Product Type"}</label>
                                 <select
-                                    className="w-full text-xs p-2 rounded-lg bg-muted/30 border border-border"
+                                    className="w-full text-xs p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus:ring-[var(--accent-primary)]"
                                     value={workflowType}
                                     onChange={(e) => setWorkflowType(e.target.value as any)}
                                 >
@@ -3232,11 +3250,14 @@ export default function PhotoshootPage() {
 
                             {/* Model Gender */}
                             <div className="space-y-1">
-                                <label className="text-[10px] uppercase font-bold text-muted-foreground">{language === "tr" ? "Model Cinsiyeti" : "Model Gender"}</label>
-                                <div className="grid grid-cols-2 gap-1 bg-muted/30 p-1 rounded-lg border">
+                                <label className="text-[10px] uppercase font-bold text-[var(--text-muted)]">{language === "tr" ? "Model Cinsiyeti" : "Model Gender"}</label>
+                                <div className="grid grid-cols-2 gap-1 bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-subtle)]">
                                     <button
                                         onClick={() => setGender("female")}
-                                        className={`text-[10px] py-1 rounded transition-all ${gender === 'female' ? 'bg-background shadow font-bold text-violet-600' : 'text-muted-foreground'}`}
+                                        className={cn(
+                                            "text-[10px] py-1 rounded transition-all",
+                                            gender === 'female' ? "bg-[var(--bg-elevated)] shadow-sm font-bold text-[var(--accent-primary)]" : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                                        )}
                                     >
                                         {language === "tr" ? "Kadın" : "F"}
                                     </button>
@@ -3253,9 +3274,9 @@ export default function PhotoshootPage() {
                         <div className="grid grid-cols-3 gap-3">
                             {/* Aspect Ratio */}
                             <div className="space-y-1">
-                                <label className="text-[10px] uppercase font-bold text-muted-foreground">{language === "tr" ? "En/Boy Oranı" : "Aspect Ratio"}</label>
+                                <label className="text-[10px] uppercase font-bold text-[var(--text-muted)]">{language === "tr" ? "En/Boy Oranı" : "Aspect Ratio"}</label>
                                 <select
-                                    className="w-full text-xs p-2 rounded-lg bg-muted/30 border border-border"
+                                    className="w-full text-xs p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)]"
                                     value={aspectRatio}
                                     onChange={(e) => setAspectRatio(e.target.value)}
                                 >
@@ -3269,9 +3290,9 @@ export default function PhotoshootPage() {
 
                             {/* Resolution */}
                             <div className="space-y-1">
-                                <label className="text-[10px] uppercase font-bold text-muted-foreground">{language === "tr" ? "Çözünürlük" : "Resolution"}</label>
+                                <label className="text-[10px] uppercase font-bold text-[var(--text-muted)]">{language === "tr" ? "Çözünürlük" : "Resolution"}</label>
                                 <select
-                                    className="w-full text-xs p-2 rounded-lg bg-muted/30 border border-border"
+                                    className="w-full text-xs p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)]"
                                     value={resolution}
                                     onChange={(e) => setResolution(e.target.value)}
                                 >
@@ -3286,7 +3307,7 @@ export default function PhotoshootPage() {
 
                         {/* Product Name Input */}
                         <div className="space-y-1">
-                            <label className="text-[10px] uppercase font-bold text-muted-foreground">{language === "tr" ? "Ürün Adı" : "Product Name"}</label>
+                            <label className="text-[10px] uppercase font-bold text-[var(--text-muted)]">{language === "tr" ? "Ürün Adı" : "Product Name"}</label>
                             <input
                                 type="text"
                                 value={productName}
@@ -3295,7 +3316,7 @@ export default function PhotoshootPage() {
                                     setIsManualProductName(true);
                                 }}
                                 placeholder={language === "tr" ? "Ürün ismini buraya yazın..." : "Enter product name..."}
-                                className="w-full bg-muted/30 border border-border text-sm font-medium rounded-lg p-2 focus:ring-1 focus:ring-violet-500"
+                                className="w-full bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm font-medium rounded-lg p-2 focus:ring-1 focus:ring-[var(--accent-primary)]"
                             />
                         </div>
 
@@ -3308,13 +3329,13 @@ export default function PhotoshootPage() {
                                     setActiveGroup('product');
                                     setLibraryTab('assets');
                                 }}
-                                className="h-14 rounded-lg border border-dashed border-violet-300 bg-violet-50/50 hover:bg-violet-50 hover:border-violet-500 cursor-pointer flex items-center px-3 gap-3 transition-colors"
+                                className="h-14 rounded-lg border border-dashed border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:bg-[var(--bg-elevated)] hover:border-[var(--accent-primary)] cursor-pointer flex items-center px-3 gap-3 transition-colors group"
                             >
-                                <div className="p-1.5 rounded-md bg-violet-100 text-violet-600">
+                                <div className="p-1.5 rounded-md bg-[var(--accent-soft)] text-[var(--accent-primary)] group-hover:scale-110 transition-transform">
                                     <Shirt className="w-5 h-5" />
                                 </div>
                                 <div className="flex-1 flex items-center justify-between overflow-hidden">
-                                    <span className="text-xs font-medium text-foreground truncate">{language === "tr" ? "Ürün Görselleri" : "Product Hub"}</span>
+                                    <span className="text-xs font-medium text-[var(--text-primary)] truncate">{language === "tr" ? "Ürün Görselleri" : "Product Hub"}</span>
                                     <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
                                 </div>
                             </div>
@@ -3381,225 +3402,256 @@ export default function PhotoshootPage() {
                         )}
                     </div>
 
-                    {/* --- LEVEL 2: ADVANCED (Visible by Default) --- */}
-                    <div className="space-y-4 pt-4 border-t border-border">
-                        <div className="flex items-center gap-2 mb-2">
-                            <div className="h-4 w-1 bg-blue-500 rounded-full" />
-                            <label className="text-[10px] uppercase font-bold text-foreground">{language === "tr" ? "GELİŞMİŞ AYARLAR" : "ADVANCED SETTINGS"}</label>
-                        </div>
+                    {/* --- LEVEL 2: ADVANCED --- */}
+                    <div className="pt-4 border-t border-[var(--border-subtle)]">
+                        <button
+                            onClick={() => setShowAdvanced(!showAdvanced)}
+                            className="flex items-center justify-between w-full px-2 py-1 mb-2 hover:bg-[var(--bg-elevated)] rounded-lg transition-colors group"
+                        >
+                            <div className="flex items-center gap-2">
+                                <div className={cn("h-4 w-1 rounded-full transition-colors", showAdvanced ? "bg-[var(--accent-primary)]" : "bg-[var(--text-disabled)]")} />
+                                <label className="text-[10px] uppercase font-bold text-[var(--text-muted)] group-hover:text-[var(--text-primary)] transition-colors cursor-pointer">
+                                    {language === "tr" ? "GELİŞMİŞ AYARLAR" : "ADVANCED SETTINGS"}
+                                </label>
+                            </div>
+                            <ChevronDown className={cn("w-3 h-3 text-[var(--text-muted)] transition-transform duration-300", showAdvanced && "rotate-180")} />
+                        </button>
 
-                        <div className="grid grid-cols-3 gap-2">
-                            <AssetCard id="pose" label={language === "tr" ? "Poz" : "Pose"} icon={User} />
-                            <AssetCard id="lighting" label={language === "tr" ? "Işık" : "Light"} icon={Camera} />
-                            <AssetCard id="fit_pattern" label={language === "tr" ? "Kalıp" : "Fit"} icon={Ruler} />
-                            <AssetCard id="background" label={language === "tr" ? "Arka Plan" : "BG"} icon={ImageIcon} />
-                            <AssetCard id="accessories" label={language === "tr" ? "Aksesuar" : "Accessory"} icon={Glasses} />
-                            {hasFeet && <AssetCard id="shoes" label={language === "tr" ? "Ayakkabı" : "Shoes"} icon={ShoppingBag} />}
-                        </div>
+                        {showAdvanced && (
+                            <div className="space-y-4 px-1 animate-in slide-in-from-top-2">
+                                <div className="grid grid-cols-3 gap-2">
+                                    <AssetCard id="pose" label={language === "tr" ? "Poz" : "Pose"} icon={User} />
+                                    <AssetCard id="lighting" label={language === "tr" ? "Işık" : "Light"} icon={Camera} />
+                                    <AssetCard id="fit_pattern" label={language === "tr" ? "Kalıp" : "Fit"} icon={Ruler} />
+                                    <AssetCard id="background" label={language === "tr" ? "Arka Plan" : "BG"} icon={ImageIcon} />
+                                    <AssetCard id="accessories" label={language === "tr" ? "Aksesuar" : "Accessory"} icon={Glasses} />
+                                    {hasFeet && <AssetCard id="shoes" label={language === "tr" ? "Ayakkabı" : "Shoes"} icon={ShoppingBag} />}
+                                </div>
 
-                        {/* Styling Toggles Group (Controlled by Framing) */}
-                        <div className="grid grid-cols-3 gap-2 mt-2">
-                            {/* Head/Face Area Controls (Enabled for Closeup & Cowboy/FullBody by default, but face details only for Closeup) */}
-                            {canShowCollarHairButtons && (
-                                <>
-                                    <div className="flex items-center justify-between p-2 rounded-lg bg-muted/40 border border-border/50 cursor-pointer"
-                                        onClick={() => setHairBehindShoulders(!hairBehindShoulders)}>
-                                        <span className="text-[10px] font-medium">{language === "tr" ? "Saç Arkada" : "Hair Behind"}</span>
-                                        <div className={`w-6 h-3.5 rounded-full transition-colors relative ${hairBehindShoulders ? 'bg-violet-500' : 'bg-zinc-300'}`}>
-                                            <div className={`absolute top-0.5 h-2.5 w-2.5 bg-white rounded-full transition-all ${hairBehindShoulders ? 'left-3' : 'left-0.5'}`} />
-                                        </div>
-                                    </div>
+                                {/* Styling Toggles Group (Controlled by Framing) */}
+                                <div className="grid grid-cols-3 gap-2 mt-2">
+                                    {/* Head/Face Area Controls (Enabled for Closeup & Cowboy/FullBody by default, but face details only for Closeup) */}
+                                    {canShowCollarHairButtons && (
+                                        <>
+                                            <div className="flex items-center justify-between p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] cursor-pointer hover:border-[var(--accent-primary)] transition-colors group"
+                                                onClick={() => setHairBehindShoulders(!hairBehindShoulders)}>
+                                                <span className="text-[10px] font-medium text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]">{language === "tr" ? "Saç Arkada" : "Hair Behind"}</span>
+                                                <div className={cn("w-6 h-3.5 rounded-full transition-colors relative", hairBehindShoulders ? "bg-[var(--accent-primary)]" : "bg-[var(--bg-elevated)]")}>
+                                                    <div className={cn("absolute top-0.5 h-2.5 w-2.5 bg-white rounded-full transition-all shadow-sm", hairBehindShoulders ? "left-3" : "left-0.5")} />
+                                                </div>
+                                            </div>
 
-                                    <div className="flex items-center justify-between p-2 rounded-lg bg-muted/40 border border-border/50 cursor-pointer"
-                                        onClick={() => setLookAtCamera(!lookAtCamera)}>
-                                        <span className="text-[10px] font-medium">{language === "tr" ? "Kameraya Bak" : "Look at Cam"}</span>
-                                        <div className={`w-6 h-3.5 rounded-full transition-colors relative ${lookAtCamera ? 'bg-violet-500' : 'bg-zinc-300'}`}>
-                                            <div className={`absolute top-0.5 h-2.5 w-2.5 bg-white rounded-full transition-all ${lookAtCamera ? 'left-3' : 'left-0.5'}`} />
-                                        </div>
-                                    </div>
+                                            <div className="flex items-center justify-between p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] cursor-pointer hover:border-[var(--accent-primary)] transition-colors group"
+                                                onClick={() => setLookAtCamera(!lookAtCamera)}>
+                                                <span className="text-[10px] font-medium text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]">{language === "tr" ? "Kameraya Bak" : "Look at Cam"}</span>
+                                                <div className={cn("w-6 h-3.5 rounded-full transition-colors relative", lookAtCamera ? "bg-[var(--accent-primary)]" : "bg-[var(--bg-elevated)]")}>
+                                                    <div className={cn("absolute top-0.5 h-2.5 w-2.5 bg-white rounded-full transition-all shadow-sm", lookAtCamera ? "left-3" : "left-0.5")} />
+                                                </div>
+                                            </div>
 
-                                    {/* Buttons: Moved Up */}
-                                    {(isCloseup || isCowboy || isFullBody) && (
-                                        <div className="flex items-center justify-between p-2 rounded-lg bg-muted/40 border border-border/50 cursor-pointer"
-                                            onClick={() => setButtonsOpen(!buttonsOpen)}>
-                                            <span className="text-[10px] font-medium">{language === "tr" ? "Düğme/Fermuar Açık" : "Buttons/Zipper Open"}</span>
-                                            <div className={`w-6 h-3.5 rounded-full transition-colors relative ${buttonsOpen ? 'bg-violet-500' : 'bg-zinc-300'}`}>
-                                                <div className={`absolute top-0.5 h-2.5 w-2.5 bg-white rounded-full transition-all ${buttonsOpen ? 'left-3' : 'left-0.5'}`} />
+                                            {/* Buttons: Moved Up */}
+                                            {(isCloseup || isCowboy || isFullBody) && (
+                                                <div className="flex items-center justify-between p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] cursor-pointer hover:border-[var(--accent-primary)] transition-colors group"
+                                                    onClick={() => setButtonsOpen(!buttonsOpen)}>
+                                                    <span className="text-[10px] font-medium text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]">{language === "tr" ? "Düğme/Fermuar Açık" : "Buttons/Zipper Open"}</span>
+                                                    <div className={cn("w-6 h-3.5 rounded-full transition-colors relative", buttonsOpen ? "bg-[var(--accent-primary)]" : "bg-[var(--bg-elevated)]")}>
+                                                        <div className={cn("absolute top-0.5 h-2.5 w-2.5 bg-white rounded-full transition-all shadow-sm", buttonsOpen ? "left-3" : "left-0.5")} />
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+
+                                    {/* Waist/Upper Body Specific: Fit/Tuck (Only if waist is visible) */}
+                                    {canShowWaistRiseFitTuck && (
+                                        <div className="flex items-center justify-between p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] cursor-pointer hover:border-[var(--accent-primary)] transition-colors group"
+                                            onClick={() => setTucked(!tucked)}>
+                                            <span className="text-[10px] font-medium text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]">{language === "tr" ? "İçeride" : "Tucked"}</span>
+                                            <div className={cn("w-6 h-3.5 rounded-full transition-colors relative", tucked ? "bg-[var(--accent-primary)]" : "bg-[var(--bg-elevated)]")}>
+                                                <div className={cn("absolute top-0.5 h-2.5 w-2.5 bg-white rounded-full transition-all shadow-sm", tucked ? "left-3" : "left-0.5")} />
                                             </div>
                                         </div>
                                     )}
-                                </>
-                            )}
 
-                            {/* Waist/Upper Body Specific: Fit/Tuck (Only if waist is visible) */}
-                            {canShowWaistRiseFitTuck && (
-                                <div className="flex items-center justify-between p-2 rounded-lg bg-muted/40 border border-border/50 cursor-pointer"
-                                    onClick={() => setTucked(!tucked)}>
-                                    <span className="text-[10px] font-medium">{language === "tr" ? "İçeride" : "Tucked"}</span>
-                                    <div className={`w-6 h-3.5 rounded-full transition-colors relative ${tucked ? 'bg-violet-500' : 'bg-zinc-300'}`}>
-                                        <div className={`absolute top-0.5 h-2.5 w-2.5 bg-white rounded-full transition-all ${tucked ? 'left-3' : 'left-0.5'}`} />
+                                    {/* Sleeves Rolled: Only if arms are visible */}
+                                    {canShowCollarHairButtons && (
+                                        <div className="flex items-center justify-between p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] cursor-pointer hover:border-[var(--accent-primary)] transition-colors group"
+                                            onClick={() => setSleevesRolled(!sleevesRolled)}>
+                                            <span className="text-[10px] font-medium text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]">{language === "tr" ? "Kollar Sıvalı" : "Sleeves Rolled"}</span>
+                                            <div className={cn("w-6 h-3.5 rounded-full transition-colors relative", sleevesRolled ? "bg-[var(--accent-primary)]" : "bg-[var(--bg-elevated)]")}>
+                                                <div className={cn("absolute top-0.5 h-2.5 w-2.5 bg-white rounded-full transition-all shadow-sm", sleevesRolled ? "left-3" : "left-0.5")} />
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Common: Wind */}
+                                    <div className="flex items-center justify-between p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] cursor-pointer hover:border-[var(--accent-primary)] transition-colors group"
+                                        onClick={() => setEnableWind(!enableWind)}>
+                                        <span className="text-[10px] font-medium text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]">{language === "tr" ? "Rüzgar" : "Wind"}</span>
+                                        <div className={cn("w-6 h-3.5 rounded-full transition-colors relative", enableWind ? "bg-blue-400" : "bg-[var(--bg-elevated)]")}>
+                                            <div className={cn("absolute top-0.5 h-2.5 w-2.5 bg-white rounded-full transition-all shadow-sm", enableWind ? "left-3" : "left-0.5")} />
+                                        </div>
                                     </div>
-                                </div>
-                            )}
 
-                            {/* Sleeves Rolled: Only if arms are visible */}
-                            {canShowCollarHairButtons && (
-                                <div className="flex items-center justify-between p-2 rounded-lg bg-muted/40 border border-border/50 cursor-pointer"
-                                    onClick={() => setSleevesRolled(!sleevesRolled)}>
-                                    <span className="text-[10px] font-medium">{language === "tr" ? "Kollar Sıvalı" : "Sleeves Rolled"}</span>
-                                    <div className={`w-6 h-3.5 rounded-full transition-colors relative ${sleevesRolled ? 'bg-violet-500' : 'bg-zinc-300'}`}>
-                                        <div className={`absolute top-0.5 h-2.5 w-2.5 bg-white rounded-full transition-all ${sleevesRolled ? 'left-3' : 'left-0.5'}`} />
-                                    </div>
+                                    {/* Expression & Gaze (Side-by-side) */}
+                                    {hasHead && (
+                                        <>
+                                            <div className="flex items-center justify-between p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] cursor-pointer hover:border-[var(--accent-primary)] transition-colors group"
+                                                onClick={() => setEnableExpression(!enableExpression)}>
+                                                <span className="text-[10px] font-medium text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]">{language === "tr" ? "İfade" : "Expression"}</span>
+                                                <div className={cn("w-6 h-3.5 rounded-full transition-colors relative", enableExpression ? "bg-[var(--accent-primary)]" : "bg-[var(--bg-elevated)]")}>
+                                                    <div className={cn("absolute top-0.5 h-2.5 w-2.5 bg-white rounded-full transition-all shadow-sm", enableExpression ? "left-3" : "left-0.5")} />
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center justify-between p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] cursor-pointer hover:border-[var(--accent-primary)] transition-colors group"
+                                                onClick={() => setEnableGaze(!enableGaze)}>
+                                                <span className="text-[10px] font-medium text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]">{language === "tr" ? "Bakış" : "Gaze"}</span>
+                                                <div className={cn("w-6 h-3.5 rounded-full transition-colors relative", enableGaze ? "bg-[var(--accent-primary)]" : "bg-[var(--bg-elevated)]")}>
+                                                    <div className={cn("absolute top-0.5 h-2.5 w-2.5 bg-white rounded-full transition-all shadow-sm", enableGaze ? "left-3" : "left-0.5")} />
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
-                            )}
 
-                            {/* Common: Wind */}
-                            <div className="flex items-center justify-between p-2 rounded-lg bg-muted/40 border border-border/50 cursor-pointer"
-                                onClick={() => setEnableWind(!enableWind)}>
-                                <span className="text-[10px] font-medium">{language === "tr" ? "Rüzgar" : "Wind"}</span>
-                                <div className={`w-6 h-3.5 rounded-full transition-colors relative ${enableWind ? 'bg-blue-400' : 'bg-zinc-300'}`}>
-                                    <div className={`absolute top-0.5 h-2.5 w-2.5 bg-white rounded-full transition-all ${enableWind ? 'left-3' : 'left-0.5'}`} />
+                                {/* NEW: Product Detail Variations (Collapsible) */}
+                                <div className="pt-2 mt-4 border-t border-dashed border-[var(--border-subtle)]">
+                                    <button
+                                        onClick={() => setShowGarmentDetails(!showGarmentDetails)}
+                                        className="flex items-center justify-between w-full py-2 hover:bg-[var(--bg-elevated)] rounded-lg transition-colors group mb-2"
+                                    >
+                                        <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase group-hover:text-[var(--text-primary)] cursor-pointer">
+                                            {language === "tr" ? "GİYSİ DETAYLARI" : "GARMENT DETAILS"}
+                                        </label>
+                                        <ChevronDown className={cn("w-3 h-3 text-[var(--text-muted)] transition-transform duration-300", showGarmentDetails && "rotate-180")} />
+                                    </button>
+
+                                    {showGarmentDetails && (
+                                        <div className="grid grid-cols-3 gap-3 animate-in fade-in slide-in-from-top-1">
+                                            {/* Head/Torso Area Options (Collar, Shoulder) */}
+                                            {canShowCollarHairButtons && (
+                                                <>
+                                                    <div className="space-y-1">
+                                                        <label className="text-[9px] font-bold text-[var(--text-muted)] uppercase">{language === "tr" ? "Yaka" : "Collar"}</label>
+                                                        <select className="w-full text-[10px] p-1.5 rounded border bg-[var(--bg-surface)] border-[var(--border-subtle)] text-[var(--text-primary)]" value={collarType} onChange={(e) => setCollarType(e.target.value as any)}>
+                                                            <option value="none">-</option>
+                                                            <option value="standard">{language === "tr" ? "Standart" : "Standard"}</option>
+                                                            <option value="v-neck">V-Neck</option>
+                                                            <option value="polo">Polo</option>
+                                                        </select>
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <label className="text-[9px] font-bold text-[var(--text-muted)] uppercase">{language === "tr" ? "Omuz" : "Shoulder"}</label>
+                                                        <select className="w-full text-[10px] p-1.5 rounded border bg-[var(--bg-surface)] border-[var(--border-subtle)] text-[var(--text-primary)]" value={shoulderType} onChange={(e) => setShoulderType(e.target.value as any)}>
+                                                            <option value="none">-</option>
+                                                            <option value="standard">{language === "tr" ? "Standart" : "Standard"}</option>
+                                                            <option value="dropped">{language === "tr" ? "Düşük" : "Dropped"}</option>
+                                                            <option value="padded">{language === "tr" ? "Vatkalı" : "Padded"}</option>
+                                                        </select>
+                                                    </div>
+                                                </>
+                                            )}
+
+                                            {/* Waist/Rise Options */}
+                                            {canShowWaistRiseFitTuck && (
+                                                <>
+                                                    <div className="space-y-1">
+                                                        <label className="text-[9px] font-bold text-[var(--text-muted)] uppercase">{language === "tr" ? "Bel" : "Waist"}</label>
+                                                        <select className="w-full text-[10px] p-1.5 rounded border bg-[var(--bg-surface)] border-[var(--border-subtle)] text-[var(--text-primary)]" value={waistType} onChange={(e) => setWaistType(e.target.value as any)}>
+                                                            <option value="none">-</option>
+                                                            <option value="standard">{language === "tr" ? "Standart" : "Standard"}</option>
+                                                            <option value="elastic">{language === "tr" ? "Lastikli" : "Elastic"}</option>
+                                                            <option value="high-waisted">{language === "tr" ? "Yüksek Bel" : "High Waisted"}</option>
+                                                        </select>
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <label className="text-[9px] font-bold text-[var(--text-muted)] uppercase">{language === "tr" ? "Ağ/Yükseklik" : "Rise"}</label>
+                                                        <select className="w-full text-[10px] p-1.5 rounded border bg-[var(--bg-surface)] border-[var(--border-subtle)] text-[var(--text-primary)]" value={riseType} onChange={(e) => setRiseType(e.target.value as any)}>
+                                                            <option value="none">-</option>
+                                                            <option value="low">{language === "tr" ? "Düşük" : "Low"}</option>
+                                                            <option value="mid">{language === "tr" ? "Orta" : "Mid"}</option>
+                                                            <option value="high">{language === "tr" ? "Yüksek" : "High"}</option>
+                                                        </select>
+                                                    </div>
+                                                </>
+                                            )}
+                                            {canShowLegHem && (
+                                                <>
+                                                    <div className="space-y-1">
+                                                        <label className="text-[9px] font-bold text-[var(--text-muted)] uppercase">{language === "tr" ? "Paça/Bacak" : "Leg"}</label>
+                                                        <select className="w-full text-[10px] p-1.5 rounded border bg-[var(--bg-surface)] border-[var(--border-subtle)] text-[var(--text-primary)]" value={legType} onChange={(e) => setLegType(e.target.value as any)}>
+                                                            <option value="none">-</option>
+                                                            <option value="skinny">Skinny</option>
+                                                            <option value="straight">{language === "tr" ? "Düz" : "Straight"}</option>
+                                                            <option value="wide">{language === "tr" ? "Geniş" : "Wide"}</option>
+                                                        </select>
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <label className="text-[9px] font-bold text-[var(--text-muted)] uppercase">{language === "tr" ? "Paça Bitişi" : "Hem"}</label>
+                                                        <select className="w-full text-[10px] p-1.5 rounded border bg-[var(--bg-surface)] border-[var(--border-subtle)] text-[var(--text-primary)]" value={hemType} onChange={(e) => setHemType(e.target.value as any)}>
+                                                            <option value="none">-</option>
+                                                            <option value="standard">{language === "tr" ? "Standart" : "Standard"}</option>
+                                                            <option value="cuffed">{language === "tr" ? "Kıvrık" : "Cuffed"}</option>
+                                                            <option value="raw">{language === "tr" ? "Kesik" : "Raw"}</option>
+                                                        </select>
+                                                    </div>
+
+                                                    {/* Socks Selection (Moved under general options, but only if feet visible) */}
+                                                    {hasFeet && (
+                                                        <div className="col-span-2 space-y-1 pt-1">
+                                                            <label className="text-[9px] font-bold text-[var(--text-muted)] uppercase">{language === "tr" ? "Çorap" : "Socks"}</label>
+                                                            <div className="grid grid-cols-3 gap-1 bg-[var(--bg-surface)] p-1 rounded border border-[var(--border-subtle)]">
+                                                                {['none', 'white', 'black'].map((s) => (
+                                                                    <button
+                                                                        key={s}
+                                                                        onClick={() => setSocksType(s as any)}
+                                                                        className={cn(
+                                                                            "text-[9px] py-1 rounded transition-all",
+                                                                            socksType === s
+                                                                                ? "bg-[var(--bg-elevated)] shadow-sm font-bold text-[var(--accent-primary)]"
+                                                                                : "text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]"
+                                                                        )}
+                                                                    >
+                                                                        {s === 'none' ? (language === 'tr' ? 'Yok' : 'None') : s.charAt(0).toUpperCase() + s.slice(1)}
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </>
+                                            )}
+
+
+                                        </div>
+                                    )}
                                 </div>
                             </div>
-
-                            {/* Expression & Gaze (Side-by-side) */}
-                            {hasHead && (
-                                <>
-                                    <div className="flex items-center justify-between p-2 rounded-lg bg-muted/40 border border-border/50 cursor-pointer"
-                                        onClick={() => setEnableExpression(!enableExpression)}>
-                                        <span className="text-[10px] font-medium">{language === "tr" ? "İfade" : "Expression"}</span>
-                                        <div className={`w-6 h-3.5 rounded-full transition-colors relative ${enableExpression ? 'bg-violet-500' : 'bg-zinc-300'}`}>
-                                            <div className={`absolute top-0.5 h-2.5 w-2.5 bg-white rounded-full transition-all ${enableExpression ? 'left-3' : 'left-0.5'}`} />
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center justify-between p-2 rounded-lg bg-muted/40 border border-border/50 cursor-pointer"
-                                        onClick={() => setEnableGaze(!enableGaze)}>
-                                        <span className="text-[10px] font-medium">{language === "tr" ? "Bakış" : "Gaze"}</span>
-                                        <div className={`w-6 h-3.5 rounded-full transition-colors relative ${enableGaze ? 'bg-violet-500' : 'bg-zinc-300'}`}>
-                                            <div className={`absolute top-0.5 h-2.5 w-2.5 bg-white rounded-full transition-all ${enableGaze ? 'left-3' : 'left-0.5'}`} />
-                                        </div>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-
-                        {/* NEW: Product Detail Variations (Conditional by Framing) */}
-                        <div className="grid grid-cols-3 gap-2 mt-2 pt-2 border-t border-dashed border-muted-foreground/20">
-                            {/* Head/Torso Area Options (Collar, Shoulder) */}
-                            {canShowCollarHairButtons && (
-                                <>
-                                    <div className="space-y-1">
-                                        <label className="text-[9px] font-bold text-muted-foreground uppercase">{language === "tr" ? "Yaka" : "Collar"}</label>
-                                        <select className="w-full text-[10px] p-1.5 rounded border bg-muted/20" value={collarType} onChange={(e) => setCollarType(e.target.value as any)}>
-                                            <option value="none">-</option>
-                                            <option value="standard">{language === "tr" ? "Standart" : "Standard"}</option>
-                                            <option value="v-neck">V-Neck</option>
-                                            <option value="polo">Polo</option>
-                                        </select>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <label className="text-[9px] font-bold text-muted-foreground uppercase">{language === "tr" ? "Omuz" : "Shoulder"}</label>
-                                        <select className="w-full text-[10px] p-1.5 rounded border bg-muted/20" value={shoulderType} onChange={(e) => setShoulderType(e.target.value as any)}>
-                                            <option value="none">-</option>
-                                            <option value="standard">{language === "tr" ? "Standart" : "Standard"}</option>
-                                            <option value="dropped">{language === "tr" ? "Düşük" : "Dropped"}</option>
-                                            <option value="padded">{language === "tr" ? "Vatkalı" : "Padded"}</option>
-                                        </select>
-                                    </div>
-                                </>
-                            )}
-
-                            {/* Waist/Rise Options */}
-                            {canShowWaistRiseFitTuck && (
-                                <>
-                                    <div className="space-y-1">
-                                        <label className="text-[9px] font-bold text-muted-foreground uppercase">{language === "tr" ? "Bel" : "Waist"}</label>
-                                        <select className="w-full text-[10px] p-1.5 rounded border bg-muted/20" value={waistType} onChange={(e) => setWaistType(e.target.value as any)}>
-                                            <option value="none">-</option>
-                                            <option value="standard">{language === "tr" ? "Standart" : "Standard"}</option>
-                                            <option value="elastic">{language === "tr" ? "Lastikli" : "Elastic"}</option>
-                                            <option value="high-waisted">{language === "tr" ? "Yüksek Bel" : "High Waisted"}</option>
-                                        </select>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <label className="text-[9px] font-bold text-muted-foreground uppercase">{language === "tr" ? "Ağ/Yükseklik" : "Rise"}</label>
-                                        <select className="w-full text-[10px] p-1.5 rounded border bg-muted/20" value={riseType} onChange={(e) => setRiseType(e.target.value as any)}>
-                                            <option value="none">-</option>
-                                            <option value="low">{language === "tr" ? "Düşük" : "Low"}</option>
-                                            <option value="mid">{language === "tr" ? "Orta" : "Mid"}</option>
-                                            <option value="high">{language === "tr" ? "Yüksek" : "High"}</option>
-                                        </select>
-                                    </div>
-                                </>
-                            )}
-                            {canShowLegHem && (
-                                <>
-                                    <div className="space-y-1">
-                                        <label className="text-[9px] font-bold text-muted-foreground uppercase">{language === "tr" ? "Paça/Bacak" : "Leg"}</label>
-                                        <select className="w-full text-[10px] p-1.5 rounded border bg-muted/20" value={legType} onChange={(e) => setLegType(e.target.value as any)}>
-                                            <option value="none">-</option>
-                                            <option value="skinny">Skinny</option>
-                                            <option value="straight">{language === "tr" ? "Düz" : "Straight"}</option>
-                                            <option value="wide">{language === "tr" ? "Geniş" : "Wide"}</option>
-                                        </select>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <label className="text-[9px] font-bold text-muted-foreground uppercase">{language === "tr" ? "Paça Bitişi" : "Hem"}</label>
-                                        <select className="w-full text-[10px] p-1.5 rounded border bg-muted/20" value={hemType} onChange={(e) => setHemType(e.target.value as any)}>
-                                            <option value="none">-</option>
-                                            <option value="standard">{language === "tr" ? "Standart" : "Standard"}</option>
-                                            <option value="cuffed">{language === "tr" ? "Kıvrık" : "Cuffed"}</option>
-                                            <option value="raw">{language === "tr" ? "Kesik" : "Raw"}</option>
-                                        </select>
-                                    </div>
-
-                                    {/* Socks Selection (Moved under general options, but only if feet visible) */}
-                                    {hasFeet && (
-                                        <div className="col-span-2 space-y-1 pt-1">
-                                            <label className="text-[9px] font-bold text-muted-foreground uppercase">{language === "tr" ? "Çorap" : "Socks"}</label>
-                                            <div className="grid grid-cols-3 gap-1 bg-muted/30 p-1 rounded border">
-                                                {['none', 'white', 'black'].map((s) => (
-                                                    <button
-                                                        key={s}
-                                                        onClick={() => setSocksType(s as any)}
-                                                        className={`text-[9px] py-1 rounded transition-all ${socksType === s ? 'bg-background shadow-sm font-bold text-violet-600' : 'text-muted-foreground hover:bg-background/50'}`}
-                                                    >
-                                                        {s === 'none' ? (language === 'tr' ? 'Yok' : 'None') : s.charAt(0).toUpperCase() + s.slice(1)}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                </>
-                            )}
-
-
-                        </div>
+                        )}
                     </div>
 
                     {/* --- LEVEL 3: EXPERT (Hidden Toggle) --- */}
-                    <div className="pt-4 border-t border-border">
+                    <div className="pt-4 border-t border-[var(--border-subtle)]">
                         <button
                             onClick={() => setShowExpert(!showExpert)}
-                            className="flex items-center justify-between w-full px-2 py-1 mb-2 hover:bg-muted/50 rounded-lg transition-colors group"
+                            className="flex items-center justify-between w-full px-2 py-1 mb-2 hover:bg-[var(--bg-elevated)] rounded-lg transition-colors group"
                         >
                             <div className="flex items-center gap-2">
-                                <div className={`h-4 w-1 rounded-full transition-colors ${showExpert ? 'bg-amber-500' : 'bg-zinc-400'}`} />
-                                <label className="text-[10px] uppercase font-bold text-muted-foreground group-hover:text-foreground transition-colors cursor-pointer">
+                                <div className={cn("h-4 w-1 rounded-full transition-colors", showExpert ? "bg-amber-500" : "bg-[var(--text-disabled)]")} />
+                                <label className="text-[10px] uppercase font-bold text-[var(--text-muted)] group-hover:text-[var(--text-primary)] transition-colors cursor-pointer">
                                     {language === "tr" ? "UZMAN AYARLARI" : "EXPERT CONTROLS"}
                                 </label>
                             </div>
-                            <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${showExpert ? 'rotate-180' : ''}`} />
+                            <ChevronDown className={cn("w-3 h-3 text-[var(--text-muted)] transition-transform duration-300", showExpert && "rotate-180")} />
                         </button>
 
                         {showExpert && (
                             <div className="space-y-4 px-1 pb-4 animate-in slide-in-from-top-2">
                                 {/* Technical Properties */}
                                 <div className="space-y-1">
-                                    <label className="text-[9px] font-bold text-muted-foreground uppercase">{language === "tr" ? "Tekrar Tutarlılığı" : "Consistency (Seed)"}</label>
+                                    <label className="text-[9px] font-bold text-[var(--text-muted)] uppercase">{language === "tr" ? "Tekrar Tutarlılığı" : "Consistency (Seed)"}</label>
                                     <input
                                         type="number"
-                                        className="w-full text-xs p-2 rounded border bg-muted/20"
+                                        className="w-full text-xs p-2 rounded border bg-[var(--bg-surface)] border-[var(--border-subtle)] text-[var(--text-primary)] focus:ring-[var(--accent-primary)]"
                                         value={seed === "" ? "" : seed}
                                         onChange={(e) => setSeed(e.target.value === "" ? "" : Number(e.target.value))}
                                         placeholder="Random"
@@ -3608,9 +3660,9 @@ export default function PhotoshootPage() {
 
                                 {/* Negative Prompt / Stickman Overrides */}
                                 <div className="space-y-1">
-                                    <label className="text-[9px] font-bold text-muted-foreground uppercase">{language === "tr" ? "Negatif Komut (Override)" : "Negative Override"}</label>
+                                    <label className="text-[9px] font-bold text-[var(--text-muted)] uppercase">{language === "tr" ? "Negatif Komut (Override)" : "Negative Override"}</label>
                                     <textarea
-                                        className="w-full h-16 text-[10px] p-2 rounded border bg-muted/20 resize-none"
+                                        className="w-full h-16 text-[10px] p-2 rounded border bg-[var(--bg-surface)] border-[var(--border-subtle)] text-[var(--text-primary)] resize-none focus:ring-[var(--accent-primary)]"
                                         value={lightingNegative}
                                         onChange={(e) => setLightingNegative(e.target.value)}
                                         placeholder="low quality, artifacts..."
@@ -3623,10 +3675,15 @@ export default function PhotoshootPage() {
                     </div>
                 </div>
                 {/* Footer Action - Moved outside scrollable div to be fixed */}
-                <div className="p-4 border-t bg-background z-10">
+                <div className="p-4 border-t border-[var(--border-subtle)] bg-[var(--bg-sidebar)] z-10">
                     <Button
                         size="lg"
-                        className={`w-full shadow-lg transition-all duration-300 ${batchMode ? 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/20' : 'bg-violet-600 hover:bg-violet-700 shadow-violet-500/20'}`}
+                        className={cn(
+                            "w-full shadow-lg transition-all duration-300",
+                            batchMode
+                                ? "bg-blue-600 hover:bg-blue-700 shadow-blue-500/20 text-white"
+                                : "bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] shadow-purple-500/20 text-white"
+                        )}
                         onClick={() => batchMode ? handleBatchGenerate() : handleGenerate()}
                         disabled={isProcessing || (batchMode && !productCode)}
                     >
@@ -3647,15 +3704,15 @@ export default function PhotoshootPage() {
                 </div>
             </div>
 
-            <div className="flex-1 bg-stone-50/50 dark:bg-stone-950/50 overflow-y-auto p-4 md:p-8 relative min-h-[400px] flex flex-col items-center">
+            <div className="flex-1 bg-[var(--bg-base)] overflow-y-auto p-4 md:p-8 relative min-h-[400px] flex flex-col items-center">
                 {isProcessing ? (
                     /* STUDIO PREPARATION OVERLAY */
                     <div className="h-full flex flex-col items-center justify-center space-y-8 my-auto w-full max-w-md">
                         {/* Studio Icon */}
                         <div className="relative">
-                            <div className="absolute inset-0 bg-gradient-to-r from-violet-500/30 to-pink-500/30 rounded-full blur-xl animate-pulse"></div>
-                            <div className="relative w-24 h-24 bg-gradient-to-br from-background to-card rounded-2xl shadow-2xl flex items-center justify-center border border-zinc-700">
-                                <Camera className="w-10 h-10 text-white" />
+                            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/30 to-pink-500/30 rounded-full blur-xl animate-pulse"></div>
+                            <div className="relative w-24 h-24 bg-gradient-to-br from-[var(--bg-surface)] to-[var(--bg-elevated)] rounded-2xl shadow-2xl flex items-center justify-center border border-[var(--border-subtle)]">
+                                <Camera className="w-10 h-10 text-[var(--accent-primary)]" />
                                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full animate-pulse shadow-lg shadow-red-500/50"></div>
                             </div>
                         </div>
@@ -3665,9 +3722,9 @@ export default function PhotoshootPage() {
 
                         {/* Progress Ring */}
                         <div className="w-full max-w-xs">
-                            <div className="h-1 w-full bg-card overflow-hidden rounded-full">
+                            <div className="h-1 w-full bg-[var(--bg-elevated)] overflow-hidden rounded-full">
                                 <div
-                                    className="h-full bg-gradient-to-r from-violet-600 via-pink-500 to-violet-600 rounded-full"
+                                    className="h-full bg-gradient-to-r from-purple-600 via-pink-500 to-purple-600 rounded-full"
                                     style={{
                                         width: '100%',
                                         animation: 'shimmer 2s linear infinite',
@@ -3682,7 +3739,7 @@ export default function PhotoshootPage() {
                         {resultImages.length > 1 ? (
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full">
                                 {resultImages.map((img, i) => (
-                                    <div key={i} className="relative aspect-[2/3] rounded-xl overflow-hidden shadow-lg border bg-white group">
+                                    <div key={i} className="relative aspect-[2/3] rounded-xl overflow-hidden shadow-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] group">
                                         <img src={img} className="w-full h-full object-cover" />
                                         <div className="absolute top-2 right-2 flex flex-col gap-2">
                                             <Button
@@ -3719,7 +3776,7 @@ export default function PhotoshootPage() {
                             </div>
                         ) : (
                             /* Single Main Image */
-                            <div className="relative aspect-[2/3] w-full rounded-2xl overflow-hidden shadow-2xl border bg-white group">
+                            <div className="relative aspect-[2/3] w-full rounded-2xl overflow-hidden shadow-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] group">
                                 <img src={resultImages[0]} className="w-full h-full object-cover" />
                                 {/* Download Button - Always Visible */}
                                 <Button
@@ -3748,7 +3805,7 @@ export default function PhotoshootPage() {
                         {/* Seed Info Display */}
                         {seed && (
                             <div className="flex justify-center -mt-2">
-                                <div className="px-3 py-1 bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 rounded-full text-[10px] font-bold border border-violet-200 dark:border-violet-800 flex items-center gap-1.5 shadow-sm">
+                                <div className="px-3 py-1 bg-[var(--bg-elevated)] text-[var(--accent-primary)] rounded-full text-[10px] font-bold border border-[var(--border-subtle)] flex items-center gap-1.5 shadow-sm">
                                     <Sparkles size={10} />
                                     {language === "tr" ? "Tekrar Tutarlılığı" : "Seed"}: {seed}
                                 </div>
@@ -3758,12 +3815,16 @@ export default function PhotoshootPage() {
                         {/* Action Buttons Row */}
                     </div>
                 ) : (
-                    <div className="my-auto flex flex-col items-center justify-center text-center text-muted-foreground opacity-50">
-                        <div className="w-32 h-32 bg-muted rounded-full flex items-center justify-center mb-4">
-                            <ImageIcon className="w-12 h-12" />
+                    <div className="my-auto w-full max-w-lg aspect-[3/4] rounded-2xl border-2 border-dashed border-[var(--border-subtle)] bg-[var(--bg-card)] flex flex-col items-center justify-center text-center p-8 group hover:border-[var(--accent-primary)] transition-colors">
+                        <div className="w-full h-full flex flex-col items-center justify-center opacity-40 group-hover:opacity-60 transition-opacity">
+                            <div className="w-24 h-24 bg-[var(--bg-surface)] rounded-2xl flex items-center justify-center mb-6 backdrop-blur-sm border border-[var(--border-subtle)]">
+                                <ImageIcon className="w-10 h-10 text-[var(--text-muted)]" />
+                            </div>
+                            <h3 className="text-lg font-medium text-[var(--text-primary)] mb-2">{language === "tr" ? "İlk fotoğrafını oluştur" : "Create your first photo"}</h3>
+                            <p className="text-sm text-[var(--text-secondary)] max-w-[240px]">
+                                {language === "tr" ? "Model ve ürün görseli seçtikten sonra çekim yapabilirsin." : "Select a model and product image to start shooting."}
+                            </p>
                         </div>
-                        <h3 className="font-semibold text-lg">{language === "tr" ? "Önizleme Alanı" : "Preview Area"}</h3>
-                        <p className="text-sm">{language === "tr" ? "Oluşturulan görsel burada görünecek" : "Generated image will appear here"}</p>
                     </div>
                 )}
 
@@ -3863,7 +3924,7 @@ export default function PhotoshootPage() {
                                         <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
                                             <span>Resolution: {item.settings.resolution}</span>
                                         </div>
-                                        <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-violet-50 text-violet-700 border border-violet-100">
+                                        <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--bg-elevated)] text-[var(--accent-primary)] border border-[var(--border-subtle)]">
                                             <span>Ratio: {item.settings.aspect_ratio}</span>
                                         </div>
                                     </div>
@@ -3873,7 +3934,7 @@ export default function PhotoshootPage() {
                                 <Button variant="outline" onClick={() => setShowPreview(false)}>
                                     {language === "tr" ? "İptal" : "Cancel"}
                                 </Button>
-                                <Button onClick={handleConfirmGeneration} className="bg-violet-600 hover:bg-violet-700">
+                                <Button onClick={handleConfirmGeneration} className="bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)]">
                                     <Sparkles className="w-4 h-4 mr-2" />
                                     {language === "tr" ? "Onayla ve Oluştur" : "Confirm & Generate"}
                                 </Button>
@@ -3949,19 +4010,29 @@ export default function PhotoshootPage() {
                             <div className="grid grid-cols-2 gap-2">
                                 <div
                                     onClick={() => setTempModelData({ ...tempModelData, gender: 'female' })}
-                                    className={`cursor-pointer rounded-lg border p-2 flex items-center justify-center gap-2 transition-all ${tempModelData.gender === 'female' ? 'bg-violet-100 border-violet-500 text-violet-700' : 'bg-muted/30 hover:bg-muted'}`}
+                                    className={cn(
+                                        "cursor-pointer rounded-lg border p-2 flex items-center justify-center gap-2 transition-all",
+                                        tempModelData.gender === 'female'
+                                            ? "bg-violet-100 border-violet-500 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300"
+                                            : "bg-[var(--bg-elevated)] hover:bg-[var(--bg-surface)] border-[var(--border-subtle)]"
+                                    )}
                                 >
                                     <span className="text-xs font-medium">{language === "tr" ? "Kadın" : "Female"}</span>
                                 </div>
                                 <div
                                     onClick={() => setTempModelData({ ...tempModelData, gender: 'male' })}
-                                    className={`cursor-pointer rounded-lg border p-2 flex items-center justify-center gap-2 transition-all ${tempModelData.gender === 'male' ? 'bg-blue-100 border-blue-500 text-blue-700' : 'bg-muted/30 hover:bg-muted'}`}
+                                    className={cn(
+                                        "cursor-pointer rounded-lg border p-2 flex items-center justify-center gap-2 transition-all",
+                                        tempModelData.gender === 'male'
+                                            ? "bg-blue-100 border-blue-500 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+                                            : "bg-[var(--bg-elevated)] hover:bg-[var(--bg-surface)] border-[var(--border-subtle)]"
+                                    )}
                                 >
                                     <span className="text-xs font-medium">{language === "tr" ? "Erkek" : "Male"}</span>
                                 </div>
                             </div>
 
-                            <Button onClick={handleSaveModel} className="w-full bg-violet-600 hover:bg-violet-700 mt-2">
+                            <Button onClick={handleSaveModel} className="w-full bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] mt-2">
                                 {language === "tr" ? "Kaydet ve Seç" : "Save & Select"}
                             </Button>
                         </div>
@@ -3990,7 +4061,7 @@ export default function PhotoshootPage() {
                                     onChange={(e) => setTempAssetData({ ...tempAssetData, name: e.target.value })}
                                 />
                             </div>
-                            <Button onClick={handleSaveAsset} className="w-full bg-violet-600 hover:bg-violet-700">
+                            <Button onClick={handleSaveAsset} className="w-full bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)]">
                                 {language === "tr" ? "Kaydet" : "Save"}
                             </Button>
                         </div>
@@ -4036,23 +4107,23 @@ export default function PhotoshootPage() {
                                 />
                             </div>
 
-                            <div className="flex items-center justify-between p-3 rounded-lg bg-violet-50/50 border border-violet-200">
+                            <div className="flex items-center justify-between p-3 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-subtle)]">
                                 <div className="space-y-0.5">
-                                    <div className="text-xs font-bold text-violet-700">
+                                    <div className="text-xs font-bold text-[var(--text-primary)]">
                                         {language === "tr" ? "Görseli Referans Olarak Gönder" : "Send Image as Visual Reference"}
                                     </div>
-                                    <div className="text-[10px] text-violet-600/70">
+                                    <div className="text-[10px] text-[var(--text-muted)]">
                                         {language === "tr" ? "Kapatılırsa sadece promptlar kullanılır" : "If disabled, only prompts will be used"}
                                     </div>
                                 </div>
                                 <button
                                     onClick={() => setTempLightingData({ ...tempLightingData, sendImageAsAsset: !tempLightingData.sendImageAsAsset })}
-                                    className={`w-10 h-5 rounded-full transition-colors relative ${tempLightingData.sendImageAsAsset ? 'bg-violet-500' : 'bg-zinc-300'}`}
+                                    className={cn("w-10 h-5 rounded-full transition-colors relative", tempLightingData.sendImageAsAsset ? "bg-[var(--accent-primary)]" : "bg-[var(--bg-muted)]")}
                                 >
                                     <div className={`absolute top-1 h-3 w-3 bg-white rounded-full transition-all ${tempLightingData.sendImageAsAsset ? 'left-6' : 'left-1'}`} />
                                 </button>
                             </div>
-                            <Button onClick={handleSaveLighting} className="w-full bg-violet-600 hover:bg-violet-700">
+                            <Button onClick={handleSaveLighting} className="w-full bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)]">
                                 {language === "tr" ? "Kütüphaneye Kaydet" : "Save to Library"}
                             </Button>
                         </div>
@@ -4077,7 +4148,7 @@ export default function PhotoshootPage() {
                             <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                                 {language === "tr" ? "Kütüphane Görseli" : "Library Thumbnail"}
                             </label>
-                            <label className="w-32 h-44 rounded-lg border border-dashed flex flex-col items-center justify-center bg-muted/30 cursor-pointer overflow-hidden relative group hover:bg-muted/50 transition-all">
+                            <label className="w-32 h-44 rounded-lg border border-dashed border-[var(--border-subtle)] flex flex-col items-center justify-center bg-[var(--bg-elevated)] cursor-pointer overflow-hidden relative group hover:bg-[var(--bg-surface)] transition-all">
                                 <input
                                     type="file"
                                     className="hidden"
@@ -4151,18 +4222,18 @@ export default function PhotoshootPage() {
                                             />
                                         </div>
 
-                                        <div className="flex items-center justify-between p-3 rounded-lg bg-violet-50/50 border border-violet-200 mt-2">
+                                        <div className="flex items-center justify-between p-3 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-subtle)] mt-2">
                                             <div className="space-y-0.5">
-                                                <div className="text-xs font-bold text-violet-700">
+                                                <div className="text-xs font-bold text-[var(--text-primary)]">
                                                     {language === "tr" ? "Görseli Referans Olarak Gönder" : "Send Image as Visual Reference"}
                                                 </div>
-                                                <div className="text-[10px] text-violet-600/70">
+                                                <div className="text-[10px] text-[var(--text-muted)]">
                                                     {language === "tr" ? "Kapatılırsa sadece promptlar kullanılır" : "If disabled, only prompts will be used"}
                                                 </div>
                                             </div>
                                             <button
                                                 onClick={() => setEditingItemSendImage(!editingItemSendImage)}
-                                                className={`w-10 h-5 rounded-full transition-colors relative ${editingItemSendImage ? 'bg-violet-500' : 'bg-zinc-300'}`}
+                                                className={cn("w-10 h-5 rounded-full transition-colors relative", editingItemSendImage ? "bg-[var(--accent-primary)]" : "bg-[var(--bg-muted)]")}
                                             >
                                                 <div className={`absolute top-1 h-3 w-3 bg-white rounded-full transition-all ${editingItemSendImage ? 'left-6' : 'left-1'}`} />
                                             </button>
@@ -4203,7 +4274,13 @@ export default function PhotoshootPage() {
                                             if (hasTag) setEditingItemTags(editingItemTags.filter(t => t !== 'tam_boy'));
                                             else setEditingItemTags([...editingItemTags.filter(t => t !== 'ust_beden'), 'tam_boy']);
                                         }}
-                                        className={`px-3 py-1 rounded-full text-[10px] uppercase font-bold transition-all border ${editingItemTags.includes('tam_boy') ? 'bg-blue-500 text-white border-blue-600' : 'bg-muted text-muted-foreground border-border'}`}
+
+                                        className={cn(
+                                            "px-3 py-1 rounded-full text-[10px] uppercase font-bold transition-all border",
+                                            editingItemTags.includes('tam_boy')
+                                                ? "bg-blue-500 text-white border-blue-600"
+                                                : "bg-[var(--bg-elevated)] text-[var(--text-muted)] border-[var(--border-subtle)] hover:text-[var(--text-primary)]"
+                                        )}
                                     >
                                         Tam Boy
                                     </button>
@@ -4213,7 +4290,12 @@ export default function PhotoshootPage() {
                                             if (hasTag) setEditingItemTags(editingItemTags.filter(t => t !== 'ust_beden'));
                                             else setEditingItemTags([...editingItemTags.filter(t => t !== 'tam_boy'), 'ust_beden']);
                                         }}
-                                        className={`px-3 py-1 rounded-full text-[10px] uppercase font-bold transition-all border ${editingItemTags.includes('ust_beden') ? 'bg-orange-500 text-white border-orange-600' : 'bg-muted text-muted-foreground border-border'}`}
+                                        className={cn(
+                                            "px-3 py-1 rounded-full text-[10px] uppercase font-bold transition-all border",
+                                            editingItemTags.includes('ust_beden')
+                                                ? "bg-orange-500 text-white border-orange-600"
+                                                : "bg-[var(--bg-elevated)] text-[var(--text-muted)] border-[var(--border-subtle)] hover:text-[var(--text-primary)]"
+                                        )}
                                     >
                                         Üst Beden
                                     </button>
@@ -4235,7 +4317,7 @@ export default function PhotoshootPage() {
 
                         <Button
                             onClick={() => handleUpdateThumbnail(null)}
-                            className="w-full bg-violet-600 hover:bg-violet-700 font-semibold"
+                            className="w-full bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] font-semibold"
                         >
                             {language === "tr" ? "Güncelle ve Kaydet" : "Update & Save"}
                         </Button>
@@ -4275,7 +4357,7 @@ export default function PhotoshootPage() {
                             </Button>
                         </div>
                         {batchPreviewPrompts.map((p, idx) => (
-                            <div key={idx} className={`space-y-2 p-3 rounded-lg border transition-colors ${selectedBatchImages[idx] ? 'bg-muted/30 border-border' : 'bg-muted/10 border-transparent opacity-60'}`}>
+                            <div key={idx} className={cn("space-y-2 p-3 rounded-lg border transition-colors", selectedBatchImages[idx] ? "bg-[var(--bg-elevated)] border-[var(--border-subtle)]" : "bg-[var(--bg-surface)] border-transparent opacity-60")}>
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
                                         <input
@@ -4304,7 +4386,7 @@ export default function PhotoshootPage() {
                                             updated[idx] = e.target.value;
                                             setEditedBatchPrompts(updated);
                                         }}
-                                        className="font-mono text-xs h-32 bg-background"
+                                        className="font-mono text-xs h-32 bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] rounded-lg p-2"
                                     />
                                 )}
                             </div>
@@ -4324,6 +4406,6 @@ export default function PhotoshootPage() {
             {/* PROCESS LOADER OVERLAY */}
             {/* PROCESS LOADER OVERLAY REMOVED per user request to avoid blocking screen */}
 
-        </div>
+        </div >
     );
 }

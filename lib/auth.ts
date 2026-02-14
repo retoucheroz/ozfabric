@@ -233,3 +233,21 @@ export async function getAllUsers(): Promise<Omit<User, 'passwordHash'>[]> {
         return [];
     }
 }
+
+export async function deleteUser(username: string): Promise<void> {
+    try {
+        if (useMemoryFallback) {
+            memoryStore.delete(`user:${username}`);
+            memoryStore.delete(`heartbeat:${username}`);
+            return;
+        }
+        const client = await getRedis();
+        if (client) {
+            await client.del(`user:${username}`);
+            await client.del(`heartbeat:${username}`);
+            console.log(`🗑️ Auth: deleteUser(${username})`);
+        }
+    } catch (e) {
+        console.error('Redis deleteUser Error:', e);
+    }
+}

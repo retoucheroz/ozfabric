@@ -79,17 +79,17 @@ export default function HistoryPage() {
     }
 
     return (
-        <div className="flex flex-col h-full bg-stone-50/30 dark:bg-background overflow-hidden">
+        <div className="flex flex-col h-full bg-[var(--bg-background)] overflow-hidden">
             {/* Header Area */}
-            <div className="shrink-0 p-6 border-b bg-white dark:bg-background/50 backdrop-blur-md sticky top-0 z-10">
+            <div className="shrink-0 p-6 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]/80 backdrop-blur-md sticky top-0 z-10">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 max-w-7xl mx-auto w-full">
                     <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400">
+                        <div className="p-2.5 rounded-xl bg-[var(--bg-elevated)] text-[var(--accent-primary)]">
                             <Clock className="w-6 h-6" />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-bold tracking-tight">{language === "tr" ? "İşlem Geçmişi" : "Activity History"}</h1>
-                            <p className="text-sm text-muted-foreground">{language === "tr" ? "Tüm üretimlerinizi ve projelerinizi yönetin" : "Manage all your generations and projects"}</p>
+                            <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">{language === "tr" ? "İşlem Geçmişi" : "Activity History"}</h1>
+                            <p className="text-sm text-[var(--text-secondary)]">{language === "tr" ? "Tüm üretimlerinizi ve projelerinizi yönetin" : "Manage all your generations and projects"}</p>
                         </div>
                     </div>
 
@@ -98,7 +98,7 @@ export default function HistoryPage() {
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                             <Input
                                 placeholder={language === "tr" ? "Ara..." : "Search..."}
-                                className="pl-9 h-10 border-zinc-200 dark:border-card"
+                                className="pl-9 h-10 border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-primary)]"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
@@ -216,7 +216,7 @@ function ProjectCard({ project, language, onDelete, onDownload }: { project: Pro
     }
 
     return (
-        <div className="group bg-white dark:bg-background border border-zinc-200 dark:border-card rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <div className="group bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
             <div className="relative aspect-[3/4] overflow-hidden bg-muted">
                 <img
                     src={project.imageUrl}
@@ -224,7 +224,7 @@ function ProjectCard({ project, language, onDelete, onDownload }: { project: Pro
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute top-3 left-3">
-                    <Badge className="bg-white/90 dark:bg-background/90 text-background dark:text-zinc-100 backdrop-blur-md border-none shadow-sm">
+                    <Badge className="bg-[var(--bg-surface)]/90 text-[var(--text-primary)] backdrop-blur-md border border-[var(--border-subtle)] shadow-sm">
                         {project.type}
                     </Badge>
                 </div>
@@ -232,7 +232,7 @@ function ProjectCard({ project, language, onDelete, onDownload }: { project: Pro
                     <Button
                         size="icon"
                         variant="secondary"
-                        className="h-8 w-8 rounded-full bg-white/90 dark:bg-card/90 backdrop-blur-md shadow-sm"
+                        className="h-8 w-8 rounded-full bg-[var(--bg-surface)]/90 text-[var(--text-primary)] backdrop-blur-md shadow-sm hover:bg-[var(--bg-elevated)]"
                         onClick={onDownload}
                     >
                         <Download className="w-4 h-4" />
@@ -241,7 +241,7 @@ function ProjectCard({ project, language, onDelete, onDownload }: { project: Pro
                         <Button
                             size="icon"
                             variant="secondary"
-                            className="h-8 w-8 rounded-full bg-white/90 dark:bg-card/90 backdrop-blur-md shadow-sm"
+                            className="h-8 w-8 rounded-full bg-[var(--bg-surface)]/90 text-[var(--text-primary)] backdrop-blur-md shadow-sm hover:bg-[var(--bg-elevated)]"
                             onClick={handleCopyPrompt}
                             title={language === "tr" ? "Promptu Kopyala" : "Copy Prompt"}
                         >
@@ -261,8 +261,8 @@ function ProjectCard({ project, language, onDelete, onDownload }: { project: Pro
             <div className="p-4">
                 <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                        <h3 className="font-semibold text-sm truncate group-hover:text-violet-600 transition-colors uppercase tracking-tight">{project.title}</h3>
-                        <div className="flex items-center gap-1.5 mt-1 text-muted-foreground">
+                        <h3 className="font-semibold text-sm truncate group-hover:text-[var(--accent-primary)] transition-colors uppercase tracking-tight text-[var(--text-primary)]">{project.title}</h3>
+                        <div className="flex items-center gap-1.5 mt-1 text-[var(--text-muted)]">
                             <Calendar className="w-3 h-3" />
                             <span className="text-[10px]">
                                 {new Date(project.createdAt).toLocaleDateString(language === "tr" ? "tr-TR" : "en-US", {
@@ -273,8 +273,8 @@ function ProjectCard({ project, language, onDelete, onDownload }: { project: Pro
                             </span>
                             {seed && (
                                 <>
-                                    <span className="text-[10px] text-zinc-300 dark:text-zinc-700">•</span>
-                                    <span className="text-[10px] font-mono bg-muted px-1 rounded">S: {seed}</span>
+                                    <span className="text-[10px] text-[var(--text-disabled)]">•</span>
+                                    <span className="text-[10px] font-mono bg-[var(--bg-muted)] text-[var(--text-secondary)] px-1 rounded">S: {seed}</span>
                                 </>
                             )}
                         </div>
@@ -330,18 +330,18 @@ function ProjectRow({ project, language, onDelete, onDownload }: { project: Proj
     }
 
     return (
-        <div className="group bg-white dark:bg-background border border-zinc-200 dark:border-card rounded-xl p-3 flex items-center gap-4 hover:shadow-md transition-all">
-            <div className="w-12 h-16 shrink-0 rounded-lg overflow-hidden border border-zinc-100 dark:border-card bg-muted relative group-hover:ring-1 ring-violet-500 transition-all">
+        <div className="group bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-xl p-3 flex items-center gap-4 hover:shadow-md transition-all">
+            <div className="w-12 h-16 shrink-0 rounded-lg overflow-hidden border border-[var(--border-subtle)] bg-[var(--bg-muted)] relative group-hover:ring-1 group-hover:ring-[var(--accent-primary)] transition-all">
                 <img src={project.imageUrl} alt={project.title} className="w-full h-full object-cover" />
             </div>
             <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                    <h3 className="font-semibold text-sm truncate uppercase tracking-tight">{project.title}</h3>
+                    <h3 className="font-semibold text-sm truncate uppercase tracking-tight text-[var(--text-primary)]">{project.title}</h3>
                     <div className="flex items-center gap-3 mt-1">
-                        <Badge variant="secondary" className="text-[9px] px-2 py-0 h-4 border-none">
+                        <Badge variant="secondary" className="text-[9px] px-2 py-0 h-4 border-none bg-[var(--bg-muted)] text-[var(--text-secondary)]">
                             {project.type}
                         </Badge>
-                        <div className="flex items-center gap-1.5 text-muted-foreground">
+                        <div className="flex items-center gap-1.5 text-[var(--text-muted)]">
                             <Calendar className="w-3 h-3" />
                             <span className="text-[10px]">
                                 {new Date(project.createdAt).toLocaleString(language === "tr" ? "tr-TR" : "en-US", {
@@ -354,7 +354,7 @@ function ProjectRow({ project, language, onDelete, onDownload }: { project: Proj
                             </span>
                         </div>
                         {seed && (
-                            <span className="text-[10px] font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded">Seed: {seed}</span>
+                            <span className="text-[10px] font-mono text-[var(--text-muted)] bg-[var(--bg-muted)] px-1.5 py-0.5 rounded">Seed: {seed}</span>
                         )}
                     </div>
                 </div>

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
@@ -28,13 +29,21 @@ export default function SettingsPage() {
     const [mounted, setMounted] = useState(false);
     const [ozzieEnabled, setOzzieEnabled] = useState(false);
 
+    const searchParams = useSearchParams();
+
     useEffect(() => {
         setMounted(true);
         const stored = localStorage.getItem("retoucheroz_runpod_key");
         if (stored) setApiKey(stored);
         const ozzieStored = localStorage.getItem("ozzie-chat-enabled");
         setOzzieEnabled(ozzieStored === "true");
-    }, []);
+
+        // Check for section query param
+        const sectionParam = searchParams.get("section");
+        if (sectionParam && ["profile", "api", "billing", "notifications", "security"].includes(sectionParam)) {
+            setActiveSection(sectionParam as SettingsSection);
+        }
+    }, [searchParams]);
 
     const handleSaveKey = () => {
         localStorage.setItem("retoucheroz_runpod_key", apiKey);
@@ -57,15 +66,15 @@ export default function SettingsPage() {
     return (
         <div className="flex h-[calc(100vh-64px)]">
             {/* Sidebar Navigation */}
-            <div className="w-64 border-r bg-muted/10 p-4 space-y-1">
+            <div className="w-64 border-r bg-[var(--bg-surface)] p-4 space-y-1">
                 {sections.map((section) => (
                     <Button
                         key={section.id}
                         variant="ghost"
-                        className={`w-full justify-start ${activeSection === section.id ? 'font-semibold bg-accent/50' : ''}`}
+                        className={`w-full justify-start ${activeSection === section.id ? 'font-semibold bg-[var(--bg-elevated)] text-[var(--accent-primary)]' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]'}`}
                         onClick={() => setActiveSection(section.id)}
                     >
-                        <section.icon className="w-4 h-4 mr-2" />
+                        <section.icon className={`w-4 h-4 mr-2 ${activeSection === section.id ? 'text-[var(--accent-primary)]' : 'text-[var(--text-muted)] group-hover:text-[var(--text-primary)]'}`} />
                         {section.label}
                     </Button>
                 ))}

@@ -208,7 +208,7 @@ export default function FaceHeadSwapPage() {
                             <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1">
                                 {t("faceSwap.identitySource")}
                             </Label>
-                            <Card className="relative h-48 overflow-hidden border-2 border-dashed border-muted hover:border-violet-500/50 transition-all bg-muted/5 p-2 flex items-center justify-center group cursor-pointer" onClick={() => identityInputRef.current?.click()}>
+                            <Card className="relative h-[200px] overflow-hidden border-2 border-dashed border-border dark:border-white/10 hover:border-violet-500/50 transition-all bg-muted/30 dark:bg-[#1a1a25] p-2 flex items-center justify-center group cursor-pointer" onClick={() => identityInputRef.current?.click()}>
                                 <input type="file" ref={identityInputRef} className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'identity')} />
                                 {identityImage ? (
                                     <div className="relative w-full h-full">
@@ -230,7 +230,7 @@ export default function FaceHeadSwapPage() {
                             <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1">
                                 {t("faceSwap.baseImage")}
                             </Label>
-                            <Card className="relative h-48 overflow-hidden border-2 border-dashed border-muted hover:border-violet-500/50 transition-all bg-muted/5 p-2 flex items-center justify-center group cursor-pointer" onClick={() => baseInputRef.current?.click()}>
+                            <Card className="relative h-[200px] overflow-hidden border-2 border-dashed border-border dark:border-white/10 hover:border-violet-500/50 transition-all bg-muted/30 dark:bg-[#1a1a25] p-2 flex items-center justify-center group cursor-pointer" onClick={() => baseInputRef.current?.click()}>
                                 <input type="file" ref={baseInputRef} className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'base')} />
                                 {baseImage ? (
                                     <div className="relative w-full h-full">
@@ -332,7 +332,7 @@ export default function FaceHeadSwapPage() {
 
                 {/* Right Side: Result Section */}
                 <div className="lg:col-span-7 flex flex-col h-full">
-                    <Card className="relative flex-1 min-h-[500px] lg:min-h-0 bg-muted/10 border-2 border-muted overflow-hidden flex items-center justify-center group rounded-3xl shadow-md">
+                    <Card className="relative flex-1 min-h-[500px] lg:min-h-0 bg-card dark:bg-[#12121a] border-2 border-dashed border-border dark:border-white/10 overflow-hidden flex items-center justify-center group rounded-3xl shadow-none hover:border-border/80 dark:hover:border-white/20 transition-colors">
                         {isGenerating ? (
                             <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-20 flex flex-col items-center justify-center p-8 text-center space-y-4">
                                 <div className="relative">

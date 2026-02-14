@@ -13,11 +13,14 @@ import { useLanguage } from "@/context/language-context"
 import { useTheme } from "next-themes"
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet"
 import { LeftSidebar } from "@/components/left-sidebar"
+import { useSidebar } from "@/context/sidebar-context"
+import { TbLayoutSidebar } from "react-icons/tb"
 
 export function TopNav() {
     const pathname = usePathname();
     const router = useRouter();
     const { credits } = useProjects();
+    const { toggleSidebar } = useSidebar();
     const { language, setLanguage, t } = useLanguage();
     const { theme, setTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
@@ -38,14 +41,13 @@ export function TopNav() {
     const navItems = [
         { label: t("nav.home"), href: "/home", icon: Home },
         { label: t("nav.create"), href: "/photoshoot", icon: Plus, isPrimary: true },
-        { label: t("nav.edit"), href: "/design/retexture", icon: Edit3 },
         { label: t("nav.train"), href: "/train", icon: BrainCircuit },
     ];
 
     return (
-        <header className="h-16 border-b bg-background flex items-center justify-between px-4 md:px-6 sticky top-0 z-50">
+        <header className="h-16 border-b bg-background flex items-center justify-between px-4 sticky top-0 z-50">
             {/* Left Section: Mobile Menu & Logo */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
                 {mounted && (
                     <Sheet>
                         <SheetTrigger asChild>
@@ -60,7 +62,9 @@ export function TopNav() {
                             </SheetHeader>
                             <div className="p-6 border-b">
                                 <Link href="/home" className="flex items-center font-bold text-xl tracking-tight">
-                                    {user?.customTitle ? (
+                                    {user?.customLogo ? (
+                                        <img src={user.customLogo} alt="Logo" className="h-8 md:h-10 w-auto object-contain" />
+                                    ) : user?.customTitle ? (
                                         <span className="bg-gradient-to-r from-violet-500 to-purple-600 bg-clip-text text-transparent font-black">{user.customTitle}</span>
                                     ) : (
                                         <>
@@ -76,9 +80,23 @@ export function TopNav() {
                     </Sheet>
                 )}
 
+                {/* Desktop Sidebar Toggle */}
+                {mounted && (
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="hidden md:flex text-muted-foreground hover:text-foreground shrink-0 ml-px"
+                        onClick={toggleSidebar}
+                    >
+                        <TbLayoutSidebar className="size-5" />
+                    </Button>
+                )}
+
                 {/* Logo */}
                 <Link href="/home" className="flex items-center font-bold text-xl tracking-tight hover:opacity-80 transition-opacity">
-                    {user?.customTitle ? (
+                    {user?.customLogo ? (
+                        <img src={user.customLogo} alt="Logo" className="h-8 md:h-10 w-auto object-contain" />
+                    ) : user?.customTitle ? (
                         <span className="bg-gradient-to-r from-violet-500 to-purple-600 bg-clip-text text-transparent font-black">{user.customTitle}</span>
                     ) : (
                         <>
@@ -115,13 +133,22 @@ export function TopNav() {
                 {/* Credit Display */}
                 {mounted && (
                     <div
-                        className="flex items-center gap-1.5 md:gap-2 px-2 md:px-3 py-1 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-full cursor-pointer hover:bg-amber-100 transition-colors"
-                        onClick={() => router.push('/settings')}
+                        className="flex items-center gap-3 px-4 py-1.5 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-lg cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/20 transition-all group"
+                        onClick={() => router.push('/settings?section=billing')}
                     >
-                        <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                        <span className="text-xs font-bold text-amber-700 dark:text-amber-300">{credits}</span>
-                        <div className="hidden md:block w-[1px] h-3 bg-amber-200 dark:bg-amber-700 mx-0.5" />
-                        <Plus className="hidden md:block w-3 h-3 text-amber-600 dark:text-amber-400" />
+                        <div className="flex items-center gap-2">
+                            <div className="p-1 rounded-md bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 group-hover:bg-amber-200 dark:group-hover:bg-amber-900/60 transition-colors">
+                                <Sparkles className="w-4 h-4" />
+                            </div>
+                            <div className="flex flex-col items-start leading-none gap-0.5">
+                                <span className="text-[10px] text-amber-600/70 dark:text-amber-400/70 font-medium uppercase tracking-wider">{t("settings.credits")}</span>
+                                <span className="text-sm font-bold text-amber-700 dark:text-amber-300 tabular-nums">{credits}</span>
+                            </div>
+                        </div>
+                        <div className="hidden md:block w-[1px] h-6 bg-amber-200 dark:bg-amber-800 mx-1" />
+                        <div className="rounded-full p-1 hover:bg-amber-200 dark:hover:bg-amber-800 transition-colors">
+                            <Plus className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                        </div>
                     </div>
                 )}
 

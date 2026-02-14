@@ -16,10 +16,14 @@ import {
     RefreshCw,
     Circle,
     Activity,
-    Settings2
+    Settings2,
+    Trash2,
+    Plus,
+    Image as ImageIcon
 } from "lucide-react"
 import { toast } from "sonner"
 import { User } from "@/lib/auth-types"
+import { useLanguage } from "@/context/language-context"
 
 const AVAILABLE_PAGES = [
     { label: 'Photoshoot (AI Model)', path: '/photoshoot' },
@@ -39,6 +43,7 @@ const getAdminHeaders = () => {
 };
 
 export default function AdminPage() {
+    const { t } = useLanguage();
     const [users, setUsers] = useState<Omit<User, 'passwordHash'>[]>([]);
     const [onlineStats, setOnlineStats] = useState<{ onlineCount: number, users: string[] }>({ onlineCount: 0, users: [] });
     const [isLoading, setIsLoading] = useState(true);
@@ -86,6 +91,26 @@ export default function AdminPage() {
         }
     };
 
+    const deleteUser = async (username: string) => {
+        if (!confirm(t('admin.deleteConfirm'))) return;
+        try {
+            const res = await fetch('/api/admin/users', {
+                method: 'DELETE',
+                headers: getAdminHeaders(),
+                body: JSON.stringify({ username })
+            });
+            if (res.ok) {
+                toast.success(`User ${username} deleted`);
+                fetchData();
+            } else {
+                const data = await res.json();
+                toast.error(data.error || "Failed to delete user");
+            }
+        } catch (error) {
+            toast.error("Network error");
+        }
+    };
+
     const togglePageAccess = (user: Omit<User, 'passwordHash'>, path: string) => {
         const current = user.authorizedPages || [];
         const updated = current.includes(path)
@@ -98,14 +123,14 @@ export default function AdminPage() {
         <div className="p-6 space-y-8 max-w-7xl mx-auto">
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
-                    <p className="text-muted-foreground text-sm">Manage users, permissions and system health.</p>
+                    <h1 className="text-3xl font-bold tracking-tight">{t('admin.title')}</h1>
+                    <p className="text-muted-foreground text-sm">{t('admin.subtitle')}</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <Card className="flex items-center gap-4 px-4 py-2 bg-violet-500/5 border-violet-500/20">
                         <Activity className="w-5 h-5 text-violet-500" />
                         <div>
-                            <p className="text-[10px] font-bold text-muted-foreground uppercase">Online Users</p>
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase">{t('admin.onlineUsers')}</p>
                             <p className="text-xl font-bold text-violet-600 leading-none">{onlineStats.onlineCount}</p>
                         </div>
                     </Card>
@@ -119,7 +144,7 @@ export default function AdminPage() {
             <Card className="border-violet-500/20 bg-zinc-50/50 dark:bg-background/50">
                 <CardHeader className="pb-4">
                     <CardTitle className="text-sm font-bold flex items-center gap-2">
-                        <Users className="w-4 h-4 text-violet-500" /> Yeni Kullanıcı Oluştur
+                        <Users className="w-4 h-4 text-violet-500" /> {t('admin.createNewUser')}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -131,7 +156,7 @@ export default function AdminPage() {
                         const role = formData.get('role') as string;
                         const customTitle = formData.get('customTitle') as string;
 
-                        if (!username || !password) return toast.error("Kullanıcı adı ve şifre zorunludur");
+                        if (!username || !password) return toast.error(t('login.errorBothImages')); // Using a placeholder for missing creds
 
                         try {
                             const res = await fetch('/api/admin/users', {
@@ -140,7 +165,7 @@ export default function AdminPage() {
                                 body: JSON.stringify({ username, password, role, customTitle })
                             });
                             if (res.ok) {
-                                toast.success("Kullanıcı başarıyla oluşturuldu");
+                                toast.success(t('admin.addUser'));
                                 fetchData();
                                 (e.target as HTMLFormElement).reset();
                             } else {
@@ -152,19 +177,19 @@ export default function AdminPage() {
                         }
                     }}>
                         <div className="space-y-1.5 flex-1 min-w-[200px]">
-                            <Label htmlFor="username">Kullanıcı Adı</Label>
+                            <Label htmlFor="username">{t('admin.username')}</Label>
                             <Input id="username" name="username" placeholder="örn: mehmet" required />
                         </div>
                         <div className="space-y-1.5 flex-1 min-w-[200px]">
-                            <Label htmlFor="password">Şifre</Label>
+                            <Label htmlFor="password">{t('admin.password')}</Label>
                             <Input id="password" name="password" type="password" placeholder="••••••••" required />
                         </div>
                         <div className="space-y-1.5 flex-1 min-w-[200px]">
-                            <Label htmlFor="customTitle">Başlık (Branding)</Label>
+                            <Label htmlFor="customTitle">{t('admin.brandedTitle')}</Label>
                             <Input id="customTitle" name="customTitle" placeholder="örn: Autography" />
                         </div>
                         <div className="space-y-1.5 w-[140px]">
-                            <Label htmlFor="role">Yetki</Label>
+                            <Label htmlFor="role">{t('admin.role')}</Label>
                             <select
                                 id="role"
                                 name="role"
@@ -175,7 +200,7 @@ export default function AdminPage() {
                             </select>
                         </div>
                         <Button type="submit" className="bg-violet-600 hover:bg-violet-700">
-                            Kullanıcı Ekle
+                            {t('admin.addUser')}
                         </Button>
                     </form>
                 </CardContent>
@@ -193,10 +218,20 @@ export default function AdminPage() {
                                 </div>
                                 <div className="flex items-center gap-1">
                                     {user.status === 'pending' && (
-                                        <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/20">Pending</Badge>
+                                        <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/20">{user.status}</Badge>
                                     )}
                                     {user.status === 'disabled' && (
-                                        <Badge variant="destructive">Disabled</Badge>
+                                        <Badge variant="destructive">{user.status}</Badge>
+                                    )}
+                                    {user.username !== 'admin' && (
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-8 w-8 text-muted-foreground hover:text-red-500 hover:bg-red-500/10"
+                                            onClick={() => deleteUser(user.username)}
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </Button>
                                     )}
                                 </div>
                             </div>
@@ -209,7 +244,7 @@ export default function AdminPage() {
                             <div className="grid grid-cols-2 gap-2">
                                 {user.status === 'pending' ? (
                                     <Button size="sm" className="col-span-2 bg-green-600 hover:bg-green-700" onClick={() => updateUser(user.username, { status: 'active' })}>
-                                        <UserCheck className="w-4 h-4 mr-2" /> Approve
+                                        <UserCheck className="w-4 h-4 mr-2" /> {t('admin.approve')}
                                     </Button>
                                 ) : (
                                     <>
@@ -221,7 +256,7 @@ export default function AdminPage() {
                                             disabled={user.username === 'admin'}
                                         >
                                             {user.status === 'active' ? <UserMinus className="w-4 h-4 mr-2 shrink-0" /> : <UserCheck className="w-4 h-4 mr-2 shrink-0" />}
-                                            <span className="truncate">{user.status === 'active' ? 'Disable' : 'Enable'}</span>
+                                            <span className="truncate">{user.status === 'active' ? t('admin.disable') : t('admin.enable')}</span>
                                         </Button>
                                         <Button
                                             size="sm"
@@ -231,33 +266,79 @@ export default function AdminPage() {
                                             disabled={user.username === 'admin'}
                                         >
                                             <Shield className={`w-4 h-4 mr-2 shrink-0 ${user.role === 'admin' ? 'text-violet-500' : ''}`} />
-                                            <span className="truncate">{user.role === 'admin' ? 'Revoke' : 'Make Admin'}</span>
+                                            <span className="truncate">{user.role === 'admin' ? t('admin.revokeAdmin') : t('admin.makeAdmin')}</span>
                                         </Button>
                                     </>
                                 )}
                             </div>
 
-                            {/* Branding Title */}
-                            <div className="space-y-1.5">
-                                <Label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
-                                    <Layout className="w-3 h-3" /> Branded Title
-                                </Label>
-                                <Input
-                                    value={user.customTitle || ''}
-                                    onChange={(e) => {
-                                        const newUsers = users.map(u => u.username === user.username ? { ...u, customTitle: e.target.value } : u);
-                                        setUsers(newUsers);
-                                    }}
-                                    onBlur={(e) => updateUser(user.username, { customTitle: e.target.value })}
-                                    placeholder="e.g. Autography"
-                                    className="h-8 text-xs bg-muted/20"
-                                />
+                            {/* Branding Title & Logo */}
+                            <div className="space-y-4">
+                                <div className="space-y-1.5">
+                                    <Label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
+                                        <Layout className="w-3 h-3" /> {t('admin.brandedTitle')}
+                                    </Label>
+                                    <Input
+                                        value={user.customTitle || ''}
+                                        onChange={(e) => {
+                                            const newUsers = users.map(u => u.username === user.username ? { ...u, customTitle: e.target.value } : u);
+                                            setUsers(newUsers);
+                                        }}
+                                        onBlur={(e) => updateUser(user.username, { customTitle: e.target.value })}
+                                        placeholder="e.g. Autography"
+                                        className="h-8 text-xs bg-muted/20"
+                                    />
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <Label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
+                                        <ImageIcon className="w-3 h-3" /> {t('admin.brandedLogo')}
+                                    </Label>
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-12 h-12 rounded-lg border bg-muted/20 flex-shrink-0 overflow-hidden flex items-center justify-center relative group">
+                                            {user.customLogo ? (
+                                                <img src={user.customLogo} alt="Logo" className="w-full h-full object-contain" />
+                                            ) : (
+                                                <ImageIcon className="w-6 h-6 text-muted-foreground/30" />
+                                            )}
+                                            <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity">
+                                                <Plus className="w-4 h-4 text-white" />
+                                                <input
+                                                    type="file"
+                                                    className="hidden"
+                                                    accept="image/png"
+                                                    onChange={async (e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (!file) return;
+                                                        if (file.type !== 'image/png') return toast.error("Only transparent PNG allowed");
+                                                        if (file.size > 1024 * 1024) return toast.error("Max size 1MB");
+
+                                                        const reader = new FileReader();
+                                                        reader.onload = async (ev) => {
+                                                            const base64 = ev.target?.result as string;
+                                                            updateUser(user.username, { customLogo: base64 });
+                                                        };
+                                                        reader.readAsDataURL(file);
+                                                    }}
+                                                />
+                                            </label>
+                                        </div>
+                                        <div className="flex-1">
+                                            <p className="text-[10px] text-muted-foreground">Transparent PNG only. Max 1MB. Overrides title.</p>
+                                            {user.customLogo && (
+                                                <Button variant="ghost" size="sm" className="h-6 text-[10px] text-red-500 mt-1" onClick={() => updateUser(user.username, { customLogo: '' })}>
+                                                    Remove Logo
+                                                </Button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Permissions */}
                             <div className="space-y-3">
                                 <Label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
-                                    <Layout className="w-3 h-3" /> Authorized Pages
+                                    <Layout className="w-3 h-3" /> {t('admin.authorizedPages')}
                                 </Label>
                                 <div className="grid grid-cols-1 gap-2 border rounded-xl p-3 bg-muted/20">
                                     {user.authorizedPages?.includes('*') ? (
@@ -281,10 +362,10 @@ export default function AdminPage() {
                             {/* JSON settings for "designing pages" */}
                             <div className="space-y-2">
                                 <Label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
-                                    <Settings2 className="w-3 h-3" /> Custom UI Config (JSON)
+                                    <Settings2 className="w-3 h-3" /> {t('admin.customConfig')}
                                 </Label>
                                 <textarea
-                                    className="w-full h-20 text-[10px] bg-muted/30 border rounded-lg p-2 font-mono focus:ring-1 ring-violet-500 outline-none"
+                                    className="w-full h-16 text-[10px] bg-muted/30 border rounded-lg p-2 font-mono focus:ring-1 ring-violet-500 outline-none"
                                     placeholder='{ "theme": "dark", "compact": true }'
                                     defaultValue={JSON.stringify(user.customSettings || {}, null, 2)}
                                     onBlur={(e) => {
@@ -304,7 +385,7 @@ export default function AdminPage() {
                 {users.length === 0 && !isLoading && (
                     <div className="col-span-full py-20 text-center opacity-40">
                         <Users className="w-16 h-16 mx-auto mb-4" />
-                        <h3 className="text-xl font-bold">No users registered yet</h3>
+                        <h3 className="text-xl font-bold">{t('admin.noUsers')}</h3>
                         <p>Tell your team to sign up on the landing page.</p>
                     </div>
                 )}

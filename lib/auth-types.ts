@@ -13,6 +13,7 @@ export interface User {
     status: 'active' | 'pending' | 'disabled';
     authorizedPages: string[];
     customTitle?: string;
+    customLogo?: string;
     customSettings?: Record<string, any>;
     createdAt: number;
     lastLogin?: number;

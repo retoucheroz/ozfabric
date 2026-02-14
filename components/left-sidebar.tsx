@@ -4,29 +4,32 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import {
-    Wand2,
-    Camera,
-    Maximize,
-    FileText,
-    Layers,
-    Palette,
-    Shirt,
-    UserSquare2,
-    Folder,
-    Globe,
-    Settings,
-    Search,
     Sparkles,
     ChevronLeft,
     ChevronRight,
-    ShoppingBag,
-    Clock,
-    MonitorPlay,
-    Shield,
 } from "lucide-react"
+import {
+    TbSmartHome,
+    TbShieldLock,
+    TbCamera,
+    TbHanger,
+    TbPhoto,
+    TbMovie,
+    TbFaceId,
+    TbShirt,
+    TbMaximize,
+    TbAnalyze,
+    TbWand,
+    TbShoppingBag,
+    TbClipboardText,
+    TbHistory,
+    TbSettings,
+    TbGhost2
+} from "react-icons/tb"
 import { useLanguage } from "@/context/language-context"
-import { Separator } from "@/components/ui/separator"
 import { useState, useEffect } from "react"
+import { useSidebar } from "@/context/sidebar-context"
+import { Separator } from "@/components/ui/separator"
 
 interface LeftSidebarProps {
     variant?: "default" | "mobile"
@@ -34,20 +37,15 @@ interface LeftSidebarProps {
 
 export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
     const pathname = usePathname();
-    const { t, language } = useLanguage();
+    const { t } = useLanguage();
+    const { isExpanded } = useSidebar();
     const [mounted, setMounted] = useState(false);
-    const [isExpanded, setIsExpanded] = useState(true);
     const [user, setUser] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isKvActive, setIsKvActive] = useState(true);
 
     useEffect(() => {
         setMounted(true);
-        const saved = localStorage.getItem('sidebar-expanded');
-        if (saved !== null) {
-            setIsExpanded(saved === 'true');
-        }
-
         // Fetch user session for RBAC
         fetch('/api/auth/session')
             .then(res => res.json())
@@ -61,62 +59,58 @@ export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
             .finally(() => setIsLoading(false));
     }, []);
 
-    const toggleSidebar = () => {
-        const newState = !isExpanded;
-        setIsExpanded(newState);
-        localStorage.setItem('sidebar-expanded', String(newState));
-    };
-
     if (!mounted) return variant === "default" ? (
-        <aside className="w-[240px] h-full border-r bg-white dark:bg-background/80 dark:backdrop-blur-xl hidden md:flex" />
+        <aside className="w-[240px] h-full border-r bg-[var(--bg-sidebar)] hidden md:flex" />
     ) : null;
 
     const isAuthorized = (path: string) => {
-        // If KV is not active, we are in bypass mode (either local or initial setup)
         if (!isKvActive) return true;
-
-        // While loading, show everything to prevent flicker
         if (isLoading) return true;
-
-        // In local development, if session check fails, we might be in "bypass" mode
         if (process.env.NODE_ENV === 'development' && !user) return true;
-
         if (!user) return false;
         if (user.role === 'admin') return true;
         return user.authorizedPages?.includes(path) || user.authorizedPages?.includes('*');
     };
 
-    const designItems: { label: string; href: string; icon: any }[] = [];
+    // --- ITEM GROUPS ---
 
-    const photoshootItems = [
-        { label: t("sidebar.aiModel"), href: "/photoshoot", icon: Camera },
-        { label: t("sidebar.tryOn"), href: "/photoshoot/try-on", icon: Camera },
-        { label: t("sidebar.editorial"), href: "/editorial", icon: Camera },
-        { label: t("sidebar.video"), href: "/video", icon: MonitorPlay },
-        { label: t("sidebar.faceHeadSwap"), href: "/face-head-swap", icon: UserSquare2 },
-        { label: t("sidebar.ghost"), href: "/photoshoot/ghost", icon: UserSquare2 },
-    ].filter(item => isAuthorized(item.href));
+    const mainItems = [
+        { label: t("nav.home"), href: '/home', icon: TbSmartHome },
+    ];
 
-    const ecomItems = [
-        { label: t("sidebar.ecom"), href: "/ecom", icon: ShoppingBag },
-    ].filter(item => isAuthorized(item.href));
-
-    const toolItems = [
-        { label: t("sidebar.analysis"), href: "/analysis", icon: Search },
-        { label: t("sidebar.resize"), href: "/resize", icon: Maximize },
-        { label: t("sidebar.techPack"), href: "/studio", icon: FileText },
-        { label: t("sidebar.train"), href: "/train", icon: Sparkles },
-    ].filter(item => isAuthorized(item.href));
-
-    const libraryItems = [
-        { label: t("sidebar.history"), href: "/history", icon: Clock },
-    ].filter(item => isAuthorized(item.href));
-
-    const showAdminLink = user?.role === 'admin' || !isKvActive || (process.env.NODE_ENV === 'development' && (isLoading || !user));
-
-    const adminItems = showAdminLink ? [
-        { label: 'Admin Panel', href: '/admin', icon: Shield },
+    const adminItems = (user?.role === 'admin' || !isKvActive || (process.env.NODE_ENV === 'development' && (isLoading || !user))) ? [
+        { label: "Admin Panel", href: '/admin', icon: TbShieldLock },
     ] : [];
+
+    // STÜDYO Group
+    const studioItems = [
+        { label: t("sidebar.photoshoot"), href: '/photoshoot', icon: TbCamera },
+        { label: t("sidebar.tryOn"), href: '/photoshoot/try-on', icon: TbHanger },
+        { label: t("sidebar.editorial"), href: '/editorial', icon: TbPhoto },
+        { label: t("sidebar.video"), href: '/video', icon: TbMovie },
+        { label: t("sidebar.faceHeadSwap"), href: '/face-head-swap', icon: TbFaceId },
+        { label: t("sidebar.ghost"), href: '/photoshoot/ghost', icon: TbGhost2 },
+    ].filter(item => isAuthorized(item.href));
+
+    // ARAÇLAR Group
+    const toolItems = [
+        { label: t("sidebar.resize"), href: '/resize', icon: TbMaximize },
+        { label: t("sidebar.analysis"), href: '/analysis', icon: TbAnalyze },
+        { label: t("sidebar.train"), href: '/train', icon: TbWand },
+    ].filter(item => isAuthorized(item.href));
+
+    // KATALOG Group
+    const catalogItems = [
+        { label: t("sidebar.ecom"), href: '/ecom', icon: TbShoppingBag },
+        { label: t("sidebar.techPack"), href: '/studio', icon: TbClipboardText },
+    ].filter(item => isAuthorized(item.href));
+
+    // Bottom Items
+    const bottomItems = [
+        { label: t("sidebar.history"), href: '/history', icon: TbHistory },
+        { label: t("sidebar.settings"), href: '/settings', icon: TbSettings },
+    ];
+
 
     const renderItem = (item: { label: string; href: string; icon: any }) => {
         const isActive = pathname === item.href;
@@ -128,29 +122,28 @@ export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
                     <div className={cn(
                         "flex items-center gap-3 px-4 py-3 rounded-xl transition-all",
                         isActive
-                            ? "bg-violet-500 text-white shadow-md shadow-violet-500/20"
-                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                            ? "bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)] font-medium"
+                            : "text-[var(--sidebar-item-text)] hover:bg-[var(--sidebar-hover-bg)]"
                     )}>
-                        <Icon className="w-5 h-5 shrink-0" />
-                        <span className="font-medium text-sm">{item.label}</span>
+                        <Icon className={cn("w-5 h-5 shrink-0", isActive ? "text-[var(--accent-primary)]" : "text-[var(--sidebar-icon-passive)]")} />
+                        <span className="text-sm">{item.label}</span>
                     </div>
                 </Link>
             );
         }
 
         return (
-            <Link key={item.href} href={item.href} className="flex-shrink-0 block w-full">
+            <Link key={item.href} href={item.href} className="flex-shrink-0 block w-full group relative mb-0.5" title={!isExpanded ? item.label : undefined}>
                 <div className={cn(
-                    "flex items-center gap-3 px-3 h-11 rounded-xl transition-all overflow-hidden whitespace-nowrap",
+                    "flex items-center gap-3 px-4 py-2.5 mx-2 rounded-lg transition-all duration-150 overflow-hidden whitespace-nowrap",
                     isActive
-                        ? "bg-violet-500 text-white shadow-lg shadow-violet-500/20"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                        ? "bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)] font-medium border-l-[3px] border-[var(--accent-primary)]"
+                        : "text-[var(--sidebar-item-text)] hover:bg-[var(--sidebar-hover-bg)] hover:text-[var(--text-primary)] border-l-[3px] border-transparent"
                 )}>
-                    <div className="flex items-center justify-center w-6 h-6 shrink-0">
-                        <Icon className="w-5 h-5" />
-                    </div>
+                    <Icon className={cn("w-5 h-5 shrink-0 transition-colors", isActive ? "text-[var(--accent-primary)]" : "text-[var(--sidebar-icon-passive)] group-hover:text-[var(--text-primary)]")} />
+
                     {isExpanded && (
-                        <span className="font-medium text-sm truncate">
+                        <span className="text-sm truncate transition-colors">
                             {item.label}
                         </span>
                     )}
@@ -159,94 +152,71 @@ export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
         );
     };
 
+    const renderGroupHeader = (title: string) => {
+        if (!isExpanded) return <Separator className="my-2 border-[var(--border-subtle)] mx-4 w-auto" />;
+
+        return (
+            <div className="px-6 pt-6 pb-2">
+                <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--sidebar-group-label)]">
+                    {title}
+                </span>
+            </div>
+        );
+    };
+
     const sidebarContent = (
         <>
             {variant === "default" && (
-                <button
-                    onClick={toggleSidebar}
-                    className="flex items-center justify-center w-full h-10 mb-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-                    title={isExpanded ? "Daralt" : "Genişlet"}
-                >
-                    {isExpanded ? (
-                        <ChevronLeft className="w-5 h-5" />
-                    ) : (
-                        <ChevronRight className="w-5 h-5" />
-                    )}
-                </button>
+                <div className="flex items-center justify-between mb-4 px-3 pt-2">
+                    {/* Logo Area or just toggle */}
+                    {isExpanded && <div className="w-4" />} {/* Spacer to center toggle if needed, or just keep it simple */}
+
+                </div>
             )}
 
-            {adminItems.length > 0 && (
-                <>
-                    <div className="flex flex-col gap-1 md:gap-1">
-                        {adminItems.map(renderItem)}
-                    </div>
-                    <Separator className="my-2 opacity-50" />
-                </>
-            )}
-
-            <div className="flex flex-col gap-1 md:gap-1">
-                {photoshootItems.map(renderItem)}
+            <div className="space-y-0.5">
+                {mainItems.map(renderItem)}
+                {adminItems.map(renderItem)}
             </div>
 
-            <Separator className="my-2 opacity-50" />
-
-            <div className="flex flex-col gap-1 md:gap-1">
-                {ecomItems.map(renderItem)}
+            {/* STÜDYO */}
+            <div>
+                {renderGroupHeader(t("sidebar.studio"))}
+                <div className="space-y-0.5">
+                    {studioItems.map(renderItem)}
+                </div>
             </div>
 
-            <Separator className="my-2 opacity-50" />
-
-            <div className="flex flex-col gap-1 md:gap-1">
-                {toolItems.map(renderItem)}
+            {/* ARAÇLAR */}
+            <div>
+                {renderGroupHeader(t("sidebar.tools"))}
+                <div className="space-y-0.5">
+                    {toolItems.map(renderItem)}
+                </div>
             </div>
 
-            <Separator className="my-2 opacity-50" />
-
-            <div className="flex flex-col gap-1 md:gap-1">
-                {libraryItems.map(renderItem)}
+            {/* KATALOG */}
+            <div>
+                {renderGroupHeader(t("sidebar.catalog"))}
+                <div className="space-y-0.5">
+                    {catalogItems.map(renderItem)}
+                </div>
             </div>
 
             <div className="flex-1" />
 
-            <Separator className="my-2 opacity-50" />
 
-            {variant === "mobile" ? (
-                <Link href="/settings">
-                    <div className={cn(
-                        "flex items-center gap-3 px-4 py-3 rounded-xl transition-all",
-                        pathname === "/settings"
-                            ? "bg-violet-500 text-white shadow-md shadow-violet-500/20"
-                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                    )}>
-                        <Settings className="w-5 h-5 shrink-0" />
-                        <span className="font-medium text-sm">{t("sidebar.settings")}</span>
-                    </div>
-                </Link>
-            ) : (
-                <Link href="/settings" className="flex-shrink-0 block w-full">
-                    <div className={cn(
-                        "flex items-center gap-3 px-3 h-11 rounded-xl transition-all overflow-hidden whitespace-nowrap",
-                        pathname === "/settings"
-                            ? "bg-violet-500 text-white shadow-lg shadow-violet-500/20"
-                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                    )}>
-                        <div className="flex items-center justify-center w-6 h-6 shrink-0">
-                            <Settings className="w-5 h-5" />
-                        </div>
-                        {isExpanded && (
-                            <span className="font-medium text-sm truncate">
-                                {t("sidebar.settings")}
-                            </span>
-                        )}
-                    </div>
-                </Link>
-            )}
+
+            {/* Bottom Items */}
+            <div className="mt-auto space-y-0.5 pb-4">
+                {bottomItems.map(renderItem)}
+            </div>
         </>
     );
 
     if (variant === "mobile") {
         return (
-            <div className="flex flex-col py-2 px-4 gap-1 h-full overflow-y-auto">
+            <div className="flex flex-col py-2 px-4 gap-1 h-full overflow-y-auto bg-[var(--bg-sidebar)]">
                 {sidebarContent}
             </div>
         );
@@ -254,8 +224,8 @@ export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
 
     return (
         <aside className={cn(
-            "h-full border-r bg-white dark:bg-background/80 dark:backdrop-blur-xl flex flex-col py-4 px-3 gap-1 shrink-0 overflow-y-auto overflow-x-hidden transition-[width] duration-300 ease-in-out z-50 relative shadow-sm",
-            isExpanded ? "w-[220px]" : "w-[72px]"
+            "h-full border-r border-[var(--border-subtle)] bg-[var(--bg-sidebar)] flex flex-col py-4 gap-0 shrink-0 overflow-y-auto overflow-x-hidden transition-[width] duration-300 ease-in-out z-50 relative shadow-xl",
+            isExpanded ? "w-[240px]" : "w-[72px]"
         )}>
             {sidebarContent}
         </aside>
