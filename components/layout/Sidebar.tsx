@@ -4,19 +4,18 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import {
-    Sparkles,
     ChevronLeft,
     ChevronRight,
 } from "lucide-react"
 import {
     TbSmartHome,
     TbShieldLock,
-    TbCamera,
+    TbCameraPlus,
     TbHanger,
-    TbPhoto,
+    TbPhotoScan,
     TbMovie,
     TbFaceId,
-    TbShirt,
+    TbGhost2,
     TbMaximize,
     TbAnalyze,
     TbWand,
@@ -24,19 +23,18 @@ import {
     TbClipboardText,
     TbHistory,
     TbSettings,
-    TbGhost2,
     TbLayoutSidebarLeftCollapse,
-    TbLayoutSidebarLeftExpand
+    TbLayoutSidebarLeftExpand,
 } from "react-icons/tb"
 import { useLanguage } from "@/context/language-context"
 import { useState, useEffect } from "react"
 import { Separator } from "@/components/ui/separator"
 
-interface LeftSidebarProps {
+interface SidebarProps {
     variant?: "default" | "mobile"
 }
 
-export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
+export function Sidebar({ variant = "default" }: SidebarProps) {
     const pathname = usePathname();
     const { t } = useLanguage();
     const [mounted, setMounted] = useState(false);
@@ -96,9 +94,9 @@ export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
 
     // STÜDYO Group
     const studioItems = [
-        { label: t("sidebar.photoshoot"), href: '/photoshoot', icon: TbCamera },
-        { label: t("sidebar.tryOn"), href: '/photoshoot/try-on', icon: TbHanger },
-        { label: t("sidebar.editorial"), href: '/editorial', icon: TbPhoto },
+        { label: t("sidebar.photoshoot"), href: '/photoshoot', icon: TbCameraPlus },
+        { label: t("sidebar.tryOn"), href: '/try-on', icon: TbHanger },
+        { label: t("sidebar.editorial"), href: '/editorial', icon: TbPhotoScan },
         { label: t("sidebar.video"), href: '/video', icon: TbMovie },
         { label: t("sidebar.faceHeadSwap"), href: '/face-head-swap', icon: TbFaceId },
         { label: t("sidebar.ghost"), href: '/photoshoot/ghost', icon: TbGhost2 },
@@ -227,8 +225,6 @@ export function LeftSidebar({ variant = "default" }: LeftSidebarProps) {
             </div>
 
             <div className="flex-1" />
-
-
 
             {/* Bottom Items */}
             <div className="mt-auto space-y-0.5 pb-4">

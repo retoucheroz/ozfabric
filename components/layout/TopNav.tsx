@@ -12,7 +12,7 @@ import { useProjects } from "@/context/projects-context"
 import { useLanguage } from "@/context/language-context"
 import { useTheme } from "next-themes"
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet"
-import { LeftSidebar } from "@/components/left-sidebar"
+import { Sidebar } from "@/components/layout/Sidebar"
 
 export function TopNav() {
     const pathname = usePathname();
@@ -71,7 +71,7 @@ export function TopNav() {
                                 </Link>
                             </div>
                             <div className="flex flex-col py-4 h-full">
-                                <LeftSidebar variant="mobile" />
+                                <Sidebar variant="mobile" />
                             </div>
                         </SheetContent>
                     </Sheet>
@@ -130,20 +130,20 @@ export function TopNav() {
                 {/* Credit Display */}
                 {mounted && (
                     <div
-                        className="flex items-center gap-3 px-4 py-1.5 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-lg cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/20 transition-all group"
+                        className="flex items-center gap-1.5 md:gap-3 px-2 md:px-4 py-1.5 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-lg cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/20 transition-all group"
                         onClick={() => router.push('/settings?tab=billing')}
                     >
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5 md:gap-2">
                             <div className="p-1 rounded-md bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 group-hover:bg-amber-200 dark:group-hover:bg-amber-900/60 transition-colors">
                                 <Sparkles className="w-4 h-4" />
                             </div>
                             <div className="flex flex-col items-start leading-none gap-0.5">
-                                <span className="text-[10px] text-amber-600/70 dark:text-amber-400/70 font-medium uppercase tracking-wider">{t("settings.credits")}</span>
+                                <span className="hidden md:inline text-[10px] text-amber-600/70 dark:text-amber-400/70 font-medium uppercase tracking-wider">{t("settings.credits")}</span>
                                 <span className="text-sm font-bold text-amber-700 dark:text-amber-300 tabular-nums">{credits}</span>
                             </div>
                         </div>
-                        <div className="hidden md:block w-[1px] h-6 bg-amber-200 dark:bg-amber-800 mx-1" />
-                        <div className="rounded-full p-1 hover:bg-amber-200 dark:hover:bg-amber-800 transition-colors">
+                        <div className="hidden sm:block w-[1px] h-6 bg-amber-200 dark:bg-amber-800 mx-1" />
+                        <div className="hidden sm:block rounded-full p-1 hover:bg-amber-200 dark:hover:bg-amber-800 transition-colors">
                             <Plus className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                         </div>
                     </div>

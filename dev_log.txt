@@ -1,0 +1,29 @@
+
+> ozfabric@0.1.0 dev
+> next dev
+
+ ⚠ Port 3000 is in use by process 25749, using available port 3001 instead.
+   ▲ Next.js 15.5.10
+   - Local:        http://localhost:3001
+   - Network:      http://192.168.1.10:3001
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1356ms
+ ✓ Compiled /middleware in 95ms (114 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 1266ms (897 modules)
+ HEAD / 200 in 1561ms
+ ✓ Compiled in 514ms (378 modules)
+ ○ Compiling /settings ...
+ ✓ Compiled /settings in 712ms (965 modules)
+ GET /settings 200 in 1333ms
+ ✓ Compiled in 285ms (420 modules)
+ ✓ Compiled /settings in 189ms (559 modules)
+ GET /settings 200 in 635ms
+ ✓ Compiled /favicon.ico in 181ms (576 modules)
+ GET /favicon.ico 200 in 264ms
+ ✓ Compiled /home in 447ms (1001 modules)
+ GET /home 200 in 690ms
+ GET /home 200 in 62ms
+ GET /favicon.ico 200 in 11ms

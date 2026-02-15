@@ -1,3 +1,5 @@
+import { SavedLighting } from "./photoshoot-shared";
+
 export const STUDIO_STEPS_TR = [
     { icon: "🏢", text: "Stüdyo açılıyor...", detail: "Set hazırlanıyor" },
     { icon: "🔌", text: "Ekipmanlar hazırlanıyor...", detail: "Sistemler kontrol ediliyor" },

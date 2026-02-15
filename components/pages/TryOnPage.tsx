@@ -27,7 +27,7 @@ const RESOLUTION_OPTIONS = [
 ];
 // -----------------
 
-export default function DetailCreatePage() {
+export default function TryOnPage() {
   const { t, language } = useLanguage();
   const [mounted, setMounted] = useState(false);
 

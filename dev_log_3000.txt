@@ -1,0 +1,97 @@
+
+> ozfabric@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.5.10
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.10:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1418ms
+ ✓ Compiled /middleware in 98ms (114 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 912ms (897 modules)
+ GET / 200 in 1302ms
+ ✓ Compiled in 408ms (378 modules)
+ ✓ Compiled in 30ms (364 modules)
+ ✓ Compiled /api/auth/session in 430ms (1484 modules)
+🏁 Session API: No session found
+ GET /api/auth/session 200 in 614ms
+ ✓ Compiled /api/auth/login in 201ms (1487 modules)
+🔐 Login attempt started...
+👤 User: admin, AdminPass configured: true
+⭐ Admin override detected
+ POST /api/auth/login 200 in 298ms
+ ○ Compiling /home ...
+ ✓ Compiled /home in 598ms (1566 modules)
+ GET /home 200 in 788ms
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 136ms
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 10ms
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 9ms
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 10ms
+ ○ Compiling /photoshoot ...
+ ✓ Compiled /photoshoot in 593ms (1653 modules)
+ GET /photoshoot 200 in 716ms
+ GET /photoshoot 200 in 609ms
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 138ms
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 10ms
+ ○ Compiling /settings ...
+ ✓ Compiled /settings in 698ms (1067 modules)
+ GET /settings 200 in 836ms
+ ✓ Compiled /api/auth/session in 163ms (1216 modules)
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 347ms
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 11ms
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 12ms
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 10ms
+ GET /home 200 in 70ms
+ GET /home 200 in 19ms
+ GET /photoshoot 200 in 50ms
+ GET /home 200 in 16ms
+ GET /photoshoot 200 in 23ms
+ ○ Compiling /try-on ...
+ ✓ Compiled /try-on in 879ms (1702 modules)
+ GET /try-on 200 in 1008ms
+ ○ Compiling /pricing ...
+ ✓ Compiled /pricing in 675ms (2499 modules)
+ GET /pricing 200 in 766ms
+ GET /photoshoot 200 in 38ms
+ GET /photoshoot 200 in 576ms
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 124ms
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 11ms
+ GET /photoshoot 200 in 56ms
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 20ms
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 10ms
+ GET /photoshoot 200 in 70ms
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 15ms
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 11ms
+ ○ Compiling /train ...
+ ✓ Compiled /train in 1043ms (2513 modules)
+ GET /train 200 in 1152ms
+ GET /home 200 in 28ms
+ GET /photoshoot 200 in 39ms
+ GET /pricing 200 in 34ms
+ GET /pricing 200 in 597ms
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 137ms
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 12ms
+ GET /home 200 in 22ms
+ GET /home 200 in 16ms
+ GET /settings 200 in 31ms
