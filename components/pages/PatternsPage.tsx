@@ -34,7 +34,7 @@ function PatternsPageContent() {
 
   const handleGenerate = async () => {
     if (!prompt) return;
-    if (!deductCredits(1)) {
+    if (!(await deductCredits(1))) {
       toast.error(t("common.insufficientCredits") || "Insufficient Credits");
       return;
     }

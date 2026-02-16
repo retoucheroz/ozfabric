@@ -49,8 +49,9 @@ interface ProjectsContextType {
     updateProject: (id: string, updates: Partial<Project>) => void;
     deleteProject: (id: string) => void;
     deleteModel: (id: string) => void;
-    deductCredits: (amount: number) => boolean;
+    deductCredits: (amount: number) => Promise<boolean>;
     addCredits: (amount: number) => void;
+    refreshCredits: () => Promise<void>;
 }
 
 const ProjectsContext = createContext<ProjectsContextType | undefined>(undefined);
@@ -59,14 +60,13 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
     const [projects, setProjects] = useState<Project[]>([]);
     const [collections, setCollections] = useState<Collection[]>([]);
     const [models, setModels] = useState<TrainedModel[]>([]);
-    const [credits, setCredits] = useState(100);
+    const [credits, setCredits] = useState(0);
 
     // Load from LocalStorage on mount
     useEffect(() => {
         const savedProjects = localStorage.getItem("ozfabric_projects");
         const savedCollections = localStorage.getItem("ozfabric_collections");
         const savedModels = localStorage.getItem("ozfabric_models");
-        const savedCredits = localStorage.getItem("ozfabric_credits");
 
         if (savedProjects) {
             try { setProjects(JSON.parse(savedProjects)); } catch (e) { console.error(e); }
@@ -94,18 +94,28 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
             ]);
         }
 
-        if (savedCredits) {
-            setCredits(parseInt(savedCredits));
-        }
+        // Fetch credits from session
+        refreshCredits();
     }, []);
+
+    const refreshCredits = async () => {
+        try {
+            const res = await fetch('/api/auth/session');
+            const data = await res.json();
+            if (data.authenticated && data.user) {
+                setCredits(data.user.credits || 0);
+            }
+        } catch (e) {
+            console.error("Failed to fetch credits:", e);
+        }
+    };
 
     // Save to LocalStorage on change
     useEffect(() => {
         if (projects.length > 0) localStorage.setItem("ozfabric_projects", JSON.stringify(projects));
         if (collections.length > 0) localStorage.setItem("ozfabric_collections", JSON.stringify(collections));
         if (models.length > 0) localStorage.setItem("ozfabric_models", JSON.stringify(models));
-        localStorage.setItem("ozfabric_credits", credits.toString());
-    }, [projects, credits, collections, models]);
+    }, [projects, collections, models]);
 
     const addProject = (project: Omit<Project, "id" | "createdAt">): string => {
         const id = crypto.randomUUID();
@@ -178,20 +188,34 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
         setProjects((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
     };
 
-    const deductCredits = (amount: number): boolean => {
-        if (credits >= amount) {
-            setCredits(prev => prev - amount);
-            return true;
+    const deductCredits = async (amount: number): Promise<boolean> => {
+        try {
+            const res = await fetch('/api/user/credits/deduct', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                setCredits(data.newBalance);
+                return true;
+            }
+            return false;
+        } catch (e) {
+            console.error("Deduct credits failed:", e);
+            return false;
         }
-        return false;
     };
 
     const addCredits = (amount: number) => {
+        // This is now purely client-side UI mock for legacy components
+        // Real credits are added via Admin Panel -> /api/admin/users
         setCredits(prev => prev + amount);
     };
 
     return (
-        <ProjectsContext.Provider value={{ projects, collections, models, credits, addProject, addCollection, addModel, addToCollection, removeFromCollection, deleteCollection, updateCollection, updateProject, deleteProject, deleteModel, deductCredits, addCredits }}>
+        <ProjectsContext.Provider value={{ projects, collections, models, credits, addProject, addCollection, addModel, addToCollection, removeFromCollection, deleteCollection, updateCollection, updateProject, deleteProject, deleteModel, deductCredits, addCredits, refreshCredits }}>
             {children}
         </ProjectsContext.Provider>
     );

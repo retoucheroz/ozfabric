@@ -62,7 +62,7 @@ function StylesPageContent() {
   const handleGenerate = async () => {
     if (!prompt) return;
 
-    if (!deductCredits(1)) {
+    if (!(await deductCredits(1))) {
       toast.error("Insufficient Credits - Upgrade to Continue");
       return;
     }

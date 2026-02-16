@@ -37,6 +37,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
+import { SERVICE_COSTS } from "@/lib/pricingConstants";
 
 export default function FaceHeadSwapPage() {
     const { t, language } = useLanguage()
@@ -50,6 +51,8 @@ export default function FaceHeadSwapPage() {
     const [aspectRatio, setAspectRatio] = useState<string>("3:4")
     const [isGenerating, setIsGenerating] = useState(false)
     const [resultImage, setResultImage] = useState<string | null>(null)
+    const [seed, setSeed] = useState<string>("")
+    const [lastUsedSeed, setLastUsedSeed] = useState<number | null>(null)
 
     const ASPECT_RATIOS = [
         { value: "1:1", label: "1:1 (Square)" },
@@ -58,6 +61,10 @@ export default function FaceHeadSwapPage() {
         { value: "2:3", label: "2:3 (Fashion)" },
         { value: "9:16", label: "9:16 (Story)" },
     ];
+
+    const estimatedCost = resolution === "4K"
+        ? SERVICE_COSTS.IMAGE_GENERATION.FACE_SWAP_4K
+        : SERVICE_COSTS.IMAGE_GENERATION.FACE_SWAP_1_2K;
 
     // Refs
     const identityInputRef = useRef<HTMLInputElement>(null)
@@ -147,7 +154,8 @@ export default function FaceHeadSwapPage() {
                     baseImageUrl: baseUrl,
                     swapMode,
                     resolution,
-                    aspectRatio
+                    aspectRatio,
+                    seed: seed !== "" ? Number(seed) : null
                 })
             })
 
@@ -155,6 +163,7 @@ export default function FaceHeadSwapPage() {
             if (!response.ok) throw new Error(data.error || "Swap failed")
 
             setResultImage(data.image)
+            setLastUsedSeed(data.seed)
             toast.success(t("faceSwap.success"))
         } catch (error: any) {
             console.error(error)
@@ -318,6 +327,20 @@ export default function FaceHeadSwapPage() {
                             </div>
                         </div>
 
+                        <div className="space-y-3">
+                            <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 px-1">
+                                <RefreshCw className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
+                                {language === 'tr' ? 'SEED (OPSİYONEL)' : 'SEED (OPTIONAL)'}
+                            </Label>
+                            <input
+                                type="number"
+                                value={seed}
+                                onChange={(e) => setSeed(e.target.value)}
+                                placeholder={language === 'tr' ? 'Rastgele için boş bırakın' : 'Leave empty for random'}
+                                className="w-full h-9 bg-muted/50 border border-border/50 rounded-lg px-3 text-[11px] font-medium focus:ring-1 focus:ring-violet-500 outline-none transition-all"
+                            />
+                        </div>
+
                         <Button
                             disabled={!identityImage || !baseImage || isGenerating}
                             onClick={handleGenerate}
@@ -332,6 +355,9 @@ export default function FaceHeadSwapPage() {
                                 <>
                                     <Sparkles className="w-4 h-4 mr-2" />
                                     {t("faceSwap.generate")}
+                                    <span className="ml-2 text-[10px] font-normal opacity-80">
+                                        ({estimatedCost} {language === "tr" ? "Kredi" : "Credits"})
+                                    </span>
                                 </>
                             )}
                         </Button>
@@ -380,6 +406,11 @@ export default function FaceHeadSwapPage() {
                                     <div className="flex items-center gap-2">
                                         <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                                         <span className="text-[10px] font-bold text-muted-foreground uppercase">{language === 'tr' ? 'BAŞARIYLA ÜRETİLDİ' : 'SUCCESSFULLY GENERATED'}</span>
+                                        {lastUsedSeed && (
+                                            <span className="text-[10px] bg-muted px-2 py-0.5 rounded-full font-mono text-muted-foreground ml-2">
+                                                Seed: {lastUsedSeed}
+                                            </span>
+                                        )}
                                     </div>
                                     <div className="flex gap-2">
                                         <Button variant="ghost" size="sm" onClick={() => setResultImage(null)} className="h-8 text-[11px] font-bold rounded-lg px-3">

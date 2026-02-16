@@ -51,17 +51,6 @@ export function ExpertSettings({
                             placeholder="Random"
                         />
                     </div>
-
-                    {/* Negative Prompt / Stickman Overrides */}
-                    <div className="space-y-1">
-                        <label className="text-[9px] font-bold text-[var(--text-muted)] uppercase">{language === "tr" ? "Negatif Komut (Override)" : "Negative Override"}</label>
-                        <textarea
-                            className="w-full h-16 text-[10px] p-2 rounded border bg-[var(--bg-surface)] border-[var(--border-subtle)] text-[var(--text-primary)] resize-none focus:ring-[var(--accent-primary)]"
-                            value={lightingNegative}
-                            onChange={(e) => setLightingNegative(e.target.value)}
-                            placeholder="low quality, artifacts..."
-                        />
-                    </div>
                 </div>
             )}
         </div>

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { TbUserCircle, TbCamera, TbRuler, TbGlass, TbShoppingBag } from "react-icons/tb";
-import { Camera, Ruler, Glasses, ShoppingBag } from "lucide-react";
+import { Camera, Ruler, Glasses, Footprints, Shirt } from "lucide-react";
 import { AssetCard } from "./AssetCard";
 
 interface AdvancedSettingsProps {
@@ -31,67 +31,63 @@ export function AdvancedSettings({
     setLightingSendImage,
 }: AdvancedSettingsProps) {
     return (
-        <div className="grid grid-cols-2 gap-2">
-            <AssetCard
-                id="pose"
-                label={language === "tr" ? "Poz" : "Pose"}
-                icon={TbUserCircle}
-                assets={assets}
-                activeLibraryAsset={activeLibraryAsset}
-                setActiveLibraryAsset={setActiveLibraryAsset}
-                handleAssetUpload={handleAssetUpload}
-                handleAssetRemove={handleAssetRemove}
-                language={language}
-                convertToStickman={convertToStickman}
-            />
-            <AssetCard
-                id="lighting"
-                label={language === "tr" ? "Işık" : "Light"}
-                icon={Camera}
-                assets={assets}
-                activeLibraryAsset={activeLibraryAsset}
-                setActiveLibraryAsset={setActiveLibraryAsset}
-                handleAssetUpload={handleAssetUpload}
-                handleAssetRemove={handleAssetRemove}
-                language={language}
-                lightingSendImage={lightingSendImage}
-                setLightingSendImage={setLightingSendImage}
-            />
-            <AssetCard
-                id="fit_pattern"
-                label={language === "tr" ? "Kalıp" : "Fit"}
-                icon={Ruler}
-                assets={assets}
-                activeLibraryAsset={activeLibraryAsset}
-                setActiveLibraryAsset={setActiveLibraryAsset}
-                handleAssetUpload={handleAssetUpload}
-                handleAssetRemove={handleAssetRemove}
-                language={language}
-            />
-            <AssetCard
-                id="accessories"
-                label={language === "tr" ? "Aksesuar" : "Accessory"}
-                icon={Glasses}
-                assets={assets}
-                activeLibraryAsset={activeLibraryAsset}
-                setActiveLibraryAsset={setActiveLibraryAsset}
-                handleAssetUpload={handleAssetUpload}
-                handleAssetRemove={handleAssetRemove}
-                language={language}
-            />
-            {hasFeet && (
+        <div className="space-y-3">
+            <h4 className="text-[10px] font-bold text-[var(--accent-primary)] uppercase tracking-[0.15em] px-1">
+                {language === "tr" ? "ÇEKİM AYARLARI" : "SHOOT SETTINGS"}
+            </h4>
+            <div className="grid grid-cols-2 gap-4">
                 <AssetCard
-                    id="shoes"
-                    label={language === "tr" ? "Ayakkabı" : "Shoes"}
-                    icon={ShoppingBag}
+                    id="pose"
+                    label={language === "tr" ? "POZ" : "POSE"}
+                    icon={TbUserCircle}
                     assets={assets}
                     activeLibraryAsset={activeLibraryAsset}
                     setActiveLibraryAsset={setActiveLibraryAsset}
                     handleAssetUpload={handleAssetUpload}
                     handleAssetRemove={handleAssetRemove}
                     language={language}
+                    convertToStickman={convertToStickman}
+                    variant="square"
                 />
-            )}
+                <AssetCard
+                    id="fit_pattern"
+                    label={language === "tr" ? "KALIP" : "FIT"}
+                    icon={Ruler}
+                    assets={assets}
+                    activeLibraryAsset={activeLibraryAsset}
+                    setActiveLibraryAsset={setActiveLibraryAsset}
+                    handleAssetUpload={handleAssetUpload}
+                    handleAssetRemove={handleAssetRemove}
+                    language={language}
+                    variant="square"
+                />
+                <AssetCard
+                    id="inner_wear"
+                    label={language === "tr" ? "İÇ GİYİM" : "INNER WEAR"}
+                    icon={Shirt}
+                    assets={assets}
+                    activeLibraryAsset={activeLibraryAsset}
+                    setActiveLibraryAsset={setActiveLibraryAsset}
+                    handleAssetUpload={handleAssetUpload}
+                    handleAssetRemove={handleAssetRemove}
+                    language={language}
+                    variant="square"
+                />
+                {hasFeet && (
+                    <AssetCard
+                        id="shoes"
+                        label={language === "tr" ? "AYAKKABI" : "SHOES"}
+                        icon={Footprints}
+                        assets={assets}
+                        activeLibraryAsset={activeLibraryAsset}
+                        setActiveLibraryAsset={setActiveLibraryAsset}
+                        handleAssetUpload={handleAssetUpload}
+                        handleAssetRemove={handleAssetRemove}
+                        language={language}
+                        variant="square"
+                    />
+                )}
+            </div>
         </div>
     );
 }

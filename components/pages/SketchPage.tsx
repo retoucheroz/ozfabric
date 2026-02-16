@@ -49,7 +49,7 @@ export default function SketchPage() {
             return;
         }
 
-        if (!deductCredits(2)) {
+        if (!(await deductCredits(2))) {
             toast.error(t("common.insufficientCredits"));
             return;
         }

@@ -53,7 +53,7 @@ export default function ResizePage() {
         if (!preview) return;
 
         const creditCost = mode === "upscale" ? 2 : 3;
-        if (!deductCredits(creditCost)) {
+        if (!(await deductCredits(creditCost))) {
             toast.error(t("common.insufficientCredits"));
             return;
         }
@@ -261,13 +261,14 @@ export default function ResizePage() {
                         <>
                             <TbSparkles className="w-5 h-5 mr-2" />
                             <span className="uppercase tracking-widest">{mode === "expand" ? t("resize.expandNow") : t("resize.upscaleNow")}</span>
+                            <span className="ml-2 text-[10px] bg-white/20 px-1.5 py-0.5 rounded font-normal">
+                                {mode === "expand" ? "3" : "2"} {t("settings.credits")}
+                            </span>
                         </>
                     )}
                 </Button>
 
-                <p className="text-xs text-center text-muted-foreground">
-                    {t("resize.cost")}: {mode === "expand" ? "3" : "2"} {t("settings.credits")}
-                </p>
+
             </div>
 
             {/* Right Panel - Result */}

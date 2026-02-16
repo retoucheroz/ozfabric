@@ -19,8 +19,10 @@ import {
     TbPackage,
     TbPhoto,
     TbSettings2,
-    TbAdjustmentsHorizontal
+    TbAdjustmentsHorizontal,
+    TbJacket
 } from "react-icons/tb"
+import { PiHandbag, PiBaseballCap, PiDiamond, PiBelt } from "react-icons/pi"
 import { useProjects } from "@/context/projects-context"
 import { useLanguage } from "@/context/language-context"
 import { toast } from "sonner"
@@ -29,7 +31,7 @@ import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { resizeImageToThumbnail, cn } from "@/lib/utils"
 import { dbOperations, STORES } from "@/lib/db"
-import { buildBatchSpecs, extractDominantColor, generateColorPaletteSVG, type BatchSpec } from "@/lib/batch-helpers"
+import { buildBatchSpecs, buildStandardBatchSpecs, extractDominantColor, generateColorPaletteSVG, type BatchSpec } from "@/lib/batch-helpers"
 
 // Modular Components
 import { ProductSection } from "@/components/photoshoot/ProductSection";
@@ -69,6 +71,7 @@ import {
     ASPECT_RATIOS,
     RESOLUTION_OPTIONS
 } from "@/lib/photoshoot-constants"
+import { SERVICE_COSTS } from "@/lib/pricingConstants";
 import { uploadToR2 } from "@/lib/uploadToR2";
 
 export default function PhotoshootPage() {
@@ -81,9 +84,19 @@ export default function PhotoshootPage() {
     const [showGarmentDetails, setShowGarmentDetails] = useState(true);
 
     const [wizardStep, setWizardStep] = useState<1 | 2 | 3 | 4>(1);
+    const [user, setUser] = useState<any>(null);
 
     useEffect(() => {
         setMounted(true);
+
+        fetch('/api/auth/session')
+            .then(res => res.json())
+            .then(data => {
+                if (data.authenticated) {
+                    setUser(data.user);
+                }
+            })
+            .catch(err => console.error("Session fetch error:", err));
     }, []);
 
     // Smart Workflow State
@@ -177,6 +190,8 @@ export default function PhotoshootPage() {
     // BATCH GENERATION (Mavi Almanya Integration)
     const [productCode, setProductCode] = useState("");
     const [batchMode, setBatchMode] = useState(false);
+    const [isMaviBatch, setIsMaviBatch] = useState(false);
+    const [stylingSideOnly, setStylingSideOnly] = useState<Record<string, boolean>>({});
     const [upperFraming, setUpperFraming] = useState<"full" | "medium_full">("full");
     const [batchPreviewPrompts, setBatchPreviewPrompts] = useState<any[]>([]);
     const [showBatchPreview, setShowBatchPreview] = useState(false);
@@ -188,28 +203,41 @@ export default function PhotoshootPage() {
 
     // PRE-GENERATION SHOT SELECTION
     const UPPER_SHOTS = [
-        { id: 'styling_front', label: 'Styling 1. Kare', labelEn: 'Styling Front' },
-        { id: 'styling_angled', label: 'Styling 2. Yan Kare', labelEn: 'Styling Angled' },
-        { id: 'styling_front_2', label: 'Styling 3. Kare', labelEn: 'Styling Front 2' },
-        { id: 'technical_back', label: 'Düz Arka Kare', labelEn: 'Technical Back' },
-        { id: 'closeup_front', label: 'Yakın Çekim Ön', labelEn: 'Close-Up Front' },
+        { id: 'styling_front', label: 'Styling 1. Kare', labelEn: 'Styling Front', descriptionTr: 'Ön styling karesi.', descriptionEn: 'Front styling shot.', image: '/crops/styling_tam_boy.jpg' },
+        { id: 'styling_angled', label: 'Styling 2. Yan Kare', labelEn: 'Styling Angled', descriptionTr: 'Yan açı styling karesi.', descriptionEn: 'Angled styling shot.', image: '/crops/styling_tam_boy.jpg' },
+        { id: 'styling_front_2', label: 'Styling 3. Kare', labelEn: 'Styling Front 2', descriptionTr: 'Alternatif ön styling karesi.', descriptionEn: 'Alternative front styling shot.', image: '/crops/styling_tam_boy.jpg' },
+        { id: 'technical_back', label: 'Düz Arka Kare', labelEn: 'Technical Back', descriptionTr: 'Teknik arka çekim.', descriptionEn: 'Technical back shot.', image: '/crops/arka_ust_vucut.jpg' },
+        { id: 'closeup_front', label: 'Yakın Çekim Ön', labelEn: 'Close-Up Front', descriptionTr: 'Ön yakın çekim.', descriptionEn: 'Front close-up.', image: '/crops/ust_closeup.jpg' },
     ];
     const LOWER_SHOTS = [
-        { id: 'styling_front', label: 'Styling 1. Kare', labelEn: 'Styling Front' },
-        { id: 'styling_angled', label: 'Styling 2. Yan Kare', labelEn: 'Styling Angled' },
-        { id: 'technical_front', label: 'Düz Ön 3. Kare', labelEn: 'Technical Front' },
-        { id: 'technical_back', label: 'Düz Arka 4. Kare', labelEn: 'Technical Back' },
-        { id: 'detail_front', label: 'Detay Ön Kare', labelEn: 'Detail Front' },
-        { id: 'detail_back', label: 'Detay Arka Kare', labelEn: 'Detail Back' },
+        { id: 'styling_front', label: 'Styling 1. Kare', labelEn: 'Styling Front', descriptionTr: 'Ön styling karesi.', descriptionEn: 'Front styling shot.', image: '/crops/styling_tam_boy.jpg' },
+        { id: 'styling_angled', label: 'Styling 2. Yan Kare', labelEn: 'Styling Angled', descriptionTr: 'Yan açı styling karesi.', descriptionEn: 'Angled styling shot.', image: '/crops/styling_tam_boy.jpg' },
+        { id: 'technical_front', label: 'Düz Ön 3. Kare', labelEn: 'Technical Front', descriptionTr: 'Düz ön teknik çekim.', descriptionEn: 'Straight front technical shot.', image: '/crops/on_tam_boy.jpg' },
+        { id: 'technical_back', label: 'Düz Arka 4. Kare', labelEn: 'Technical Back', descriptionTr: 'Düz arka teknik çekim.', descriptionEn: 'Straight back technical shot.', image: '/crops/arka_tam_boy.jpg' },
+        { id: 'detail_front', label: 'Detay Ön Kare', labelEn: 'Detail Front', descriptionTr: 'Ön detay çekimi.', descriptionEn: 'Front detail shot.', image: '/crops/alt_on_detay.jpg' },
+        { id: 'detail_back', label: 'Detay Arka Kare', labelEn: 'Detail Back', descriptionTr: 'Arka detay çekimi.', descriptionEn: 'Back detail shot.', image: '/crops/alt_arka_detay.jpg' },
     ];
-    const availableBatchShots = workflowType === 'upper' ? UPPER_SHOTS : LOWER_SHOTS;
+    const STANDARD_SHOTS = [
+        { id: 'std_styling_full', label: 'Tam Boy Styling', labelEn: 'Full Body Styling', descriptionTr: 'Tam boy, artistik pozlama.', descriptionEn: 'Full body, artistic posing.', image: '/crops/styling_tam_boy.jpg' },
+        { id: 'std_styling_upper', label: 'Üst Vücut Styling', labelEn: 'Upper Body Styling', descriptionTr: 'Üst vücut, artistik pozlama.', descriptionEn: 'Upper body, artistic posing.', image: '/crops/styling_ust_vucut.jpg' },
+        { id: 'std_tech_full_front', label: 'Ön Tam Boy', labelEn: 'Front Full Body', descriptionTr: 'Tam boy ön, kollar yanlarda.', descriptionEn: 'Full body front, arms at sides.', image: '/crops/on_tam_boy.jpg' },
+        { id: 'std_tech_full_back', label: 'Arka Tam Boy', labelEn: 'Back Full Body', descriptionTr: 'Tam boy arka, kollar yanlarda.', descriptionEn: 'Full body back, arms at sides.', image: '/crops/arka_tam_boy.jpg' },
+        { id: 'std_tech_upper_front', label: 'Ön Üst Vücut', labelEn: 'Front Upper Body', descriptionTr: 'Üst vücut ön, kollar yanlarda.', descriptionEn: 'Upper body front, arms at sides.', image: '/crops/on_ust_vucut.jpg' },
+        { id: 'std_tech_upper_back', label: 'Arka Üst Vücut', labelEn: 'Back Upper Body', descriptionTr: 'Üst vücut arka, kollar yanlarda.', descriptionEn: 'Upper body back, arms at sides.', image: '/crops/arka_ust_vucut.jpg' },
+        { id: 'std_detail_front', label: 'Alt Ürün Ön Detay', labelEn: 'Lower Front Detail', descriptionTr: 'Belden dize kadar ön detay çekimi.', descriptionEn: 'Lower front detail from waist to knee.', image: '/crops/alt_on_detay.jpg' },
+        { id: 'std_detail_back', label: 'Alt Ürün Arka Detay', labelEn: 'Lower Back Detail', descriptionTr: 'Belden dize kadar arka detay çekimi.', descriptionEn: 'Lower back detail from waist to knee.', image: '/crops/alt_arka_detay.jpg' },
+        { id: 'std_closeup_front', label: 'Üst Ürün Ön Yakın Çekim', labelEn: 'Upper Front Closeup', descriptionTr: 'Yüzden göğüs altına yakın çekim.', descriptionEn: 'Close-up from face to chest.', image: '/crops/ust_closeup.jpg' },
+    ];
+    const availableBatchShots = isMaviBatch
+        ? (workflowType === 'upper' ? UPPER_SHOTS : LOWER_SHOTS)
+        : STANDARD_SHOTS;
     const [batchShotSelection, setBatchShotSelection] = useState<Record<string, boolean>>({});
 
     // Reset shot selection when workflow or batch mode changes
     useEffect(() => {
         if (batchMode) {
             const defaults: Record<string, boolean> = {};
-            availableBatchShots.forEach(s => { defaults[s.id] = true; });
+            availableBatchShots.forEach(s => { defaults[s.id] = false; });
             setBatchShotSelection(defaults);
         }
     }, [batchMode, workflowType]);
@@ -1002,6 +1030,12 @@ export default function PhotoshootPage() {
         const isReStyling = pendingOptions?.isReStyling || false;
         if (!isReStyling && !pendingOptions?.isThreeAngles) setResultImages(null);
 
+        const costToDeduct = pendingOptions?.isThreeAngles ? singleCost * 3 : singleCost;
+        if (!(await deductCredits(costToDeduct))) {
+            toast.error(language === 'tr' ? "Yetersiz kredi!" : "Insufficient credits!");
+            return;
+        }
+
         try {
             // We need to re-call the API but with preview: false. 
             // We need to reconstruct the payload logic or just pass the SAME logic?
@@ -1168,6 +1202,29 @@ export default function PhotoshootPage() {
         setIsProcessing(false);
     };
 
+    const buildSpecs = () => {
+        // Find pose description from library if selected
+        const selectedPose = savedPoses.find(p => p.url === assets.pose);
+        const libraryPosePrompt = selectedPose?.customPrompt || poseDescription;
+
+        // Find angled pose from library
+        const selectedModel = savedModels.find(m => m.url === assets.model);
+        const modelGender = (selectedModel?.gender || gender || "female") as 'male' | 'female';
+        const angledPoses = savedPoses.filter(p =>
+            p.gender === modelGender &&
+            p.tags &&
+            p.tags.includes('yan_aci')
+        );
+        const randomAngledPose = angledPoses.length > 0 ? angledPoses[Math.floor(Math.random() * angledPoses.length)] : null;
+        const angledPosePrompt = randomAngledPose?.customPrompt || null;
+
+        if (isMaviBatch) {
+            return buildBatchSpecs(workflowType as any, upperFraming, libraryPosePrompt, hairBehindShoulders, modelGender, savedPoses, angledPosePrompt, enableWind);
+        } else {
+            return buildStandardBatchSpecs(hairBehindShoulders, modelGender, libraryPosePrompt, stylingSideOnly, enableWind, savedPoses);
+        }
+    };
+
     // === BATCH GENERATION FUNCTIONS (Mavi Almanya Integration) ===
 
 
@@ -1258,15 +1315,15 @@ export default function PhotoshootPage() {
 
             if (!currentProductName) currentProductName = "Fashion Garment";
 
-            const allBatchSpecs = buildBatchSpecs(workflowType, upperFraming, libraryPosePrompt, hairBehindShoulders, modelGender, savedPoses, angledPosePrompt, enableWind);
+            const allBatchSpecs = (buildSpecs() as BatchSpec[]);
             // Filter by pre-selection checkboxes
-            const batchSpecs = allBatchSpecs.filter(spec => batchShotSelection[spec.view] !== false);
+            const batchSpecs = allBatchSpecs.filter((spec: BatchSpec) => batchShotSelection[spec.view] === true);
             if (batchSpecs.length === 0) {
                 toast.error(language === "tr" ? "En az bir kare seçmelisiniz!" : "Select at least one shot!");
                 setIsProcessing(false);
                 return;
             }
-            const previews = batchSpecs.map((spec, idx) => {
+            const previews = batchSpecs.map((spec: BatchSpec, idx: number) => {
                 // Truncate fitDescription for detail shots
                 let previewFitDesc = currentFitDesc;
                 if (spec.fitDescriptionMode === 'first_sentence_only' && previewFitDesc) {
@@ -1295,7 +1352,7 @@ export default function PhotoshootPage() {
                 }
 
                 return {
-                    title: `${productCode}_image_${String(idx + 1).padStart(3, '0')}`,
+                    title: productCode ? `${productCode}${idx + 1}` : `image_${idx + 1}`,
                     spec: spec,
                     structured
                 };
@@ -1404,6 +1461,16 @@ export default function PhotoshootPage() {
         const finalSeed = (seed !== null && seed !== "") ? Number(seed) : Math.floor(Math.random() * 1000000000);
         // We update the state so UX shows which seed was actually used
         if (seed === "") setSeed(finalSeed);
+
+        const finalSelectionCount = selectedBatchImages.filter(Boolean).length;
+        const totalBatchCost = singleCost * finalSelectionCount;
+
+        if (totalBatchCost > 0) {
+            if (!(await deductCredits(totalBatchCost))) {
+                toast.error(language === "tr" ? "Yetersiz kredi!" : "Insufficient credits!");
+                return;
+            }
+        }
 
         try {
             const generatedImages: any[] = [];
@@ -2502,14 +2569,23 @@ export default function PhotoshootPage() {
     }, [activeLibraryAsset, activeGroup]);
 
 
+    // COST CALCULATION
+    const singleCost = resolution === "4K"
+        ? SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_4K
+        : SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_1_2K;
 
+    const estimatedCost = batchMode
+        ? singleCost * (showBatchPreview
+            ? selectedBatchImages.filter(Boolean).length
+            : Object.values(batchShotSelection).filter(Boolean).length)
+        : singleCost;
     if (!mounted) return null;
 
     return (
         <div className="flex h-[calc(100vh-64px)] overflow-hidden relative">
             {/* LEFT COLUMN: Wizard Content */}
             <div className="flex-1 overflow-y-auto bg-[var(--bg-sidebar)] custom-scrollbar">
-                <div className="p-4 md:p-6 max-w-5xl mx-auto space-y-8">
+                <div className="p-4 md:p-6 max-w-4xl mx-auto space-y-8">
 
                     {/* Header: Progress */}
                     <div>
@@ -2518,20 +2594,20 @@ export default function PhotoshootPage() {
 
                     {/* Page Title */}
                     <div className="mb-4 text-center">
-                        <h1 className="text-xl font-bold text-[var(--text-primary)]">📸 {t("home.photoshootTitle")}</h1>
-                        <p className="text-[10px] text-[var(--text-secondary)]">{t("home.photoshootDesc")}</p>
+                        <h1 className="text-2xl font-black uppercase tracking-tight text-[var(--text-primary)]">📸 {t("home.photoshootTitle")}</h1>
+                        <p className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] opacity-60 mt-1">{t("home.photoshootDesc")}</p>
                     </div>
 
                     {/* WIZARD STEP 1: PRODUCT */}
                     {wizardStep === 1 && (
-                        <div className="space-y-6">
-                            <div className="flex items-center gap-2 mb-4">
-                                <div className="p-1.5 rounded-lg bg-[var(--accent-soft)] text-[var(--accent-primary)]">
-                                    <TbSettings2 className="w-4 h-4" />
+                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="p-2 rounded-xl bg-[var(--accent-soft)] text-[var(--accent-primary)] shadow-sm">
+                                    <TbSettings2 className="w-5 h-5" />
                                 </div>
                                 <div className="flex flex-col">
-                                    <label className="text-[10px] uppercase font-black text-[var(--text-primary)] tracking-widest">{language === "tr" ? "ÜRÜN SEÇİMİ" : "PRODUCT SELECTION"}</label>
-                                    <span className="text-[8px] text-[var(--text-muted)] font-bold uppercase tracking-tighter">{language === "tr" ? "ÇEKİLECEK ÜRÜNÜ BELİRLE" : "DEFINE PRODUCT TO SHOOT"}</span>
+                                    <label className="text-xs uppercase font-black text-[var(--text-primary)] tracking-[0.2em]">{language === "tr" ? "ÜRÜN SEÇİMİ" : "PRODUCT SELECTION"}</label>
+                                    <span className="text-[10px] text-[var(--text-muted)] font-black uppercase tracking-tighter opacity-60">{language === "tr" ? "ÇEKİLECEK ÜRÜNÜ BELİRLE" : "DEFINE PRODUCT TO SHOOT"}</span>
                                 </div>
                             </div>
 
@@ -2546,22 +2622,15 @@ export default function PhotoshootPage() {
                                 setActiveGroup={setActiveGroup}
                                 setLibraryTab={setLibraryTab}
                             />
-                            <div className="flex justify-between mt-8">
-                                {wizardStep > 1 && (
-                                    <button
-                                        onClick={() => setWizardStep((prev) => (prev - 1) as 1 | 2 | 3 | 4)}
-                                        className="px-6 py-2 rounded-lg border border-purple-500/30 hover:bg-purple-500/10"
-                                    >
-                                        ← Geri
-                                    </button>
-                                )}
+                            <div className="flex justify-between mt-12 pt-6 border-t border-[var(--border-subtle)]">
+                                <div />
                                 {wizardStep < 4 && (
-                                    <button
+                                    <Button
                                         onClick={() => setWizardStep((prev) => (prev + 1) as 1 | 2 | 3 | 4)}
-                                        className="px-6 py-2 rounded-lg bg-purple-500 hover:bg-purple-600 ml-auto"
+                                        className="px-10 py-6 rounded-2xl bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-white font-black uppercase tracking-widest shadow-lg shadow-[var(--accent-primary)]/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
                                     >
-                                        Devam →
-                                    </button>
+                                        {language === "tr" ? "DEVAM ET" : "CONTINUE"} <ChevronRight className="ml-2 w-5 h-5" />
+                                    </Button>
                                 )}
                             </div>
                         </div>
@@ -2569,60 +2638,87 @@ export default function PhotoshootPage() {
 
                     {/* WIZARD STEP 2: MODEL & BACKGROUND */}
                     {wizardStep === 2 && (
-                        <div className="space-y-6">
-                            <ModelSection
-                                language={language}
-                                gender={gender}
-                                setGender={setGender}
-                                assets={assets}
-                                activeLibraryAsset={activeLibraryAsset}
-                                setActiveLibraryAsset={setActiveLibraryAsset}
-                                handleAssetUpload={handleAssetUpload}
-                                handleAssetRemove={handleAssetRemove}
-                            />
-                            <div className="flex flex-col gap-3 pt-1">
-                                <BackgroundSection
+                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* Model & Gender Group */}
+                                <ModelSection
                                     language={language}
+                                    gender={gender}
+                                    setGender={setGender}
                                     assets={assets}
                                     activeLibraryAsset={activeLibraryAsset}
                                     setActiveLibraryAsset={setActiveLibraryAsset}
                                     handleAssetUpload={handleAssetUpload}
                                     handleAssetRemove={handleAssetRemove}
                                 />
+
+                                {/* Background & Lighting Group */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <BackgroundSection
+                                        language={language}
+                                        assets={assets}
+                                        activeLibraryAsset={activeLibraryAsset}
+                                        setActiveLibraryAsset={setActiveLibraryAsset}
+                                        handleAssetUpload={handleAssetUpload}
+                                        handleAssetRemove={handleAssetRemove}
+                                    />
+                                    <AssetCard
+                                        id="lighting"
+                                        label={language === "tr" ? "IŞIK" : "LIGHT"}
+                                        icon={Camera}
+                                        assets={assets}
+                                        activeLibraryAsset={activeLibraryAsset}
+                                        setActiveLibraryAsset={setActiveLibraryAsset}
+                                        handleAssetUpload={handleAssetUpload}
+                                        handleAssetRemove={handleAssetRemove}
+                                        language={language}
+                                        lightingSendImage={lightingSendImage}
+                                        setLightingSendImage={setLightingSendImage}
+                                        variant="square"
+                                    />
+                                </div>
                             </div>
-                            <div className="flex justify-between mt-8">
-                                {wizardStep > 1 && (
-                                    <button
-                                        onClick={() => setWizardStep((prev) => (prev - 1) as 1 | 2 | 3 | 4)}
-                                        className="px-6 py-2 rounded-lg border border-purple-500/30 hover:bg-purple-500/10"
-                                    >
-                                        ← Geri
-                                    </button>
-                                )}
+                            <div className="flex justify-between mt-12 pt-6 border-t border-[var(--border-subtle)]">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setWizardStep((prev) => (prev - 1) as 1 | 2 | 3 | 4)}
+                                    className="px-8 py-6 rounded-2xl border-2 border-[var(--border-subtle)] font-bold uppercase tracking-wider hover:bg-[var(--bg-elevated)] transition-all"
+                                >
+                                    <ChevronLeft className="mr-2 w-5 h-5" /> {language === "tr" ? "GERİ" : "BACK"}
+                                </Button>
                                 {wizardStep < 4 && (
-                                    <button
+                                    <Button
                                         onClick={() => setWizardStep((prev) => (prev + 1) as 1 | 2 | 3 | 4)}
-                                        className="px-6 py-2 rounded-lg bg-purple-500 hover:bg-purple-600 ml-auto"
+                                        className="px-10 py-6 rounded-2xl bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-white font-bold uppercase tracking-wider shadow-lg shadow-[var(--accent-primary)]/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
                                     >
-                                        Devam →
-                                    </button>
+                                        {language === "tr" ? "DEVAM ET" : "CONTINUE"} <ChevronRight className="ml-2 w-5 h-5" />
+                                    </Button>
                                 )}
                             </div>
                         </div>
                     )}
 
-                    {/* WIZARD STEP 3: ADVANCED SETTINGS */}
+                    {/* WIZARD STEP 3: DETAILS & SETTINGS */}
                     {wizardStep === 3 && (
-                        <div className="space-y-6">
-                            <div className="grid grid-cols-2 gap-4">
-                                {/* Aspect Ratio */}
+                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="flex items-center gap-3 mb-1">
+                                <div className="p-2 rounded-xl bg-[var(--accent-soft)] text-[var(--accent-primary)] shadow-sm">
+                                    <TbSettings2 className="w-4 h-4" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <label className="text-[11px] uppercase font-bold text-[var(--text-primary)] tracking-[0.15em]">{language === "tr" ? "ÇEKİM DETAYLARI" : "SHOOT DETAILS"}</label>
+                                    <span className="text-[9px] text-[var(--text-muted)] font-bold uppercase tracking-tight opacity-60">{language === "tr" ? "ÇEKİMİN TÜM AYARLARINI ÖZELLEŞTİR" : "CUSTOMIZE ALL SHOOT SETTINGS"}</span>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-4 p-3 rounded-2xl bg-[var(--bg-elevated)] border border-[var(--border-subtle)] shadow-inner">
                                 <div className="space-y-1.5">
-                                    <label className="text-[10px] uppercase font-black text-[var(--text-muted)] tracking-wider px-1">
-                                        {language === "tr" ? "Oran" : "Ratio"}
+                                    <label className="text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wide px-1">
+                                        {language === "tr" ? "GÖRSEL ORANI" : "ASPECT RATIO"}
                                     </label>
-                                    <div className="relative group">
+                                    <div className="relative">
                                         <select
-                                            className="w-full text-xs px-3 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] appearance-none transition-all shadow-sm font-bold"
+                                            className="w-full text-xs px-3 py-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--accent-primary)]/20 focus:border-[var(--accent-primary)] appearance-none transition-all font-bold"
                                             value={aspectRatio}
                                             onChange={(e) => setAspectRatio(e.target.value)}
                                         >
@@ -2632,20 +2728,17 @@ export default function PhotoshootPage() {
                                                 </option>
                                             ))}
                                         </select>
-                                        <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-[var(--text-muted)]">
-                                            <ChevronDown className="w-3 h-3" />
-                                        </div>
+                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none" />
                                     </div>
                                 </div>
 
-                                {/* Resolution */}
                                 <div className="space-y-1.5">
-                                    <label className="text-[10px] uppercase font-black text-[var(--text-muted)] tracking-wider px-1">
-                                        {language === "tr" ? "Kalite" : "Quality"}
+                                    <label className="text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wide px-1">
+                                        {language === "tr" ? "ÇÖZÜNÜRLÜK" : "RESOLUTION"}
                                     </label>
-                                    <div className="relative group">
+                                    <div className="relative">
                                         <select
-                                            className="w-full text-xs px-3 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] appearance-none transition-all shadow-sm font-bold"
+                                            className="w-full text-xs px-3 py-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--accent-primary)]/20 focus:border-[var(--accent-primary)] appearance-none transition-all font-bold"
                                             value={resolution}
                                             onChange={(e) => setResolution(e.target.value)}
                                         >
@@ -2655,101 +2748,109 @@ export default function PhotoshootPage() {
                                                 </option>
                                             ))}
                                         </select>
-                                        <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-[var(--text-muted)]">
-                                            <ChevronDown className="w-3 h-3" />
-                                        </div>
+                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none" />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wide px-1">
+                                        {language === "tr" ? "TEKRAR TUTARLILIĞI (SEED)" : "CONSISTENCY (SEED)"}
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            type="number"
+                                            className="w-full text-xs px-3 py-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--accent-primary)]/20 focus:border-[var(--accent-primary)] transition-all font-bold placeholder:text-[var(--text-disabled)]"
+                                            value={seed === "" ? "" : seed}
+                                            onChange={(e) => setSeed(e.target.value === "" ? "" : Number(e.target.value))}
+                                            placeholder="RANDOM"
+                                        />
+                                        {seed !== "" && (
+                                            <button
+                                                onClick={() => setSeed("")}
+                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500 hover:scale-110 transition-transform"
+                                            >
+                                                <X size={14} strokeWidth={3} />
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </div>
 
-                            <AdvancedSettings
-                                language={language}
-                                hasFeet={hasFeet}
-                                assets={assets}
-                                activeLibraryAsset={activeLibraryAsset}
-                                setActiveLibraryAsset={setActiveLibraryAsset}
-                                handleAssetUpload={handleAssetUpload}
-                                handleAssetRemove={handleAssetRemove}
-                                convertToStickman={convertToStickman}
-                                lightingSendImage={lightingSendImage}
-                                setLightingSendImage={setLightingSendImage}
-                            />
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+                                <AdvancedSettings
+                                    language={language}
+                                    hasFeet={hasFeet}
+                                    assets={assets}
+                                    activeLibraryAsset={activeLibraryAsset}
+                                    setActiveLibraryAsset={setActiveLibraryAsset}
+                                    handleAssetUpload={handleAssetUpload}
+                                    handleAssetRemove={handleAssetRemove}
+                                    convertToStickman={convertToStickman}
+                                    lightingSendImage={lightingSendImage}
+                                    setLightingSendImage={setLightingSendImage}
+                                />
 
-                            <BehaviorToggles
-                                language={language}
-                                canShowCollarHairButtons={canShowCollarHairButtons}
-                                hairBehindShoulders={hairBehindShoulders}
-                                setHairBehindShoulders={setHairBehindShoulders}
-                                lookAtCamera={lookAtCamera}
-                                setLookAtCamera={setLookAtCamera}
-                                buttonsOpen={buttonsOpen}
-                                setButtonsOpen={setButtonsOpen}
-                                isCloseup={isCloseup}
-                                isCowboy={isCowboy}
-                                isFullBody={isFullBody}
-                                canShowWaistRiseFitTuck={canShowWaistRiseFitTuck}
-                                tucked={tucked}
-                                setTucked={setTucked}
-                                sleevesRolled={sleevesRolled}
-                                setSleevesRolled={setSleevesRolled}
-                                enableWind={enableWind}
-                                setEnableWind={setEnableWind}
-                                hasHead={hasHead}
-                                enableExpression={enableExpression}
-                                setEnableExpression={setEnableExpression}
-                                enableGaze={enableGaze}
-                                setEnableGaze={setEnableGaze}
-                            />
+                                <BehaviorToggles
+                                    language={language}
+                                    canShowCollarHairButtons={canShowCollarHairButtons}
+                                    hairBehindShoulders={hairBehindShoulders}
+                                    setHairBehindShoulders={setHairBehindShoulders}
+                                    lookAtCamera={lookAtCamera}
+                                    setLookAtCamera={setLookAtCamera}
+                                    buttonsOpen={buttonsOpen}
+                                    setButtonsOpen={setButtonsOpen}
+                                    isCloseup={isCloseup}
+                                    isCowboy={isCowboy}
+                                    isFullBody={isFullBody}
+                                    canShowWaistRiseFitTuck={canShowWaistRiseFitTuck}
+                                    tucked={tucked}
+                                    setTucked={setTucked}
+                                    sleevesRolled={sleevesRolled}
+                                    setSleevesRolled={setSleevesRolled}
+                                    enableWind={enableWind}
+                                    setEnableWind={setEnableWind}
+                                    hasHead={hasHead}
+                                    enableExpression={enableExpression}
+                                    setEnableExpression={setEnableExpression}
+                                    enableGaze={enableGaze}
+                                    setEnableGaze={setEnableGaze}
+                                    socksType={socksType}
+                                    setSocksType={setSocksType}
+                                />
+                            </div>
 
-                            <ClothingDetails
-                                language={language}
-                                canShowCollarHairButtons={canShowCollarHairButtons}
-                                collarType={collarType}
-                                setCollarType={setCollarType}
-                                shoulderType={shoulderType}
-                                setShoulderType={setShoulderType}
-                                canShowWaistRiseFitTuck={canShowWaistRiseFitTuck}
-                                waistType={waistType}
-                                setWaistType={setWaistType}
-                                riseType={riseType}
-                                setRiseType={setRiseType}
-                                canShowLegHem={canShowLegHem}
-                                legType={legType}
-                                setLegType={setLegType}
-                                hemType={hemType}
-                                setHemType={setHemType}
-                                hasFeet={hasFeet}
-                                socksType={socksType}
-                                setSocksType={setSocksType}
-                                showGarmentDetails={showGarmentDetails}
-                                setShowGarmentDetails={setShowGarmentDetails}
-                            />
+                            {/* Move Accessories below to maintain alignment overhead */}
+                            <div className="space-y-4 pt-4 border-t border-[var(--border-subtle)]/50">
+                                <div className="flex items-center justify-between px-1">
+                                    <h4 className="text-[10px] font-bold text-[var(--accent-primary)] uppercase tracking-[0.15em] px-1">
+                                        {language === "tr" ? "DİĞER AKSESUARLAR" : "OTHER ACCESSORIES"}
+                                    </h4>
+                                </div>
+                                <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
+                                    <AssetCard id="jacket" label={language === "tr" ? "DIŞ GİYİM" : "OUTERWEAR"} icon={TbJacket} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="square" />
+                                    <AssetCard id="bag" label={language === "tr" ? "ÇANTA" : "BAG"} icon={PiHandbag} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="square" />
+                                    <AssetCard id="glasses" label={language === "tr" ? "GÖZLÜK" : "GLASSES"} icon={Glasses} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="square" />
+                                    <AssetCard id="hat" label={language === "tr" ? "ŞAPKA" : "HAT"} icon={PiBaseballCap} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="square" />
+                                    <AssetCard id="jewelry" label={language === "tr" ? "TAKILAR" : "JEWELRY"} icon={PiDiamond} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="square" />
+                                    <AssetCard id="belt" label={language === "tr" ? "KEMER" : "BELT"} icon={PiBelt} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="square" />
+                                </div>
+                            </div>
 
-                            <ExpertSettings
-                                language={language}
-                                showExpert={showExpert}
-                                setShowExpert={setShowExpert}
-                                seed={seed}
-                                setSeed={(val: string | number) => setSeed(val === "" ? "" : Number(val))}
-                                lightingNegative={lightingNegative}
-                                setLightingNegative={setLightingNegative}
-                            />
-                            <div className="flex justify-between mt-8">
-                                {wizardStep > 1 && (
-                                    <button
-                                        onClick={() => setWizardStep((prev) => (prev - 1) as 1 | 2 | 3 | 4)}
-                                        className="px-6 py-2 rounded-lg border border-purple-500/30 hover:bg-purple-500/10"
-                                    >
-                                        ← Geri
-                                    </button>
-                                )}
+                            <div className="flex justify-between mt-12 pt-6 border-t border-[var(--border-subtle)]">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setWizardStep((prev) => (prev - 1) as 1 | 2 | 3 | 4)}
+                                    className="px-8 py-6 rounded-2xl border-2 border-[var(--border-subtle)] font-bold uppercase tracking-wider hover:bg-[var(--bg-elevated)] transition-all"
+                                >
+                                    <ChevronLeft className="mr-2 w-5 h-5" /> {language === "tr" ? "GERİ" : "BACK"}
+                                </Button>
                                 {wizardStep < 4 && (
-                                    <button
+                                    <Button
                                         onClick={() => setWizardStep((prev) => (prev + 1) as 1 | 2 | 3 | 4)}
-                                        className="px-6 py-2 rounded-lg bg-purple-500 hover:bg-purple-600 ml-auto"
+                                        className="px-10 py-6 rounded-2xl bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-white font-bold uppercase tracking-wider shadow-lg shadow-[var(--accent-primary)]/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
                                     >
-                                        Devam →
-                                    </button>
+                                        {language === "tr" ? "DEVAM ET" : "CONTINUE"} <ChevronRight className="ml-2 w-5 h-5" />
+                                    </Button>
                                 )}
                             </div>
                         </div>
@@ -2872,6 +2973,7 @@ export default function PhotoshootPage() {
                                             handleBatchGenerate={handleBatchGenerate}
                                             batchMode={batchMode}
                                             productCode={productCode}
+                                            estimatedCost={estimatedCost}
                                         />
                                     </div>
                                 </div>
@@ -2890,6 +2992,11 @@ export default function PhotoshootPage() {
                                         availableBatchShots={availableBatchShots}
                                         batchShotSelection={batchShotSelection}
                                         setBatchShotSelection={setBatchShotSelection}
+                                        isAdmin={user?.role === 'admin'}
+                                        isMaviBatch={isMaviBatch}
+                                        setIsMaviBatch={setIsMaviBatch}
+                                        stylingSideOnly={stylingSideOnly}
+                                        setStylingSideOnly={setStylingSideOnly}
                                     />
                                 </div>
                                 <Button
@@ -2902,7 +3009,12 @@ export default function PhotoshootPage() {
                                             <Loader2 className="w-5 h-5 animate-spin" /> {language === "tr" ? "Üretiliyor..." : "Generating..."}
                                         </span>
                                     ) : (
-                                        language === "tr" ? "Toplu Üretimi Başlat" : "Start Batch Production"
+                                        <span className="flex items-center gap-2">
+                                            {language === "tr" ? "Toplu Üretimi Başlat" : "Start Batch Production"}
+                                            <span className="bg-white/20 px-2 py-0.5 rounded text-xs">
+                                                {estimatedCost} {language === "tr" ? "Kredi" : "Credits"}
+                                            </span>
+                                        </span>
                                     )}
                                 </Button>
                             </div>

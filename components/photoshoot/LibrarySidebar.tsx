@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button"
 import { Upload, X, Edit2, ChevronLeft, User, Camera, Sparkles, Gem, MoveHorizontal, Glasses, ShoppingBag, FileText, ScanLine, Shirt } from "lucide-react"
 import { RotateCw, ImageIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { TbShirt, TbHanger, TbShirtFilled, TbJacket, TbSparkles, TbDiamonds } from "react-icons/tb"
+import { PiPants, PiPantsFill, PiHandbag, PiBaseballCap, PiBelt } from "react-icons/pi"
 import { AssetCard as BaseAssetCard } from "@/components/photoshoot/AssetCard"
 import { ModelSection } from "@/components/photoshoot/ModelSection"
 import { SavedPose, SavedModel, SavedBackground, SavedFit, SavedLighting, SavedShoe, SavedJacket, SavedBag, SavedGlasses, SavedHat, SavedJewelry, SavedBelt, LIGHTING_PRESETS } from "@/lib/photoshoot-shared"
@@ -120,7 +122,7 @@ export function LibrarySidebar({
     sessionLibrary
 }: LibrarySidebarProps) {
 
-    const AssetCard = ({ id, label, icon, required = false }: { id: string, label: string, icon: any, required?: boolean }) => (
+    const AssetCard = ({ id, label, icon, required = false, variant = 'default' }: { id: string, label: string, icon: any, required?: boolean, variant?: 'default' | 'square' }) => (
         <BaseAssetCard
             id={id}
             label={label}
@@ -132,81 +134,103 @@ export function LibrarySidebar({
             handleAssetUpload={handleAssetUpload}
             handleAssetRemove={handleAssetRemove}
             language={language}
+            variant={variant}
         />
     );
 
     return (
         <div
             className={cn(
-                "absolute right-0 top-0 bottom-0 w-full sm:w-80 lg:w-[440px] bg-[var(--bg-sidebar)] border-l border-[var(--border-subtle)] shadow-2xl z-[60] flex flex-col transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1)",
+                "absolute right-0 top-0 bottom-0 w-full sm:w-80 lg:w-[480px] bg-[var(--bg-sidebar)] border-l border-[var(--border-subtle)] shadow-2xl z-[60] flex flex-col transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1)",
                 activeLibraryAsset ? "translate-x-0 opacity-100" : "translate-x-full opacity-0 pointer-events-none"
             )}
         >
             {/* Header */}
-            <div className="p-3 border-b border-[var(--border-subtle)] flex items-center justify-between bg-[var(--bg-elevated)]">
-                <div className="flex items-center gap-2">
+            <div className="p-4 border-b border-[var(--border-subtle)] flex items-center justify-between bg-[var(--bg-elevated)]">
+                <div className="flex items-center gap-3">
                     {/* Back Button for Nested Navigation */}
                     {(activeLibraryAsset && !['product_group', 'accessories_group'].includes(activeLibraryAsset) && activeGroup) && (
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="h-6 w-6 -ml-1 mr-1 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]"
+                            className="h-8 w-8 -ml-1 mr-1 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]"
                             onClick={() => setActiveLibraryAsset(activeGroup === 'product' ? 'product_group' : 'accessories_group')}
                         >
-                            <ChevronLeft className="w-4 h-4" />
+                            <ChevronLeft className="w-5 h-5" />
                         </Button>
                     )}
 
-                    <span className="text-sm font-bold truncate max-w-[150px] text-[var(--text-primary)]">
-                        {activeLibraryAsset === 'product_group' ? (language === "tr" ? "Ürün" : "Product") :
-                            activeLibraryAsset === 'accessories_group' ? (language === "tr" ? "Aksesuarlar" : "Accessories") :
-                                (language === "tr" ? "Seçim Yap" : "Select Asset")}
+                    <span className="text-base font-black uppercase tracking-tight text-[var(--text-primary)]">
+                        {activeLibraryAsset === 'product_group' ? (language === "tr" ? "ÜRÜN YÖNETİMİ" : "PRODUCT MGMT") :
+                            activeLibraryAsset === 'accessories_group' ? (language === "tr" ? "AKSESUARLAR" : "ACCESSORIES") :
+                                (language === "tr" ? "SEÇİM YAP" : "SELECT ASSET")}
                     </span>
                 </div>
-                <Button variant="ghost" size="icon" className="h-6 w-6 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]" onClick={() => { setActiveLibraryAsset(null); setActiveGroup(null); }}>
-                    <X className="w-4 h-4" />
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]" onClick={() => { setActiveLibraryAsset(null); setActiveGroup(null); }}>
+                    <X className="w-5 h-5" />
                 </Button>
             </div>
 
             {/* GROUP SELECTION VIEW */}
             {(activeLibraryAsset === 'product_group' || activeLibraryAsset === 'accessories_group' || activeLibraryAsset === 'accessories') ? (
-                <div className="flex-1 overflow-y-auto p-3 space-y-2">
+                <div className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
                     {activeLibraryAsset === 'product_group' && (
-                        <>
-                            <AssetCard id="top_front" label={language === "tr" ? "Üst Ürün Ön Kare" : "Top Front"} icon={FileText} />
-                            <AssetCard id="top_back" label={language === "tr" ? "Üst Ürün Arka Kare" : "Top Back"} icon={MoveHorizontal} />
-                            <AssetCard id="bottom_front" label={language === "tr" ? "Alt Ürün Ön Kare" : "Bottom Front"} icon={FileText} />
-                            <AssetCard id="bottom_back" label={language === "tr" ? "Alt Ürün Arka Kare" : "Bottom Back"} icon={MoveHorizontal} />
-                            <div className="my-2 border-t" />
-                            <AssetCard id="inner_wear" label={language === "tr" ? "İç Giyim (Opsiyonel)" : "Inner Wear (Optional)"} icon={Shirt} />
-                            <div className="my-2 border-t" />
-                            <h4 className="text-[10px] font-bold text-blue-600 uppercase tracking-wider mb-2 mt-4">{language === "tr" ? "Ön Detaylar" : "Front Details"}</h4>
-                            <div className="grid grid-cols-2 gap-2">
-                                <AssetCard id="detail_front_1" label={language === "tr" ? "Ön Detay 1" : "Front Detail 1"} icon={ScanLine} />
-                                <AssetCard id="detail_front_2" label={language === "tr" ? "Ön Detay 2" : "Front Detail 2"} icon={ScanLine} />
-                                <AssetCard id="detail_front_3" label={language === "tr" ? "Ön Detay 3" : "Front Detail 3"} icon={ScanLine} />
-                                <AssetCard id="detail_front_4" label={language === "tr" ? "Ön Detay 4" : "Front Detail 4"} icon={ScanLine} />
-                            </div>
-                            <h4 className="text-[10px] font-bold text-amber-600 uppercase tracking-wider mb-2 mt-4">{language === "tr" ? "Arka Detaylar" : "Back Details"}</h4>
-                            <div className="grid grid-cols-2 gap-2">
-                                <AssetCard id="detail_back_1" label={language === "tr" ? "Arka Detay 1" : "Back Detail 1"} icon={ScanLine} />
-                                <AssetCard id="detail_back_2" label={language === "tr" ? "Arka Detay 2" : "Back Detail 2"} icon={ScanLine} />
-                                <AssetCard id="detail_back_3" label={language === "tr" ? "Arka Detay 3" : "Back Detail 3"} icon={ScanLine} />
-                                <AssetCard id="detail_back_4" label={language === "tr" ? "Arka Detay 4" : "Back Detail 4"} icon={ScanLine} />
+                        <div className="space-y-6">
+                            {/* Primary Products */}
+                            <div className="space-y-3">
+                                <h4 className="text-[10px] font-black text-[var(--accent-primary)] uppercase tracking-[0.2em] px-1">{language === "tr" ? "TEMEL ÜRÜNLER" : "PRIMARY PRODUCTS"}</h4>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-3">
+                                        <AssetCard id="top_front" label={language === "tr" ? "Üst Ön" : "Top Front"} icon={TbShirtFilled} variant="square" />
+                                        <AssetCard id="top_back" label={language === "tr" ? "Üst Arka" : "Top Back"} icon={TbShirt} variant="square" />
+                                    </div>
+                                    <div className="space-y-3">
+                                        <AssetCard id="bottom_front" label={language === "tr" ? "Alt Ön" : "Bottom Front"} icon={PiPantsFill} variant="square" />
+                                        <AssetCard id="bottom_back" label={language === "tr" ? "Alt Arka" : "Bottom Back"} icon={PiPants} variant="square" />
+                                    </div>
+                                </div>
                             </div>
 
-                        </>
+                            {/* Detailed Views */}
+                            <div className="space-y-5">
+                                <div className="space-y-3">
+                                    <h4 className="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] flex items-center gap-2 px-1">
+                                        <ScanLine size={12} />
+                                        {language === "tr" ? "ÖN DETAYLAR" : "FRONT DETAILS"}
+                                    </h4>
+                                    <div className="grid grid-cols-4 gap-1.5">
+                                        <AssetCard id="detail_front_1" label={language === "tr" ? "Det 1" : "Det 1"} icon={ScanLine} variant="square" />
+                                        <AssetCard id="detail_front_2" label={language === "tr" ? "Det 2" : "Det 2"} icon={ScanLine} variant="square" />
+                                        <AssetCard id="detail_front_3" label={language === "tr" ? "Det 3" : "Det 3"} icon={ScanLine} variant="square" />
+                                        <AssetCard id="detail_front_4" label={language === "tr" ? "Det 4" : "Det 4"} icon={ScanLine} variant="square" />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-3">
+                                    <h4 className="text-[10px] font-black text-amber-500 uppercase tracking-[0.2em] flex items-center gap-2 px-1">
+                                        <ScanLine size={12} />
+                                        {language === "tr" ? "ARKA DETAYLAR" : "BACK DETAILS"}
+                                    </h4>
+                                    <div className="grid grid-cols-4 gap-1.5">
+                                        <AssetCard id="detail_back_1" label={language === "tr" ? "Det 1" : "Det 1"} icon={ScanLine} variant="square" />
+                                        <AssetCard id="detail_back_2" label={language === "tr" ? "Det 2" : "Det 2"} icon={ScanLine} variant="square" />
+                                        <AssetCard id="detail_back_3" label={language === "tr" ? "Det 3" : "Det 3"} icon={ScanLine} variant="square" />
+                                        <AssetCard id="detail_back_4" label={language === "tr" ? "Det 4" : "Det 4"} icon={ScanLine} variant="square" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     )}
 
                     {(activeLibraryAsset === 'accessories_group' || activeLibraryAsset === 'accessories') && (
-                        <>
-                            <AssetCard id="jacket" label={language === "tr" ? "Dış Giyim" : "Outerwear"} icon={Shirt} />
-                            <AssetCard id="bag" label={language === "tr" ? "Çanta" : "Bag"} icon={ShoppingBag} />
-                            <AssetCard id="glasses" label={language === "tr" ? "Gözlük" : "Glasses"} icon={Glasses} />
-                            <AssetCard id="hat" label={language === "tr" ? "Şapka" : "Hat"} icon={Sparkles} />
-                            <AssetCard id="jewelry" label={language === "tr" ? "Takı" : "Jewelry"} icon={Gem} />
-                            {hasWaist && <AssetCard id="belt" label={language === "tr" ? "Kemer" : "Belt"} icon={ScanLine} />}
-                        </>
+                        <div className="grid grid-cols-2 gap-3">
+                            <AssetCard id="jacket" label={language === "tr" ? "DIŞ GİYİM" : "OUTERWEAR"} icon={TbJacket} variant="square" />
+                            <AssetCard id="bag" label={language === "tr" ? "ÇANTA" : "BAG"} icon={PiHandbag} variant="square" />
+                            <AssetCard id="glasses" label={language === "tr" ? "GÖZLÜK" : "GLASSES"} icon={Glasses} variant="square" />
+                            <AssetCard id="hat" label={language === "tr" ? "ŞAPKA" : "HAT"} icon={PiBaseballCap} variant="square" />
+                            <AssetCard id="jewelry" label={language === "tr" ? "TAKI" : "JEWELRY"} icon={TbDiamonds} variant="square" />
+                            {hasWaist && <AssetCard id="belt" label={language === "tr" ? "KEMER" : "BELT"} icon={PiBelt} variant="square" />}
+                        </div>
                     )}
                 </div>
             ) : (

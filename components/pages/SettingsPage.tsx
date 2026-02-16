@@ -20,7 +20,7 @@ type SettingsSection = "profile" | "billing" | "notifications" | "security";
 
 function SettingsContent() {
     const { credits, addCredits } = useProjects();
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const { theme, setTheme } = useTheme();
     const searchParams = useSearchParams();
     const initialSection = (searchParams.get("tab") as SettingsSection) || "profile";
@@ -48,8 +48,7 @@ function SettingsContent() {
 
 
     const handleTopUp = () => {
-        addCredits(500);
-        toast.success("500 " + t("settings.credits") + " added!");
+        toast.info(language === 'tr' ? "Kredi eklemek için lütfen yönetici ile iletişime geçin." : "Please contact administrator to add credits.");
     };
 
     const sections = [

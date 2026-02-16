@@ -210,7 +210,7 @@ export function buildBatchSpecs(
                 excludeHairInfo: true,
                 excludeSocksInfo: true,
                 excludeShoesAsset: true,
-                excludeBeltAsset: true, // User request
+                excludeBeltAsset: true,
                 isStyling: false
             },
             // 6. Detail Back
@@ -226,11 +226,159 @@ export function buildBatchSpecs(
                 excludeHairInfo: true,
                 excludeSocksInfo: true,
                 excludeShoesAsset: true,
-                excludeBeltAsset: true, // User request
+                excludeBeltAsset: true,
                 isStyling: false
             }
         ];
     }
+}
+
+export function buildStandardBatchSpecs(
+    hairBehindShoulders: boolean,
+    genderVal: 'male' | 'female',
+    poseLibraryPrompt: string | null,
+    stylingSideOnly: Record<string, boolean>,
+    enableWind: boolean,
+    savedPoses: any[]
+): BatchSpec[] {
+    const getRandomPose = (type: 'random' | 'angled'): string => {
+        // Try to get from library first
+        const libraryPoses = savedPoses.filter(p =>
+            p.gender === genderVal &&
+            (type === 'random' || (p.tags && p.tags.includes('yan_aci')))
+        );
+
+        if (libraryPoses.length > 0) {
+            return libraryPoses[Math.floor(Math.random() * libraryPoses.length)].customPrompt;
+        }
+
+        const poses = type === 'random'
+            ? (genderVal === 'female'
+                ? ["Standing with one hand on hip, weight shifted to left leg", "Hands in pockets, relaxed stance", "Arms crossed casually", "One hand touching hair"]
+                : ["Standing with hands in pockets, shoulders relaxed", "Arms at sides, weight on one leg", "One hand in pocket, other relaxed", "Hands clasped in front"])
+            : (genderVal === 'female'
+                ? ["Body rotated 45 degrees to the right, looking over shoulder", "Three-quarter turn to the left, hands on hips", "Slight rotation showing side profile"]
+                : ["Body rotated 45 degrees to the right, looking at camera", "Three-quarter turn to the left, hands in pockets", "Slight rotation showing side profile"]);
+        return poses[Math.floor(Math.random() * poses.length)];
+    };
+
+    return [
+        {
+            view: "std_styling_full",
+            pose: stylingSideOnly["std_styling_full"] ? getRandomPose('angled') : (poseLibraryPrompt || getRandomPose('random')),
+            dynamic: true,
+            lookAtCamera: !stylingSideOnly["std_styling_full"],
+            hairBehind: hairBehindShoulders,
+            camera: { shot_type: 'full_body', framing: 'head_to_toe', angle: stylingSideOnly["std_styling_full"] ? "angled" : "front" },
+            assets: ['front', 'back'],
+            fitDescriptionMode: 'full',
+            enableWind: enableWind,
+            isStyling: true
+        },
+        {
+            view: "std_styling_upper",
+            pose: stylingSideOnly["std_styling_upper"] ? getRandomPose('angled') : (poseLibraryPrompt || getRandomPose('random')),
+            dynamic: true,
+            lookAtCamera: !stylingSideOnly["std_styling_upper"],
+            hairBehind: hairBehindShoulders,
+            camera: { shot_type: 'cowboy_shot', framing: 'cowboy_shot', angle: stylingSideOnly["std_styling_upper"] ? "angled" : "front" },
+            assets: ['front', 'back'],
+            fitDescriptionMode: 'full',
+            enableWind: enableWind,
+            isStyling: true
+        },
+        {
+            view: "std_tech_full_front",
+            pose: "Standing straight, arms at sides, neutral stance. Professional studio photography.",
+            dynamic: false,
+            lookAtCamera: true,
+            hairBehind: true,
+            camera: { shot_type: 'full_body', framing: 'head_to_toe', angle: "front" },
+            assets: ['front'],
+            fitDescriptionMode: 'full',
+            excludeAllAccessories: true,
+            isStyling: false
+        },
+        {
+            view: "std_tech_full_back",
+            pose: "Standing straight, back to camera, arms at sides. Professional studio photography.",
+            dynamic: false,
+            lookAtCamera: false,
+            hairBehind: true,
+            camera: { shot_type: 'full_body', framing: 'head_to_toe', angle: "back" },
+            assets: ['back'],
+            fitDescriptionMode: 'full',
+            excludeHairInfo: true,
+            excludeAllAccessories: true,
+            isStyling: false
+        },
+        {
+            view: "std_tech_upper_front",
+            pose: "Standing straight, arms at sides, neutral stance. Cowboy shot.",
+            dynamic: false,
+            lookAtCamera: true,
+            hairBehind: true,
+            camera: { shot_type: 'cowboy_shot', framing: 'cowboy_shot', angle: "front" },
+            assets: ['front'],
+            fitDescriptionMode: 'full',
+            excludeAllAccessories: true,
+            isStyling: false
+        },
+        {
+            view: "std_tech_upper_back",
+            pose: "Standing straight, back to camera, arms at sides. Cowboy shot.",
+            dynamic: false,
+            lookAtCamera: false,
+            hairBehind: true,
+            camera: { shot_type: 'cowboy_shot', framing: 'cowboy_shot', angle: "back" },
+            assets: ['back'],
+            fitDescriptionMode: 'full',
+            excludeHairInfo: true,
+            excludeAllAccessories: true,
+            isStyling: false
+        },
+        {
+            view: "std_detail_front",
+            pose: "Close-Up fashion photography detail shot. Camera framing is waist-to-knees. Standing straight.",
+            dynamic: false,
+            lookAtCamera: true,
+            hairBehind: true,
+            camera: { shot_type: 'close_up', framing: 'waist_to_above_knees', angle: "front" },
+            assets: ['front'],
+            fitDescriptionMode: 'first_sentence_only',
+            excludeHairInfo: true,
+            excludeSocksInfo: true,
+            excludeShoesAsset: true,
+            excludeBeltAsset: true,
+            isStyling: false
+        },
+        {
+            view: "std_detail_back",
+            pose: "Close-Up fashion photography back detail shot. Camera framing is waist-to-knees. Standing straight, back to camera.",
+            dynamic: false,
+            lookAtCamera: false,
+            hairBehind: true,
+            camera: { shot_type: 'close_up', framing: 'waist_to_above_knees', angle: "back" },
+            assets: ['back'],
+            fitDescriptionMode: 'first_sentence_only',
+            excludeHairInfo: true,
+            excludeSocksInfo: true,
+            excludeShoesAsset: true,
+            excludeBeltAsset: true,
+            isStyling: false
+        },
+        {
+            view: "std_closeup_front",
+            pose: "Close-up fashion photography shot, focusing on the collar and face area. Model is standing perfectly straight.",
+            dynamic: false,
+            lookAtCamera: true,
+            hairBehind: hairBehindShoulders,
+            camera: { shot_type: 'close_up', framing: 'chest_and_face', angle: "front" },
+            assets: ['front'],
+            fitDescriptionMode: 'full',
+            isStyling: false
+        }
+    ];
 }
 
 export async function extractDominantColor(imageUrl: string): Promise<string> {

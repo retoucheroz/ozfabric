@@ -11,6 +11,7 @@ interface BackgroundSectionProps {
     setActiveLibraryAsset: (id: any) => void;
     handleAssetUpload: (id: string, file: File) => void;
     handleAssetRemove: (id: string, e: React.MouseEvent) => void;
+    variant?: "default" | "square";
 }
 
 export function BackgroundSection({
@@ -19,12 +20,13 @@ export function BackgroundSection({
     activeLibraryAsset,
     setActiveLibraryAsset,
     handleAssetUpload,
-    handleAssetRemove
+    handleAssetRemove,
+    variant = "square"
 }: BackgroundSectionProps) {
     return (
         <AssetCard
             id="background"
-            label={language === "tr" ? "Arka Plan" : "Background"}
+            label={language === "tr" ? "ARKA PLAN" : "BACKGROUND"}
             icon={TbPhoto}
             assets={assets}
             activeLibraryAsset={activeLibraryAsset}
@@ -32,6 +34,7 @@ export function BackgroundSection({
             handleAssetUpload={handleAssetUpload}
             handleAssetRemove={handleAssetRemove}
             language={language}
+            variant={variant}
         />
     );
 }

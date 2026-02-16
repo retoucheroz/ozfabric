@@ -77,34 +77,36 @@ export function ModelSection({
     }
 
     return (
-        <div className="space-y-4">
-            {/* Gender Toggle */}
-            <div className="space-y-1.5">
-                <label className="text-[10px] uppercase font-black text-[var(--text-muted)] tracking-wider px-1">
-                    {language === "tr" ? "Cinsiyet" : "Gender"}
-                </label>
-                <div className="grid grid-cols-2 gap-1 bg-[var(--bg-elevated)] p-1 rounded-xl border border-[var(--border-subtle)] shadow-inner">
+        <div className="grid grid-cols-2 gap-3.5">
+            {/* Gender Selection Card */}
+            <div className="group/card relative max-w-[135px] mx-auto w-full">
+                <div className="relative aspect-square rounded-xl border-2 flex overflow-hidden transition-all duration-500 bg-[var(--bg-elevated)] border-[var(--border-subtle)] shadow-sm">
                     <button
                         onClick={() => setGender("female")}
                         className={cn(
-                            "text-[10px] py-1.5 rounded-lg transition-all font-black uppercase tracking-tighter",
+                            "flex-1 flex flex-col items-center justify-center gap-2 transition-all group/fem",
                             gender === 'female'
-                                ? "bg-[var(--bg-surface)] shadow-md text-[var(--accent-primary)]"
-                                : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                                ? "bg-pink-500 text-white shadow-inner"
+                                : "bg-transparent text-[var(--text-muted)] hover:bg-pink-500/5 hover:text-pink-500"
                         )}
                     >
-                        {language === "tr" ? "Kadın" : "F"}
+                        <TbGenderFemale size={32} className={cn("transition-all duration-500", gender === 'female' ? "scale-110 drop-shadow-md" : "group-hover/fem:scale-110")} />
+                        <span className="text-[9px] font-black uppercase tracking-widest">{language === "tr" ? "KADIN" : "FEMALE"}</span>
                     </button>
+
+                    <div className="w-[1px] h-full bg-[var(--border-subtle)]" />
+
                     <button
                         onClick={() => setGender("male")}
                         className={cn(
-                            "text-[10px] py-1.5 rounded-lg transition-all font-black uppercase tracking-tighter",
+                            "flex-1 flex flex-col items-center justify-center gap-2 transition-all group/male",
                             gender === 'male'
-                                ? "bg-[var(--bg-surface)] shadow-md text-blue-600"
-                                : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                                ? "bg-blue-500 text-white shadow-inner"
+                                : "bg-transparent text-[var(--text-muted)] hover:bg-blue-500/5 hover:text-blue-500"
                         )}
                     >
-                        {language === "tr" ? "Erkek" : "M"}
+                        <TbGenderMale size={32} className={cn("transition-all duration-500", gender === 'male' ? "scale-110 drop-shadow-md" : "group-hover/male:scale-110")} />
+                        <span className="text-[9px] font-black uppercase tracking-widest">{language === "tr" ? "ERKEK" : "MALE"}</span>
                     </button>
                 </div>
             </div>
@@ -112,7 +114,7 @@ export function ModelSection({
             {/* Model Asset Card */}
             <AssetCard
                 id="model"
-                label={language === "tr" ? "Model Seçimi" : "Model Library"}
+                label={language === "tr" ? "MANKEN" : "MODEL"}
                 icon={TbUserCircle}
                 required
                 assets={assets}
@@ -121,6 +123,7 @@ export function ModelSection({
                 handleAssetUpload={handleAssetUpload}
                 handleAssetRemove={handleAssetRemove}
                 language={language}
+                variant="square"
             />
         </div>
     );

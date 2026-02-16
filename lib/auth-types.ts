@@ -15,6 +15,7 @@ export interface User {
     customTitle?: string;
     customLogo?: string;
     customSettings?: Record<string, any>;
+    credits: number;
     createdAt: number;
     lastLogin?: number;
 }

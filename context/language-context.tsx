@@ -471,7 +471,14 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     const handleSetLanguage = (lang: Language) => {
         setLanguage(lang);
         localStorage.setItem("retoucheroz_language", lang);
+        document.documentElement.lang = lang;
     };
+
+    useEffect(() => {
+        if (typeof document !== 'undefined') {
+            document.documentElement.lang = language;
+        }
+    }, [language]);
 
     const t = (key: string): string => {
         const translation = translations[key];

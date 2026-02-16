@@ -41,6 +41,7 @@ import { downloadImage, cn } from "@/lib/utils"
 import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
+import { SERVICE_COSTS } from "@/lib/pricingConstants";
 
 const ANGLE_OPTIONS = [
   { id: "front", label: "Front 3/4", labelTr: "Ön 3/4", icon: "↗️" },
@@ -132,8 +133,10 @@ function GhostPageContent() {
       toast.error(language === "tr" ? "Lütfen ana giysi görseli yükleyin" : "Please upload main garment image");
       return;
     }
-    const creditCost = selectedResolution === "4K" ? 4 : 2;
-    if (!deductCredits(creditCost)) {
+    const creditCost = selectedResolution === "4K"
+      ? SERVICE_COSTS.IMAGE_GENERATION.GHOST_MODEL_4K
+      : SERVICE_COSTS.IMAGE_GENERATION.GHOST_MODEL_1_2K;
+    if (!(await deductCredits(creditCost))) {
       toast.error(t("common.insufficientCredits") || "Insufficient Credits");
       return;
     }
@@ -443,12 +446,12 @@ function GhostPageContent() {
               <>
                 <TbSparkles className="w-5 h-5" />
                 <span className="uppercase tracking-widest">{t("ghost.generate") || "Generate Ghost"}</span>
+                <span className="ml-1 text-[10px] bg-white/20 px-1.5 py-0.5 rounded font-normal">
+                  {selectedResolution === "4K" ? SERVICE_COSTS.IMAGE_GENERATION.GHOST_MODEL_4K : SERVICE_COSTS.IMAGE_GENERATION.GHOST_MODEL_1_2K} {language === "tr" ? "Kr" : "Cr"}
+                </span>
               </>
             )}
           </Button>
-          <p className="text-[10px] text-center text-muted-foreground uppercase tracking-wider">
-            {language === "tr" ? `Maliyet: ${selectedResolution === "4K" ? 4 : 2} Kredi` : `Cost: ${selectedResolution === "4K" ? 4 : 2} Credits`}
-          </p>
         </div>
       </div>
 

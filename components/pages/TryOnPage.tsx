@@ -9,6 +9,7 @@ import { Upload, Shirt, Camera, Loader2, Maximize2, X, Eye, FileText, ShoppingBa
 import { toast } from "sonner"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Separator } from "@/components/ui/separator"
+import { SERVICE_COSTS } from "@/lib/pricingConstants";
 
 // --- CONSTANTS ---
 const ASPECT_RATIOS = [
@@ -21,9 +22,9 @@ const ASPECT_RATIOS = [
 ];
 
 const RESOLUTION_OPTIONS = [
-  { id: "1K", label: "1K Standard", labelTr: "1K Standart", credits: 4 },
-  { id: "2K", label: "2K High", labelTr: "2K Yüksek", credits: 4 },
-  { id: "4K", label: "4K Ultra", labelTr: "4K Ultra", credits: 8 },
+  { id: "1K", label: "1K Standard", labelTr: "1K Standart" },
+  { id: "2K", label: "2K High", labelTr: "2K Yüksek" },
+  { id: "4K", label: "4K Ultra", labelTr: "4K Ultra" },
 ];
 // -----------------
 
@@ -37,6 +38,10 @@ export default function TryOnPage() {
   const [gender, setGender] = useState<"female" | "male">("female");
   const [resolution, setResolution] = useState("4K"); // DEFAULT 4K
   const [aspectRatio, setAspectRatio] = useState("2:3"); // DEFAULT 2:3
+
+  const estimatedCost = resolution === "4K"
+    ? SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_4K
+    : SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_1_2K;
 
   // LOWER BODY OPTIONS
   const [lowerTucked, setLowerTucked] = useState(true); // For lower body: undershirt tucked
@@ -654,6 +659,9 @@ export default function TryOnPage() {
             >
               {isProcessing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Camera className="w-4 h-4 mr-2" />}
               {language === "tr" ? "Detay Oluştur" : "Generate Detail"}
+              <span className="ml-2 text-[10px] bg-white/20 px-1.5 py-0.5 rounded">
+                {estimatedCost} {language === "tr" ? "Kr" : "Cr"}
+              </span>
             </Button>
 
             {workflowType === 'upper' && !modelImage && (

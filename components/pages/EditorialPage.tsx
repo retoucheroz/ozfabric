@@ -26,6 +26,7 @@ import { resizeImageToThumbnail } from "@/lib/utils"
 import { CAMERAS, LOCATIONS, type CameraSpec, type LensSpec, type EditorialLocation } from "@/lib/editorial-data"
 import { motion, AnimatePresence } from "framer-motion"
 import { Separator } from "@/components/ui/separator"
+import { SERVICE_COSTS } from "@/lib/pricingConstants";
 import { Input } from "@/components/ui/input"
 import { PlusCircle, Plus, Settings2, Info, Download, Maximize, Sliders, Monitor, Command, Compass } from "lucide-react"
 
@@ -135,6 +136,10 @@ export default function EditorialPage() {
     const [activeLensIndex, setActiveLensIndex] = useState(0);
     const [focalLength, setFocalLength] = useState<number>(35);
     const [aperture, setAperture] = useState<string>("f/4");
+
+    const estimatedCost = resolution === "4K"
+        ? SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_4K
+        : SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_1_2K;
 
     // Library States
     const [sidebarMode, setSidebarMode] = useState<'controls' | 'library'>('controls');
@@ -629,6 +634,9 @@ export default function EditorialPage() {
                                             <>
                                                 <Zap className="w-4 h-4 fill-current group-hover:animate-pulse" />
                                                 {language === "tr" ? "ÇEKİMİ BAŞLAT" : "START PHOTOSHOOT"}
+                                                <span className="ml-2 text-[10px] bg-white/20 px-1.5 py-0.5 rounded">
+                                                    {estimatedCost} {language === "tr" ? "Kr" : "Cr"}
+                                                </span>
                                             </>
                                         )}
                                     </button>

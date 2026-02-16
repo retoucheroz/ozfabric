@@ -50,6 +50,7 @@ import { useLanguage } from "@/context/language-context"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { Separator } from "@/components/ui/separator"
+import { SERVICE_COSTS } from "@/lib/pricingConstants";
 import { Textarea } from "@/components/ui/textarea"
 import {
     Select,
@@ -663,6 +664,11 @@ export default function VideoPage() {
         return <div className="flex-1 bg-background" />;
     }
 
+    // Cost Calculation
+    const currentDuration = multiShot ? totalDuration : duration;
+    const costPerSec = isSoundOn ? SERVICE_COSTS.VIDEO_GENERATION.KLING_3_SOUND_ON : SERVICE_COSTS.VIDEO_GENERATION.KLING_3_SOUND_OFF;
+    const estimatedCost = currentDuration * costPerSec;
+
     return (
         <div className="flex flex-col h-[calc(100vh-64px)] bg-[var(--bg-surface)] text-foreground overflow-hidden">
             {/* Header Area */}
@@ -699,17 +705,22 @@ export default function VideoPage() {
                     <Button
                         onClick={handleGenerate}
                         disabled={isProcessing}
-                        className="bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-white font-black h-10 px-4 sm:px-8 rounded-xl shadow-lg shadow-[var(--accent-primary)]/20 transition-all active:scale-95 text-xs uppercase tracking-widest"
+                        className="bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-white font-black h-10 px-4 sm:px-8 rounded-xl shadow-lg shadow-[var(--accent-primary)]/20 transition-all active:scale-95 text-xs uppercase tracking-widest relative group"
                     >
                         {isProcessing ? (
                             <TbLoader2 className="w-4 h-4 animate-spin" />
                         ) : (
-                            <div className="flex items-center gap-2">
-                                <TbSparkles className="w-4 h-4" />
-                                <span className="hidden sm:inline">{language === 'tr' ? 'Oluştur' : 'Generate'}</span>
+                            <div className="flex flex-col items-center leading-none">
+                                <div className="flex items-center gap-2">
+                                    <TbSparkles className="w-4 h-4" />
+                                    <span className="hidden sm:inline">{language === 'tr' ? 'Oluştur' : 'Generate'}</span>
+                                </div>
+                                <span className="text-[9px] opacity-80 font-normal mt-0.5 lowercase group-hover:text-yellow-200 transition-colors">
+                                    {estimatedCost} {language === 'tr' ? 'Kr' : 'Cr'}
+                                </span>
                             </div>
                         )}
-                        {!isProcessing && <span className="sm:hidden">{language === 'tr' ? 'Git' : 'Go'}</span>}
+                        {!isProcessing && <span className="sm:hidden ml-1 text-[9px] opacity-70">({estimatedCost})</span>}
                     </Button>
                 </div>
             </div>

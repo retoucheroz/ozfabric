@@ -81,9 +81,9 @@ import {
 } from "@/components/ui/collapsible"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
+import { SERVICE_COSTS } from "@/lib/pricingConstants";
 import { Separator } from "@/components/ui/separator"
 
-// === STUDIO ANIMATION STEPS ===
 const STUDIO_STEPS_TR = [
     { icon: "💡", text: "Stüdyo ışıkları ayarlanıyor...", detail: "Yumuşak aydınlatma kurulumu" },
     { icon: "📸", text: "Ürün yerleşimi kontrol ediliyor...", detail: "Altın oran hizalaması" },
@@ -195,6 +195,10 @@ export default function EComPage() {
         outputFormat: "webp",
         numImages: 1
     })
+
+    const estimatedCost = apiOptions.resolution === "4K"
+        ? SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_4K
+        : SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_1_2K;
 
     const handleAnalyze = async () => {
         if (!userPrompt.trim()) {
@@ -565,7 +569,7 @@ export default function EComPage() {
                                         "px-12 h-16 rounded-2xl text-lg font-black tracking-tight transition-all duration-500 shadow-[0_0_30px_rgba(139,92,246,0.2)]",
                                         isGenerating
                                             ? "bg-muted text-muted-foreground cursor-not-allowed"
-                                            : "bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-white hover:scale-105 active:scale-95"
+                                            : "bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-white hover:scale-105 active:scale-95 group relative"
                                     )}
                                     onClick={handleGenerate}
                                     disabled={isGenerating}
@@ -576,9 +580,14 @@ export default function EComPage() {
                                             {language === "tr" ? "STÜDYO AKTİF..." : "STUDIO ACTIVE..."}
                                         </div>
                                     ) : (
-                                        <div className="flex items-center gap-3">
-                                            <TbSparkles className="w-6 h-6" />
-                                            {language === "tr" ? "ÇEKİMİ BAŞLAT" : "START PRODUCTION"}
+                                        <div className="flex flex-col items-center">
+                                            <div className="flex items-center gap-3">
+                                                <TbSparkles className="w-6 h-6" />
+                                                {language === "tr" ? "ÇEKİMİ BAŞLAT" : "START PRODUCTION"}
+                                            </div>
+                                            <span className="text-[10px] font-medium opacity-80 mt-1 uppercase tracking-widest group-hover:text-yellow-200 transition-colors">
+                                                {estimatedCost} {language === "tr" ? "Kredi" : "Credits"}
+                                            </span>
                                         </div>
                                     )}
                                 </Button>

@@ -18,6 +18,7 @@ import {
     Settings2,
     Trash2,
     Plus,
+    X,
     Image as ImageIcon
 } from "lucide-react"
 import { toast } from "sonner"
@@ -236,11 +237,11 @@ export default function AdminPanel() {
                                 Joined: {new Date(user.createdAt).toLocaleDateString()}
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-6">
+                        <CardContent className="space-y-5">
                             <div className="grid grid-cols-2 gap-2">
                                 {user.status === 'pending' ? (
                                     <Button size="sm" className="col-span-2 bg-green-600 hover:bg-green-700" onClick={() => updateUser(user.username, { status: 'active' })}>
-                                        <UserCheck className="w-4 h-4 mr-2" /> {t('admin.approve')}
+                                        <RefreshCw className="w-4 h-4 mr-2" /> {t('admin.approve')}
                                     </Button>
                                 ) : (
                                     <>
@@ -268,7 +269,7 @@ export default function AdminPanel() {
                                 )}
                             </div>
 
-                            <div className="space-y-4">
+                            <div className="space-y-4 p-4 rounded-2xl bg-zinc-500/5 border border-zinc-500/10">
                                 <div className="space-y-1.5">
                                     <Label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
                                         <Layout className="w-3 h-3" /> {t('admin.brandedTitle')}
@@ -287,16 +288,61 @@ export default function AdminPanel() {
 
                                 <div className="space-y-1.5">
                                     <Label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
+                                        <RefreshCw className="w-3 h-3 text-amber-500" /> {t('settings.credits')}
+                                    </Label>
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex-1 h-9 flex items-center px-3 rounded-lg bg-background border font-black text-sm text-amber-600">
+                                            {user.credits || 0}
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <Input
+                                                id={`credits-${user.username}`}
+                                                type="number"
+                                                placeholder="+/-"
+                                                className="w-16 h-9 text-xs"
+                                            />
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                className="h-9 border-amber-500/20 hover:bg-amber-500/10 text-amber-600 font-bold text-[10px]"
+                                                onClick={() => {
+                                                    const input = document.getElementById(`credits-${user.username}`) as HTMLInputElement;
+                                                    const val = parseInt(input.value);
+                                                    if (!isNaN(val)) {
+                                                        updateUser(user.username, { credits: (user.credits || 0) + val });
+                                                        input.value = '';
+                                                    }
+                                                }}
+                                            >
+                                                ADD
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <Label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1.5">
                                         <ImageIcon className="w-3 h-3" /> {t('admin.brandedLogo')}
                                     </Label>
                                     <div className="flex items-center gap-3">
-                                        <div className="w-12 h-12 rounded-lg border bg-muted/20 flex-shrink-0 overflow-hidden flex items-center justify-center relative group">
+                                        <div className="w-10 h-10 rounded-lg border bg-muted/20 flex-shrink-0 overflow-hidden flex items-center justify-center relative group">
                                             {user.customLogo ? (
-                                                <img src={user.customLogo} alt="Logo" className="w-full h-full object-contain" />
+                                                <>
+                                                    <img src={user.customLogo} alt="Logo" className="w-full h-full object-contain" />
+                                                    <button
+                                                        className="absolute top-0 right-0 p-0.5 bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity z-30"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            updateUser(user.username, { customLogo: '' });
+                                                        }}
+                                                    >
+                                                        <X className="w-3 h-3" />
+                                                    </button>
+                                                </>
                                             ) : (
-                                                <ImageIcon className="w-6 h-6 text-muted-foreground/30" />
+                                                <ImageIcon className="w-5 h-5 text-muted-foreground/30" />
                                             )}
-                                            <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity">
+                                            <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity z-20">
                                                 <Plus className="w-4 h-4 text-white" />
                                                 <input
                                                     type="file"
@@ -316,6 +362,7 @@ export default function AdminPanel() {
                                                 />
                                             </label>
                                         </div>
+                                        <p className="text-[9px] text-muted-foreground uppercase font-bold leading-tight">PNG ONLY <br /> (TRANSPARENT)</p>
                                     </div>
                                 </div>
                             </div>
@@ -324,16 +371,17 @@ export default function AdminPanel() {
                                 <Label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
                                     <Layout className="w-3 h-3" /> {t('admin.authorizedPages')}
                                 </Label>
-                                <div className="grid grid-cols-1 gap-2 border rounded-xl p-3 bg-muted/20">
+                                <div className="grid grid-cols-1 gap-1 border rounded-xl p-3 bg-muted/20 max-h-[160px] overflow-y-auto custom-scrollbar">
                                     {user.authorizedPages?.includes('*') ? (
-                                        <div className="text-xs font-bold text-violet-500 flex items-center gap-2 py-1">
-                                            <Shield className="w-3 h-3" /> Full System Access (Admin)
+                                        <div className="text-[10px] font-bold text-violet-500 flex items-center gap-2 py-1">
+                                            <Shield className="w-3 h-3" /> FULL SYSTEM ACCESS (ADMIN)
                                         </div>
                                     ) : (
                                         AVAILABLE_PAGES.map((page) => (
-                                            <div key={page.path} className="flex items-center justify-between py-1">
-                                                <span className="text-xs font-medium">{page.label}</span>
+                                            <div key={page.path} className="flex items-center justify-between py-1 border-b border-muted/20 last:border-0">
+                                                <span className="text-[10px] font-bold uppercase tracking-tight">{page.label}</span>
                                                 <Switch
+                                                    className="scale-75"
                                                     checked={user.authorizedPages?.includes(page.path)}
                                                     onCheckedChange={() => togglePageAccess(user, page.path)}
                                                 />
@@ -346,6 +394,6 @@ export default function AdminPanel() {
                     </Card>
                 ))}
             </div>
-        </div>
+        </div >
     )
 }

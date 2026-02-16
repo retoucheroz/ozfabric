@@ -7,52 +7,30 @@ import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/context/language-context"
 import { motion } from "framer-motion"
+import { SERVICE_COSTS } from "@/lib/pricingConstants";
+import { useEffect } from "react";
+
+import { PRICING_PLANS, CREDIT_PACKS } from "@/lib/pricingConstants";
+// ... imports
 
 export default function PricingPage() {
     const { t, language } = useLanguage();
-    const [isAnnual, setIsAnnual] = useState(true);
+    // Removed isAnnual state as plans are currently simplified to monthly
+    // const [isAnnual, setIsAnnual] = useState(true); 
+    const [user, setUser] = useState<any>(null);
 
-    const plans = [
-        {
-            id: "free",
-            name: language === "tr" ? "Ücretsiz Deneme" : "Free Trial",
-            price: "0",
-            description: language === "tr" ? "Platformu keşfetmek için başlangıç paketi." : "Get started with basic features.",
-            features: language === "tr"
-                ? ["5 Ücretsiz Kredi", "Temel Model Erişimi", "720p Çözünürlük", "Topluluk Desteği"]
-                : ["5 Free Credits", "Standard AI Models", "720p Resolution", "Community Support"],
-            icon: Rocket,
-            color: "gray",
-            buttonText: language === "tr" ? "Şimdi Başla" : "Get Started",
-            popular: false
-        },
-        {
-            id: "pro",
-            name: "Pro Plan",
-            price: isAnnual ? "29" : "39",
-            description: language === "tr" ? "Profesyonel tasarımcılar için." : "Perfect for designers.",
-            features: language === "tr"
-                ? ["Sınırsız Kredi Seçeneği", "Tüm Pro Modellere Erişim", "4K Ultra HD Çözünürlük", "Arka Plan Kaldırma", "Öncelikli İşleme", "Ticari Lisans"]
-                : ["Unlimited Credits Plan", "All Pro AI Models", "4K Ultra HD Output", "Background Removal", "Priority Processing", "Commercial License"],
-            icon: Crown,
-            color: "violet",
-            buttonText: language === "tr" ? "Pro'ya Yükselt" : "Upgrade to Pro",
-            popular: true
-        },
-        {
-            id: "enterprise",
-            name: "Enterprise",
-            price: "99",
-            description: language === "tr" ? "Büyük ajanslar ve markalar için." : "For large agencies and brands.",
-            features: language === "tr"
-                ? ["Özel Model Eğitimi (LoRA)", "API Erişimi", "Ekip Yönetimi", "7/24 Özel Destek", "Yüksek Hızlı Rendering", "Kurumsal Güvenlik"]
-                : ["Custom Model Training", "API Access", "Team Management", "24/7 Dedicated Support", "High-speed Rendering", "Enterprise Security"],
-            icon: Zap,
-            color: "indigo",
-            buttonText: language === "tr" ? "İletişime Geçin" : "Contact Sales",
-            popular: false
-        }
-    ];
+    useEffect(() => {
+        fetch('/api/auth/session')
+            .then(res => res.json())
+            .then(data => {
+                if (data.authenticated) {
+                    setUser(data.user);
+                }
+            })
+            .catch(err => console.error("Session fetch failed", err));
+    }, []);
+
+    // Plans are now imported from constants
 
     return (
         <div className="min-h-screen bg-[var(--bg-base)] py-8 px-6 overflow-y-auto">
@@ -86,33 +64,15 @@ export default function PricingPage() {
                         </p>
                     </motion.div>
 
-                    {/* Billing Toggle */}
-                    <div className="flex items-center justify-center gap-3 pt-2">
-                        <span className={cn("text-xs font-medium transition-colors", !isAnnual ? "text-[var(--text-primary)]" : "text-[var(--text-muted)]")}>
-                            {language === "tr" ? "Aylık" : "Monthly"}
-                        </span>
-                        <button
-                            onClick={() => setIsAnnual(!isAnnual)}
-                            className="w-12 h-6 bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-full relative p-1 transition-all"
-                        >
-                            <div className={cn(
-                                "absolute top-1 bottom-1 w-4 bg-violet-500 rounded-full transition-all shadow-lg shadow-violet-500/30",
-                                isAnnual ? "right-1" : "left-1"
-                            )} />
-                        </button>
-                        <span className={cn("text-xs font-medium transition-colors flex items-center gap-2", isAnnual ? "text-[var(--text-primary)]" : "text-[var(--text-muted)]")}>
-                            {language === "tr" ? "Yıllık" : "Yearly"}
-                            <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[9px] font-bold px-1.5 py-0">
-                                %30 İNDİRİM
-                            </Badge>
-                        </span>
-                    </div>
+                    {/* Billing Toggle Removed - Simplification */}
                 </div>
 
                 {/* Pricing Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {plans.map((plan, idx) => {
-                        const Icon = plan.icon;
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                    {PRICING_PLANS.map((plan, idx) => {
+                        const Icon = idx === 0 ? Rocket : (idx === 1 ? Crown : Zap);
+                        const isMain = plan.highlight;
+
                         return (
                             <motion.div
                                 key={plan.id}
@@ -120,72 +80,163 @@ export default function PricingPage() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.4, delay: idx * 0.1 }}
                                 className={cn(
-                                    "relative group rounded-2xl p-6 transition-all duration-300",
-                                    "bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-violet-500/30",
-                                    "flex flex-col h-full shadow-lg shadow-black/5",
-                                    plan.popular && "ring-1 ring-violet-500 border-violet-500 bg-violet-500/[0.02]"
+                                    "relative group rounded-3xl p-8 transition-all duration-300 flex flex-col h-full",
+                                    isMain
+                                        ? "bg-gradient-to-b from-violet-600 to-indigo-700 text-white shadow-2xl shadow-violet-900/20 scale-105 z-10 border-0"
+                                        : "bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-violet-500/30 shadow-lg shadow-black/5"
                                 )}
                             >
-                                {plan.popular && (
-                                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-violet-500 text-white text-[9px] font-black px-3 py-1 rounded-full shadow-lg shadow-violet-500/20 flex items-center gap-1.5 z-20">
-                                        <Star className="w-2.5 h-2.5 fill-white" />
-                                        {language === "tr" ? "EN POPÜLER" : "MOST POPULAR"}
+                                {isMain && (
+                                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[10px] font-black px-4 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 z-20 uppercase tracking-wider">
+                                        <Star className="w-3 h-3 fill-white" />
+                                        {language === "tr" ? "Önerilen" : "Most Popular"}
                                     </div>
                                 )}
 
-                                <div className="mb-6">
-                                    <div className={cn(
-                                        "w-10 h-10 rounded-xl flex items-center justify-center mb-4 mx-auto md:mx-0",
-                                        plan.color === "violet" ? "bg-violet-500/10 text-violet-500" :
-                                            plan.color === "indigo" ? "bg-indigo-500/10 text-indigo-500" : "bg-gray-500/10 text-gray-500"
-                                    )}>
-                                        <Icon className="w-5 h-5" />
+                                <div className="mb-6 text-center">
+                                    <h3 className={cn("text-lg font-black uppercase tracking-tight mb-2", isMain ? "text-white" : "text-[var(--text-primary)]")}>
+                                        {language === "tr" ? plan.nameTr : plan.name}
+                                    </h3>
+                                    <div className={cn("text-xs font-medium opacity-80", isMain ? "text-white/80" : "text-[var(--text-secondary)]")}>
+                                        {language === "tr" ? plan.descriptionTr : plan.description}
                                     </div>
-                                    <h3 className="text-lg font-bold text-[var(--text-primary)]">{plan.name}</h3>
-                                    <p className="text-[var(--text-secondary)] text-[11px] mt-1.5 leading-relaxed">
-                                        {plan.description}
-                                    </p>
                                 </div>
 
-                                <div className="mb-6">
-                                    <div className="flex items-baseline gap-1 justify-center md:justify-start">
-                                        <span className="text-3xl font-black text-[var(--text-primary)]">${plan.price}</span>
-                                        <span className="text-[var(--text-muted)] text-sm font-medium">/{language === "tr" ? "ay" : "mo"}</span>
+                                <div className="mb-6 text-center">
+                                    <div className="flex items-baseline gap-1 justify-center">
+                                        <span className={cn("text-4xl font-black heading-font", isMain ? "text-white" : "text-[var(--text-primary)]")}>${plan.price}</span>
+                                        {plan.price !== "0" && <span className={cn("text-sm font-medium", isMain ? "text-white/60" : "text-[var(--text-muted)]")}>/{language === "tr" ? "ay" : "mo"}</span>}
                                     </div>
-                                    {isAnnual && plan.price !== "0" && (
-                                        <p className="text-[var(--text-muted)] text-[9px] uppercase font-bold tracking-wider mt-1 text-center md:text-left">
-                                            {language === "tr" ? "Yıllık faturalandırılır" : "Billed annually"}
-                                        </p>
-                                    )}
+                                    <Badge variant="secondary" className={cn("mt-3 font-bold", isMain ? "bg-white/20 text-white border-none" : "bg-violet-500/10 text-violet-500 border-violet-500/20")}>
+                                        {plan.credits.toLocaleString()} {language === "tr" ? "KREDİ" : "CREDITS"}
+                                    </Badge>
                                 </div>
 
-                                <div className="space-y-2.5 flex-1">
-                                    {plan.features.map((feature, fIdx) => (
-                                        <div key={fIdx} className="flex items-start gap-2.5">
-                                            <div className="mt-0.5 shrink-0 bg-emerald-500/10 rounded-full p-0.5">
-                                                <Check className="w-3 h-3 text-emerald-500" />
+                                <div className="space-y-4 flex-1 mb-8">
+                                    {(language === "tr" ? plan.featuresTr : plan.features).map((feature, fIdx) => (
+                                        <div key={fIdx} className="flex items-center gap-3">
+                                            <div className={cn("p-0.5 rounded-full", isMain ? "bg-white/20" : "bg-emerald-500/10")}>
+                                                <Check className={cn("w-3 h-3", isMain ? "text-white" : "text-emerald-500")} />
                                             </div>
-                                            <span className="text-xs text-[var(--text-secondary)]">{feature}</span>
+                                            <span className={cn("text-xs font-medium", isMain ? "text-white/90" : "text-[var(--text-secondary)]")}>{feature}</span>
                                         </div>
                                     ))}
                                 </div>
 
                                 <Button
-                                    size="sm"
+                                    size="lg"
                                     className={cn(
-                                        "w-full mt-6 h-10 rounded-lg font-bold text-xs transition-all duration-300 flex items-center justify-center gap-2",
-                                        plan.popular
-                                            ? "bg-violet-500 hover:bg-violet-600 text-white shadow-md shadow-violet-500/10"
+                                        "w-full h-12 rounded-xl font-bold text-xs uppercase tracking-widest transition-all duration-300",
+                                        isMain
+                                            ? "bg-white text-violet-600 hover:bg-white/90 shadow-xl"
                                             : "bg-[var(--bg-elevated)] hover:bg-[var(--bg-muted)] text-[var(--text-primary)] border border-[var(--border-subtle)]"
                                     )}
                                 >
-                                    {plan.buttonText}
-                                    <ChevronRight className="w-3.5 h-3.5 opacity-50" />
+                                    {language === "tr" ? (plan.price === "0" ? "Şimdi Başla" : "Seç") : (plan.price === "0" ? "Start Now" : "Select Plan")}
                                 </Button>
                             </motion.div>
                         );
                     })}
                 </div>
+
+                {/* Credit Packs */}
+                <div className="mt-16">
+                    <h2 className="text-xl font-bold text-center mb-8 text-[var(--text-primary)]">
+                        {language === "tr" ? "Kredi Paketleri" : "Credit Packs"}
+                    </h2>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {CREDIT_PACKS.map((pack, i) => (
+                            <div key={i} className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-center hover:border-violet-500/30 transition-all relative overflow-hidden group">
+                                {pack.label === "Pro" || pack.label === "Ultra" ? (
+                                    <div className="absolute top-0 right-0 bg-violet-500/10 text-violet-500 text-[9px] font-bold px-2 py-0.5 rounded-bl-lg">
+                                        BONUS
+                                    </div>
+                                ) : null}
+                                <div className="text-2xl font-black text-[var(--text-primary)] mb-1">{pack.credits.toLocaleString()}</div>
+                                <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider font-bold mb-3">{language === "tr" ? "KREDİ" : "CREDITS"}</div>
+                                <Button size="sm" variant="outline" className="w-full text-xs font-bold border-violet-500/20 text-violet-500 hover:bg-violet-500/10 hover:text-violet-600 transition-all group-hover:scale-105 active:scale-95">
+                                    {pack.price} {language === "tr" ? "Satın Al" : "Buy Now"}
+                                </Button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Service Costs Info - ADMIN ONLY */}
+                {user?.role === 'admin' && (
+                    <div className="mt-16 bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-2xl p-6 md:p-8">
+                        <h2 className="text-xl font-bold mb-6 text-[var(--text-primary)] flex items-center gap-2">
+                            <Zap className="w-5 h-5 text-yellow-500" />
+                            {language === "tr" ? "Hizmet Maliyetleri (Admin)" : "Service Costs (Admin)"}
+                        </h2>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--text-muted)] mb-4 border-b pb-2">
+                                    {language === "tr" ? "Görsel Üretim" : "Image Generation"}
+                                </h3>
+                                <div className="space-y-3 text-sm">
+                                    <div className="flex justify-between py-1 border-b border-[var(--border-subtle)] border-dashed">
+                                        <span>Nano Banana Pro (1-2K)</span>
+                                        <span className="font-bold">{SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_1_2K}</span>
+                                    </div>
+                                    <div className="flex justify-between py-1 border-b border-[var(--border-subtle)] border-dashed">
+                                        <span>Nano Banana Pro (4K)</span>
+                                        <span className="font-bold">{SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_4K}</span>
+                                    </div>
+                                    <div className="flex justify-between py-1 border-b border-[var(--border-subtle)] border-dashed">
+                                        <span>Face Swap (1-2K)</span>
+                                        <span className="font-bold">{SERVICE_COSTS.IMAGE_GENERATION.FACE_SWAP_1_2K}</span>
+                                    </div>
+                                    <div className="flex justify-between py-1 border-b border-[var(--border-subtle)] border-dashed">
+                                        <span>Face Swap (4K)</span>
+                                        <span className="font-bold">{SERVICE_COSTS.IMAGE_GENERATION.FACE_SWAP_4K}</span>
+                                    </div>
+                                    <div className="flex justify-between py-1 border-b border-[var(--border-subtle)] border-dashed">
+                                        <span>Ghost Model (1-2K)</span>
+                                        <span className="font-bold">{SERVICE_COSTS.IMAGE_GENERATION.GHOST_MODEL_1_2K}</span>
+                                    </div>
+                                    <div className="flex justify-between py-1 border-b border-[var(--border-subtle)] border-dashed">
+                                        <span>Ghost Model (4K)</span>
+                                        <span className="font-bold">{SERVICE_COSTS.IMAGE_GENERATION.GHOST_MODEL_4K}</span>
+                                    </div>
+                                    <div className="flex justify-between py-1">
+                                        <span>Upscaler</span>
+                                        <span className="font-bold">{SERVICE_COSTS.IMAGE_GENERATION.UPSCALER_PER_MP} / MP</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--text-muted)] mb-4 border-b pb-2">
+                                    {language === "tr" ? "Video Üretim" : "Video Generation"}
+                                </h3>
+                                <div className="space-y-3 text-sm">
+                                    <div className="flex justify-between py-1 border-b border-[var(--border-subtle)] border-dashed">
+                                        <span>Kling 3 ({language === "tr" ? "ses kapalı" : "sound off"})</span>
+                                        <span className="font-bold">{SERVICE_COSTS.VIDEO_GENERATION.KLING_3_SOUND_OFF} / {language === "tr" ? "sn" : "sec"}</span>
+                                    </div>
+                                    <div className="flex justify-between py-1 border-b border-[var(--border-subtle)] border-dashed">
+                                        <span>Kling 3 ({language === "tr" ? "ses açık" : "sound on"})</span>
+                                        <span className="font-bold">{SERVICE_COSTS.VIDEO_GENERATION.KLING_3_SOUND_ON} / {language === "tr" ? "sn" : "sec"}</span>
+                                    </div>
+                                    <div className="flex justify-between py-1 border-b border-[var(--border-subtle)] border-dashed">
+                                        <span>Kling 3 (Voice Control)</span>
+                                        <span className="font-bold">{SERVICE_COSTS.VIDEO_GENERATION.KLING_3_VOICE_CONTROL} / {language === "tr" ? "sn" : "sec"}</span>
+                                    </div>
+                                    <div className="flex justify-between py-1 border-b border-[var(--border-subtle)] border-dashed">
+                                        <span>Kling 2.5 (5 {language === "tr" ? "sn" : "sec"})</span>
+                                        <span className="font-bold">{SERVICE_COSTS.VIDEO_GENERATION.KLING_2_5_5SEC}</span>
+                                    </div>
+                                    <div className="flex justify-between py-1">
+                                        <span>Kling 2.5 ({language === "tr" ? "ek saniye" : "extra sec"})</span>
+                                        <span className="font-bold">{SERVICE_COSTS.VIDEO_GENERATION.KLING_2_5_EXTRA_SEC} / {language === "tr" ? "sn" : "sec"}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Footer Disclaimer */}
                 <div className="mt-12 text-center">
