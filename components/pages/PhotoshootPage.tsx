@@ -1834,69 +1834,82 @@ export default function PhotoshootPage() {
 
     // === STATE PERSISTENCE: Save/Restore state on navigation ===
     useEffect(() => {
-        // Restore state from sessionStorage on mount
-        const savedState = sessionStorage.getItem('photoshoot-state');
-        if (savedState) {
+        const restoreState = async () => {
             try {
-                const parsed = JSON.parse(savedState);
-                // Restore LOW-RES assets (safe for sessionStorage)
-                if (parsed.assets) {
-                    setAssets(parsed.assets);
-                    // Clear high-res when loading state since high-res is not persisted in sessionStorage
-                    setAssetsHighRes(Object.keys(assetsHighRes).reduce((acc, key) => ({ ...acc, [key]: null }), {}));
+                const savedState = await dbOperations.get<{ data: any }>(STORES.PHOTOSHOOT_STATE, 'current');
+                if (savedState && savedState.data) {
+                    const parsed = savedState.data;
+                    // Restore LOW-RES assets
+                    if (parsed.assets) {
+                        setAssets(parsed.assets);
+                        // Clear high-res when loading state since high-res is not persisted
+                        setAssetsHighRes(Object.keys(assetsHighRes).reduce((acc, key) => ({ ...acc, [key]: null }), {}));
+                    }
+                    if (parsed.productName) setProductName(parsed.productName);
+                    if (parsed.workflowType) setWorkflowType(parsed.workflowType);
+                    if (parsed.productDescription) setProductDescription(parsed.productDescription);
+                    if (parsed.fitDescription) setFitDescription(parsed.fitDescription);
+                    if (parsed.upperGarmentDescription) setUpperGarmentDescription(parsed.upperGarmentDescription);
+                    if (parsed.lowerGarmentDescription) setLowerGarmentDescription(parsed.lowerGarmentDescription);
+                    if (parsed.innerWearDescription) setInnerWearDescription(parsed.innerWearDescription);
+                    if (parsed.shoesDescription) setShoesDescription(parsed.shoesDescription);
+                    if (parsed.modelDescription) setModelDescription(parsed.modelDescription);
+                    if (parsed.buttonsOpen !== undefined) setButtonsOpen(parsed.buttonsOpen);
+                    if (parsed.tucked !== undefined) setTucked(parsed.tucked);
+                    if (parsed.socksType) setSocksType(parsed.socksType);
+                    if (parsed.closureType) setClosureType(parsed.closureType);
+                    if (parsed.gender) setGender(parsed.gender);
+                    if (parsed.resolution) setResolution(parsed.resolution);
+                    if (parsed.aspectRatio) setAspectRatio(parsed.aspectRatio);
+                    if (parsed.enableWind !== undefined) setEnableWind(parsed.enableWind);
+                    if (parsed.enableExpression !== undefined) setEnableExpression(parsed.enableExpression);
+                    if (parsed.enableGaze !== undefined) setEnableGaze(parsed.enableGaze);
                 }
-                // NOTE: assetsHighRes is NOT restored (RAM only)
-                if (parsed.productName) setProductName(parsed.productName);
-                if (parsed.workflowType) setWorkflowType(parsed.workflowType);
-                if (parsed.productDescription) setProductDescription(parsed.productDescription);
-                if (parsed.fitDescription) setFitDescription(parsed.fitDescription);
-                if (parsed.upperGarmentDescription) setUpperGarmentDescription(parsed.upperGarmentDescription);
-                if (parsed.lowerGarmentDescription) setLowerGarmentDescription(parsed.lowerGarmentDescription);
-                if (parsed.innerWearDescription) setInnerWearDescription(parsed.innerWearDescription);
-                if (parsed.shoesDescription) setShoesDescription(parsed.shoesDescription);
-                if (parsed.modelDescription) setModelDescription(parsed.modelDescription);
-                if (parsed.buttonsOpen !== undefined) setButtonsOpen(parsed.buttonsOpen);
-                if (parsed.tucked !== undefined) setTucked(parsed.tucked);
-                if (parsed.socksType) setSocksType(parsed.socksType);
-                if (parsed.closureType) setClosureType(parsed.closureType);
-                if (parsed.gender) setGender(parsed.gender);
-                if (parsed.resolution) setResolution(parsed.resolution);
-                if (parsed.aspectRatio) setAspectRatio(parsed.aspectRatio);
-                if (parsed.enableWind !== undefined) setEnableWind(parsed.enableWind);
-                if (parsed.enableExpression !== undefined) setEnableExpression(parsed.enableExpression);
-                if (parsed.enableGaze !== undefined) setEnableGaze(parsed.enableGaze);
             } catch (e) {
-                console.error("Failed to restore state", e);
+                console.error("Failed to restore state from IndexedDB", e);
             }
-        }
+        };
+
+        restoreState();
     }, []);
 
-    // Save state to sessionStorage whenever key values change
+    // Save state to IndexedDB whenever key values change
     useEffect(() => {
-        const stateToSave = {
-            // Save LOW-RES assets (768px, safe for sessionStorage)
-            assets,
-            productName,
-            workflowType,
-            productDescription,
-            fitDescription,
-            upperGarmentDescription,
-            lowerGarmentDescription,
-            innerWearDescription,
-            shoesDescription,
-            modelDescription,
-            buttonsOpen,
-            tucked,
-            socksType,
-            closureType,
-            gender,
-            resolution,
-            aspectRatio,
-            enableWind,
-            enableExpression,
-            enableGaze
+        const saveState = async () => {
+            const stateToSave = {
+                id: 'current',
+                data: {
+                    assets,
+                    productName,
+                    workflowType,
+                    productDescription,
+                    fitDescription,
+                    upperGarmentDescription,
+                    lowerGarmentDescription,
+                    innerWearDescription,
+                    shoesDescription,
+                    modelDescription,
+                    buttonsOpen,
+                    tucked,
+                    socksType,
+                    closureType,
+                    gender,
+                    resolution,
+                    aspectRatio,
+                    enableWind,
+                    enableExpression,
+                    enableGaze
+                }
+            };
+            try {
+                await dbOperations.add(STORES.PHOTOSHOOT_STATE, stateToSave);
+            } catch (e) {
+                console.error("Failed to save state to IndexedDB", e);
+            }
         };
-        sessionStorage.setItem('photoshoot-state', JSON.stringify(stateToSave));
+
+        const timeout = setTimeout(saveState, 500); // Debounce save
+        return () => clearTimeout(timeout);
     }, [assets, productName, workflowType, productDescription, fitDescription, upperGarmentDescription, lowerGarmentDescription, innerWearDescription, shoesDescription, modelDescription, buttonsOpen, tucked, socksType, closureType, gender, resolution, aspectRatio, enableWind, enableExpression, enableGaze]);
 
 

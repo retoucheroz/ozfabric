@@ -1,6 +1,6 @@
 
 const DB_NAME = 'OzFabricDB';
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 
 // Store names
 export const STORES = {
@@ -15,7 +15,8 @@ export const STORES = {
     GLASSES: 'glasses',
     HATS: 'hats',
     JEWELRY: 'jewelry',
-    BELTS: 'belts'
+    BELTS: 'belts',
+    PHOTOSHOOT_STATE: 'photoshoot_state'
 } as const;
 
 type StoreName = typeof STORES[keyof typeof STORES];
@@ -47,6 +48,18 @@ export const dbRequest = (): Promise<IDBDatabase> => {
 };
 
 export const dbOperations = {
+    async get<T>(storeName: StoreName, id: string): Promise<T | null> {
+        const db = await dbRequest();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction(storeName, 'readonly');
+            const store = transaction.objectStore(storeName);
+            const request = store.get(id);
+
+            request.onsuccess = () => resolve(request.result || null);
+            request.onerror = () => reject(request.error);
+        });
+    },
+
     async getAll<T>(storeName: StoreName): Promise<T[]> {
         const db = await dbRequest();
         return new Promise((resolve, reject) => {

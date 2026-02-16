@@ -11,45 +11,46 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Image URL is required" }, { status: 400 });
         }
 
-        // Sanitize input
         const { ensureR2Url } = await import("@/lib/r2");
+        console.log("Pose API: Sanitizing image URL...");
         const sanitizedUrl = await ensureR2Url(image_url, "poses/extraction");
+        console.log("Pose API: Sanitized URL (length):", sanitizedUrl?.length);
 
         const falKey = process.env.FAL_KEY;
         if (!falKey) {
+            console.error("Pose API Error: FAL_KEY missing");
             return NextResponse.json({ error: "FAL_KEY is not configured" }, { status: 500 });
         }
 
         const { fal } = await import("@fal-ai/client");
+        fal.config({ credentials: falKey });
 
-        // Configure FAL
-        fal.config({
-            credentials: falKey
-        });
+        console.log("Pose API: Running fal-ai/dwpose...");
+        try {
+            const result: any = await fal.run("fal-ai/dwpose", {
+                input: {
+                    image_url: sanitizedUrl
+                }
+            });
 
-        // Use fal-ai/dwpose for better skeletal extraction
-        const result: any = await fal.run("fal-ai/dwpose", {
-            input: {
-                image_url: sanitizedUrl
+            console.log("Pose API: Fal Result received");
+
+            const poseData = result.data || result;
+            if (poseData.image && poseData.image.url) {
+                return NextResponse.json({ pose_image: poseData.image.url });
+            } else if (poseData.url) {
+                return NextResponse.json({ pose_image: poseData.url });
+            } else {
+                console.error("Pose API Error: Invalid response structure", result);
+                return NextResponse.json({ error: "Invalid response from AI service" }, { status: 500 });
             }
-        });
-
-        console.log("Fal Pose SDK Result:", result);
-
-        // SDK result is often nested under .data
-        const poseData = result.data || result;
-
-        if (poseData.image && poseData.image.url) {
-            return NextResponse.json({ pose_image: poseData.image.url });
-        } else if (poseData.url) {
-            return NextResponse.json({ pose_image: poseData.url });
-        } else {
-            console.error("Pose API Invalid Response Structure:", result);
-            return NextResponse.json({ error: "Invalid response from AI service" }, { status: 500 });
+        } catch (falError: any) {
+            console.error("Pose API: Fal.ai service error:", falError);
+            return NextResponse.json({ error: `AI Service Error: ${falError.message || 'Unknown'}` }, { status: 500 });
         }
 
     } catch (error: any) {
-        console.error("Pose API Error:", error);
+        console.error("Pose API Global Error:", error);
         return NextResponse.json(
             { error: error.message || "Something went wrong" },
             { status: 500 }

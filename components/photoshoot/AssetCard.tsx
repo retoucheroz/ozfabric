@@ -101,7 +101,7 @@ export function AssetCard({
                     onDragLeave={handleDragLeave}
                     onDrop={handleDrop}
                 >
-                    {assets[id] ? (
+                    {assets[id] && assets[id] !== "LIGHTING_SET" ? (
                         <div className="relative w-full h-full group/image">
                             <img src={assets[id]!} className="w-full h-full object-cover transition-transform duration-700 group-hover/image:scale-110" alt={label} />
 
@@ -119,6 +119,20 @@ export function AssetCard({
                                 <Button size="icon" variant="destructive" className="h-7 w-7 rounded-lg shadow-lg hover:scale-110 transition-transform" onClick={(e) => handleAssetRemove(id, e)}>
                                     <Trash2 size={12} />
                                 </Button>
+                            </div>
+                        </div>
+                    ) : assets[id] === "LIGHTING_SET" ? (
+                        <div className="flex flex-col items-center gap-2.5 p-3 text-center transition-all group-hover/card:scale-105">
+                            <div className="p-3.5 rounded-2xl bg-[var(--accent-soft)]/50 text-[var(--accent-primary)] shadow-inner">
+                                {Icon ? <Icon size={24} /> : <Upload size={24} />}
+                            </div>
+                            <div className="space-y-0.5">
+                                <span className="text-[11px] font-bold uppercase tracking-wide text-[var(--text-primary)] block leading-tight">
+                                    {label}
+                                </span>
+                                <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-tighter opacity-80 block">
+                                    {language === "tr" ? "PRESET AKTİF" : "PRESET ACTIVE"}
+                                </span>
                             </div>
                         </div>
                     ) : (
@@ -208,12 +222,16 @@ export function AssetCard({
                     )}
                     onClick={handleDirectUploadClick}
                 >
-                    {assets[id] ? (
+                    {assets[id] && assets[id] !== "LIGHTING_SET" ? (
                         <div className="relative w-full h-full overflow-hidden">
                             <img src={assets[id]!} className="w-full h-full object-cover transition-transform duration-500 group-hover/upload:scale-110" alt={label} />
                             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/upload:opacity-100 transition-opacity">
                                 <Upload className="w-4 h-4 text-white" />
                             </div>
+                        </div>
+                    ) : assets[id] === "LIGHTING_SET" ? (
+                        <div className="flex items-center justify-center w-full h-full bg-[var(--accent-soft)]/30">
+                            {Icon ? <Icon className="w-6 h-6 text-[var(--accent-primary)]" /> : <Upload className="w-6 h-6 text-[var(--accent-primary)]" />}
                         </div>
                     ) : (
                         <Upload className="w-6 h-6 transition-transform duration-300 group-hover/upload:scale-110" />
