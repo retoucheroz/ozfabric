@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
                     role: 'admin',
                     status: 'active',
                     authorizedPages: ['*'], // Special wildcard for admin
+                    credits: 0,
                     createdAt: Date.now(),
                 };
                 await saveUser(user);

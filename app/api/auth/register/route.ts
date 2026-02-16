@@ -21,7 +21,8 @@ export async function POST(req: NextRequest) {
             passwordHash: await hashPassword(password),
             role: 'user',
             status: 'pending', // Users must be approved by admin
-            authorizedPages: ['/home'], // Default access
+            authorizedPages: ['/home', '/photoshoot'], // Default access
+            credits: 0,
             createdAt: Date.now(),
         };
 
