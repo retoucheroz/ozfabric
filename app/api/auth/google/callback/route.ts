@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
     // Auto-detect host for redirect URI
     const host = req.headers.get('host');
     const protocol = host?.includes('localhost') ? 'http' : 'https';
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
+    const appUrl = process.env.APP_URL || `${protocol}://${host}`;
     const redirectUri = `${appUrl}/api/auth/google/callback`;
 
     if (!code) {

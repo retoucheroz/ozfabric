@@ -5,10 +5,10 @@ export async function GET(req: any) {
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
-    // Auto-detect host if NEXT_PUBLIC_APP_URL is missing
+    // Auto-detect host if APP_URL is missing
     const host = req.headers.get('host');
     const protocol = host?.includes('localhost') ? 'http' : 'https';
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
+    const appUrl = process.env.APP_URL || `${protocol}://${host}`;
     const redirectUri = `${appUrl}/api/auth/google/callback`;
 
     if (!clientId || !clientSecret) {
