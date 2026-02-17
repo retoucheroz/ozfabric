@@ -17,7 +17,7 @@ import { Sidebar } from "@/components/layout/Sidebar"
 export function TopNav() {
     const pathname = usePathname();
     const router = useRouter();
-    const { credits } = useProjects();
+    const { credits, refreshCredits } = useProjects();
     const { language, setLanguage, t } = useLanguage();
     const { theme, setTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
@@ -25,6 +25,8 @@ export function TopNav() {
 
     useEffect(() => {
         setMounted(true);
+        refreshCredits(); // Ensure credits are up to date when the nav mounts
+
         fetch('/api/auth/session')
             .then(res => res.json())
             .then(data => {

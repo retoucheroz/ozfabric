@@ -63,7 +63,7 @@ export async function addCredits(email: string, amount: number): Promise<DbUser 
 
 export async function getAllUsers(): Promise<Omit<DbUser, 'password_hash'>[]> {
     const result = await sql`
-        SELECT id, email, name, credits, role, created_at, updated_at 
+        SELECT id, email, name, credits, role, status, authorized_pages, custom_title, custom_logo, created_at, updated_at 
         FROM users 
         ORDER BY created_at DESC
     `;

@@ -101,14 +101,27 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
     const refreshCredits = async () => {
         try {
             const res = await fetch('/api/auth/session');
-            const data = await res.json();
-            if (data.authenticated && data.user) {
-                setCredits(data.user.credits || 0);
+            if (res.ok) {
+                const data = await res.json();
+                if (data.authenticated && data.user) {
+                    setCredits(data.user.credits || 0);
+                    // Also console log for debugging
+                    console.log(`💳 Credits Refreshed: ${data.user.credits}`);
+                }
             }
         } catch (e) {
             console.error("Failed to fetch credits:", e);
         }
     };
+
+    // Auto-refresh when window gains focus (user comes back to tab)
+    useEffect(() => {
+        const handleFocus = () => {
+            refreshCredits();
+        };
+        window.addEventListener('focus', handleFocus);
+        return () => window.removeEventListener('focus', handleFocus);
+    }, []);
 
     // Save to LocalStorage on change
     useEffect(() => {
