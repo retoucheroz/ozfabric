@@ -51,14 +51,14 @@ export async function POST(req: NextRequest) {
         const data = await response.json();
         let imageUrl = data.image?.url || data.images?.[0]?.url || MOCK_RESULT;
 
-        // Persist to R2 if configured
-        if (imageUrl && !imageUrl.includes('unsplash') && process.env.R2_BUCKET) {
+        // Persist to R2/S3
+        if (imageUrl && !imageUrl.includes('unsplash')) {
             try {
                 const { uploadFromUrl } = await import("@/lib/s3");
                 imageUrl = await uploadFromUrl(imageUrl, "vton");
-                console.log('VTON Persisted to R2:', imageUrl);
+                console.log('VTON Persisted to S3:', imageUrl);
             } catch (r2Error) {
-                console.error('R2 persistence error:', r2Error);
+                console.error('S3 persistence error:', r2Error);
             }
         }
 

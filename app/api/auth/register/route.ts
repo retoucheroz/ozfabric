@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
             status: 'pending', // Users must be approved by admin
             authorizedPages: ['/home', '/photoshoot'], // Default access
             credits: 0,
+            authType: 'credentials',
             createdAt: Date.now(),
         };
 

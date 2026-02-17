@@ -19,7 +19,9 @@ export async function POST(req: NextRequest) {
         const safeName = (fileName || "upload").replace(/[^a-zA-Z0-9.-]/g, "_");
         const key = `${folder}/${Date.now()}_${Math.random().toString(36).substring(7)}_${safeName}`;
 
-        const Bucket = process.env.R2_BUCKET as string;
+        const Bucket = process.env.AWS_S3_BUCKET || process.env.R2_BUCKET;
+        if (!Bucket) throw new Error("Bucket not configured");
+
         await r2.send(new PutObjectCommand({
             Bucket,
             Key: key,
@@ -28,12 +30,13 @@ export async function POST(req: NextRequest) {
         }));
 
         const publicBase = process.env.NEXT_PUBLIC_R2_PUBLIC_BASE_URL;
-        if (!publicBase) {
-            return NextResponse.json({ url: key, success: true });
-        }
+        const Region = process.env.AWS_REGION || "eu-central-1";
 
-        const finalUrl = `${publicBase.replace(/\/$/, "")}/${key}`;
-        console.log("Server-side R2 upload successful:", finalUrl);
+        const finalUrl = publicBase
+            ? `${publicBase.replace(/\/$/, "")}/${key}`
+            : `https://${Bucket}.s3.${Region}.amazonaws.com/${key}`;
+
+        console.log("Server-side upload successful:", finalUrl);
 
         return NextResponse.json({ url: finalUrl, success: true });
 

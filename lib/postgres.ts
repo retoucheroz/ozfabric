@@ -15,6 +15,7 @@ export interface DbUser {
     authorized_pages: string[] | null;
     custom_title: string | null;
     custom_logo: string | null;
+    auth_type: string | null;
 }
 
 export async function getUserByEmail(email: string): Promise<DbUser | null> {
@@ -22,10 +23,10 @@ export async function getUserByEmail(email: string): Promise<DbUser | null> {
     return result[0] as DbUser || null;
 }
 
-export async function createUser(email: string, name: string | null, passwordHash: string | null, role: string = 'user'): Promise<DbUser> {
+export async function createUser(email: string, name: string | null, passwordHash: string | null, role: string = 'user', authType: string = 'credentials'): Promise<DbUser> {
     const result = await sql`
-        INSERT INTO users (email, name, password_hash, role, credits)
-        VALUES (${email}, ${name}, ${passwordHash}, ${role}, 0)
+        INSERT INTO users (email, name, password_hash, role, credits, auth_type)
+        VALUES (${email}, ${name}, ${passwordHash}, ${role}, 0, ${authType})
         RETURNING *
     `;
     return result[0] as DbUser;
@@ -63,7 +64,7 @@ export async function addCredits(email: string, amount: number): Promise<DbUser 
 
 export async function getAllUsers(): Promise<Omit<DbUser, 'password_hash'>[]> {
     const result = await sql`
-        SELECT id, email, name, credits, role, status, authorized_pages, custom_title, custom_logo, created_at, updated_at 
+        SELECT id, email, name, credits, role, status, authorized_pages, custom_title, custom_logo, auth_type, created_at, updated_at 
         FROM users 
         ORDER BY created_at DESC
     `;
@@ -134,6 +135,7 @@ export async function updateUser(email: string, updates: {
     authorized_pages?: string[];
     custom_title?: string;
     custom_logo?: string;
+    auth_type?: string;
 }): Promise<DbUser | null> {
     const result = await sql`
         UPDATE users 
@@ -144,6 +146,7 @@ export async function updateUser(email: string, updates: {
             authorized_pages = COALESCE(${updates.authorized_pages ?? null}, authorized_pages),
             custom_title = COALESCE(${updates.custom_title ?? null}, custom_title),
             custom_logo = COALESCE(${updates.custom_logo ?? null}, custom_logo),
+            auth_type = COALESCE(${updates.auth_type ?? null}, auth_type),
             updated_at = CURRENT_TIMESTAMP
         WHERE email = ${email}
         RETURNING *

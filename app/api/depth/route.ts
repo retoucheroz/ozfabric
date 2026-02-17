@@ -48,7 +48,10 @@ export async function POST(req: NextRequest) {
       throw new Error("No depth map URL in response");
     }
 
-    return NextResponse.json({ depthMapUrl });
+    const { ensureS3Url } = await import("@/lib/s3");
+    const savedDepthUrl = await ensureS3Url(depthMapUrl, "depth-maps");
+
+    return NextResponse.json({ depthMapUrl: savedDepthUrl });
   } catch (error: any) {
     console.error("Depth estimation error:", error);
     return NextResponse.json(

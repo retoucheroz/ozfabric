@@ -36,10 +36,12 @@ export async function POST(req: Request) {
             console.log("Pose API: Fal Result received");
 
             const poseData = result.data || result;
-            if (poseData.image && poseData.image.url) {
-                return NextResponse.json({ pose_image: poseData.image.url });
-            } else if (poseData.url) {
-                return NextResponse.json({ pose_image: poseData.url });
+            const rawPoseUrl = poseData.image?.url || poseData.url;
+
+            if (rawPoseUrl) {
+                const { ensureS3Url } = await import("@/lib/s3");
+                const savedPoseUrl = await ensureS3Url(rawPoseUrl, "poses/results");
+                return NextResponse.json({ pose_image: savedPoseUrl });
             } else {
                 console.error("Pose API Error: Invalid response structure", result);
                 return NextResponse.json({ error: "Invalid response from AI service" }, { status: 500 });

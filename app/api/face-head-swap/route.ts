@@ -79,14 +79,14 @@ export async function POST(req: NextRequest) {
         let imageUrl = data.images?.[0]?.url;
         const usedSeed = data.seed;
 
-        // Persist to R2 if configured
-        if (imageUrl && process.env.R2_BUCKET) {
+        // Persist to R2/S3
+        if (imageUrl) {
             try {
                 const { uploadFromUrl } = await import("@/lib/s3");
                 imageUrl = await uploadFromUrl(imageUrl, "face-swap");
-                console.log('FaceSwap Persisted to R2:', imageUrl);
+                console.log('FaceSwap Persisted to S3:', imageUrl);
             } catch (r2Error) {
-                console.error('R2 faceswap persistence error:', r2Error);
+                console.error('S3 faceswap persistence error:', r2Error);
             }
         }
 

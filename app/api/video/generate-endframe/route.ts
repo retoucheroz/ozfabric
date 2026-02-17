@@ -144,9 +144,12 @@ Now analyze the provided first frame image and generate the end frame prompt.
             return NextResponse.json({ error: "No image generated" }, { status: 500 });
         }
 
+        const { ensureS3Url } = await import("@/lib/s3");
+        const savedImageUrl = await ensureS3Url(generatedImageUrl, "videos/end-frames");
+
         return NextResponse.json({
             status: "success",
-            imageUrl: generatedImageUrl,
+            imageUrl: savedImageUrl,
             prompt: generatedPrompt
         });
 

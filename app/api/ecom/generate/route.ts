@@ -107,16 +107,14 @@ export async function POST(req: NextRequest) {
 
         console.log('Generated image URL:', imageUrl)
 
-        // Persist to R2 if configured
+        // Persist to R2/S3
         let finalImageUrl = imageUrl;
-        if (process.env.R2_BUCKET) {
-            try {
-                const { uploadFromUrl } = await import("@/lib/s3");
-                finalImageUrl = await uploadFromUrl(imageUrl, "ecom");
-                console.log('Persisted to R2:', finalImageUrl);
-            } catch (r2Error) {
-                console.error('R2 persistence error:', r2Error);
-            }
+        try {
+            const { uploadFromUrl } = await import("@/lib/s3");
+            finalImageUrl = await uploadFromUrl(imageUrl, "ecom");
+            console.log('Ecom Persisted to S3:', finalImageUrl);
+        } catch (r2Error) {
+            console.error('S3 persistence error:', r2Error);
         }
 
         return NextResponse.json({

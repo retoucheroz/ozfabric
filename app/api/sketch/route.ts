@@ -55,6 +55,23 @@ export async function POST(req: Request) {
         }
 
         const result = await response.json();
+        let imageUrl = result.images?.[0]?.url || result.image?.url;
+
+        if (imageUrl) {
+            try {
+                const { uploadFromUrl } = await import("@/lib/s3");
+                const savedUrl = await uploadFromUrl(imageUrl, "sketch/results");
+
+                // Update the result object with the new URL
+                if (result.images?.[0]) result.images[0].url = savedUrl;
+                if (result.image) result.image.url = savedUrl;
+
+                console.log("Sketch result persisted to S3:", savedUrl);
+            } catch (e) {
+                console.error("S3 persistence error for sketch:", e);
+            }
+        }
+
         return NextResponse.json(result);
 
     } catch (error: any) {

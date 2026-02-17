@@ -90,6 +90,7 @@ export async function POST(req: NextRequest) {
             credits: 0,
             customTitle: customTitle || '',
             customLogo: customLogo || '',
+            authType: 'credentials',
             createdAt: Date.now(),
         };
 

@@ -43,9 +43,19 @@ export async function POST(req: NextRequest) {
         }
 
         const data = await response.json();
-        const imageUrl = data.image?.url || data.images?.[0]?.url;
+        const rawUrl = data.image?.url || data.images?.[0]?.url;
 
-        return NextResponse.json({ status: "completed", imageUrl: imageUrl });
+        let finalUrl = rawUrl;
+        if (rawUrl) {
+            try {
+                const { ensureS3Url } = await import("@/lib/s3");
+                finalUrl = await ensureS3Url(rawUrl, "resized");
+            } catch (e) {
+                console.error("S3 resize persistence error:", e);
+            }
+        }
+
+        return NextResponse.json({ status: "completed", imageUrl: finalUrl });
 
     } catch (error) {
         console.error(error);

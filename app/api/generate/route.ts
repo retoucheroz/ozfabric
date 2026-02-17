@@ -860,11 +860,10 @@ export async function POST(req: NextRequest) {
             const data = await response.json();
             const falUrl = data.images?.[0]?.url;
 
-            // If R2 is configured, persist the image to R2
-            if (falUrl && process.env.R2_BUCKET) {
+            // Persist the image to R2/S3
+            if (falUrl) {
                 const { uploadFromUrl } = await import("@/lib/s3");
-                const r2Url = await uploadFromUrl(falUrl);
-                return r2Url;
+                return await uploadFromUrl(falUrl, "generations");
             }
 
             return falUrl;

@@ -1,12 +1,12 @@
 import { User, Session } from './auth-types';
 import { cookies } from 'next/headers';
 import { hashPassword, comparePasswords } from '@/lib/crypto';
-import { 
-    getUserByEmail, 
-    createUser, 
+import {
+    getUserByEmail,
+    createUser,
     updateUser,
-    getAllUsers as pgGetAllUsers, 
-    deleteUserByEmail, 
+    getAllUsers as pgGetAllUsers,
+    deleteUserByEmail,
     DbUser,
     createDbSession,
     getDbSession,
@@ -30,6 +30,7 @@ function dbUserToUser(dbUser: DbUser): User {
         authorizedPages: dbUser.authorized_pages || [],
         customTitle: dbUser.custom_title || undefined,
         customLogo: dbUser.custom_logo || undefined,
+        authType: (dbUser.auth_type || 'credentials') as 'credentials' | 'google',
     };
 }
 
@@ -37,14 +38,14 @@ export async function getUser(username: string): Promise<User | null> {
     try {
         const dbUser = await getUserByEmail(username);
         if (!dbUser) return null;
-        
+
         const user = dbUserToUser(dbUser);
-        
+
         if (username === 'admin' || dbUser.role === 'admin') {
             user.role = 'admin';
             user.authorizedPages = ['*'];
         }
-        
+
         console.log(`👤 Auth: getUser(${username}) -> Found (Role: ${user.role}, Credits: ${user.credits})`);
         return user;
     } catch (e) {
@@ -56,7 +57,7 @@ export async function getUser(username: string): Promise<User | null> {
 export async function saveUser(user: User): Promise<void> {
     try {
         const existingUser = await getUserByEmail(user.username);
-        
+
         if (existingUser) {
             await updateUser(user.username, {
                 credits: user.credits,
@@ -65,13 +66,15 @@ export async function saveUser(user: User): Promise<void> {
                 authorized_pages: user.authorizedPages,
                 custom_title: user.customTitle,
                 custom_logo: user.customLogo,
+                auth_type: user.authType,
             });
         } else {
             await createUser(
                 user.username,
                 user.name || null,
                 user.passwordHash || null,
-                user.role || 'user'
+                user.role || 'user',
+                user.authType || 'credentials'
             );
         }
         console.log(`💾 Auth: saveUser(${user.username})`);
@@ -110,13 +113,13 @@ export async function getSession(): Promise<Session | null> {
             console.log(`🔑 Auth: getSession(${sessionId}) -> NULL`);
             return null;
         }
-        
+
         const session: Session = {
             sessionId: dbSession.session_id,
             username: dbSession.username,
             expiresAt: dbSession.expires_at
         };
-        
+
         console.log(`🔑 Auth: getSession(${sessionId}) -> Found (${session.username})`);
         return session;
     } catch (e) {
@@ -155,6 +158,7 @@ export async function getAllUsers(): Promise<Omit<User, 'passwordHash'>[]> {
             authorizedPages: u.authorized_pages || [],
             customTitle: u.custom_title || undefined,
             customLogo: u.custom_logo || undefined,
+            authType: (u.auth_type || 'credentials') as 'credentials' | 'google',
         }));
     } catch (e) {
         console.error('getAllUsers Error:', e);

@@ -19,6 +19,7 @@ export interface User {
     credits: number;
     createdAt?: number;
     lastLogin?: number;
+    authType?: 'credentials' | 'google';
 }
 
 export interface Session {

@@ -94,9 +94,20 @@ export async function POST(req: NextRequest) {
         const base64Image = buffer.toString("base64");
         const dataUrl = `data:image/jpeg;base64,${base64Image}`;
 
+        // Persist to S3
+        let finalUrl = dataUrl;
+        try {
+            const { uploadBase64 } = await import("@/lib/s3");
+            const savedUrl = await uploadBase64(dataUrl, "patterns");
+            if (savedUrl) finalUrl = savedUrl;
+            console.log("Pattern persisted to S3:", finalUrl);
+        } catch (s3Error) {
+            console.error("S3 pattern persistence error:", s3Error);
+        }
+
         return NextResponse.json({
             status: "completed",
-            imageUrl: dataUrl,
+            imageUrl: finalUrl,
             prompt: optimizedPrompt,
             originalPrompt: userPrompt
         });

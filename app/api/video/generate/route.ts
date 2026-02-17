@@ -95,10 +95,14 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "No video was generated" }, { status: 500 });
         }
 
+        const videoUrl = data.video.url;
+        const { uploadFromUrl } = await import("@/lib/s3");
+        const savedVideoUrl = await uploadFromUrl(videoUrl, "videos/generations");
+
         return NextResponse.json({
             status: "completed",
             video: {
-                url: data.video.url,
+                url: savedVideoUrl,
                 fileName: data.video.file_name || "output.mp4",
                 contentType: data.video.content_type || "video/mp4",
                 fileSize: data.video.file_size,
