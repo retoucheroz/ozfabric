@@ -59,7 +59,7 @@ import { EditItemDialog } from "@/components/photoshoot/dialogs/EditItemDialog"
 // Shared Types & Constants
 import {
     SavedPose, SavedModel, SavedBackground, SavedFit, SavedLighting, SavedShoe,
-    SavedJacket, SavedBag, SavedGlasses, SavedHat, SavedJewelry, SavedBelt, LibraryItem,
+    SavedJacket, SavedBag, SavedGlasses, SavedInnerWear, SavedHat, SavedJewelry, SavedBelt, LibraryItem,
     LIGHTING_PRESETS, BACKGROUND_PRESETS, UPPER_SHOTS, LOWER_SHOTS
 } from "@/lib/photoshoot-shared"
 
@@ -1677,6 +1677,7 @@ export default function PhotoshootPage() {
     const [savedHats, setSavedHats] = useState<SavedHat[]>([]);
     const [savedJewelry, setSavedJewelry] = useState<SavedJewelry[]>([]);
     const [savedBelts, setSavedBelts] = useState<SavedBelt[]>([]);
+    const [savedInnerWears, setSavedInnerWears] = useState<SavedInnerWear[]>([]);
     const [savedLightings, setSavedLightings] = useState<SavedLighting[]>([]);
 
     // Dialog States
@@ -1741,6 +1742,9 @@ export default function PhotoshootPage() {
 
                 const belts = await dbOperations.getAll<SavedBelt>(STORES.BELTS);
                 setSavedBelts(belts.sort((a, b) => b.createdAt - a.createdAt));
+
+                const innerWears = await dbOperations.getAll<SavedInnerWear>(STORES.INNER_WEAR);
+                setSavedInnerWears(innerWears.sort((a, b) => b.createdAt - a.createdAt));
 
             } catch (e) {
                 console.error("Failed to load libraries form DB", e);
@@ -2134,6 +2138,10 @@ export default function PhotoshootPage() {
             const updated = [newItem as SavedBelt, ...savedBelts];
             setSavedBelts(updated);
             await dbOperations.add(STORES.BELTS, newItem);
+        } else if (key === 'inner_wear') {
+            const updated = [newItem as SavedInnerWear, ...savedInnerWears];
+            setSavedInnerWears(updated);
+            await dbOperations.add(STORES.INNER_WEAR, newItem);
         }
 
         toast.success(language === "tr" ? "Öğe kütüphaneye kaydedildi" : "Item saved to library");
@@ -2180,6 +2188,10 @@ export default function PhotoshootPage() {
             const updated = savedBelts.filter(i => i.id !== id);
             setSavedBelts(updated);
             await dbOperations.delete(STORES.BELTS, id);
+        } else if (key === 'inner_wear') {
+            const updated = savedInnerWears.filter(i => i.id !== id);
+            setSavedInnerWears(updated);
+            await dbOperations.delete(STORES.INNER_WEAR, id);
         }
         toast.info(language === "tr" ? "Öğe silindi" : "Item deleted");
     };
@@ -2337,6 +2349,11 @@ export default function PhotoshootPage() {
                 const itemToUpdate = updated.find(i => i.id === id);
                 setSavedBelts(updated);
                 if (itemToUpdate) await dbOperations.add(STORES.BELTS, itemToUpdate);
+            } else if (type === 'inner_wear') {
+                const updated = savedInnerWears.map(item => item.id === id ? { ...item, thumbUrl: resizedThumb || item.thumbUrl, customPrompt: editingItemPrompt } : item);
+                const itemToUpdate = updated.find(i => i.id === id);
+                setSavedInnerWears(updated);
+                if (itemToUpdate) await dbOperations.add(STORES.INNER_WEAR, itemToUpdate);
             }
             toast.success(language === "tr" ? "Güncellendi" : "Updated");
             setEditingThumbItem(null);
@@ -2548,6 +2565,13 @@ export default function PhotoshootPage() {
     const handleSavedBeltClick = (bl: SavedBelt) => {
         setAssets(prev => ({ ...prev, belt: bl.url }));
         setAssetsHighRes(prev => ({ ...prev, belt: null }));
+    };
+
+    const handleSavedInnerWearClick = (iw: SavedInnerWear) => {
+        setAssets(prev => ({ ...prev, inner_wear: iw.url }));
+        setAssetsHighRes(prev => ({ ...prev, inner_wear: null }));
+        if (iw.customPrompt) setInnerWearDescription(iw.customPrompt);
+        else setInnerWearDescription(null);
     };
 
     const handleSavedPoseClick = (pose: SavedPose) => {
@@ -3256,6 +3280,7 @@ export default function PhotoshootPage() {
                 handleSavedHatClick={handleSavedHatClick}
                 handleSavedJewelryClick={handleSavedJewelryClick}
                 handleSavedBeltClick={handleSavedBeltClick}
+                handleSavedInnerWearClick={handleSavedInnerWearClick}
                 setAssets={setAssets}
                 setAssetsHighRes={setAssetsHighRes}
                 setLightingPositive={setLightingPositive}
@@ -3280,6 +3305,7 @@ export default function PhotoshootPage() {
                 savedHats={savedHats}
                 savedJewelry={savedJewelry}
                 savedBelts={savedBelts}
+                savedInnerWears={savedInnerWears}
                 models={models}
                 handleLibrarySelect={handleLibrarySelect}
                 sessionLibrary={sessionLibrary}

@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
             });
         }
 
-        const { ensureR2Url } = await import("@/lib/r2");
+        const { ensureR2Url } = await import("@/lib/s3");
         const [sanitizedHuman, sanitizedGarment] = await Promise.all([
             ensureR2Url(humanImage, "vton/human"),
             ensureR2Url(garmentImage, "vton/garment")
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
         // Persist to R2 if configured
         if (imageUrl && !imageUrl.includes('unsplash') && process.env.R2_BUCKET) {
             try {
-                const { uploadFromUrl } = await import("@/lib/r2");
+                const { uploadFromUrl } = await import("@/lib/s3");
                 imageUrl = await uploadFromUrl(imageUrl, "vton");
                 console.log('VTON Persisted to R2:', imageUrl);
             } catch (r2Error) {

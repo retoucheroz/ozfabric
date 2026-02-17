@@ -11,7 +11,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Image URL is required" }, { status: 400 });
         }
 
-        const { ensureR2Url } = await import("@/lib/r2");
+        const { ensureR2Url } = await import("@/lib/s3");
         console.log("Pose API: Sanitizing image URL...");
         const sanitizedUrl = await ensureR2Url(image_url, "poses/extraction");
         console.log("Pose API: Sanitized URL (length):", sanitizedUrl?.length);

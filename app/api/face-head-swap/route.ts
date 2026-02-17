@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Both images are required" }, { status: 400 });
         }
 
-        const { ensureR2Url } = await import("@/lib/r2");
+        const { ensureR2Url } = await import("@/lib/s3");
         const [sanitizedRef, sanitizedBase] = await Promise.all([
             ensureR2Url(referenceImageUrl, "face-swap/ref"),
             ensureR2Url(baseImageUrl, "face-swap/base")
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
         // Persist to R2 if configured
         if (imageUrl && process.env.R2_BUCKET) {
             try {
-                const { uploadFromUrl } = await import("@/lib/r2");
+                const { uploadFromUrl } = await import("@/lib/s3");
                 imageUrl = await uploadFromUrl(imageUrl, "face-swap");
                 console.log('FaceSwap Persisted to R2:', imageUrl);
             } catch (r2Error) {

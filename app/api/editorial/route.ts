@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
         const finalSeed = seed !== null ? Number(seed) : Math.floor(Math.random() * 1000000000);
 
         // Sanitize input image
-        const { ensureR2Url } = await import("@/lib/r2");
+        const { ensureR2Url } = await import("@/lib/s3");
         const sanitizedImage = await ensureR2Url(image, "editorial/inputs");
 
         const falPayload = {
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
         let finalUrls = falUrls;
         if (falUrls.length > 0 && process.env.R2_BUCKET) {
             try {
-                const { uploadFromUrl } = await import("@/lib/r2");
+                const { uploadFromUrl } = await import("@/lib/s3");
                 finalUrls = await Promise.all(falUrls.map((url: string) => uploadFromUrl(url, "editorial")));
                 console.log('Editorial Persisted to R2:', finalUrls);
             } catch (r2Error) {

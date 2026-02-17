@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
 
         // === R2 INPUT SANITIZATION ===
         // Ensure all input images are R2 URLs, not base64 strings
-        const { ensureR2Url } = await import("@/lib/r2");
+        const { ensureR2Url } = await import("@/lib/s3");
         const sanitizedData = await Promise.all(
             Object.entries(rawUploadedImages || {}).map(async ([key, value]) => {
                 if (typeof value === 'string' && value) {
@@ -860,7 +860,7 @@ export async function POST(req: NextRequest) {
 
             // If R2 is configured, persist the image to R2
             if (falUrl && process.env.R2_BUCKET) {
-                const { uploadFromUrl } = await import("@/lib/r2");
+                const { uploadFromUrl } = await import("@/lib/s3");
                 const r2Url = await uploadFromUrl(falUrl);
                 return r2Url;
             }

@@ -36,7 +36,7 @@ export async function PATCH(req: NextRequest) {
 
     // Handle logo upload if provided as base64
     if (updates.customLogo && updates.customLogo.startsWith('data:image')) {
-        const { ensureR2Url } = await import('@/lib/r2');
+        const { ensureR2Url } = await import('@/lib/s3');
         updates.customLogo = await ensureR2Url(updates.customLogo, 'branding/logos');
     }
 
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
 
         // Handle logo upload if provided as base64
         if (customLogo && customLogo.startsWith('data:image')) {
-            const { ensureR2Url } = await import('@/lib/r2');
+            const { ensureR2Url } = await import('@/lib/s3');
             customLogo = await ensureR2Url(customLogo, 'branding/logos');
         }
 

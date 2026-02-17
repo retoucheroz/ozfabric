@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
 
         // Add images if provided
         if (images && images.length > 0) {
-            const { ensureR2Url } = await import("@/lib/r2");
+            const { ensureR2Url } = await import("@/lib/s3");
             const imageUrls: string[] = await Promise.all(
                 images.filter(img => img && img.length > 0).map(img => ensureR2Url(img, "ecom/inputs"))
             );
@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
         let finalImageUrl = imageUrl;
         if (process.env.R2_BUCKET) {
             try {
-                const { uploadFromUrl } = await import("@/lib/r2");
+                const { uploadFromUrl } = await import("@/lib/s3");
                 finalImageUrl = await uploadFromUrl(imageUrl, "ecom");
                 console.log('Persisted to R2:', finalImageUrl);
             } catch (r2Error) {

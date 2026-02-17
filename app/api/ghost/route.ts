@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
             });
         }
 
-        const { ensureR2Url } = await import("@/lib/r2");
+        const { ensureR2Url } = await import("@/lib/s3");
         const sanitizedImages = await Promise.all(
             images.filter(Boolean).map((img: string) => ensureR2Url(img, "ghost/inputs"))
         );
@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
             // Persist to R2 if configured
             if (process.env.R2_BUCKET) {
                 try {
-                    const { uploadFromUrl } = await import("@/lib/r2");
+                    const { uploadFromUrl } = await import("@/lib/s3");
                     imageUrl = await uploadFromUrl(imageUrl, "ghost");
                     console.log('Ghost Persisted to R2:', imageUrl);
                 } catch (r2Error) {

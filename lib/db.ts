@@ -1,6 +1,6 @@
 
 const DB_NAME = 'OzFabricDB';
-const DB_VERSION = 4;
+const DB_VERSION = 5;
 
 // Store names
 export const STORES = {
@@ -16,6 +16,7 @@ export const STORES = {
     HATS: 'hats',
     JEWELRY: 'jewelry',
     BELTS: 'belts',
+    INNER_WEAR: 'inner_wear',
     PHOTOSHOOT_STATE: 'photoshoot_state'
 } as const;
 

@@ -8,7 +8,7 @@ import { TbShirt, TbHanger, TbShirtFilled, TbJacket, TbSparkles, TbDiamonds } fr
 import { PiPants, PiPantsFill, PiHandbag, PiBaseballCap, PiBelt } from "react-icons/pi"
 import { AssetCard as BaseAssetCard } from "@/components/photoshoot/AssetCard"
 import { ModelSection } from "@/components/photoshoot/ModelSection"
-import { SavedPose, SavedModel, SavedBackground, SavedFit, SavedLighting, SavedShoe, SavedJacket, SavedBag, SavedGlasses, SavedHat, SavedJewelry, SavedBelt, LIGHTING_PRESETS } from "@/lib/photoshoot-shared"
+import { SavedPose, SavedModel, SavedBackground, SavedFit, SavedLighting, SavedShoe, SavedJacket, SavedBag, SavedGlasses, SavedInnerWear, SavedHat, SavedJewelry, SavedBelt, LIGHTING_PRESETS, BACKGROUND_PRESETS } from "@/lib/photoshoot-shared"
 
 import { Dispatch, SetStateAction } from "react"
 
@@ -38,6 +38,7 @@ interface LibrarySidebarProps {
     handleSavedHatClick: (item: SavedHat) => void;
     handleSavedJewelryClick: (item: SavedJewelry) => void;
     handleSavedBeltClick: (item: SavedBelt) => void;
+    handleSavedInnerWearClick: (item: SavedInnerWear) => void;
     setAssets: Dispatch<SetStateAction<any>>;
     setAssetsHighRes: Dispatch<SetStateAction<any>>;
     setLightingPositive: (prompt: string) => void;
@@ -64,6 +65,7 @@ interface LibrarySidebarProps {
     savedHats: SavedHat[];
     savedJewelry: SavedJewelry[];
     savedBelts: SavedBelt[];
+    savedInnerWears: SavedInnerWear[];
     models: any[]; // Your user trained models
     handleLibrarySelect: (item: { src: string }, isUpload?: boolean) => void;
     sessionLibrary: string[];
@@ -93,6 +95,7 @@ export function LibrarySidebar({
     handleSavedHatClick,
     handleSavedJewelryClick,
     handleSavedBeltClick,
+    handleSavedInnerWearClick,
     setAssets,
     setAssetsHighRes,
     setLightingPositive,
@@ -117,6 +120,7 @@ export function LibrarySidebar({
     savedHats,
     savedJewelry,
     savedBelts,
+    savedInnerWears,
     models,
     handleLibrarySelect,
     sessionLibrary
@@ -280,8 +284,9 @@ export function LibrarySidebar({
                                 ) : (
                                     /* Standard or other custom tabs */
                                     <>
-                                        <TabsTrigger value="library" className="text-xs col-span-1">{language === "tr" ? "Kütüphane" : "Library"}</TabsTrigger>
-                                        <TabsTrigger value="assets" className="text-xs col-span-2">{language === "tr" ? "Yükle" : "Upload"}</TabsTrigger>
+                                        <TabsTrigger value="library" className="text-xs">{language === "tr" ? "Kütüphane" : "Library"}</TabsTrigger>
+                                        <TabsTrigger value="templates" className="text-xs">{language === "tr" ? "Şablonlar" : "Templates"}</TabsTrigger>
+                                        <TabsTrigger value="assets" className="text-xs">{language === "tr" ? "Yükle" : "Upload"}</TabsTrigger>
                                     </>
                                 )}
                             </TabsList>
@@ -340,10 +345,10 @@ export function LibrarySidebar({
                                     setAssets={setAssets}
                                     setAssetsHighRes={setAssetsHighRes}
                                 />
-                            ) : (['background', 'fit_pattern', 'shoes', 'lighting', 'jacket', 'bag', 'glasses', 'hat', 'jewelry', 'belt'].includes(internalAsset || '')) ? (
-                                <div className="space-y-4">
-                                    <div className="grid grid-cols-2 gap-2">
-                                        {(internalAsset === 'background' ? savedBackgrounds :
+                            ) : (['background', 'fit_pattern', 'inner_wear', 'shoes', 'lighting', 'jacket', 'bag', 'glasses', 'hat', 'jewelry', 'belt'].includes(internalAsset || '')) ? (
+                                <div className="space-y-4 h-[calc(100vh-280px)] flex flex-col">
+                                    <div className="grid grid-cols-2 gap-2 overflow-y-auto custom-scrollbar pr-1 pb-10">
+                                        {(internalAsset === 'background' ? [...savedBackgrounds, ...BACKGROUND_PRESETS.filter(bp => !savedBackgrounds.some(sb => sb.id === bp.id))] :
                                             internalAsset === 'fit_pattern' ? savedFits :
                                                 internalAsset === 'lighting' ? [...savedLightings, ...LIGHTING_PRESETS.filter(lp => !savedLightings.some(sl => sl.id === lp.id))] :
                                                     internalAsset === 'shoes' ? savedShoes :
@@ -353,100 +358,124 @@ export function LibrarySidebar({
                                                                     internalAsset === 'hat' ? savedHats :
                                                                         internalAsset === 'jewelry' ? savedJewelry :
                                                                             internalAsset === 'belt' ? savedBelts :
-                                                                                []).map(item => (
-                                                                                    <div key={item.id} className="group relative aspect-square rounded-lg border bg-card overflow-hidden cursor-pointer hover:ring-2 hover:ring-violet-500 transition-all">
-                                                                                        {(item.thumbUrl || item.url) ? (
-                                                                                            <img
-                                                                                                src={item.thumbUrl || item.url}
-                                                                                                className="w-full h-full object-cover"
-                                                                                                onClick={() => {
-                                                                                                    if (internalAsset === 'fit_pattern') {
-                                                                                                        handleSavedFitClick(item as SavedFit);
-                                                                                                    } else if (internalAsset === 'shoes') {
-                                                                                                        handleSavedShoeClick(item as SavedShoe);
-                                                                                                    } else if (internalAsset === 'jacket') {
-                                                                                                        handleSavedJacketClick(item as SavedJacket);
-                                                                                                    } else if (internalAsset === 'bag') {
-                                                                                                        handleSavedBagClick(item as SavedBag);
-                                                                                                    } else if (internalAsset === 'glasses') {
-                                                                                                        handleSavedGlassesClick(item as SavedGlasses);
-                                                                                                    } else if (internalAsset === 'hat') {
-                                                                                                        handleSavedHatClick(item as SavedHat);
-                                                                                                    } else if (internalAsset === 'jewelry') {
-                                                                                                        handleSavedJewelryClick(item as SavedJewelry);
-                                                                                                    } else if (internalAsset === 'belt') {
-                                                                                                        handleSavedBeltClick(item as SavedBelt);
-                                                                                                    } else if (internalAsset === 'lighting') {
-                                                                                                        const l = item as SavedLighting;
-                                                                                                        setAssets((p: any) => ({ ...p, lighting: l.url || "LIGHTING_SET" }));
-                                                                                                        setAssetsHighRes((p: any) => ({ ...p, lighting: null }));
-                                                                                                        setLightingPositive(l.positivePrompt);
-                                                                                                        setLightingNegative(l.negativePrompt);
-                                                                                                        setLightingSendImage(l.sendImageAsAsset);
-                                                                                                    } else {
-                                                                                                        setAssets((p: any) => ({ ...p, [internalAsset!]: item.url }));
-                                                                                                        setAssetsHighRes((p: any) => ({ ...p, [internalAsset!]: null }));
-                                                                                                    }
-                                                                                                    setActiveLibraryAsset(null);
-                                                                                                }}
-                                                                                            />
-                                                                                        ) : (
-                                                                                            <div
-                                                                                                className="w-full h-full flex flex-col items-center justify-center bg-[var(--bg-elevated)] text-[var(--accent-primary)] font-bold text-[10px] p-2 text-center"
-                                                                                                onClick={() => {
-                                                                                                    if (internalAsset === 'lighting') {
-                                                                                                        const l = item as SavedLighting;
-                                                                                                        setAssets((p: any) => ({ ...p, lighting: "LIGHTING_SET" }));
-                                                                                                        setAssetsHighRes((p: any) => ({ ...p, lighting: null }));
-                                                                                                        setLightingPositive(l.positivePrompt);
-                                                                                                        setLightingNegative(l.negativePrompt);
-                                                                                                        setLightingSendImage(l.sendImageAsAsset);
-                                                                                                        setActiveLibraryAsset(null);
-                                                                                                    } else if (internalAsset === 'shoes') {
-                                                                                                        handleSavedShoeClick(item as SavedShoe);
-                                                                                                        setActiveLibraryAsset(null);
-                                                                                                    } else if (internalAsset === 'jacket') {
-                                                                                                        handleSavedJacketClick(item as SavedJacket);
-                                                                                                        setActiveLibraryAsset(null);
-                                                                                                    } else if (internalAsset === 'bag') {
-                                                                                                        handleSavedBagClick(item as SavedBag);
-                                                                                                        setActiveLibraryAsset(null);
-                                                                                                    } else if (internalAsset === 'glasses') {
-                                                                                                        handleSavedGlassesClick(item as SavedGlasses);
-                                                                                                        setActiveLibraryAsset(null);
-                                                                                                    } else if (internalAsset === 'hat') {
-                                                                                                        handleSavedHatClick(item as SavedHat);
-                                                                                                        setActiveLibraryAsset(null);
-                                                                                                    } else if (internalAsset === 'jewelry') {
-                                                                                                        handleSavedJewelryClick(item as SavedJewelry);
-                                                                                                        setActiveLibraryAsset(null);
-                                                                                                    } else if (internalAsset === 'belt') {
-                                                                                                        handleSavedBeltClick(item as SavedBelt);
-                                                                                                        setActiveLibraryAsset(null);
-                                                                                                    }
-                                                                                                }}
-                                                                                            >
-                                                                                                <Camera size={20} className="mb-1 opacity-50" />
-                                                                                                {item.name}
+                                                                                internalAsset === 'inner_wear' ? savedInnerWears :
+                                                                                    []).map((item: any) => {
+                                                                                        const isPreset = internalAsset === 'lighting' ? LIGHTING_PRESETS.some(lp => lp.id === item.id) :
+                                                                                            internalAsset === 'background' ? BACKGROUND_PRESETS.some(bp => bp.id === item.id) : false;
+                                                                                        const thumbToShow = internalAsset === 'background' && isPreset ? (item.preview || item.color) : (item.thumbUrl || item.url);
+
+                                                                                        return (
+                                                                                            <div key={item.id} className="group relative aspect-square rounded-lg border bg-card overflow-hidden cursor-pointer hover:ring-2 hover:ring-violet-500 transition-all">
+                                                                                                {thumbToShow ? (
+                                                                                                    (internalAsset === 'background' && isPreset && item.color) ? (
+                                                                                                        <div
+                                                                                                            className="w-full h-full"
+                                                                                                            style={{ background: item.color }}
+                                                                                                            onClick={() => {
+                                                                                                                setAssets((p: any) => ({ ...p, background: item.color }));
+                                                                                                                setActiveLibraryAsset(null);
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    ) : (
+                                                                                                        <img
+                                                                                                            src={thumbToShow}
+                                                                                                            className="w-full h-full object-cover"
+                                                                                                            onClick={() => {
+                                                                                                                if (internalAsset === 'fit_pattern') {
+                                                                                                                    handleSavedFitClick(item as SavedFit);
+                                                                                                                } else if (internalAsset === 'shoes') {
+                                                                                                                    handleSavedShoeClick(item as SavedShoe);
+                                                                                                                } else if (internalAsset === 'jacket') {
+                                                                                                                    handleSavedJacketClick(item as SavedJacket);
+                                                                                                                } else if (internalAsset === 'bag') {
+                                                                                                                    handleSavedBagClick(item as SavedBag);
+                                                                                                                } else if (internalAsset === 'glasses') {
+                                                                                                                    handleSavedGlassesClick(item as SavedGlasses);
+                                                                                                                } else if (internalAsset === 'hat') {
+                                                                                                                    handleSavedHatClick(item as SavedHat);
+                                                                                                                } else if (internalAsset === 'jewelry') {
+                                                                                                                    handleSavedJewelryClick(item as SavedJewelry);
+                                                                                                                } else if (internalAsset === 'belt') {
+                                                                                                                    handleSavedBeltClick(item as SavedBelt);
+                                                                                                                } else if (internalAsset === 'inner_wear') {
+                                                                                                                    handleSavedInnerWearClick(item as SavedInnerWear);
+                                                                                                                } else if (internalAsset === 'lighting') {
+                                                                                                                    const l = item as SavedLighting;
+                                                                                                                    setAssets((p: any) => ({ ...p, lighting: l.url || "LIGHTING_SET" }));
+                                                                                                                    setAssetsHighRes((p: any) => ({ ...p, lighting: null }));
+                                                                                                                    setLightingPositive(l.positivePrompt);
+                                                                                                                    setLightingNegative(l.negativePrompt);
+                                                                                                                    setLightingSendImage(l.sendImageAsAsset);
+                                                                                                                } else if (internalAsset === 'background' && isPreset) {
+                                                                                                                    setAssets((p: any) => ({ ...p, background: item.preview }));
+                                                                                                                } else {
+                                                                                                                    setAssets((p: any) => ({ ...p, [internalAsset!]: item.url }));
+                                                                                                                    setAssetsHighRes((p: any) => ({ ...p, [internalAsset!]: null }));
+                                                                                                                }
+                                                                                                                setActiveLibraryAsset(null);
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    )
+                                                                                                ) : (
+                                                                                                    <div
+                                                                                                        className="w-full h-full flex flex-col items-center justify-center bg-[var(--bg-elevated)] text-[var(--accent-primary)] font-bold text-[10px] p-2 text-center"
+                                                                                                        onClick={() => {
+                                                                                                            if (internalAsset === 'lighting') {
+                                                                                                                const l = item as SavedLighting;
+                                                                                                                setAssets((p: any) => ({ ...p, lighting: "LIGHTING_SET" }));
+                                                                                                                setAssetsHighRes((p: any) => ({ ...p, lighting: null }));
+                                                                                                                setLightingPositive(l.positivePrompt);
+                                                                                                                setLightingNegative(l.negativePrompt);
+                                                                                                                setLightingSendImage(l.sendImageAsAsset);
+                                                                                                                setActiveLibraryAsset(null);
+                                                                                                            } else if (internalAsset === 'shoes') {
+                                                                                                                handleSavedShoeClick(item as SavedShoe);
+                                                                                                                setActiveLibraryAsset(null);
+                                                                                                            } else if (internalAsset === 'jacket') {
+                                                                                                                handleSavedJacketClick(item as SavedJacket);
+                                                                                                                setActiveLibraryAsset(null);
+                                                                                                            } else if (internalAsset === 'bag') {
+                                                                                                                handleSavedBagClick(item as SavedBag);
+                                                                                                                setActiveLibraryAsset(null);
+                                                                                                            } else if (internalAsset === 'glasses') {
+                                                                                                                handleSavedGlassesClick(item as SavedGlasses);
+                                                                                                                setActiveLibraryAsset(null);
+                                                                                                            } else if (internalAsset === 'hat') {
+                                                                                                                handleSavedHatClick(item as SavedHat);
+                                                                                                                setActiveLibraryAsset(null);
+                                                                                                            } else if (internalAsset === 'jewelry') {
+                                                                                                                handleSavedJewelryClick(item as SavedJewelry);
+                                                                                                                setActiveLibraryAsset(null);
+                                                                                                            } else if (internalAsset === 'belt') {
+                                                                                                                handleSavedBeltClick(item as SavedBelt);
+                                                                                                                setActiveLibraryAsset(null);
+                                                                                                            } else if (internalAsset === 'inner_wear') {
+                                                                                                                handleSavedInnerWearClick(item as SavedInnerWear);
+                                                                                                                setActiveLibraryAsset(null);
+                                                                                                            }
+                                                                                                        }}
+                                                                                                    >
+                                                                                                        <Camera size={20} className="mb-1 opacity-50" />
+                                                                                                        {item.name || item.labelTr || item.label}
+                                                                                                    </div>
+                                                                                                )}
+                                                                                                <div className="absolute bottom-0 inset-x-0 p-1 bg-black/60 text-[9px] text-white truncate">{item.name || item.labelTr || item.label}</div>
+                                                                                                <div className="absolute top-1 right-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                                                    {!isPreset ? (
+                                                                                                        <>
+                                                                                                            <button onClick={(e) => { e.stopPropagation(); deleteSavedAsset(internalAsset!, item.id); }} className="p-1 bg-red-500 text-white rounded hover:bg-red-600"><X size={10} /></button>
+                                                                                                            <button onClick={(e) => { e.stopPropagation(); handleEditItemClick(internalAsset!, item.id); }} className="p-1 bg-[var(--accent-primary)] text-white rounded hover:bg-[var(--accent-hover)]"><Edit2 size={10} /></button>
+                                                                                                        </>
+                                                                                                    ) : (
+                                                                                                        (internalAsset === 'lighting' || internalAsset === 'shoes' || internalAsset === 'fit_pattern' || internalAsset === 'jacket' || internalAsset === 'bag' || internalAsset === 'glasses' || internalAsset === 'hat' || internalAsset === 'jewelry' || internalAsset === 'belt' || internalAsset === 'inner_wear') && (
+                                                                                                            <button onClick={(e) => { e.stopPropagation(); handleEditItemClick(internalAsset!, item.id); }} className="p-1 bg-[var(--accent-primary)] text-white rounded hover:bg-[var(--accent-hover)]"><Edit2 size={10} /></button>
+                                                                                                        )
+                                                                                                    )}
+                                                                                                </div>
                                                                                             </div>
-                                                                                        )}
-                                                                                        <div className="absolute bottom-0 inset-x-0 p-1 bg-black/60 text-[9px] text-white truncate">{item.name}</div>
-                                                                                        <div className="absolute top-1 right-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                                            {/* Presets (static ones) are NOT deletable, but they ARE editable now */}
-                                                                                            {(!LIGHTING_PRESETS.some(lp => lp.id === item.id)) ? (
-                                                                                                <>
-                                                                                                    <button onClick={(e) => { e.stopPropagation(); deleteSavedAsset(internalAsset!, item.id); }} className="p-1 bg-red-500 text-white rounded hover:bg-red-600"><X size={10} /></button>
-                                                                                                    <button onClick={(e) => { e.stopPropagation(); handleEditItemClick(internalAsset!, item.id); }} className="p-1 bg-[var(--accent-primary)] text-white rounded hover:bg-[var(--accent-hover)]"><Edit2 size={10} /></button>
-                                                                                                </>
-                                                                                            ) : (
-                                                                                                (internalAsset === 'lighting' || internalAsset === 'shoes') && (
-                                                                                                    <button onClick={(e) => { e.stopPropagation(); handleEditItemClick(internalAsset!, item.id); }} className="p-1 bg-[var(--accent-primary)] text-white rounded hover:bg-[var(--accent-hover)]"><Edit2 size={10} /></button>
-                                                                                                )
-                                                                                            )}
-                                                                                        </div>
-                                                                                    </div>
-                                                                                ))}
-                                        {(internalAsset === 'background' ? savedBackgrounds :
+                                                                                        );
+                                                                                    })}
+                                        {(internalAsset === 'background' ? [...savedBackgrounds, ...BACKGROUND_PRESETS.filter(bp => !savedBackgrounds.some(sb => sb.id === bp.id))] :
                                             internalAsset === 'fit_pattern' ? savedFits :
                                                 internalAsset === 'lighting' ? [...savedLightings, ...LIGHTING_PRESETS.filter(lp => !savedLightings.some(sl => sl.id === lp.id))] :
                                                     internalAsset === 'shoes' ? savedShoes :
@@ -456,13 +485,14 @@ export function LibrarySidebar({
                                                                     internalAsset === 'hat' ? savedHats :
                                                                         internalAsset === 'jewelry' ? savedJewelry :
                                                                             internalAsset === 'belt' ? savedBelts :
-                                                                                []).length === 0 && (
+                                                                                internalAsset === 'inner_wear' ? savedInnerWears :
+                                                                                    []).length === 0 && (
                                                 <div className="col-span-2 text-center text-[10px] text-[var(--text-muted)] py-10 bg-[var(--bg-surface)] border border-dashed border-[var(--border-subtle)] rounded-lg">No saved items.</div>
                                             )}
                                     </div>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-2 gap-2">
+                                <div className="grid grid-cols-2 gap-2 overflow-y-auto max-h-[calc(100vh-320px)] custom-scrollbar pr-1">
                                     {sessionLibrary.map((item, idx) => (
                                         <div key={idx} onClick={() => handleLibrarySelect({ src: item })} className="aspect-[3/4] rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-elevated)] overflow-hidden cursor-pointer hover:ring-2 hover:ring-[var(--accent-primary)] transition-all">
                                             <img src={item} className="w-full h-full object-cover" />
@@ -553,8 +583,9 @@ export function LibrarySidebar({
                             )}
                         </TabsContent>
                     </Tabs>
-                </div>
-            )}
-        </div>
+                </div >
+            )
+            }
+        </div >
     );
 }

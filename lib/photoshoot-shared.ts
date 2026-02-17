@@ -58,6 +58,7 @@ export interface SavedLighting extends LibraryItem {
 export interface SavedJacket extends LibraryItem { customPrompt?: string; }
 export interface SavedBag extends LibraryItem { customPrompt?: string; }
 export interface SavedGlasses extends LibraryItem { customPrompt?: string; }
+export interface SavedInnerWear extends LibraryItem { customPrompt?: string; }
 export interface SavedHat extends LibraryItem { customPrompt?: string; }
 export interface SavedJewelry extends LibraryItem { customPrompt?: string; }
 export interface SavedBelt extends LibraryItem { customPrompt?: string; }
