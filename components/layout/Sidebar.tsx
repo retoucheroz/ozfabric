@@ -117,6 +117,12 @@ export function Sidebar({ variant = "default" }: SidebarProps) {
         { label: t("sidebar.techPack"), href: '/studio', icon: TbClipboardText },
     ].filter(item => isAuthorized(item.href));
 
+    // TASARIM Group
+    const designItems = [
+        { label: t("sidebar.sketch"), href: '/sketch', icon: TbWand },
+        { label: t("sidebar.patterns"), href: '/design/patterns', icon: TbRotate360 },
+    ].filter(item => isAuthorized(item.href));
+
     // Bottom Items
     const bottomItems = [
         { label: t("sidebar.history"), href: '/history', icon: TbHistory },
@@ -200,6 +206,14 @@ export function Sidebar({ variant = "default" }: SidebarProps) {
             <div className="space-y-0.5">
                 {mainItems.map(renderItem)}
                 {adminItems.map(renderItem)}
+            </div>
+
+            {/* TASARIM */}
+            <div>
+                {renderGroupHeader(t("sidebar.design"))}
+                <div className="space-y-0.5">
+                    {designItems.map(renderItem)}
+                </div>
             </div>
 
             {/* STÜDYO */}
