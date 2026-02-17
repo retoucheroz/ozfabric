@@ -20,6 +20,7 @@ export interface DbUser {
     custom_title: string | null;
     custom_logo: string | null;
     auth_type: string | null;
+    avatar_url: string | null;
 }
 
 export async function getUserByEmail(email: string): Promise<DbUser | null> {
@@ -27,10 +28,10 @@ export async function getUserByEmail(email: string): Promise<DbUser | null> {
     return result[0] as DbUser || null;
 }
 
-export async function createUser(email: string, name: string | null, passwordHash: string | null, role: string = 'user', authType: string = 'credentials'): Promise<DbUser> {
+export async function createUser(email: string, name: string | null, passwordHash: string | null, role: string = 'user', authType: string = 'credentials', avatarUrl: string | null = null): Promise<DbUser> {
     const result = await sql`
-        INSERT INTO users (email, name, password_hash, role, credits, auth_type)
-        VALUES (${email}, ${name}, ${passwordHash}, ${role}, 0, ${authType})
+        INSERT INTO users (email, name, password_hash, role, credits, auth_type, avatar_url)
+        VALUES (${email}, ${name}, ${passwordHash}, ${role}, 0, ${authType}, ${avatarUrl})
         RETURNING *
     `;
     return result[0] as DbUser;
@@ -140,6 +141,7 @@ export async function updateUser(email: string, updates: {
     custom_title?: string;
     custom_logo?: string;
     auth_type?: string;
+    avatar_url?: string | null;
 }): Promise<DbUser | null> {
     const result = await sql`
         UPDATE users 
@@ -151,6 +153,7 @@ export async function updateUser(email: string, updates: {
             custom_title = COALESCE(${updates.custom_title ?? null}, custom_title),
             custom_logo = COALESCE(${updates.custom_logo ?? null}, custom_logo),
             auth_type = COALESCE(${updates.auth_type ?? null}, auth_type),
+            avatar_url = COALESCE(${updates.avatar_url ?? null}, avatar_url),
             updated_at = CURRENT_TIMESTAMP
         WHERE email = ${email}
         RETURNING *

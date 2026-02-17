@@ -20,6 +20,7 @@ export interface User {
     createdAt?: number;
     lastLogin?: number;
     authType?: 'credentials' | 'google';
+    avatar?: string;
 }
 
 export interface Session {

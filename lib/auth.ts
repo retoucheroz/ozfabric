@@ -31,6 +31,7 @@ function dbUserToUser(dbUser: DbUser): User {
         customTitle: dbUser.custom_title || undefined,
         customLogo: dbUser.custom_logo || undefined,
         authType: (dbUser.auth_type || 'credentials') as 'credentials' | 'google',
+        avatar: dbUser.avatar_url || undefined,
     };
 }
 
@@ -67,6 +68,7 @@ export async function saveUser(user: User): Promise<void> {
                 custom_title: user.customTitle,
                 custom_logo: user.customLogo,
                 auth_type: user.authType,
+                avatar_url: user.avatar,
             });
         } else {
             await createUser(
@@ -74,7 +76,8 @@ export async function saveUser(user: User): Promise<void> {
                 user.name || null,
                 user.passwordHash || null,
                 user.role || 'user',
-                user.authType || 'credentials'
+                user.authType || 'credentials',
+                user.avatar || null
             );
         }
         console.log(`💾 Auth: saveUser(${user.username})`);
@@ -159,6 +162,7 @@ export async function getAllUsers(): Promise<Omit<User, 'passwordHash'>[]> {
             customTitle: u.custom_title || undefined,
             customLogo: u.custom_logo || undefined,
             authType: (u.auth_type || 'credentials') as 'credentials' | 'google',
+            avatar: u.avatar_url || undefined,
         }));
     } catch (e) {
         console.error('getAllUsers Error:', e);

@@ -37,25 +37,48 @@ export async function GET(req: NextRequest) {
         let user = await getUser(googleUser.email);
 
         if (!user) {
-            // Create new Google user
+            // Create new Google user with ALL pages enabled
             user = {
                 username: googleUser.email,
                 email: googleUser.email,
                 name: googleUser.name,
-                passwordHash: '', // No password for Google users
+                passwordHash: '',
                 role: 'user',
                 status: 'active',
-                authorizedPages: ['/home', '/photoshoot'],
-                credits: 1000, // Starting credits for new Google users
+                authorizedPages: [
+                    '/home',
+                    '/photoshoot',
+                    'photoshoot:batch',
+                    '/try-on',
+                    '/editorial',
+                    '/video',
+                    '/face-head-swap',
+                    '/ecom',
+                    '/analysis',
+                    '/studio',
+                    '/train',
+                    '/ghost',
+                    '/patterns',
+                    '/sketch'
+                ],
+                credits: 1000,
                 authType: 'google',
+                avatar: googleUser.picture, // Google avatar
                 createdAt: Date.now(),
             };
             await saveUser(user);
-        } else if (user.authType !== 'google' && !user.passwordHash) {
-            // Link existing user if they don't have a password but were placeholder
-            user.authType = 'google';
-            user.name = googleUser.name || user.name;
-            await saveUser(user);
+        } else {
+            // Update existing user with Google data if it's a google login
+            let changed = false;
+            if (!user.avatar && googleUser.picture) {
+                user.avatar = googleUser.picture;
+                changed = true;
+            }
+            if (user.authType !== 'google') {
+                user.authType = 'google';
+                changed = true;
+            }
+            if (changed) await saveUser(user);
         }
 
         // Create session

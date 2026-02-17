@@ -186,16 +186,16 @@ export function TopNav() {
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Avatar className="w-9 h-9 border cursor-pointer hover:ring-2 ring-violet-500 transition-all">
-                                    <AvatarImage src="https://github.com/shadcn.png" />
-                                    <AvatarFallback>RO</AvatarFallback>
+                                    <AvatarImage src={user?.avatar} />
+                                    <AvatarFallback>{user?.name?.substring(0, 2).toUpperCase() || user?.username?.substring(0, 2).toUpperCase() || "RO"}</AvatarFallback>
                                 </Avatar>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-64">
                                 {/* User Info */}
                                 <DropdownMenuLabel className="font-normal">
                                     <div className="flex flex-col space-y-1">
-                                        <p className="text-sm font-medium leading-none">rawless Designer</p>
-                                        <p className="text-xs leading-none text-muted-foreground">designer@rawless.ai</p>
+                                        <p className="text-sm font-medium leading-none">{user?.name || user?.username || "RetoucherOZ"}</p>
+                                        <p className="text-xs leading-none text-muted-foreground">{user?.email || user?.username}</p>
                                     </div>
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />

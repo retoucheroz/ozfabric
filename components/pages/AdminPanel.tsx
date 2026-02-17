@@ -36,6 +36,9 @@ const AVAILABLE_PAGES = [
     { label: 'Analysis', path: '/analysis' },
     { label: 'Studio (Tech Pack)', path: '/studio' },
     { label: 'Train', path: '/train' },
+    { label: 'Ghost Mannequin', path: '/ghost' },
+    { label: 'Sketch to Photo', path: '/sketch' },
+    { label: 'Patterns', path: '/patterns' },
 ];
 
 const getAdminHeaders = () => {
@@ -207,12 +210,12 @@ export default function AdminPanel() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {users.map((user) => (
-                    <Card key={user.username} className={`border-2 transition-all ${user.status === 'pending' ? 'border-amber-500/30' : 'border-muted'}`}>
+                    <Card key={user.username} className={`border-2 transition-all flex flex-col min-w-0 ${user.status === 'pending' ? 'border-amber-500/30' : 'border-muted'}`}>
                         <CardHeader className="pb-2">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <div className={`w-2 h-2 rounded-full ${onlineStats.users.includes(user.username) ? 'bg-green-500 animate-pulse' : 'bg-muted'}`} />
-                                    <CardTitle className="text-lg">{user.username}</CardTitle>
+                                    <CardTitle className="text-sm font-black break-all flex-1">{user.username}</CardTitle>
                                     <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>{user.role}</Badge>
                                     {user.authType === 'google' && (
                                         <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-500/20 gap-1">
@@ -383,7 +386,7 @@ export default function AdminPanel() {
                                 <Label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
                                     <Layout className="w-3 h-3" /> {t('admin.authorizedPages')}
                                 </Label>
-                                <div className="grid grid-cols-1 gap-1 border rounded-xl p-3 bg-muted/20 max-h-[160px] overflow-y-auto custom-scrollbar">
+                                <div className="grid grid-cols-1 gap-1 border rounded-xl p-3 bg-muted/20 max-h-[300px] overflow-y-auto custom-scrollbar">
                                     {user.authorizedPages?.includes('*') ? (
                                         <div className="text-[10px] font-bold text-violet-500 flex items-center gap-2 py-1">
                                             <Shield className="w-3 h-3" /> FULL SYSTEM ACCESS (ADMIN)

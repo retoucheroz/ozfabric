@@ -31,12 +31,35 @@ function SettingsContent() {
     const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
     const [mounted, setMounted] = useState(false);
     const [ozzieEnabled, setOzzieEnabled] = useState(false);
+    const [user, setUser] = useState<{
+        name?: string,
+        email?: string,
+        username?: string,
+        role?: string,
+        avatar?: string,
+        createdAt?: number
+    } | null>(null);
+
+    const fetchSession = async () => {
+        try {
+            const res = await fetch('/api/auth/session');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.authenticated) {
+                    setUser(data.user);
+                }
+            }
+        } catch (e) {
+            console.error("Session fetch failed", e);
+        }
+    };
 
     useEffect(() => {
         setMounted(true);
 
         const ozzieStored = localStorage.getItem("ozzie-chat-enabled");
         setOzzieEnabled(ozzieStored === "true");
+        fetchSession();
 
         // Sync section with URL if it changes
         const tab = searchParams.get("tab") as SettingsSection;
@@ -107,19 +130,47 @@ function SettingsContent() {
 
                                 <div className="flex flex-col sm:flex-row items-center gap-6 relative z-10">
                                     <div className="relative group">
-                                        <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-[var(--accent-primary)] to-violet-600 flex items-center justify-center text-white text-3xl font-black shadow-2xl shadow-[var(--accent-primary)]/20 group-hover:scale-105 transition-transform duration-500">
-                                            RO
+                                        <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-[var(--accent-primary)] to-violet-600 flex items-center justify-center text-white text-3xl font-black shadow-2xl shadow-[var(--accent-primary)]/20 overflow-hidden group-hover:scale-105 transition-transform duration-500">
+                                            {user?.avatar ? (
+                                                <img src={user.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                                            ) : (
+                                                user?.name?.substring(0, 2).toUpperCase() || (user?.email?.substring(0, 2).toUpperCase() || 'RO')
+                                            )}
                                         </div>
-                                        <Button size="icon" variant="ghost" className="absolute -bottom-2 -right-2 w-8 h-8 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] shadow-lg hover:text-[var(--accent-primary)] transition-all">
-                                            <LogOut className="w-4 h-4 rotate-90" />
-                                        </Button>
+                                        <label className="absolute -bottom-2 -right-2 w-8 h-8 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] shadow-lg hover:text-[var(--accent-primary)] flex items-center justify-center cursor-pointer transition-all active:scale-90">
+                                            <Bot className="w-4 h-4" />
+                                            <input
+                                                type="file"
+                                                className="hidden"
+                                                accept="image/*"
+                                                onChange={async (e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (!file) return;
+                                                    const reader = new FileReader();
+                                                    reader.onload = async (ev) => {
+                                                        const base64 = ev.target?.result as string;
+                                                        // Update avatar local state
+                                                        setUser(prev => prev ? { ...prev, avatar: base64 } : null);
+                                                    };
+                                                    reader.readAsDataURL(file);
+                                                }}
+                                            />
+                                        </label>
                                     </div>
                                     <div className="flex-1 text-center sm:text-left">
-                                        <div className="text-xl font-black uppercase italic tracking-tight text-[var(--text-primary)]">Retoucheroz Designer</div>
-                                        <div className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest">designer@retoucheroz.ai</div>
+                                        <div className="text-xl font-black uppercase italic tracking-tight text-[var(--text-primary)]">
+                                            {user?.name || user?.username || t("common.user")}
+                                        </div>
+                                        <div className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest">
+                                            {user?.email || user?.username}
+                                        </div>
                                         <div className="mt-3 flex flex-wrap justify-center sm:justify-start gap-2">
-                                            <Badge variant="outline" className="border-[var(--accent-primary)]/20 text-[var(--accent-primary)] bg-[var(--accent-soft)] text-[9px] font-black uppercase tracking-widest">PRO PLAN</Badge>
-                                            <Badge variant="outline" className="border-[var(--border-subtle)] text-[var(--text-muted)] bg-[var(--bg-surface)] text-[9px] font-black uppercase tracking-widest">EST. 2025</Badge>
+                                            <Badge variant="outline" className="border-[var(--accent-primary)]/20 text-[var(--accent-primary)] bg-[var(--accent-soft)] text-[9px] font-black uppercase tracking-widest">
+                                                {user?.role === 'admin' ? 'ADMIN PLAN' : 'FREE PLAN'}
+                                            </Badge>
+                                            <Badge variant="outline" className="border-[var(--border-subtle)] text-[var(--text-muted)] bg-[var(--bg-surface)] text-[9px] font-black uppercase tracking-widest">
+                                                EST. {user?.createdAt ? new Date(user.createdAt).getFullYear() : 2025}
+                                            </Badge>
                                         </div>
                                     </div>
                                     <Button variant="outline" className="rounded-xl border-[var(--border-subtle)] font-black uppercase tracking-widest text-[10px] h-10 px-6 hover:bg-[var(--accent-soft)] hover:text-[var(--accent-primary)] transition-all shrink-0">
@@ -133,28 +184,46 @@ function SettingsContent() {
                                     <div className="space-y-2">
                                         <Label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest px-1">{t("settings.fullName")}</Label>
                                         <Input
-                                            defaultValue="Retoucheroz Designer"
+                                            id="settings-name"
+                                            defaultValue={user?.name || ""}
+                                            key={user?.name}
                                             className="h-12 bg-[var(--bg-surface)] border-[var(--border-subtle)] rounded-2xl px-4 font-bold focus:ring-1 focus:ring-[var(--accent-primary)]/30 text-[var(--text-primary)]"
                                         />
                                     </div>
                                     <div className="space-y-2">
                                         <Label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest px-1">{t("settings.email")}</Label>
                                         <Input
-                                            defaultValue="designer@retoucheroz.ai"
-                                            className="h-12 bg-[var(--bg-surface)] border-[var(--border-subtle)] rounded-2xl px-4 font-bold focus:ring-1 focus:ring-[var(--accent-primary)]/30 text-[var(--text-primary)]"
+                                            defaultValue={user?.email || ""}
+                                            key={user?.email}
+                                            disabled
+                                            className="h-12 bg-[var(--bg-surface)] border-[var(--border-subtle)] rounded-2xl px-4 font-bold opacity-50 text-[var(--text-primary)]"
                                         />
                                     </div>
                                 </div>
+                                <Button
+                                    className="w-full sm:w-auto h-12 px-10 bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-hover)] font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-[var(--accent-primary)]/20 transition-all active:scale-95 text-xs"
+                                    onClick={async () => {
+                                        const nameInput = document.getElementById('settings-name') as HTMLInputElement;
+                                        const name = nameInput.value;
+                                        const avatar = user?.avatar;
 
-                                <div className="space-y-2">
-                                    <Label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest px-1">{t("settings.company")}</Label>
-                                    <Input
-                                        placeholder={t("settings.company")}
-                                        className="h-12 bg-[var(--bg-surface)] border-[var(--border-subtle)] rounded-2xl px-4 font-bold focus:ring-1 focus:ring-[var(--accent-primary)]/30 text-[var(--text-primary)]"
-                                    />
-                                </div>
-
-                                <Button className="w-full sm:w-auto h-12 px-10 bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-hover)] font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-[var(--accent-primary)]/20 transition-all active:scale-95 text-xs">
+                                        try {
+                                            const res = await fetch('/api/user/profile', {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({ name, avatar })
+                                            });
+                                            if (res.ok) {
+                                                toast.success(t("settings.saveSuccess") || "Değişiklikler kaydedildi.");
+                                                fetchSession();
+                                            } else {
+                                                toast.error("Hata oluştu.");
+                                            }
+                                        } catch (e) {
+                                            toast.error("Hata oluştu.");
+                                        }
+                                    }}
+                                >
                                     {t("settings.saveChanges")}
                                 </Button>
                             </Card>
@@ -430,7 +499,7 @@ function SettingsContent() {
                     }
                 `}</style>
             </div>
-        </div>
+        </div >
     )
 }
 
