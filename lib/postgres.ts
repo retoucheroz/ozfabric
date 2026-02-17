@@ -12,6 +12,9 @@ export interface DbUser {
     created_at: Date;
     updated_at: Date;
     status: string;
+    authorized_pages: string[] | null;
+    custom_title: string | null;
+    custom_logo: string | null;
 }
 
 export async function getUserByEmail(email: string): Promise<DbUser | null> {
@@ -118,6 +121,30 @@ export async function updateUserStatus(email: string, status: string): Promise<D
     const result = await sql`
         UPDATE users 
         SET status = ${status}, updated_at = CURRENT_TIMESTAMP
+        WHERE email = ${email}
+        RETURNING *
+    `;
+    return result[0] as DbUser || null;
+}
+
+export async function updateUser(email: string, updates: {
+    credits?: number;
+    role?: string;
+    status?: string;
+    authorized_pages?: string[];
+    custom_title?: string;
+    custom_logo?: string;
+}): Promise<DbUser | null> {
+    const result = await sql`
+        UPDATE users 
+        SET 
+            credits = COALESCE(${updates.credits ?? null}, credits),
+            role = COALESCE(${updates.role ?? null}, role),
+            status = COALESCE(${updates.status ?? null}, status),
+            authorized_pages = COALESCE(${updates.authorized_pages ?? null}, authorized_pages),
+            custom_title = COALESCE(${updates.custom_title ?? null}, custom_title),
+            custom_logo = COALESCE(${updates.custom_logo ?? null}, custom_logo),
+            updated_at = CURRENT_TIMESTAMP
         WHERE email = ${email}
         RETURNING *
     `;

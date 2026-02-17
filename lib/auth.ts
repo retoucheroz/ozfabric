@@ -4,7 +4,7 @@ import { hashPassword, comparePasswords } from '@/lib/crypto';
 import { 
     getUserByEmail, 
     createUser, 
-    updateUserCredits, 
+    updateUser,
     getAllUsers as pgGetAllUsers, 
     deleteUserByEmail, 
     DbUser,
@@ -16,9 +16,8 @@ import {
 const SESSION_COOKIE_NAME = 'ozfabric_session';
 const SESSION_TTL = 60 * 60 * 24 * 7; // 1 week
 
-export const isKvActive = true; // Keep for compatibility
+export const isKvActive = true;
 
-// Convert DbUser to User format
 function dbUserToUser(dbUser: DbUser): User {
     return {
         username: dbUser.email,
@@ -27,8 +26,10 @@ function dbUserToUser(dbUser: DbUser): User {
         passwordHash: dbUser.password_hash || '',
         role: dbUser.role as 'admin' | 'user',
         credits: dbUser.credits,
-        authorizedPages: dbUser.role === "admin" ? ["*"] : undefined,
-        status: (dbUser.status || "active") as "active" | "pending" | "disabled",
+        status: (dbUser.status || 'active') as 'active' | 'pending' | 'disabled',
+        authorizedPages: dbUser.authorized_pages || [],
+        customTitle: dbUser.custom_title || undefined,
+        customLogo: dbUser.custom_logo || undefined,
     };
 }
 
@@ -57,7 +58,14 @@ export async function saveUser(user: User): Promise<void> {
         const existingUser = await getUserByEmail(user.username);
         
         if (existingUser) {
-            await updateUserCredits(user.username, user.credits || 0);
+            await updateUser(user.username, {
+                credits: user.credits,
+                role: user.role,
+                status: user.status,
+                authorized_pages: user.authorizedPages,
+                custom_title: user.customTitle,
+                custom_logo: user.customLogo,
+            });
         } else {
             await createUser(
                 user.username,
@@ -99,7 +107,7 @@ export async function getSession(): Promise<Session | null> {
 
         const dbSession = await getDbSession(sessionId);
         if (!dbSession) {
-            console.log(`🔑 Auth: getSession(${sessionId}) -> NULL (not found or expired)`);
+            console.log(`🔑 Auth: getSession(${sessionId}) -> NULL`);
             return null;
         }
         
@@ -131,7 +139,6 @@ export async function logout() {
 }
 
 export async function getOnlineUsers(): Promise<string[]> {
-    // For now, return empty - can implement with heartbeat table later
     return [];
 }
 
@@ -144,7 +151,10 @@ export async function getAllUsers(): Promise<Omit<User, 'passwordHash'>[]> {
             name: u.name || undefined,
             role: (u.role === 'admin' ? 'admin' : 'user') as 'admin' | 'user',
             credits: u.credits,
-            authorizedPages: u.role === 'admin' ? ['*'] : undefined,
+            status: (u.status || 'active') as 'active' | 'pending' | 'disabled',
+            authorizedPages: u.authorized_pages || [],
+            customTitle: u.custom_title || undefined,
+            customLogo: u.custom_logo || undefined,
         }));
     } catch (e) {
         console.error('getAllUsers Error:', e);
