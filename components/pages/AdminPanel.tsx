@@ -235,7 +235,7 @@ export default function AdminPanel() {
                                 </div>
                             </div>
                             <CardDescription className="text-[10px] uppercase font-bold tracking-wider">
-                                Joined: {new Date(user.createdAt).toLocaleDateString()}
+                                Joined: {new Date(user.createdAt || Date.now()).toLocaleDateString()}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-5">
