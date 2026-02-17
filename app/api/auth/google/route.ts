@@ -1,10 +1,15 @@
 import { NextResponse } from 'next/server';
 import { OAuth2Client } from 'google-auth-library';
 
-export async function GET() {
+export async function GET(req: any) {
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-    const redirectUri = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/auth/google/callback`;
+
+    // Auto-detect host if NEXT_PUBLIC_APP_URL is missing
+    const host = req.headers.get('host');
+    const protocol = host?.includes('localhost') ? 'http' : 'https';
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
+    const redirectUri = `${appUrl}/api/auth/google/callback`;
 
     if (!clientId || !clientSecret) {
         return NextResponse.json({ error: 'Google Auth not configured' }, { status: 500 });
