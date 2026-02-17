@@ -21,7 +21,11 @@ export interface BatchSpec {
     excludeAllAccessories?: boolean; // Strip ALL accessories (belt, bag, hat, glasses, jewelry) from API & prompt
     enableWind?: boolean; // Subtle airflow toggle
     isStyling?: boolean; // Flag to identify styling shots
-    includeGlasses?: boolean; // Only include glasses for specific shots
+    includeGlasses?: boolean; // Include glasses for this shot
+    includeBag?: boolean; // Include bag for this shot
+    includeHat?: boolean; // Include hat for this shot
+    includeJewelry?: boolean; // Include jewelry for this shot
+    includeJacket?: boolean; // Include jacket for this shot
     useStickman?: boolean; // Only use stickman for specific shots
 }
 

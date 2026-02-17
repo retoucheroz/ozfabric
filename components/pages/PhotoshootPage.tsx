@@ -232,6 +232,14 @@ export default function PhotoshootPage() {
         ? (workflowType === 'upper' ? UPPER_SHOTS : LOWER_SHOTS)
         : STANDARD_SHOTS;
     const [batchShotSelection, setBatchShotSelection] = useState<Record<string, boolean>>({});
+    const [techAccessories, setTechAccessories] = useState<Record<string, boolean>>({
+        jacket: false,
+        bag: false,
+        glasses: false,
+        hat: false,
+        jewelry: false,
+        belt: false
+    });
 
     // Reset shot selection when workflow or batch mode changes
     useEffect(() => {
@@ -718,7 +726,7 @@ export default function PhotoshootPage() {
     const [isProcessing, setIsProcessing] = useState(false);
     const [isStoppingBatch, setIsStoppingBatch] = useState(false);
     const isStoppingBatchRef = useRef(false);
-    const [resultImages, setResultImages] = useState<string[] | null>(null);
+    const [resultImages, setResultImages] = useState<any[] | null>(null);
     const [generationStage, setGenerationStage] = useState<'idle' | 'generating' | 'complete'>('idle');
     const [previewData, setPreviewData] = useState<any>(null);
     const [previewMode, setPreviewMode] = useState<'text' | 'json'>('json'); // Default to JSON as requested
@@ -907,6 +915,7 @@ export default function PhotoshootPage() {
                 }
             } else {
                 uploadedImages = Object.keys(assets).reduce((acc, k) => {
+                    if (k === 'lighting' && !lightingSendImage) return acc;
                     acc[k] = assetsHighRes[k] || assets[k];
                     return acc;
                 }, {} as any);
@@ -1368,12 +1377,21 @@ export default function PhotoshootPage() {
                     productName: preview.structured.productName,
                     workflowType: workflowType,
                     uploadedImages: Object.keys(assets).reduce((acc: any, k: string) => {
-                        // Exclude ALL accessories for technical shots in lower workflow
-                        if (preview.spec.excludeAllAccessories && ['glasses', 'hat', 'bag', 'belt', 'jewelry'].includes(k)) {
+                        // EXCEPTION: For technical/non-styling shots, only include accessories IF explicitly selected in techAccessories
+                        const isAccessory = ['jacket', 'bag', 'glasses', 'hat', 'belt', 'jewelry'].includes(k);
+                        const isStylingShot = preview.spec.isStyling;
+
+                        if (isAccessory && !isStylingShot) {
+                            if (!techAccessories[k]) return acc; // Skip this accessory for technical shot
+                        }
+
+                        // Mavi EU logic or specific exclusion logic
+                        if (preview.spec.excludeAllAccessories && isAccessory) {
                             return acc;
                         }
+
                         if (k === 'glasses') {
-                            acc[k] = preview.spec.includeGlasses ? (assetsHighRes.glasses || assets.glasses) : undefined;
+                            acc[k] = preview.spec.includeGlasses || (isStylingShot ? true : techAccessories.glasses) ? (assetsHighRes.glasses || assets.glasses) : undefined;
                         } else if (k === 'lighting' && !lightingSendImage) {
                             acc[k] = undefined;
                         } else {
@@ -1615,10 +1633,13 @@ export default function PhotoshootPage() {
                     const data = await res.json();
                     const imageUrl = data.images?.[0] || data.image_url;
                     if (imageUrl) {
+                        const nameSuffix = preview.title.replace(/\s+/g, '_').toLowerCase();
+                        const fullFilename = `${productCode || 'shot'}_${nameSuffix}.jpg`;
+
                         generatedImages.push({
-                            filename: `${preview.title}.jpg`,
+                            filename: fullFilename,
                             url: imageUrl,
-                            downloadName: `${preview.title}.jpg`
+                            downloadName: fullFilename
                         });
                         resultUrls.push(imageUrl);
 
@@ -3060,42 +3081,53 @@ export default function PhotoshootPage() {
 
                         {(user?.role === 'admin' || user?.authorizedPages?.includes('photoshoot:batch')) && (
                             <TabsContent value="batch">
-                                <div className="max-w-4xl mx-auto space-y-6">
-                                    <div className="border rounded-xl bg-[var(--bg-surface)] p-4">
-                                        <BatchPanel
-                                            language={language}
-                                            batchMode={batchMode}
-                                            setBatchMode={setBatchMode}
-                                            productCode={productCode}
-                                            setProductCode={setProductCode}
-                                            availableBatchShots={availableBatchShots}
-                                            batchShotSelection={batchShotSelection}
-                                            setBatchShotSelection={setBatchShotSelection}
-                                            isAdmin={user?.role === 'admin'}
-                                            isMaviBatch={isMaviBatch}
-                                            setIsMaviBatch={setIsMaviBatch}
-                                            stylingSideOnly={stylingSideOnly}
-                                            setStylingSideOnly={setStylingSideOnly}
-                                        />
+                                <div className="max-w-5xl mx-auto px-1 md:px-0">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+                                        {/* Sol Taraf: Batch Ayarları ve Seçimler */}
+                                        <div className="col-span-1 flex flex-col">
+                                            <div className="flex-1 bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-xl overflow-hidden shadow-sm flex flex-col p-6">
+                                                <BatchPanel
+                                                    language={language}
+                                                    batchMode={batchMode}
+                                                    setBatchMode={setBatchMode}
+                                                    productCode={productCode}
+                                                    setProductCode={setProductCode}
+                                                    availableBatchShots={availableBatchShots}
+                                                    batchShotSelection={batchShotSelection}
+                                                    setBatchShotSelection={setBatchShotSelection}
+                                                    isAdmin={user?.role === 'admin'}
+                                                    isMaviBatch={isMaviBatch}
+                                                    setIsMaviBatch={setIsMaviBatch}
+                                                    stylingSideOnly={stylingSideOnly}
+                                                    setStylingSideOnly={setStylingSideOnly}
+                                                    techAccessories={techAccessories}
+                                                    setTechAccessories={setTechAccessories}
+                                                    assets={assets}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Sağ Taraf: Önizleme / Üretim Alanı */}
+                                        <div className="col-span-1 lg:col-span-2 flex flex-col">
+                                            <div className="flex-1 bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-xl overflow-hidden shadow-sm flex flex-col">
+                                                <PreviewArea
+                                                    language={language}
+                                                    isProcessing={isProcessing}
+                                                    isStoppingBatch={isStoppingBatch}
+                                                    handleStopBatch={handleStopBatch}
+                                                    isGenerationSuccess={isGenerationSuccess}
+                                                    resultImages={resultImages}
+                                                    router={router}
+                                                    StudioSteps={StudioSteps}
+                                                    handleGenerate={handleGenerate}
+                                                    handleBatchGenerate={handleBatchGenerate}
+                                                    batchMode={true}
+                                                    productCode={productCode}
+                                                    estimatedCost={estimatedCost}
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
-                                    <Button
-                                        onClick={handleBatchGenerate}
-                                        disabled={isProcessing}
-                                        className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 text-lg shadow-lg hover:shadow-purple-500/25 transition-all"
-                                    >
-                                        {isProcessing ? (
-                                            <span className="flex items-center gap-2">
-                                                <Loader2 className="w-5 h-5 animate-spin" /> {language === "tr" ? "Üretiliyor..." : "Generating..."}
-                                            </span>
-                                        ) : (
-                                            <span className="flex items-center gap-2">
-                                                {language === "tr" ? "Toplu Üretimi Başlat" : "Start Batch Production"}
-                                                <span className="bg-white/20 px-2 py-0.5 rounded text-xs">
-                                                    {estimatedCost} {language === "tr" ? "Kredi" : "Credits"}
-                                                </span>
-                                            </span>
-                                        )}
-                                    </Button>
                                 </div>
                             </TabsContent>
                         )}

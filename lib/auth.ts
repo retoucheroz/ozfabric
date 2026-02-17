@@ -1,107 +1,72 @@
-import { createClient } from 'redis';
 import { User, Session } from './auth-types';
 import { cookies } from 'next/headers';
 import { hashPassword, comparePasswords } from '@/lib/crypto';
+import { getUserByEmail, createUser, updateUserCredits, getAllUsers as pgGetAllUsers, deleteUserByEmail, DbUser } from './postgres';
 
 const SESSION_COOKIE_NAME = 'ozfabric_session';
 const SESSION_TTL = 60 * 60 * 24 * 7; // 1 week
 
-// Configuration
-const REDIS_URL = process.env.REDIS_URL || process.env.KV_URL;
-const isKvConfigured = !!REDIS_URL;
-export const isKvActive = isKvConfigured;
-const useMemoryFallback = !isKvConfigured && process.env.NODE_ENV === 'development';
+// In-memory session store (for sessions only - users are in Postgres)
+const sessionStore: Map<string, Session> = (global as any)._ozSessionStore || new Map<string, Session>();
+const heartbeatStore: Map<string, number> = (global as any)._ozHeartbeatStore || new Map<string, number>();
+(global as any)._ozSessionStore = sessionStore;
+(global as any)._ozHeartbeatStore = heartbeatStore;
 
-// Singleton Redis Client
-let redisClient: any = null;
+export const isKvActive = true; // Keep for compatibility
 
-async function getRedis() {
-    if (useMemoryFallback) return null;
-
-    if (redisClient?.isOpen) return redisClient;
-
-    try {
-        if (!REDIS_URL) {
-            console.error('❌ Redis: REDIS_URL is not defined');
-            return null;
-        }
-
-        console.log('🔌 Redis: Connecting to:', REDIS_URL.split('@')[1] || 'URL');
-
-        redisClient = createClient({
-            url: REDIS_URL,
-            socket: {
-                reconnectStrategy: (retries) => Math.min(retries * 50, 2000),
-                connectTimeout: 10000,
-                keepAlive: true,
-            }
-        });
-
-        redisClient.on('error', (err: any) => console.error('❌ Redis Client Error:', err));
-
-        await redisClient.connect();
-        console.log('✅ Redis: Connection established');
-        return redisClient;
-    } catch (e) {
-        console.error('❌ Redis Connection Error:', e);
-        redisClient = null;
-        return null;
-    }
+// Convert DbUser to User format
+function dbUserToUser(dbUser: DbUser): User {
+    return {
+        username: dbUser.email,
+        email: dbUser.email,
+        name: dbUser.name || undefined,
+        passwordHash: dbUser.password_hash || '',
+        role: dbUser.role as 'admin' | 'user',
+        credits: dbUser.credits,
+        authorizedPages: dbUser.role === 'admin' ? ['*'] : undefined,
+    };
 }
-
-// Memory Store for Dev
-const memoryStore: Map<string, any> = (global as any)._ozMemoryStore || new Map<string, any>();
-if (useMemoryFallback) {
-    (global as any)._ozMemoryStore = memoryStore;
-}
-
-// Helpers
-const parseValue = (val: any) => {
-    if (!val) return null;
-    if (typeof val === 'object') return val;
-    try {
-        return typeof val === 'string' ? JSON.parse(val) : val;
-    } catch (e) {
-        return val;
-    }
-};
 
 export async function getUser(username: string): Promise<User | null> {
     try {
-        if (useMemoryFallback) return memoryStore.get(`user:${username}`) || null;
-        const client = await getRedis();
-        if (!client) return null;
-
-        const data = await client.get(`user:${username}`);
-        const user = parseValue(data);
-
-        // SELF-HEALING: If it's admin, ensure they have admin roles
-        if (username === 'admin' && user) {
+        const dbUser = await getUserByEmail(username);
+        if (!dbUser) return null;
+        
+        const user = dbUserToUser(dbUser);
+        
+        // Ensure admin has admin role
+        if (username === 'admin' || dbUser.role === 'admin') {
             user.role = 'admin';
-            if (!user.authorizedPages) user.authorizedPages = ['*'];
+            user.authorizedPages = ['*'];
         }
-
-        console.log(`👤 Auth: getUser(${username}) -> ${user ? `Found (Role: ${user.role})` : 'NULL'}`);
+        
+        console.log(`👤 Auth: getUser(${username}) -> Found (Role: ${user.role}, Credits: ${user.credits})`);
         return user;
     } catch (e) {
-        console.error('Redis getUser Error:', e);
+        console.error('Postgres getUser Error:', e);
         return null;
     }
 }
 
 export async function saveUser(user: User): Promise<void> {
     try {
-        if (useMemoryFallback) {
-            memoryStore.set(`user:${user.username}`, user);
-            return;
+        const existingUser = await getUserByEmail(user.username);
+        
+        if (existingUser) {
+            // Update credits
+            await updateUserCredits(user.username, user.credits || 0);
+        } else {
+            // Create new user
+            await createUser(
+                user.username,
+                user.name || null,
+                user.passwordHash || null,
+                user.role || 'user'
+            );
         }
-        const client = await getRedis();
-        if (client) {
-            await client.set(`user:${user.username}`, JSON.stringify(user));
-            console.log(`💾 Auth: saveUser(${user.username})`);
-        }
+        console.log(`💾 Auth: saveUser(${user.username})`);
     } catch (e) {
-        console.error('Redis saveUser Error:', e);
+        console.error('Postgres saveUser Error:', e);
     }
 }
 
@@ -110,26 +75,8 @@ export async function createSession(username: string): Promise<string> {
     const expiresAt = Date.now() + SESSION_TTL * 1000;
     const session: Session = { sessionId, username, expiresAt };
 
-    try {
-        if (useMemoryFallback) {
-            memoryStore.set(`session:${sessionId}`, session);
-            const active = memoryStore.get('active_sessions') || [];
-            if (!active.includes(sessionId)) {
-                memoryStore.set(`active_sessions`, [...active, sessionId]);
-            }
-        } else {
-            const client = await getRedis();
-            if (client) {
-                await client.set(`session:${sessionId}`, JSON.stringify(session), {
-                    EX: SESSION_TTL
-                });
-                await client.sAdd('active_sessions', sessionId);
-                console.log(`🔑 Auth: createSession(${username}) [${sessionId}]`);
-            }
-        }
-    } catch (e) {
-        console.error('Redis createSession Error:', e);
-    }
+    sessionStore.set(`session:${sessionId}`, session);
+    console.log(`🔑 Auth: createSession(${username}) [${sessionId}]`);
 
     const cookieStore = await cookies();
     cookieStore.set(SESSION_COOKIE_NAME, sessionId, {
@@ -149,25 +96,17 @@ export async function getSession(): Promise<Session | null> {
         const sessionId = cookieStore.get(SESSION_COOKIE_NAME)?.value;
         if (!sessionId) return null;
 
-        let session: Session | null = null;
-        if (useMemoryFallback) {
-            session = memoryStore.get(`session:${sessionId}`) || null;
-        } else {
-            const client = await getRedis();
-            if (client) {
-                const data = await client.get(`session:${sessionId}`);
-                console.log(`🔑 Auth: getSession(${sessionId}) -> ${data ? 'Found' : 'NULL'}`);
-                session = parseValue(data);
-            }
-        }
-
+        const session = sessionStore.get(`session:${sessionId}`) || null;
+        
         if (session) {
-            const client = await getRedis();
-            if (client) await client.set(`heartbeat:${session.username}`, Date.now().toString(), { EX: 300 });
+            // Update heartbeat
+            heartbeatStore.set(`heartbeat:${session.username}`, Date.now());
         }
+        
+        console.log(`🔑 Auth: getSession(${sessionId}) -> ${session ? 'Found' : 'NULL'}`);
         return session;
     } catch (e) {
-        console.error('Redis getSession Error:', e);
+        console.error('getSession Error:', e);
         return null;
     }
 }
@@ -177,22 +116,11 @@ export async function logout() {
         const cookieStore = await cookies();
         const sessionId = cookieStore.get(SESSION_COOKIE_NAME)?.value;
         if (sessionId) {
-            if (useMemoryFallback) {
-                const session = memoryStore.get(`session:${sessionId}`);
-                if (session) memoryStore.delete(`heartbeat:${session.username}`);
-                memoryStore.delete(`session:${sessionId}`);
-                const active = (memoryStore.get('active_sessions') || []).filter((id: string) => id !== sessionId);
-                memoryStore.set('active_sessions', active);
-            } else {
-                const client = await getRedis();
-                if (client) {
-                    const data = await client.get(`session:${sessionId}`);
-                    const session = parseValue(data);
-                    if (session) await client.del(`heartbeat:${session.username}`);
-                    await client.del(`session:${sessionId}`);
-                    await client.sRem('active_sessions', sessionId);
-                }
+            const session = sessionStore.get(`session:${sessionId}`);
+            if (session) {
+                heartbeatStore.delete(`heartbeat:${session.username}`);
             }
+            sessionStore.delete(`session:${sessionId}`);
         }
         cookieStore.delete(SESSION_COOKIE_NAME);
     } catch (e) {
@@ -201,53 +129,39 @@ export async function logout() {
 }
 
 export async function getOnlineUsers(): Promise<string[]> {
-    try {
-        const client = await getRedis();
-        if (!client) return [];
-        const heartbeats = await client.keys('heartbeat:*');
-        return heartbeats.map((key: string) => key.split(':')[1]);
-    } catch (e) {
-        return [];
-    }
+    const now = Date.now();
+    const online: string[] = [];
+    heartbeatStore.forEach((timestamp, key) => {
+        if (now - timestamp < 300000) { // 5 minutes
+            online.push(key.replace('heartbeat:', ''));
+        }
+    });
+    return online;
 }
 
 export async function getAllUsers(): Promise<Omit<User, 'passwordHash'>[]> {
     try {
-        const client = await getRedis();
-        if (!client) return [];
-        const keys = await client.keys('user:*');
-        if (keys.length === 0) return [];
-        const values = await client.mGet(keys);
-
-        return values.map(parseValue).filter(Boolean).map((u: User) => {
-            const { passwordHash, ...rest } = u;
-
-            // Self-heal admin in list too
-            if (rest.username === 'admin') {
-                rest.role = 'admin';
-            }
-
-            return rest;
-        });
+        const dbUsers = await pgGetAllUsers();
+        return dbUsers.map(u => ({
+            username: u.email,
+            email: u.email,
+            name: u.name || undefined,
+            role: (u.role === 'admin' ? 'admin' : 'user') as 'admin' | 'user',
+            credits: u.credits,
+            authorizedPages: u.role === 'admin' ? ['*'] : undefined,
+        }));
     } catch (e) {
+        console.error('getAllUsers Error:', e);
         return [];
     }
 }
 
 export async function deleteUser(username: string): Promise<void> {
     try {
-        if (useMemoryFallback) {
-            memoryStore.delete(`user:${username}`);
-            memoryStore.delete(`heartbeat:${username}`);
-            return;
-        }
-        const client = await getRedis();
-        if (client) {
-            await client.del(`user:${username}`);
-            await client.del(`heartbeat:${username}`);
-            console.log(`🗑️ Auth: deleteUser(${username})`);
-        }
+        await deleteUserByEmail(username);
+        heartbeatStore.delete(`heartbeat:${username}`);
+        console.log(`🗑️ Auth: deleteUser(${username})`);
     } catch (e) {
-        console.error('Redis deleteUser Error:', e);
+        console.error('Postgres deleteUser Error:', e);
     }
 }

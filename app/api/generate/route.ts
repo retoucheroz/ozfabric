@@ -276,8 +276,7 @@ export async function POST(req: NextRequest) {
                     hair_behind_shoulders: hairBehindShoulders, // Explicit boolean
                     look_at_camera: lookAtCamera, // NEW: Explicit boolean
                     body_description: modelDescription || null, // NEW: Custom physical traits
-                    wind: (workflowType === 'lower' && isStylingShot && enableWind) ||
-                        (workflowType === 'upper' && isStylingShot && enableWind && (shotIndex === 1 || shotIndex === 3))
+                    wind: isStylingShot && enableWind
                 },
 
                 garment: {
@@ -433,9 +432,12 @@ export async function POST(req: NextRequest) {
                 }
 
                 // Framing for Styling
-                if (poseFocus === 'upper' && shotIndex === 1) {
+                if (poseFocus === 'upper') {
                     structuredPrompt.camera.shot_type = 'cowboy_shot';
                     structuredPrompt.camera.framing = 'cowboy_shot';
+                } else if (poseFocus === 'closeup') {
+                    structuredPrompt.camera.shot_type = 'close_up';
+                    structuredPrompt.camera.framing = 'chest_and_face';
                 } else {
                     structuredPrompt.camera.shot_type = 'full_body';
                     structuredPrompt.camera.framing = 'head_to_toe';
@@ -795,11 +797,11 @@ export async function POST(req: NextRequest) {
             const isTechnicalForGaze = effectiveRole === 'technical' || isBackView || view.includes('side') || view.includes('detail') || framing === 'chest_and_face' || framing === 'waist_to_above_knees';
             const isTechnicalForExpression = isTechnicalForGaze || view.includes('angled') || sp.camera.angle === 'angled';
 
-            // Expression: enabled ONLY for FIRST styling shot AND not technical
-            const canHaveExpression = effectiveRole === 'styling' && shotIndex === 1 && !isTechnicalForExpression && enableExpression;
+            // Expression: enabled for ALL styling shots (not technical)
+            const canHaveExpression = effectiveRole === 'styling' && !isTechnicalForExpression && enableExpression;
 
-            // Gaze: enabled for FIRST and SECOND styling shots AND not technical (Gaze allowed on Angled)
-            const canHaveGaze = effectiveRole === 'styling' && (shotIndex === 1 || shotIndex === 2) && !isTechnicalForGaze && enableGaze;
+            // Gaze: enabled for ALL styling shots (not technical, gaze allowed on Angled)
+            const canHaveGaze = effectiveRole === 'styling' && !isTechnicalForGaze && enableGaze;
 
             if (canHaveExpression) {
                 const randomExpression = EXPRESSIONS[Math.floor(Math.random() * EXPRESSIONS.length)];

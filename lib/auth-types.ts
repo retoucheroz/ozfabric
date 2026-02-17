@@ -1,4 +1,3 @@
-
 export type UserRole = 'admin' | 'user';
 
 export interface UserPermission {
@@ -8,15 +7,17 @@ export interface UserPermission {
 
 export interface User {
     username: string;
+    email?: string;
+    name?: string;
     passwordHash: string;
     role: UserRole;
-    status: 'active' | 'pending' | 'disabled';
-    authorizedPages: string[];
+    status?: 'active' | 'pending' | 'disabled';
+    authorizedPages?: string[];
     customTitle?: string;
     customLogo?: string;
     customSettings?: Record<string, any>;
     credits: number;
-    createdAt: number;
+    createdAt?: number;
     lastLogin?: number;
 }
 
