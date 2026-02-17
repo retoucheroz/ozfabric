@@ -19,6 +19,18 @@ const SESSION_TTL = 60 * 60 * 24 * 7; // 1 week
 export const isKvActive = true;
 
 function dbUserToUser(dbUser: DbUser): User {
+    let authPages: string[] = [];
+    if (Array.isArray(dbUser.authorized_pages)) {
+        authPages = dbUser.authorized_pages;
+    } else if (typeof dbUser.authorized_pages === 'string') {
+        const str = dbUser.authorized_pages as string;
+        authPages = str
+            .replace(/^\{|\}$/g, '')
+            .split(',')
+            .map(s => s.trim().replace(/^"|"$/g, ''))
+            .filter(Boolean);
+    }
+
     return {
         username: dbUser.email,
         email: dbUser.email,
@@ -27,11 +39,7 @@ function dbUserToUser(dbUser: DbUser): User {
         role: dbUser.role as 'admin' | 'user',
         credits: dbUser.credits,
         status: (dbUser.status || 'active') as 'active' | 'pending' | 'disabled',
-        authorizedPages: Array.isArray(dbUser.authorized_pages)
-            ? dbUser.authorized_pages
-            : (typeof dbUser.authorized_pages === 'string'
-                ? (dbUser.authorized_pages as string).replace(/[{}]/g, '').split(',').filter(Boolean)
-                : []),
+        authorizedPages: authPages,
         customTitle: dbUser.custom_title || undefined,
         customLogo: dbUser.custom_logo || undefined,
         authType: (dbUser.auth_type || 'credentials') as 'credentials' | 'google',
@@ -48,10 +56,12 @@ export async function getUser(username: string): Promise<User | null> {
 
         if (username === 'admin' || dbUser.role === 'admin') {
             user.role = 'admin';
-            user.authorizedPages = ['*'];
+            if (!user.authorizedPages || user.authorizedPages.length === 0) {
+                user.authorizedPages = ['*'];
+            }
         }
 
-        console.log(`👤 Auth: getUser(${username}) -> Found (Role: ${user.role}, Credits: ${user.credits})`);
+        console.log(`👤 Auth: getUser(${username}) -> Role: ${user.role}, Pages: ${user.authorizedPages?.length || 0}`);
         return user;
     } catch (e) {
         console.error('Postgres getUser Error:', e);
@@ -62,6 +72,7 @@ export async function getUser(username: string): Promise<User | null> {
 export async function saveUser(user: User): Promise<void> {
     try {
         const existingUser = await getUserByEmail(user.username);
+        console.log(`💾 Auth: saveUser(${user.username}) -> Existing: ${!!existingUser}, Role: ${user.role}, Pages: ${user.authorizedPages?.length || 0}`);
 
         if (existingUser) {
             await updateUser(user.username, {
@@ -85,9 +96,9 @@ export async function saveUser(user: User): Promise<void> {
                 user.authorizedPages || []
             );
         }
-        console.log(`💾 Auth: saveUser(${user.username})`);
     } catch (e) {
-        console.error('Postgres saveUser Error:', e);
+        console.error('saveUser Error:', e);
+        throw e;
     }
 }
 

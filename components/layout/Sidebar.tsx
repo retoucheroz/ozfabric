@@ -76,7 +76,8 @@ export function Sidebar({ variant = "default" }: SidebarProps) {
 
     const isAuthorized = (path: string) => {
         if (!isKvActive) return true;
-        if (isLoading) return true;
+        // Don't show everything while loading, only home
+        if (isLoading) return path === '/home';
         if (process.env.NODE_ENV === 'development' && !user) return true;
         if (!user) return false;
         if (user.role === 'admin') return true;

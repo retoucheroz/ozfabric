@@ -69,16 +69,17 @@ export async function GET(req: NextRequest) {
             await saveUser(user);
         } else {
             // Update existing user with Google data if it's a google login
-            let changed = false;
+            const updates: any = {};
             if (!user.avatar && googleUser.picture) {
-                user.avatar = googleUser.picture;
-                changed = true;
+                updates.avatar_url = googleUser.picture;
             }
             if (user.authType !== 'google') {
-                user.authType = 'google';
-                changed = true;
+                updates.auth_type = 'google';
             }
-            if (changed) await saveUser(user);
+            if (Object.keys(updates).length > 0) {
+                const { updateUser } = await import('@/lib/postgres');
+                await updateUser(user.username, updates);
+            }
         }
 
         // Create session
