@@ -1,6 +1,10 @@
 import { neon } from '@neondatabase/serverless';
 
-const sql = neon(process.env.DATABASE_URL!);
+if (!process.env.DATABASE_URL) {
+    console.warn("CRITICAL: DATABASE_URL is not set. Database features will fail.");
+}
+
+const sql = neon(process.env.DATABASE_URL || "");
 
 export interface DbUser {
     id: number;
