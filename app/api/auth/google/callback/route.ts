@@ -57,8 +57,8 @@ export async function GET(req: NextRequest) {
                     '/analysis',
                     '/studio',
                     '/train',
-                    '/ghost',
-                    '/patterns',
+                    '/photoshoot/ghost',
+                    '/design/patterns',
                     '/sketch'
                 ],
                 credits: 1000,

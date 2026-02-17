@@ -27,7 +27,11 @@ function dbUserToUser(dbUser: DbUser): User {
         role: dbUser.role as 'admin' | 'user',
         credits: dbUser.credits,
         status: (dbUser.status || 'active') as 'active' | 'pending' | 'disabled',
-        authorizedPages: dbUser.authorized_pages || [],
+        authorizedPages: Array.isArray(dbUser.authorized_pages)
+            ? dbUser.authorized_pages
+            : (typeof dbUser.authorized_pages === 'string'
+                ? (dbUser.authorized_pages as string).replace(/[{}]/g, '').split(',').filter(Boolean)
+                : []),
         customTitle: dbUser.custom_title || undefined,
         customLogo: dbUser.custom_logo || undefined,
         authType: (dbUser.auth_type || 'credentials') as 'credentials' | 'google',
@@ -77,7 +81,8 @@ export async function saveUser(user: User): Promise<void> {
                 user.passwordHash || null,
                 user.role || 'user',
                 user.authType || 'credentials',
-                user.avatar || null
+                user.avatar || null,
+                user.authorizedPages || []
             );
         }
         console.log(`💾 Auth: saveUser(${user.username})`);

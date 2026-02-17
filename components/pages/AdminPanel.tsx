@@ -36,9 +36,9 @@ const AVAILABLE_PAGES = [
     { label: 'Analysis', path: '/analysis' },
     { label: 'Studio (Tech Pack)', path: '/studio' },
     { label: 'Train', path: '/train' },
-    { label: 'Ghost Mannequin', path: '/ghost' },
+    { label: 'Ghost Mannequin', path: '/photoshoot/ghost' },
     { label: 'Sketch to Photo', path: '/sketch' },
-    { label: 'Patterns', path: '/patterns' },
+    { label: 'Patterns', path: '/design/patterns' },
 ];
 
 const getAdminHeaders = () => {
@@ -76,21 +76,26 @@ export default function AdminPanel() {
     }, []);
 
     const updateUser = async (username: string, updates: Partial<User>) => {
+        // Optimistic update
+        const oldUsers = [...users];
+        setUsers(prev => prev.map(u => u.username === username ? { ...u, ...updates } : u));
+
         try {
             const res = await fetch('/api/admin/users', {
                 method: 'PATCH',
                 headers: getAdminHeaders(),
                 body: JSON.stringify({ username, updates })
             });
-            if (res.ok) {
-                toast.success(`User ${username} updated`);
-                fetchData();
-            } else {
+            if (!res.ok) {
                 const data = await res.json();
                 toast.error(data.error || "Failed to update user");
+                setUsers(oldUsers); // Rollback
+            } else {
+                // fetchData(); // Optional: refresh to sync with server
             }
         } catch (error) {
             toast.error("Network error");
+            setUsers(oldUsers); // Rollback
         }
     };
 

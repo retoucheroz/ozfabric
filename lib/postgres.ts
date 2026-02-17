@@ -28,10 +28,10 @@ export async function getUserByEmail(email: string): Promise<DbUser | null> {
     return result[0] as DbUser || null;
 }
 
-export async function createUser(email: string, name: string | null, passwordHash: string | null, role: string = 'user', authType: string = 'credentials', avatarUrl: string | null = null): Promise<DbUser> {
+export async function createUser(email: string, name: string | null, passwordHash: string | null, role: string = 'user', authType: string = 'credentials', avatarUrl: string | null = null, authorizedPages: string[] = []): Promise<DbUser> {
     const result = await sql`
-        INSERT INTO users (email, name, password_hash, role, credits, auth_type, avatar_url)
-        VALUES (${email}, ${name}, ${passwordHash}, ${role}, 0, ${authType}, ${avatarUrl})
+        INSERT INTO users (email, name, password_hash, role, credits, auth_type, avatar_url, authorized_pages)
+        VALUES (${email}, ${name}, ${passwordHash}, ${role}, 0, ${authType}, ${avatarUrl}, ${authorizedPages})
         RETURNING *
     `;
     return result[0] as DbUser;
@@ -149,7 +149,7 @@ export async function updateUser(email: string, updates: {
             credits = COALESCE(${updates.credits ?? null}, credits),
             role = COALESCE(${updates.role ?? null}, role),
             status = COALESCE(${updates.status ?? null}, status),
-            authorized_pages = COALESCE(${updates.authorized_pages ?? null}, authorized_pages),
+            authorized_pages = COALESCE(${updates.authorized_pages ?? null}::text[], authorized_pages),
             custom_title = COALESCE(${updates.custom_title ?? null}, custom_title),
             custom_logo = COALESCE(${updates.custom_logo ?? null}, custom_logo),
             auth_type = COALESCE(${updates.auth_type ?? null}, auth_type),

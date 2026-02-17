@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession, getUser, getAllUsers, saveUser, deleteUser } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 async function checkAdmin(req?: NextRequest) {
     // Fallback: Allow admin operations via ADMIN_PASSWORD header when KV is unavailable
     const adminPassword = process.env.ADMIN_PASSWORD;
