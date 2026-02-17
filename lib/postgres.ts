@@ -80,3 +80,35 @@ export async function updateUserRole(email: string, role: string): Promise<DbUse
     `;
     return result[0] as DbUser || null;
 }
+
+// Session functions
+export interface DbSession {
+    session_id: string;
+    username: string;
+    expires_at: number;
+    created_at: Date;
+}
+
+export async function createDbSession(sessionId: string, username: string, expiresAt: number): Promise<void> {
+    await sql`
+        INSERT INTO sessions (session_id, username, expires_at)
+        VALUES (${sessionId}, ${username}, ${expiresAt})
+        ON CONFLICT (session_id) DO UPDATE SET expires_at = ${expiresAt}
+    `;
+}
+
+export async function getDbSession(sessionId: string): Promise<DbSession | null> {
+    const result = await sql`
+        SELECT * FROM sessions 
+        WHERE session_id = ${sessionId} AND expires_at > ${Date.now()}
+    `;
+    return result[0] as DbSession || null;
+}
+
+export async function deleteDbSession(sessionId: string): Promise<void> {
+    await sql`DELETE FROM sessions WHERE session_id = ${sessionId}`;
+}
+
+export async function deleteExpiredSessions(): Promise<void> {
+    await sql`DELETE FROM sessions WHERE expires_at < ${Date.now()}`;
+}

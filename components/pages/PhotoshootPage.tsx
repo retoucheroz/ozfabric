@@ -1250,6 +1250,7 @@ export default function PhotoshootPage() {
         }
 
         setIsProcessing(true);
+        setResultImages(null);
 
         try {
             // Analysis
@@ -1476,6 +1477,7 @@ export default function PhotoshootPage() {
     const handleConfirmBatchGeneration = async () => {
         setShowBatchPreview(false);
         setIsProcessing(true);
+        setResultImages(null); // Clear previous results
         setIsStoppingBatch(false);
         isStoppingBatchRef.current = false;
 
@@ -1636,14 +1638,10 @@ export default function PhotoshootPage() {
                         const nameSuffix = preview.title.replace(/\s+/g, '_').toLowerCase();
                         const fullFilename = `${productCode || 'shot'}_${nameSuffix}.jpg`;
 
-                        generatedImages.push({
-                            filename: fullFilename,
-                            url: imageUrl,
-                            downloadName: fullFilename
-                        });
-                        resultUrls.push(imageUrl);
+                        const newImg = { filename: fullFilename, url: imageUrl, downloadName: fullFilename };
+                        generatedImages.push(newImg);
+                        setResultImages(prev => [...(prev || []), newImg]);
 
-                        // Save each one to history
                         addProject({
                             title: `Batch: ${productCode} - ${preview.title}`,
                             type: "Photoshoot",
@@ -1654,16 +1652,11 @@ export default function PhotoshootPage() {
                 }
             }
 
-            // Update main preview area instead of using popup
-            setIsGenerationSuccess(true);
-            await new Promise(r => setTimeout(r, 1000));
-            // setResultImages(resultUrls); // This was for the old single image display
-            // setBatchResultImages([]); // Clear batch result images to avoid popup trigger
-            // toast.success(language === "tr" ? "Toplu üretim tamamlandı!" : "Batch generation complete!");
-
             if (generatedImages.length > 0) {
-                setResultImages(generatedImages);
+                setIsGenerationSuccess(true);
                 setGenerationStage('complete');
+                await new Promise(r => setTimeout(r, 800));
+                setResultImages([...generatedImages]);
                 toast.success(language === "tr" ? "İşlem tamamlandı!" : "Batch complete!");
             }
         } catch (e: any) {
@@ -1673,7 +1666,7 @@ export default function PhotoshootPage() {
             setIsProcessing(false);
             setIsStoppingBatch(false);
             isStoppingBatchRef.current = false;
-            setIsGenerationSuccess(false);
+            setTimeout(() => setIsGenerationSuccess(false), 2000);
         }
     };
 
