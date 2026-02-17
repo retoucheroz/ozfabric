@@ -716,6 +716,8 @@ export default function PhotoshootPage() {
 
     // State for Generation
     const [isProcessing, setIsProcessing] = useState(false);
+    const [isStoppingBatch, setIsStoppingBatch] = useState(false);
+    const isStoppingBatchRef = useRef(false);
     const [resultImages, setResultImages] = useState<string[] | null>(null);
     const [generationStage, setGenerationStage] = useState<'idle' | 'generating' | 'complete'>('idle');
     const [previewData, setPreviewData] = useState<any>(null);
@@ -1456,6 +1458,8 @@ export default function PhotoshootPage() {
     const handleConfirmBatchGeneration = async () => {
         setShowBatchPreview(false);
         setIsProcessing(true);
+        setIsStoppingBatch(false);
+        isStoppingBatchRef.current = false;
 
         // Ensure we use a consistent seed for the whole batch
         const finalSeed = (seed !== null && seed !== "") ? Number(seed) : Math.floor(Math.random() * 1000000000);
@@ -1477,6 +1481,12 @@ export default function PhotoshootPage() {
             const resultUrls: string[] = [];
 
             for (let i = 0; i < batchPreviewPrompts.length; i++) {
+                // Check if stop requested
+                if (isStoppingBatchRef.current) {
+                    toast.warning(language === "tr" ? "Toplu üretim durduruldu." : "Batch production stopped.");
+                    break;
+                }
+
                 // Skip if not selected
                 if (!selectedBatchImages[i]) {
                     continue;
@@ -1626,17 +1636,29 @@ export default function PhotoshootPage() {
             // Update main preview area instead of using popup
             setIsGenerationSuccess(true);
             await new Promise(r => setTimeout(r, 1000));
-            setResultImages(resultUrls);
-            setBatchResultImages([]); // Clear batch result images to avoid popup trigger
-            toast.success(language === "tr" ? "Toplu üretim tamamlandı!" : "Batch generation complete!");
+            // setResultImages(resultUrls); // This was for the old single image display
+            // setBatchResultImages([]); // Clear batch result images to avoid popup trigger
+            // toast.success(language === "tr" ? "Toplu üretim tamamlandı!" : "Batch generation complete!");
 
+            if (generatedImages.length > 0) {
+                setResultImages(generatedImages);
+                setGenerationStage('complete');
+                toast.success(language === "tr" ? "İşlem tamamlandı!" : "Batch complete!");
+            }
         } catch (e: any) {
-            console.error("BATCH CONFIRM ERROR:", e);
+            console.error("Batch error:", e);
             toast.error(`Error: ${e.message}`);
         } finally {
             setIsProcessing(false);
+            setIsStoppingBatch(false);
+            isStoppingBatchRef.current = false;
             setIsGenerationSuccess(false);
         }
+    };
+
+    const handleStopBatch = () => {
+        setIsStoppingBatch(true);
+        isStoppingBatchRef.current = true;
     };
 
     const handleNewStyling = () => handleGenerate({ isReStyling: true });
@@ -2268,9 +2290,24 @@ export default function PhotoshootPage() {
                     }
                 }
             } else if (type === 'background') {
-                const updated = savedBackgrounds.map(item => item.id === id ? { ...item, thumbUrl: resizedThumb || item.thumbUrl } : item);
-                const itemToUpdate = updated.find(i => i.id === id);
-                setSavedBackgrounds(updated);
+                const updated = savedBackgrounds.map(item => item.id === id ? { ...item, thumbUrl: resizedThumb || item.thumbUrl, customPrompt: editingItemPrompt } : item);
+                let itemToUpdate = updated.find(i => i.id === id);
+
+                if (!itemToUpdate && BACKGROUND_PRESETS.some(bp => bp.id === id)) {
+                    const preset = BACKGROUND_PRESETS.find(bp => bp.id === id)!;
+                    itemToUpdate = {
+                        id: preset.id,
+                        url: preset.preview || "",
+                        name: preset.label,
+                        thumbUrl: resizedThumb || preset.preview || "",
+                        customPrompt: editingItemPrompt,
+                        createdAt: Date.now()
+                    };
+                    setSavedBackgrounds([itemToUpdate as SavedBackground, ...savedBackgrounds]);
+                } else {
+                    setSavedBackgrounds(updated);
+                }
+
                 if (itemToUpdate) await dbOperations.add(STORES.BACKGROUNDS, itemToUpdate);
             } else if (type === 'fit_pattern') {
                 const updated = savedFits.map(item => item.id === id ? { ...item, thumbUrl: resizedThumb || item.thumbUrl, customPrompt: editingItemPrompt } : item);
@@ -3004,6 +3041,8 @@ export default function PhotoshootPage() {
                                         <PreviewArea
                                             language={language}
                                             isProcessing={isProcessing}
+                                            isStoppingBatch={isStoppingBatch}
+                                            handleStopBatch={handleStopBatch}
                                             isGenerationSuccess={isGenerationSuccess}
                                             resultImages={resultImages}
                                             router={router}
@@ -3093,35 +3132,37 @@ export default function PhotoshootPage() {
                             <div className="space-y-6">
                                 {previewData.map((item: any, idx: number) => (
                                     <div key={idx} className="border rounded-lg p-4 bg-muted/50">
-                                        <div className="flex items-center justify-between mb-3">
-                                            <h4 className="font-semibold flex items-center gap-2">
-                                                <FileText className="w-4 h-4 text-primary" />
-                                                {item.title || (language === "tr" ? "Oluşturma İstemi" : "Generation Prompt")}
-                                            </h4>
-                                            <div className="flex items-center gap-2">
-                                                <Button
-                                                    variant={previewMode === 'text' ? 'default' : 'ghost'}
-                                                    size="sm"
-                                                    className="h-7 text-[10px]"
-                                                    onClick={() => setPreviewMode('text')}
-                                                >
-                                                    Text
-                                                </Button>
-                                                <Button
-                                                    variant={previewMode === 'json' ? 'default' : 'ghost'}
-                                                    size="sm"
-                                                    className="h-7 text-[10px]"
-                                                    onClick={() => {
-                                                        setPreviewMode('json');
-                                                        if (previewData && previewData[0]) {
-                                                            setUserAddedPrompt(JSON.stringify(previewData[0].structured, null, 2));
-                                                        }
-                                                    }}
-                                                >
-                                                    JSON
-                                                </Button>
+                                        {user?.role === 'admin' && (
+                                            <div className="flex items-center justify-between mb-3">
+                                                <h4 className="font-semibold flex items-center gap-2">
+                                                    <FileText className="w-4 h-4 text-primary" />
+                                                    {item.title || (language === "tr" ? "Oluşturma İstemi" : "Generation Prompt")}
+                                                </h4>
+                                                <div className="flex items-center gap-2">
+                                                    <Button
+                                                        variant={previewMode === 'text' ? 'default' : 'ghost'}
+                                                        size="sm"
+                                                        className="h-7 text-[10px]"
+                                                        onClick={() => setPreviewMode('text')}
+                                                    >
+                                                        Text
+                                                    </Button>
+                                                    <Button
+                                                        variant={previewMode === 'json' ? 'default' : 'ghost'}
+                                                        size="sm"
+                                                        className="h-7 text-[10px]"
+                                                        onClick={() => {
+                                                            setPreviewMode('json');
+                                                            if (previewData && previewData[0]) {
+                                                                setUserAddedPrompt(JSON.stringify(previewData[0].structured, null, 2));
+                                                            }
+                                                        }}
+                                                    >
+                                                        JSON
+                                                    </Button>
+                                                </div>
                                             </div>
-                                        </div>
+                                        )}
                                         <div className="flex items-center gap-2 mb-2">
                                             <Button
                                                 variant={previewMode === 'text' ? 'secondary' : 'ghost'}
@@ -3138,21 +3179,27 @@ export default function PhotoshootPage() {
                                             </Button>
                                         </div>
 
-                                        <div className="space-y-2">
-                                            <div className="space-y-4">
-                                                <textarea
-                                                    className="w-full p-4 text-[12px] border rounded-lg bg-[#0a0a0a] text-green-400 min-h-[350px] font-mono leading-relaxed focus:ring-1 focus:ring-green-500/50 outline-none scrollbar-thin scrollbar-thumb-card"
-                                                    value={userAddedPrompt}
-                                                    onChange={(e) => setUserAddedPrompt(e.target.value)}
-                                                    spellCheck={false}
-                                                />
-                                                {previewMode === 'json' && (
-                                                    <p className="text-[10px] text-muted-foreground italic px-1">
-                                                        {language === "tr" ? "JSON'u düzenleyerek çekim detaylarını değiştirebilirsiniz." : "You can modify shot details by editing the JSON above."}
-                                                    </p>
-                                                )}
+                                        {user?.role === 'admin' ? (
+                                            <div className="space-y-2">
+                                                <div className="space-y-4">
+                                                    <textarea
+                                                        className="w-full p-4 text-[12px] border rounded-lg bg-[#0a0a0a] text-green-400 min-h-[350px] font-mono leading-relaxed focus:ring-1 focus:ring-green-500/50 outline-none scrollbar-thin scrollbar-thumb-card"
+                                                        value={userAddedPrompt}
+                                                        onChange={(e) => setUserAddedPrompt(e.target.value)}
+                                                        spellCheck={false}
+                                                    />
+                                                    {previewMode === 'json' && (
+                                                        <p className="text-[10px] text-muted-foreground italic px-1">
+                                                            {language === "tr" ? "JSON'u düzenleyerek çekim detaylarını değiştirebilirsiniz." : "You can modify shot details by editing the JSON above."}
+                                                        </p>
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
+                                        ) : (
+                                            <div className="py-10 text-center text-xs text-muted-foreground bg-[var(--bg-surface)] rounded-lg border border-dashed border-[var(--border-subtle)]">
+                                                {language === "tr" ? "Üretim detayları analiz edildi. Onaylayıp devam edebilirsiniz." : "Generation details analyzed. You can confirm and proceed."}
+                                            </div>
+                                        )}
 
                                         <div className="mt-3 flex items-center gap-2 text-[10px] text-muted-foreground">
                                             <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
@@ -3241,6 +3288,13 @@ export default function PhotoshootPage() {
                     savedFits={savedFits}
                     savedShoes={savedShoes}
                     savedLightings={savedLightings}
+                    savedJackets={savedJackets}
+                    savedBags={savedBags}
+                    savedGlasses={savedGlasses}
+                    savedHats={savedHats}
+                    savedJewelry={savedJewelry}
+                    savedBelts={savedBelts}
+                    savedInnerWears={savedInnerWears}
                 />
 
                 <BatchPreviewDialog
@@ -3253,6 +3307,7 @@ export default function PhotoshootPage() {
                     editedBatchPrompts={editedBatchPrompts}
                     setEditedBatchPrompts={setEditedBatchPrompts}
                     onConfirm={handleConfirmBatchGeneration}
+                    isAdmin={user?.role === 'admin'}
                 />
             </div>
 
@@ -3309,6 +3364,7 @@ export default function PhotoshootPage() {
                 models={models}
                 handleLibrarySelect={handleLibrarySelect}
                 sessionLibrary={sessionLibrary}
+                isAdmin={user?.role === 'admin'}
             />
 
         </div >

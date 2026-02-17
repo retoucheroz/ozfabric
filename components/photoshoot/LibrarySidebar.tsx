@@ -69,6 +69,7 @@ interface LibrarySidebarProps {
     models: any[]; // Your user trained models
     handleLibrarySelect: (item: { src: string }, isUpload?: boolean) => void;
     sessionLibrary: string[];
+    isAdmin?: boolean;
 }
 
 export function LibrarySidebar({
@@ -123,7 +124,8 @@ export function LibrarySidebar({
     savedInnerWears,
     models,
     handleLibrarySelect,
-    sessionLibrary
+    sessionLibrary,
+    isAdmin
 }: LibrarySidebarProps) {
 
     const AssetCard = ({ id, label, icon, required = false, variant = 'default' }: { id: string, label: string, icon: any, required?: boolean, variant?: 'default' | 'square' }) => (
@@ -274,7 +276,7 @@ export function LibrarySidebar({
 
                     <Tabs value={libraryTab} onValueChange={setLibraryTab} className="flex-1 flex flex-col">
                         <div className="px-3 pt-3">
-                            <TabsList className="w-full grid grid-cols-3">
+                            <TabsList className={cn("w-full grid", (['pose', 'model'].includes(internalAsset || "") || !isAdmin) ? "grid-cols-3" : "grid-cols-4")}>
                                 {/* POSE & MODEL Share the same "Library | Upload" structure */}
                                 {['pose', 'model'].includes(internalAsset || "") ? (
                                     <>
@@ -287,6 +289,11 @@ export function LibrarySidebar({
                                         <TabsTrigger value="library" className="text-xs">{language === "tr" ? "Kütüphane" : "Library"}</TabsTrigger>
                                         <TabsTrigger value="templates" className="text-xs">{language === "tr" ? "Şablonlar" : "Templates"}</TabsTrigger>
                                         <TabsTrigger value="assets" className="text-xs">{language === "tr" ? "Yükle" : "Upload"}</TabsTrigger>
+                                        {isAdmin && (
+                                            <TabsTrigger value="prompt" className="text-[10px] uppercase font-bold tracking-tight">
+                                                {language === "tr" ? "İSTEM" : "PROMPT"}
+                                            </TabsTrigger>
+                                        )}
                                     </>
                                 )}
                             </TabsList>
@@ -467,7 +474,7 @@ export function LibrarySidebar({
                                                                                                             <button onClick={(e) => { e.stopPropagation(); handleEditItemClick(internalAsset!, item.id); }} className="p-1 bg-[var(--accent-primary)] text-white rounded hover:bg-[var(--accent-hover)]"><Edit2 size={10} /></button>
                                                                                                         </>
                                                                                                     ) : (
-                                                                                                        (internalAsset === 'lighting' || internalAsset === 'shoes' || internalAsset === 'fit_pattern' || internalAsset === 'jacket' || internalAsset === 'bag' || internalAsset === 'glasses' || internalAsset === 'hat' || internalAsset === 'jewelry' || internalAsset === 'belt' || internalAsset === 'inner_wear') && (
+                                                                                                        (internalAsset === 'lighting' || internalAsset === 'shoes' || internalAsset === 'fit_pattern' || internalAsset === 'jacket' || internalAsset === 'bag' || internalAsset === 'glasses' || internalAsset === 'hat' || internalAsset === 'jewelry' || internalAsset === 'belt' || internalAsset === 'inner_wear' || internalAsset === 'background') && (
                                                                                                             <button onClick={(e) => { e.stopPropagation(); handleEditItemClick(internalAsset!, item.id); }} className="p-1 bg-[var(--accent-primary)] text-white rounded hover:bg-[var(--accent-hover)]"><Edit2 size={10} /></button>
                                                                                                         )
                                                                                                     )}

@@ -39,7 +39,9 @@ export interface SavedModel extends LibraryItem {
     customPrompt?: string;
 }
 
-export interface SavedBackground extends LibraryItem { }
+export interface SavedBackground extends LibraryItem {
+    customPrompt?: string;
+}
 
 export interface SavedFit extends LibraryItem {
     customPrompt?: string;

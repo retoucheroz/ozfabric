@@ -15,6 +15,7 @@ interface BatchPreviewDialogProps {
     editedBatchPrompts: string[];
     setEditedBatchPrompts: (prompts: string[]) => void;
     onConfirm: () => void;
+    isAdmin?: boolean;
 }
 
 export function BatchPreviewDialog({
@@ -26,7 +27,8 @@ export function BatchPreviewDialog({
     setSelectedBatchImages,
     editedBatchPrompts,
     setEditedBatchPrompts,
-    onConfirm
+    onConfirm,
+    isAdmin
 }: BatchPreviewDialogProps) {
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -81,7 +83,7 @@ export function BatchPreviewDialog({
                                 </div>
                                 <span className="text-[10px] text-muted-foreground font-mono">{selectedBatchImages[idx] ? (language === "tr" ? "Üretilecek" : "Will Generate") : (language === "tr" ? "Atlanacak" : "Skipped")}</span>
                             </div>
-                            {selectedBatchImages[idx] && (
+                            {selectedBatchImages[idx] && isAdmin && (
                                 <Textarea
                                     value={editedBatchPrompts[idx]}
                                     onChange={(e) => {

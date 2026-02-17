@@ -24,6 +24,13 @@ interface EditItemDialogProps {
     savedFits: any[];
     savedLightings: any[];
     savedShoes: any[];
+    savedJackets: any[];
+    savedBags: any[];
+    savedGlasses: any[];
+    savedHats: any[];
+    savedJewelry: any[];
+    savedBelts: any[];
+    savedInnerWears: any[];
 }
 
 export function EditItemDialog({
@@ -45,7 +52,14 @@ export function EditItemDialog({
     savedBackgrounds,
     savedFits,
     savedLightings,
-    savedShoes
+    savedShoes,
+    savedJackets,
+    savedBags,
+    savedGlasses,
+    savedHats,
+    savedJewelry,
+    savedBelts,
+    savedInnerWears
 }: EditItemDialogProps) {
     if (!editingThumbItem) return null;
 
@@ -70,25 +84,41 @@ export function EditItemDialog({
                                 }}
                             />
                             {(() => {
+                                if (!editingThumbItem) return null;
                                 const { type, id } = editingThumbItem;
                                 const list = type === 'pose' ? savedPoses
                                     : type === 'model' ? savedModels
                                         : type === 'background' ? savedBackgrounds
                                             : type === 'fit_pattern' ? savedFits
                                                 : type === 'lighting' ? savedLightings
-                                                    : savedShoes;
+                                                    : type === 'shoes' ? savedShoes
+                                                        : type === 'jacket' ? savedJackets
+                                                            : type === 'bag' ? savedBags
+                                                                : type === 'glasses' ? savedGlasses
+                                                                    : type === 'hat' ? savedHats
+                                                                        : type === 'jewelry' ? savedJewelry
+                                                                            : type === 'belt' ? savedBelts
+                                                                                : savedInnerWears;
                                 return (list as any[]).find(i => i.id === id)?.thumbUrl;
                             })() ? (
                                 <div className="relative w-full h-full">
                                     <img
                                         src={(() => {
-                                            const { type, id } = editingThumbItem!;
+                                            if (!editingThumbItem) return "";
+                                            const { type, id } = editingThumbItem;
                                             const list = type === 'pose' ? savedPoses
                                                 : type === 'model' ? savedModels
                                                     : type === 'background' ? savedBackgrounds
                                                         : type === 'fit_pattern' ? savedFits
                                                             : type === 'lighting' ? savedLightings
-                                                                : savedShoes;
+                                                                : type === 'shoes' ? savedShoes
+                                                                    : type === 'jacket' ? savedJackets
+                                                                        : type === 'bag' ? savedBags
+                                                                            : type === 'glasses' ? savedGlasses
+                                                                                : type === 'hat' ? savedHats
+                                                                                    : type === 'jewelry' ? savedJewelry
+                                                                                        : type === 'belt' ? savedBelts
+                                                                                            : savedInnerWears;
                                             return (list as any[]).find(i => i.id === id)?.thumbUrl;
                                         })()}
                                         className="w-full h-full object-cover"
@@ -107,7 +137,7 @@ export function EditItemDialog({
                         </label>
                     </div>
 
-                    {(editingThumbItem?.type === 'pose' || editingThumbItem?.type === 'model' || editingThumbItem?.type === 'fit_pattern' || editingThumbItem?.type === 'shoes' || editingThumbItem?.type === 'lighting') && (
+                    {(editingThumbItem?.type === 'pose' || editingThumbItem?.type === 'model' || editingThumbItem?.type === 'fit_pattern' || editingThumbItem?.type === 'shoes' || editingThumbItem?.type === 'lighting' || editingThumbItem?.type === 'background' || editingThumbItem?.type === 'jacket' || editingThumbItem?.type === 'bag' || editingThumbItem?.type === 'glasses' || editingThumbItem?.type === 'hat' || editingThumbItem?.type === 'jewelry' || editingThumbItem?.type === 'belt' || editingThumbItem?.type === 'inner_wear') && (
                         <div className="space-y-4">
                             {editingThumbItem.type === 'lighting' ? (
                                 <>
@@ -157,7 +187,9 @@ export function EditItemDialog({
                                         <FileText size={12} />
                                         {editingThumbItem.type === 'pose'
                                             ? (language === "tr" ? "Poz Prompt Açıklaması" : "Pose Prompt Description")
-                                            : (language === "tr" ? "Kalıp/Desen Prompt Açıklaması" : "Fit/Pattern Prompt Description")}
+                                            : editingThumbItem.type === 'fit_pattern'
+                                                ? (language === "tr" ? "Kalıp/Desen Prompt Açıklaması" : "Fit/Pattern Prompt Description")
+                                                : (language === "tr" ? "Özel Prompt Açıklaması" : "Custom Prompt Description")}
                                     </label>
                                     <textarea
                                         className="w-full h-32 text-sm p-3 rounded-lg border bg-background focus:ring-2 focus:ring-violet-500 outline-none resize-none"

@@ -17,6 +17,8 @@ interface PreviewAreaProps {
     batchMode: boolean;
     productCode: string;
     estimatedCost: number;
+    isStoppingBatch?: boolean;
+    handleStopBatch?: () => void;
 }
 
 export function PreviewArea({
@@ -30,7 +32,9 @@ export function PreviewArea({
     handleBatchGenerate,
     batchMode,
     productCode,
-    estimatedCost
+    estimatedCost,
+    isStoppingBatch,
+    handleStopBatch
 }: PreviewAreaProps) {
     const generateButton = (
         <div className="w-full max-w-md mb-6 space-y-2">
@@ -66,6 +70,28 @@ export function PreviewArea({
         </div>
     );
 
+    const stopButton = isProcessing && batchMode && handleStopBatch && (
+        <Button
+            variant="destructive"
+            size="sm"
+            onClick={handleStopBatch}
+            disabled={isStoppingBatch}
+            className="mt-4 animate-in fade-in slide-in-from-bottom-2 duration-300 shadow-lg shadow-red-500/20"
+        >
+            {isStoppingBatch ? (
+                <span className="flex items-center gap-2">
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                    {language === "tr" ? "Durduruluyor..." : "Stopping..."}
+                </span>
+            ) : (
+                <span className="flex items-center gap-2">
+                    <Eraser className="w-4 h-4" />
+                    {language === "tr" ? "Üretimi Durdur" : "Stop Production"}
+                </span>
+            )}
+        </Button>
+    );
+
     if (isProcessing) {
         return (
             <div className="flex-1 bg-[var(--bg-base)] overflow-y-auto p-4 md:p-8 relative min-h-[400px] flex flex-col items-center justify-center">
@@ -93,7 +119,8 @@ export function PreviewArea({
                         </div>
                     </div>
                 </div>
-                {generateButton}
+                {stopButton}
+                {!stopButton && generateButton}
             </div>
         );
     }

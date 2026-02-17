@@ -259,7 +259,7 @@ export async function POST(req: NextRequest) {
                 }
             }
 
-            return assets;
+            return assets.filter(a => a && a.startsWith("http"));
         };
 
         // 2. Build Structured Prompt JSON for each view
