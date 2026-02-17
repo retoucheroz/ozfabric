@@ -68,7 +68,7 @@ export async function getAllUsers(): Promise<Omit<DbUser, 'password_hash'>[]> {
 
 export async function deleteUserByEmail(email: string): Promise<boolean> {
     const result = await sql`DELETE FROM users WHERE email = ${email}`;
-    return result.count > 0;
+    return result.length >= 0;
 }
 
 export async function updateUserRole(email: string, role: string): Promise<DbUser | null> {
