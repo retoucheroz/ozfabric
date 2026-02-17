@@ -2874,9 +2874,11 @@ export default function PhotoshootPage() {
                 {wizardStep === 4 && (
                     <Tabs defaultValue="single" onValueChange={(val) => setBatchMode(val === 'batch')} className="w-full animate-in fade-in duration-500">
                         <div className="flex justify-center mb-6">
-                            <TabsList className="grid w-full max-w-[400px] grid-cols-2">
+                            <TabsList className={cn("grid w-full max-w-[400px]", (user?.role === 'admin' || user?.authorizedPages?.includes('photoshoot:batch')) ? "grid-cols-2" : "grid-cols-1")}>
                                 <TabsTrigger value="single">{language === "tr" ? "Tekli Üretim" : "Single Production"}</TabsTrigger>
-                                <TabsTrigger value="batch">{language === "tr" ? "Toplu Üretim (Batch)" : "Batch Production"}</TabsTrigger>
+                                {(user?.role === 'admin' || user?.authorizedPages?.includes('photoshoot:batch')) && (
+                                    <TabsTrigger value="batch">{language === "tr" ? "Toplu Üretim (Batch)" : "Batch Production"}</TabsTrigger>
+                                )}
                             </TabsList>
                         </div>
 
@@ -2993,45 +2995,47 @@ export default function PhotoshootPage() {
                             </div>
                         </TabsContent>
 
-                        <TabsContent value="batch">
-                            <div className="max-w-4xl mx-auto space-y-6">
-                                <div className="border rounded-xl bg-[var(--bg-surface)] p-4">
-                                    <BatchPanel
-                                        language={language}
-                                        batchMode={batchMode}
-                                        setBatchMode={setBatchMode}
-                                        productCode={productCode}
-                                        setProductCode={setProductCode}
-                                        availableBatchShots={availableBatchShots}
-                                        batchShotSelection={batchShotSelection}
-                                        setBatchShotSelection={setBatchShotSelection}
-                                        isAdmin={user?.role === 'admin'}
-                                        isMaviBatch={isMaviBatch}
-                                        setIsMaviBatch={setIsMaviBatch}
-                                        stylingSideOnly={stylingSideOnly}
-                                        setStylingSideOnly={setStylingSideOnly}
-                                    />
-                                </div>
-                                <Button
-                                    onClick={handleBatchGenerate}
-                                    disabled={isProcessing}
-                                    className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 text-lg shadow-lg hover:shadow-purple-500/25 transition-all"
-                                >
-                                    {isProcessing ? (
-                                        <span className="flex items-center gap-2">
-                                            <Loader2 className="w-5 h-5 animate-spin" /> {language === "tr" ? "Üretiliyor..." : "Generating..."}
-                                        </span>
-                                    ) : (
-                                        <span className="flex items-center gap-2">
-                                            {language === "tr" ? "Toplu Üretimi Başlat" : "Start Batch Production"}
-                                            <span className="bg-white/20 px-2 py-0.5 rounded text-xs">
-                                                {estimatedCost} {language === "tr" ? "Kredi" : "Credits"}
+                        {(user?.role === 'admin' || user?.authorizedPages?.includes('photoshoot:batch')) && (
+                            <TabsContent value="batch">
+                                <div className="max-w-4xl mx-auto space-y-6">
+                                    <div className="border rounded-xl bg-[var(--bg-surface)] p-4">
+                                        <BatchPanel
+                                            language={language}
+                                            batchMode={batchMode}
+                                            setBatchMode={setBatchMode}
+                                            productCode={productCode}
+                                            setProductCode={setProductCode}
+                                            availableBatchShots={availableBatchShots}
+                                            batchShotSelection={batchShotSelection}
+                                            setBatchShotSelection={setBatchShotSelection}
+                                            isAdmin={user?.role === 'admin'}
+                                            isMaviBatch={isMaviBatch}
+                                            setIsMaviBatch={setIsMaviBatch}
+                                            stylingSideOnly={stylingSideOnly}
+                                            setStylingSideOnly={setStylingSideOnly}
+                                        />
+                                    </div>
+                                    <Button
+                                        onClick={handleBatchGenerate}
+                                        disabled={isProcessing}
+                                        className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 text-lg shadow-lg hover:shadow-purple-500/25 transition-all"
+                                    >
+                                        {isProcessing ? (
+                                            <span className="flex items-center gap-2">
+                                                <Loader2 className="w-5 h-5 animate-spin" /> {language === "tr" ? "Üretiliyor..." : "Generating..."}
                                             </span>
-                                        </span>
-                                    )}
-                                </Button>
-                            </div>
-                        </TabsContent>
+                                        ) : (
+                                            <span className="flex items-center gap-2">
+                                                {language === "tr" ? "Toplu Üretimi Başlat" : "Start Batch Production"}
+                                                <span className="bg-white/20 px-2 py-0.5 rounded text-xs">
+                                                    {estimatedCost} {language === "tr" ? "Kredi" : "Credits"}
+                                                </span>
+                                            </span>
+                                        )}
+                                    </Button>
+                                </div>
+                            </TabsContent>
+                        )}
                     </Tabs>
                 )}
 
