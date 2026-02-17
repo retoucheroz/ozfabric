@@ -27,7 +27,8 @@ function dbUserToUser(dbUser: DbUser): User {
         passwordHash: dbUser.password_hash || '',
         role: dbUser.role as 'admin' | 'user',
         credits: dbUser.credits,
-        authorizedPages: dbUser.role === 'admin' ? ['*'] : undefined,
+        authorizedPages: dbUser.role === "admin" ? ["*"] : undefined,
+        status: (dbUser.status || "active") as "active" | "pending" | "disabled",
     };
 }
 

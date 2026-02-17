@@ -11,6 +11,7 @@ export interface DbUser {
     password_hash: string | null;
     created_at: Date;
     updated_at: Date;
+    status: string;
 }
 
 export async function getUserByEmail(email: string): Promise<DbUser | null> {
@@ -111,4 +112,14 @@ export async function deleteDbSession(sessionId: string): Promise<void> {
 
 export async function deleteExpiredSessions(): Promise<void> {
     await sql`DELETE FROM sessions WHERE expires_at < ${Date.now()}`;
+}
+
+export async function updateUserStatus(email: string, status: string): Promise<DbUser | null> {
+    const result = await sql`
+        UPDATE users 
+        SET status = ${status}, updated_at = CURRENT_TIMESTAMP
+        WHERE email = ${email}
+        RETURNING *
+    `;
+    return result[0] as DbUser || null;
 }
