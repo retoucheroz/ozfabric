@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
 
         // Deduct credits after success (or before, depending on policy)
         if (user.role !== 'admin') {
-            await deductCredits(user.email, cost, `${swapMode === 'head_swap' ? 'Head' : 'Face'} Swap (${resolution})`);
+            await deductCredits(user.username, cost, `${swapMode === 'head_swap' ? 'Head' : 'Face'} Swap (${resolution})`);
         }
 
         return NextResponse.json({
