@@ -85,6 +85,7 @@ export default function PhotoshootPage() {
 
     const [wizardStep, setWizardStep] = useState<1 | 2 | 3 | 4>(1);
     const [user, setUser] = useState<any>(null);
+    const isRestoringRef = useRef(true);
 
     useEffect(() => {
         setMounted(true);
@@ -295,6 +296,7 @@ export default function PhotoshootPage() {
     const [microFeedback, setMicroFeedback] = useState<string | null>(null);
 
     useEffect(() => {
+        if (isRestoringRef.current) return;
         if (assets.pose) {
             setMicroFeedback(language === "tr" ? "Bu poz bel ve bacak uyumunu vurguluyor." : "This pose highlights waist and leg alignment.");
             const timer = setTimeout(() => setMicroFeedback(null), 4000);
@@ -303,6 +305,7 @@ export default function PhotoshootPage() {
     }, [assets.pose, language]);
 
     useEffect(() => {
+        if (isRestoringRef.current) return;
         if (assets.lighting) {
             setMicroFeedback(language === "tr" ? "Bu ışık kumaş dokusunu ön plana çıkarıyor." : "This lighting emphasizes fabric texture.");
             const timer = setTimeout(() => setMicroFeedback(null), 4000);
@@ -1907,6 +1910,11 @@ export default function PhotoshootPage() {
                 }
             } catch (e) {
                 console.error("Failed to restore state from IndexedDB", e);
+            } finally {
+                // Wait small delay to ensure assets state updates don't trigger feedback immediately
+                setTimeout(() => {
+                    isRestoringRef.current = false;
+                }, 1000);
             }
         };
 
