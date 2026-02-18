@@ -77,6 +77,23 @@ export function ProductSection({
                                 setProductName(e.target.value);
                                 setIsManualProductName(true);
                             }}
+                            onBlur={async () => {
+                                if (productName && productName.trim().length > 2) {
+                                    try {
+                                        const res = await fetch("/api/translate", {
+                                            method: "POST",
+                                            headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify({ text: productName, targetLanguage: 'en' })
+                                        });
+                                        const data = await res.json();
+                                        if (data.translation && data.translation.toLowerCase() !== productName.toLowerCase()) {
+                                            setProductName(data.translation);
+                                        }
+                                    } catch (e) {
+                                        console.error("Auto-translate failed", e);
+                                    }
+                                }
+                            }}
                             placeholder={language === "tr" ? "Gömlek, Pantolon..." : "Enter name..."}
                             className="w-full bg-[var(--bg-surface)] border-2 border-[var(--border-subtle)] text-[var(--text-primary)] text-sm font-black placeholder:text-[var(--text-muted)]/50 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-[var(--accent-primary)]/20 focus:border-[var(--accent-primary)] outline-none transition-all shadow-sm hover:shadow-md"
                         />

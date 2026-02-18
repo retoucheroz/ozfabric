@@ -34,6 +34,19 @@ async function migrate() {
         await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS authorized_pages TEXT[];`;
         console.log("✅ authorized_pages added/checked.");
 
+        console.log("Creating credit_transactions table...");
+        await sql`
+            CREATE TABLE IF NOT EXISTS credit_transactions (
+                id SERIAL PRIMARY KEY,
+                user_email TEXT NOT NULL,
+                amount INTEGER NOT NULL,
+                description TEXT,
+                type TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        `;
+        console.log("✅ credit_transactions table created/checked.");
+
         console.log("🚀 Migration complete!");
     } catch (error) {
         console.error("❌ Migration failed:", error);

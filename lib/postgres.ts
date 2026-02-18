@@ -23,6 +23,15 @@ export interface DbUser {
     avatar_url: string | null;
 }
 
+export interface CreditTransaction {
+    id: number;
+    user_email: string;
+    amount: number;
+    description: string | null;
+    type: string | null;
+    created_at: Date;
+}
+
 export async function getUserByEmail(email: string): Promise<DbUser | null> {
     const result = await sql`SELECT * FROM users WHERE email = ${email}`;
     return result[0] as DbUser || null;
@@ -47,23 +56,39 @@ export async function updateUserCredits(email: string, credits: number): Promise
     return result[0] as DbUser || null;
 }
 
-export async function deductCredits(email: string, amount: number): Promise<DbUser | null> {
+export async function deductCredits(email: string, amount: number, description: string = 'Image Generation'): Promise<DbUser | null> {
     const result = await sql`
         UPDATE users 
         SET credits = credits - ${amount}, updated_at = CURRENT_TIMESTAMP
         WHERE email = ${email} AND credits >= ${amount}
         RETURNING *
     `;
+
+    if (result[0]) {
+        await sql`
+            INSERT INTO credit_transactions (user_email, amount, description, type)
+            VALUES (${email}, ${-amount}, ${description}, 'usage')
+        `;
+    }
+
     return result[0] as DbUser || null;
 }
 
-export async function addCredits(email: string, amount: number): Promise<DbUser | null> {
+export async function addCredits(email: string, amount: number, description: string = 'Admin Deposit'): Promise<DbUser | null> {
     const result = await sql`
         UPDATE users 
         SET credits = credits + ${amount}, updated_at = CURRENT_TIMESTAMP
         WHERE email = ${email}
         RETURNING *
     `;
+
+    if (result[0]) {
+        await sql`
+            INSERT INTO credit_transactions (user_email, amount, description, type)
+            VALUES (${email}, ${amount}, ${description}, 'deposit')
+        `;
+    }
+
     return result[0] as DbUser || null;
 }
 
@@ -159,4 +184,20 @@ export async function updateUser(email: string, updates: {
         RETURNING *
     `;
     return result[0] as DbUser || null;
+}
+
+export async function getCreditTransactions(email: string): Promise<CreditTransaction[]> {
+    const result = await sql`
+        SELECT * FROM credit_transactions 
+        WHERE user_email = ${email}
+        ORDER BY created_at DESC
+    `;
+    return result as CreditTransaction[];
+}
+
+export async function logCreditTransaction(email: string, amount: number, description: string, type: string = 'adjustment'): Promise<void> {
+    await sql`
+        INSERT INTO credit_transactions (user_email, amount, description, type)
+        VALUES (${email}, ${amount}, ${description}, ${type})
+    `;
 }

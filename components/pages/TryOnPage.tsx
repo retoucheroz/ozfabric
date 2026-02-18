@@ -354,6 +354,23 @@ export default function TryOnPage() {
                 type="text"
                 value={productName}
                 onChange={(e) => setProductName(e.target.value)}
+                onBlur={async () => {
+                  if (productName && productName.trim().length > 2) {
+                    try {
+                      const res = await fetch("/api/translate", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ text: productName, targetLanguage: 'en' })
+                      });
+                      const data = await res.json();
+                      if (data.translation && data.translation.toLowerCase() !== productName.toLowerCase()) {
+                        setProductName(data.translation);
+                      }
+                    } catch (e) {
+                      console.error("Auto-translate failed", e);
+                    }
+                  }
+                }}
                 placeholder={language === "tr" ? "Ürün Adı (otomatik algılanır)" : "Product Name (auto-detected)"}
                 className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring pr-8"
               />

@@ -19,6 +19,7 @@ import {
     Trash2,
     Plus,
     X,
+    History,
     Image as ImageIcon
 } from "lucide-react"
 import { toast } from "sonner"
@@ -50,6 +51,9 @@ export default function AdminPanel() {
     const [users, setUsers] = useState<Omit<User, 'passwordHash'>[]>([]);
     const [onlineStats, setOnlineStats] = useState<{ onlineCount: number, users: string[] }>({ onlineCount: 0, users: [] });
     const [isLoading, setIsLoading] = useState(true);
+    const [selectedUserForHistory, setSelectedUserForHistory] = useState<string | null>(null);
+    const [creditHistory, setCreditHistory] = useState<any[]>([]);
+    const [isHistoryLoading, setIsHistoryLoading] = useState(false);
 
     const fetchData = async () => {
         setIsLoading(true);
@@ -116,6 +120,44 @@ export default function AdminPanel() {
             }
         } catch (error) {
             toast.error("Network error");
+        }
+    };
+
+    const adjustCredits = async (email: string, amount: number, description: string = '') => {
+        try {
+            const res = await fetch('/api/admin/users/credits', {
+                method: 'POST',
+                headers: getAdminHeaders(),
+                body: JSON.stringify({ email, amount, description })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                setUsers(prev => prev.map(u => u.username === email ? { ...u, credits: data.credits } : u));
+                toast.success(t('admin.addUser'));
+            } else {
+                const data = await res.json();
+                toast.error(data.error || "Hata oluştu");
+            }
+        } catch (err) {
+            toast.error("İşlem başarısız");
+        }
+    };
+
+    const fetchCreditHistory = async (email: string) => {
+        setIsHistoryLoading(true);
+        setSelectedUserForHistory(email);
+        try {
+            const res = await fetch(`/api/admin/users/credits?email=${encodeURIComponent(email)}`, {
+                headers: getAdminHeaders()
+            });
+            if (res.ok) {
+                setCreditHistory(await res.json());
+            }
+        } catch (error) {
+            toast.error("Failed to fetch credit history");
+        } finally {
+            setIsHistoryLoading(false);
         }
     };
 
@@ -329,12 +371,20 @@ export default function AdminPanel() {
                                                     const input = document.getElementById(`credits-${user.username}`) as HTMLInputElement;
                                                     const val = parseInt(input.value);
                                                     if (!isNaN(val)) {
-                                                        updateUser(user.username, { credits: (user.credits || 0) + val });
+                                                        adjustCredits(user.username, val);
                                                         input.value = '';
                                                     }
                                                 }}
                                             >
                                                 ADD
+                                            </Button>
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                className="h-9 w-9 p-0 border-zinc-500/20 text-zinc-500 hover:bg-zinc-500/10"
+                                                onClick={() => fetchCreditHistory(user.username)}
+                                            >
+                                                <History className="w-4 h-4" />
                                             </Button>
                                         </div>
                                     </div>
@@ -414,6 +464,70 @@ export default function AdminPanel() {
                     </Card>
                 ))}
             </div>
+
+            {/* Credit History Dialog */}
+            {selectedUserForHistory && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+                    <Card className="w-full max-w-2xl max-h-[80vh] flex flex-col overflow-hidden shadow-2xl border-violet-500/20 animate-in fade-in zoom-in duration-200">
+                        <CardHeader className="border-b bg-violet-500/5 relative">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="absolute right-4 top-4 h-8 w-8 rounded-full hover:bg-red-500/10 hover:text-red-500"
+                                onClick={() => setSelectedUserForHistory(null)}
+                            >
+                                <X className="w-4 h-4" />
+                            </Button>
+                            <CardTitle className="text-lg flex items-center gap-2">
+                                <History className="w-5 h-5 text-violet-500" />
+                                {t('settings.credits')} {t('admin.history')}
+                            </CardTitle>
+                            <CardDescription className="font-bold text-violet-600">{selectedUserForHistory}</CardDescription>
+                        </CardHeader>
+                        <CardContent className="p-0 overflow-y-auto custom-scrollbar">
+                            {isHistoryLoading ? (
+                                <div className="p-12 flex flex-col items-center justify-center gap-4 text-muted-foreground">
+                                    <RefreshCw className="w-8 h-8 animate-spin text-violet-500" />
+                                    <p className="text-xs font-bold uppercase tracking-widest animate-pulse">Loading History...</p>
+                                </div>
+                            ) : creditHistory.length === 0 ? (
+                                <div className="p-12 text-center text-muted-foreground">
+                                    <p className="text-sm">No credit history found for this user.</p>
+                                </div>
+                            ) : (
+                                <table className="w-full text-left border-collapse">
+                                    <thead className="sticky top-0 bg-zinc-50 dark:bg-zinc-900 border-b z-10">
+                                        <tr>
+                                            <th className="p-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t('admin.date')}</th>
+                                            <th className="p-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t('admin.description')}</th>
+                                            <th className="p-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground text-right">{t('admin.credits')}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y">
+                                        {creditHistory.map((tx) => (
+                                            <tr key={tx.id} className="hover:bg-muted/30 transition-colors">
+                                                <td className="p-4">
+                                                    <div className="text-xs font-medium">{new Date(tx.created_at).toLocaleDateString()}</div>
+                                                    <div className="text-[9px] text-muted-foreground">{new Date(tx.created_at).toLocaleTimeString()}</div>
+                                                </td>
+                                                <td className="p-4">
+                                                    <div className="text-xs font-bold">{tx.description || '-'}</div>
+                                                    <Badge variant="outline" className={`text-[9px] px-1 h-4 uppercase ${tx.type === 'usage' ? 'text-amber-600 border-amber-500/20 bg-amber-500/5' : 'text-green-600 border-green-500/20 bg-green-500/5'}`}>
+                                                        {tx.type}
+                                                    </Badge>
+                                                </td>
+                                                <td className={`p-4 text-sm font-black text-right ${tx.amount < 0 ? 'text-red-500' : 'text-green-500'}`}>
+                                                    {tx.amount > 0 ? '+' : ''}{tx.amount}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            )}
+                        </CardContent>
+                    </Card>
+                </div>
+            )}
         </div >
     )
 }

@@ -449,6 +449,10 @@ const translations: Translations = {
     "admin.customConfig": { en: "Custom UI Config (JSON)", tr: "Özel UI Yapılandırması (JSON)" },
     "admin.deleteUser": { en: "Delete User", tr: "Kullanıcıyı Sil" },
     "admin.deleteConfirm": { en: "Are you sure you want to delete this user? This action cannot be undone.", tr: "Bu kullanıcıyı silmek istediğinize emin misiniz? Bu işlem geri alınamaz." },
+    "admin.history": { en: "History", tr: "Geçmişi" },
+    "admin.date": { en: "Date", tr: "Tarih" },
+    "admin.description": { en: "Description", tr: "Açıklama" },
+    "admin.credits": { en: "Credits", tr: "Kredi" },
     "admin.noUsers": { en: "No users registered yet", tr: "Henüz kayıtlı kullanıcı yok" },
 };
 
