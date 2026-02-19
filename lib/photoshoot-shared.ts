@@ -130,18 +130,154 @@ export const LIGHTING_PRESETS: SavedLighting[] = [
 ];
 
 export const UPPER_SHOTS = [
-    { id: 'styling_front', label: 'Styling 1. Kare', labelEn: 'Styling Front' },
-    { id: 'styling_angled', label: 'Styling 2. Yan Kare', labelEn: 'Styling Angled' },
-    { id: 'styling_front_2', label: 'Styling 3. Kare', labelEn: 'Styling Front 2' },
-    { id: 'technical_back', label: 'Düz Arka Kare', labelEn: 'Technical Back' },
-    { id: 'closeup_front', label: 'Yakın Çekim Ön', labelEn: 'Close-Up Front' },
+    { id: 'styling_front', label: 'Styling 1. Kare', labelEn: 'Styling Front', descriptionTr: 'Ön styling karesi.', descriptionEn: 'Front styling shot.', image: '/crops/styling_tam_boy.jpg' },
+    { id: 'styling_angled', label: 'Styling 2. Yan Kare', labelEn: 'Styling Angled', descriptionTr: 'Yan açı styling karesi.', descriptionEn: 'Angled styling shot.', image: '/crops/styling_tam_boy.jpg' },
+    { id: 'styling_front_2', label: 'Styling 3. Kare', labelEn: 'Styling Front 2', descriptionTr: 'Alternatif ön styling karesi.', descriptionEn: 'Alternative front styling shot.', image: '/crops/styling_ust_vucut.jpg' },
+    { id: 'technical_back', label: 'Düz Arka Kare', labelEn: 'Technical Back', descriptionTr: 'Düz arka teknik çekim.', descriptionEn: 'Straight back technical shot.', image: '/crops/arka_tam_boy.jpg' },
+    { id: 'closeup_front', label: 'Yakın Çekim Ön', labelEn: 'Close-Up Front', descriptionTr: 'Ön yakın çekim.', descriptionEn: 'Front close-up shot.', image: '/crops/ust_closeup.jpg' },
 ];
 
 export const LOWER_SHOTS = [
-    { id: 'styling_front', label: 'Styling 1. Kare', labelEn: 'Styling Front' },
-    { id: 'styling_angled', label: 'Styling 2. Yan Kare', labelEn: 'Styling Angled' },
-    { id: 'technical_front', label: 'Düz Ön 3. Kare', labelEn: 'Technical Front' },
-    { id: 'technical_back', label: 'Düz Arka 4. Kare', labelEn: 'Technical Back' },
-    { id: 'detail_front', label: 'Detay Ön Kare', labelEn: 'Detail Front' },
-    { id: 'detail_back', label: 'Detay Arka Kare', labelEn: 'Detail Back' },
+    { id: 'styling_front', label: 'Styling 1. Kare', labelEn: 'Styling Front', descriptionTr: 'Ön styling karesi.', descriptionEn: 'Front styling shot.', image: '/crops/styling_tam_boy.jpg' },
+    { id: 'styling_angled', label: 'Styling 2. Yan Kare', labelEn: 'Styling Angled', descriptionTr: 'Yan açı styling karesi.', descriptionEn: 'Angled styling shot.', image: '/crops/styling_tam_boy.jpg' },
+    { id: 'technical_front', label: 'Düz Ön 3. Kare', labelEn: 'Technical Front', descriptionTr: 'Düz ön teknik çekim.', descriptionEn: 'Straight front technical shot.', image: '/crops/on_tam_boy.jpg' },
+    { id: 'technical_back', label: 'Düz Arka 4. Kare', labelEn: 'Technical Back', descriptionTr: 'Düz arka teknik çekim.', descriptionEn: 'Straight back technical shot.', image: '/crops/arka_tam_boy.jpg' },
+    { id: 'detail_front', label: 'Detay Ön Kare', labelEn: 'Detail Front', descriptionTr: 'Ön detay çekimi.', descriptionEn: 'Front detail shot.', image: '/crops/alt_on_detay.jpg' },
+    { id: 'detail_back', label: 'Detay Arka Kare', labelEn: 'Detail Back', descriptionTr: 'Arka detay çekimi.', descriptionEn: 'Back detail shot.', image: '/crops/alt_arka_detay.jpg' },
+];
+
+export const STANDARD_SHOTS = [
+    { id: 'std_styling_full', label: 'Tam Boy Styling', labelEn: 'Full Body Styling', descriptionTr: 'Tam boy, artistik pozlama.', descriptionEn: 'Full body, artistic posing.', image: '/crops/styling_tam_boy.jpg' },
+    { id: 'std_styling_upper', label: 'Üst Vücut Styling', labelEn: 'Upper Body Styling', descriptionTr: 'Üst vücut, artistik pozlama.', descriptionEn: 'Upper body, artistic posing.', image: '/crops/styling_ust_vucut.jpg' },
+    { id: 'std_tech_full_front', label: 'Ön Tam Boy', labelEn: 'Front Full Body', descriptionTr: 'Tam boy ön, kollar yanlarda.', descriptionEn: 'Full body front, arms at sides.', image: '/crops/on_tam_boy.jpg' },
+    { id: 'std_tech_full_back', label: 'Arka Tam Boy', labelEn: 'Back Full Body', descriptionTr: 'Tam boy arka, kollar yanlarda.', descriptionEn: 'Full body back, arms at sides.', image: '/crops/arka_tam_boy.jpg' },
+    { id: 'std_tech_upper_front', label: 'Ön Üst Vücut', labelEn: 'Front Upper Body', descriptionTr: 'Üst vücut ön, kollar yanlarda.', descriptionEn: 'Upper body front, arms at sides.', image: '/crops/on_ust_vucut.jpg' },
+    { id: 'std_tech_upper_back', label: 'Arka Üst Vücut', labelEn: 'Back Upper Body', descriptionTr: 'Üst vücut arka, kollar yanlarda.', descriptionEn: 'Upper body back, arms at sides.', image: '/crops/arka_ust_vucut.jpg' },
+    { id: 'std_detail_front', label: 'Alt Ürün Ön Detay', labelEn: 'Lower Front Detail', descriptionTr: 'Belden dize kadar ön detay çekimi.', descriptionEn: 'Lower front detail from waist to knee.', image: '/crops/alt_on_detay.jpg' },
+    { id: 'std_detail_back', label: 'Alt Ürün Arka Detay', labelEn: 'Lower Back Detail', descriptionTr: 'Belden dize kadar arka detay çekimi.', descriptionEn: 'Lower back detail from waist to knee.', image: '/crops/alt_arka_detay.jpg' },
+    { id: 'std_closeup_front', label: 'Üst Ürün Ön Yakın Çekim', labelEn: 'Upper Front Closeup', descriptionTr: 'Yüzden göğüs altına yakın çekim.', descriptionEn: 'Close-up from face to chest.', image: '/crops/ust_closeup.jpg' },
+];
+export const MODEL_PRESETS: SavedModel[] = [
+    // Female Models
+    {
+        id: "f-emma",
+        name: "Emma",
+        url: "/models/female_2048/Generated-Image-February-19,-2026---8_39AM.jpg",
+        gender: "female",
+        createdAt: 1771401600000
+    },
+    {
+        id: "f-sophia",
+        name: "Sophia",
+        url: "/models/female_2048/Generated-Image-February-19,-2026---8_42AM.jpg",
+        gender: "female",
+        createdAt: 1771401600001
+    },
+    {
+        id: "f-isabella",
+        name: "Isabella",
+        url: "/models/female_2048/Generated-Image-February-19,-2026---8_46AM.jpg",
+        gender: "female",
+        createdAt: 1771401600002
+    },
+    {
+        id: "f-olivia",
+        name: "Olivia",
+        url: "/models/female_2048/Generated-Image-February-19,-2026---8_56AM+.jpg",
+        gender: "female",
+        createdAt: 1771401600003
+    },
+    {
+        id: "f-ava",
+        name: "Ava",
+        url: "/models/female_2048/Generated-Image-February-19,-2026---8_56AM.jpg",
+        gender: "female",
+        createdAt: 1771401600004
+    },
+    {
+        id: "f-mia",
+        name: "Mia",
+        url: "/models/female_2048/Generated-Image-February-19,-2026---9_02AM.jpg",
+        gender: "female",
+        createdAt: 1771401600005
+    },
+
+    // Male Models
+    {
+        id: "m-liam",
+        name: "Liam",
+        url: "/models/male_2048/1.jpg",
+        gender: "male",
+        createdAt: 1771401600100
+    },
+    {
+        id: "m-noah",
+        name: "Noah",
+        url: "/models/male_2048/2.jpg",
+        gender: "male",
+        createdAt: 1771401600101
+    },
+    {
+        id: "m-oliver",
+        name: "Oliver",
+        url: "/models/male_2048/3.jpg",
+        gender: "male",
+        createdAt: 1771401600102
+    },
+    {
+        id: "m-james",
+        name: "James",
+        url: "/models/male_2048/4.jpg",
+        gender: "male",
+        createdAt: 1771401600103
+    },
+    {
+        id: "m-elijah",
+        name: "Elijah",
+        url: "/models/male_2048/5.jpg",
+        gender: "male",
+        createdAt: 1771401600104
+    },
+    {
+        id: "m-william",
+        name: "William",
+        url: "/models/male_2048/Generated-Image-February-19,-2026---8_20AM.jpg",
+        gender: "male",
+        createdAt: 1771401600105
+    },
+    {
+        id: "m-henry",
+        name: "Henry",
+        url: "/models/male_2048/Generated-Image-February-19,-2026---8_22AM.jpg",
+        gender: "male",
+        createdAt: 1771401600106
+    },
+    {
+        id: "m-lucas",
+        name: "Lucas",
+        url: "/models/male_2048/Generated-Image-February-19,-2026---8_28AM.jpg",
+        gender: "male",
+        createdAt: 1771401600107
+    },
+    {
+        id: "m-benjamin",
+        name: "Benjamin",
+        url: "/models/male_2048/Generated-Image-February-19,-2026---8_30AM.jpg",
+        gender: "male",
+        createdAt: 1771401600108
+    },
+    {
+        id: "m-theodore",
+        name: "Theodore",
+        url: "/models/male_2048/Generated-Image-February-19,-2026---8_33AM.jpg",
+        gender: "male",
+        createdAt: 1771401600109
+    },
+    {
+        id: "m-jack",
+        name: "Jack",
+        url: "/models/male_2048/Generated-Image-February-19,-2026---8_35AM.jpg",
+        gender: "male",
+        createdAt: 1771401600110
+    }
 ];

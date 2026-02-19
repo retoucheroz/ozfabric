@@ -15,7 +15,7 @@ export default function DashboardLayout({
                 <aside className="hidden md:flex shrink-0">
                     <Sidebar />
                 </aside>
-                <main className="flex-1 overflow-auto">
+                <main className="flex-1 overflow-auto bg-[var(--bg-sidebar)]">
                     {children}
                 </main>
             </div>

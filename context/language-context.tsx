@@ -22,7 +22,7 @@ const translations: Translations = {
 
     // Sidebar
     "sidebar.design": { en: "Design", tr: "Tasarım" },
-    "sidebar.photoshoot": { en: "Photoshoot", tr: "Fotoğraf" },
+    "sidebar.photoshoot": { en: "Studio", tr: "Stüdyo" },
     "sidebar.studio": { en: "STUDIO", tr: "STÜDYO" },
     "sidebar.catalog": { en: "CATALOG", tr: "KATALOG" },
     "sidebar.tools": { en: "TOOLS", tr: "ARAÇLAR" },
@@ -76,8 +76,8 @@ const translations: Translations = {
     "home.aiGenerations": { en: "AI Generations", tr: "AI Üretimleri" },
     "home.createVisualize": { en: "Create & Visualize", tr: "Oluştur & Görselleştir" },
 
-    "home.photoshootTitle": { en: "Generate Photo", tr: "Fotoğraf Üret" },
-    "home.photoshootDesc": { en: "Create professional model photos.", tr: "Profesyonel model fotoğrafları oluşturun." },
+    "home.photoshootTitle": { en: "AI Studio", tr: "Stüdyo" },
+    "home.photoshootDesc": { en: "Create professional studio photos.", tr: "Profesyonel stüdyo çekimleri gerçekleştirin." },
     "home.videoTitle": { en: "Generate Video", tr: "Video Üret" },
     "home.videoDesc": { en: "Create cinematic reels and stories with AI.", tr: "AI ile sinematik reels ve hikayeler oluşturun." },
 
@@ -85,7 +85,7 @@ const translations: Translations = {
     "home.sketchDesc": { en: "Turn sketches into realistic products.", tr: "Eskizlerinizi gerçek ürünlere dönüştürün." },
 
     "home.virtualTryOn": { en: "Generate Detail", tr: "Detay Üret" },
-    "home.virtualTryOnDesc": { en: "Visualize garments on AI models instantly.", tr: "Giysileri AI modeller üzerinde anında görselleştirin." },
+    "home.virtualTryOnDesc": { en: "Visualize garments in AI studios instantly.", tr: "Giysileri AI stüdyolar içerisinde anında görselleştirin." },
 
     "home.ghostModelTitle": { en: "Generate Ghost Model", tr: "Ghost Model Üret" },
     "home.ghostModelDesc": { en: "Transform hanging/flat items into 3D ghost mannequin shots.", tr: "Askıda veya düz ürünlerinizi 3D hayalet manken çekimine çevirin." },
@@ -116,10 +116,10 @@ const translations: Translations = {
     "photoshoot.dropMultiple": { en: "Drag multiple images or click to select", tr: "Birden fazla görsel sürükleyin veya tıklayarak seçin" },
     "photoshoot.howToGetResults": { en: "HOW TO GET GOOD RESULTS?", tr: "İYİ SONUÇLAR NASIL ALINIR?" },
     "photoshoot.tip1": { en: "Longest side of image should be less than 3000px.", tr: "Görselin en uzun kenarı 3000px'den küçük olmalı." },
-    "photoshoot.tip2": { en: "Supports model, full-body mannequin shots.", tr: "Model ve tam vücut manken çekimlerini destekler." },
-    "photoshoot.tip3": { en: "Does not support hanging, flat lay, or mannequin shots without limbs.", tr: "Asılı, düz serili veya uzvusuz manken çekimlerini desteklemez." },
+    "photoshoot.tip2": { en: "Supports studio, full-body shots.", tr: "Stüdyo ve tam vücut çekimlerini destekler." },
+    "photoshoot.tip3": { en: "Does not support hanging, flat lay, or shots without limbs.", tr: "Asılı, düz serili veya uzvusuz çekimleri desteklemez." },
     "photoshoot.quickSelectModel": { en: "QUICK SELECT MODEL", tr: "HIZLI MODEL SEÇİMİ" },
-    "photoshoot.selectModel": { en: "Select Model", tr: "Model Seç" },
+    "photoshoot.selectModel": { en: "Select Studio", tr: "Stüdyo Seç" },
     "photoshoot.selectBackground": { en: "Select Background", tr: "Arka Plan Seç" },
     "photoshoot.selectPose": { en: "Select Pose", tr: "Poz Seç" },
     "photoshoot.chooseAngle": { en: "Choose Angle", tr: "Açı Seç" },
@@ -275,12 +275,12 @@ const translations: Translations = {
     "tryOn.upperBody": { en: "Upper Body (Tops)", tr: "Üst Giyim (Üstler)" },
     "tryOn.lowerBody": { en: "Lower Body (Pants/Skirts)", tr: "Alt Giyim (Pantolon/Etek)" },
     "tryOn.dresses": { en: "Dresses (Full Body)", tr: "Elbiseler (Tam Vücut)" },
-    "tryOn.uploadModel": { en: "Upload Model", tr: "Model Yükle" },
+    "tryOn.uploadModel": { en: "Upload Studio", tr: "Stüdyo Yükle" },
     "tryOn.uploadGarment": { en: "Upload Garment", tr: "Giysi Yükle" },
-    "tryOn.dropModel": { en: "Drop model image here", tr: "Model görselini buraya bırakın" },
+    "tryOn.dropModel": { en: "Drop studio image here", tr: "Stüdyo görselini buraya bırakın" },
     "tryOn.generateTryOn": { en: "Generate Try-On", tr: "Deneme Oluştur" },
     "tryOn.processing": { en: "Processing...", tr: "İşleniyor..." },
-    "tryOn.noResultDesc": { en: "Select a model and a garment to start the virtual try-on process.", tr: "Sanal deneme işlemi başlatmak için model ve giysi seçin." },
+    "tryOn.noResultDesc": { en: "Select a studio and a garment to start the virtual try-on process.", tr: "Sanal deneme işlemi başlatmak için stüdyo ve giysi seçin." },
 
     // Ghost Mannequin Page
     "ghost.title": { en: "Ghost Mannequin", tr: "Hayalet Manken" },

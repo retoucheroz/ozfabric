@@ -8,46 +8,43 @@ export async function POST(req: NextRequest) {
     try {
         const {
             image, // User uploaded model image
-            backgroundPrompt,
-            camera,
-            lens,
-            focalLength,
-            aperture,
-            prompt: userPrompt,
+            outfitImage, // Optional outfit/combination image
+            backgroundPrompt: _, // Ignored as we use structured prompt now
+            camera: __, // Ignored
+            lens: ___, // Ignored
+            focalLength: ____, // Ignored
+            aperture: _____, // Ignored
+            prompt: finalPrompt, // Now receives the fully structured master prompt
             resolution = "1K",
             aspectRatio = "3:4",
-            seed = null
+            seed = null,
+            modelType = "full_body"
         } = await req.json();
-
-        // Construct final prompt
-        let finalPrompt = "";
-
-        if (backgroundPrompt) finalPrompt += `${backgroundPrompt}. `;
-        if (userPrompt) finalPrompt += `${userPrompt}. `;
-
-        // Add Camera Specs
-        const cameraSpecs = `Camera: ${camera}, Lens: ${lens}, Focal Length: ${focalLength}mm, Aperture: ${aperture}`;
-        finalPrompt += ` ${cameraSpecs}. `;
-
-        // Enhance with editorial quality keywords
-        finalPrompt += " High-end fashion editorial photography, professional lighting, photorealistic, 8k resolution, cinematic quality.";
 
         const finalSeed = seed !== null ? Number(seed) : Math.floor(Math.random() * 1000000000);
 
-        // Sanitize input image
+        // Sanitize input images
         const { ensureR2Url } = await import("@/lib/s3");
-        const sanitizedImage = await ensureR2Url(image, "editorial/inputs");
+        const sanitizedModel = await ensureR2Url(image, "editorial/inputs");
+        let sanitizedOutfit = null;
+        if (outfitImage) {
+            sanitizedOutfit = await ensureR2Url(outfitImage, "editorial/inputs");
+        }
 
-        const falPayload = {
+        const falPayload: any = {
             prompt: finalPrompt,
             image_urls: {
-                model: sanitizedImage
+                model: sanitizedModel
             },
             aspect_ratio: aspectRatio,
             resolution: resolution === "4K" ? "4K" : resolution === "2K" ? "2K" : "1K",
             seed: finalSeed,
             output_format: "png"
         };
+
+        if (sanitizedOutfit) {
+            falPayload.image_urls.outfit = sanitizedOutfit;
+        }
 
         const falKey = process.env.FAL_KEY;
         if (!falKey) throw new Error("FAL_KEY missing");

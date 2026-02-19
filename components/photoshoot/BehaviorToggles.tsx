@@ -67,7 +67,7 @@ export function BehaviorToggles({
                 <TooltipTrigger asChild>
                     <div
                         className={cn(
-                            "flex flex-col items-center justify-between p-2.5 min-h-[110px] rounded-xl border-2 transition-all cursor-pointer group select-none",
+                            "flex flex-col items-center justify-between p-2.5 h-full rounded-xl border-2 transition-all cursor-pointer group select-none",
                             active
                                 ? "bg-[var(--accent-soft)] border-[var(--accent-primary)] shadow-sm"
                                 : "bg-[var(--bg-elevated)] border-[var(--border-subtle)] hover:border-[var(--accent-primary)]/50"
@@ -99,11 +99,11 @@ export function BehaviorToggles({
     );
 
     return (
-        <div className="space-y-3">
+        <div className="flex flex-col h-full space-y-3">
             <h4 className="text-[10px] font-bold text-[var(--accent-primary)] uppercase tracking-[0.15em] px-1">
                 {language === "tr" ? "DETAY AYARLARI" : "DETAIL SETTINGS"}
             </h4>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-2 flex-1">
                 {/* 1. Hair */}
                 <ToggleItem
                     label={language === "tr" ? "SAÇ ARKADA" : "HAIR BACK"}
@@ -147,7 +147,7 @@ export function BehaviorToggles({
                 {/* 5. Sleeves Rolled */}
                 <ToggleItem
                     label={language === "tr" ? "KOLLAR SIVALI" : "ROLLED SLEEVE"}
-                    brief={language === "tr" ? "Kolları yukarı çeker" : "Pull up sleeves"}
+                    brief={language === "tr" ? "Kollari yukarı çeker" : "Pull up sleeves"}
                     detailed={language === "tr" ? "Uzun kollu ürünlerin kollarının dirseğe kadar sıvanması seçeneği." : "Rolling up the sleeves of long-sleeved products to the elbows."}
                     icon={TbHandStop}
                     active={sleevesRolled}
@@ -187,7 +187,7 @@ export function BehaviorToggles({
                 {/* 9. Socks Toggle (Cyclic) */}
                 <div
                     className={cn(
-                        "flex flex-col items-center justify-between p-2.5 min-h-[90px] rounded-xl border-2 transition-all cursor-pointer group select-none shadow-sm",
+                        "flex flex-col items-center justify-between p-2.5 h-full rounded-xl border-2 transition-all cursor-pointer group select-none shadow-sm",
                         socksType !== 'none'
                             ? "bg-[var(--accent-soft)] border-[var(--accent-primary)]"
                             : "bg-[var(--bg-elevated)] border-[var(--border-subtle)] hover:border-[var(--accent-primary)]/50"

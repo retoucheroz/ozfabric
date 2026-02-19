@@ -128,7 +128,7 @@ export function LibrarySidebar({
     isAdmin
 }: LibrarySidebarProps) {
 
-    const AssetCard = ({ id, label, icon, required = false, variant = 'default' }: { id: string, label: string, icon: any, required?: boolean, variant?: 'default' | 'square' }) => (
+    const AssetCard = ({ id, label, icon, required = false, variant = 'default', hideLibrary = false }: { id: string, label: string, icon: any, required?: boolean, variant?: 'default' | 'square', hideLibrary?: boolean }) => (
         <BaseAssetCard
             id={id}
             label={label}
@@ -141,13 +141,14 @@ export function LibrarySidebar({
             handleAssetRemove={handleAssetRemove}
             language={language}
             variant={variant}
+            hideLibrary={hideLibrary}
         />
     );
 
     return (
         <div
             className={cn(
-                "absolute right-0 top-0 bottom-0 w-full sm:w-80 lg:w-[480px] bg-[var(--bg-sidebar)] border-l border-[var(--border-subtle)] shadow-2xl z-[60] flex flex-col transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1)",
+                "fixed right-0 top-0 bottom-0 w-full sm:w-80 lg:w-[480px] bg-[var(--bg-sidebar)] border-l border-[var(--border-subtle)] shadow-2xl z-[60] flex flex-col transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1)",
                 activeLibraryAsset ? "translate-x-0 opacity-100" : "translate-x-full opacity-0 pointer-events-none"
             )}
         >
@@ -187,12 +188,12 @@ export function LibrarySidebar({
                                 <h4 className="text-[10px] font-black text-[var(--accent-primary)] uppercase tracking-[0.2em] px-1">{language === "tr" ? "TEMEL ÜRÜNLER" : "PRIMARY PRODUCTS"}</h4>
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="space-y-3">
-                                        <AssetCard id="top_front" label={language === "tr" ? "Üst Ön" : "Top Front"} icon={TbShirtFilled} variant="square" />
-                                        <AssetCard id="top_back" label={language === "tr" ? "Üst Arka" : "Top Back"} icon={TbShirt} variant="square" />
+                                        <AssetCard id="top_front" label={language === "tr" ? "Üst Ön" : "Top Front"} icon={TbShirtFilled} variant="square" hideLibrary={true} />
+                                        <AssetCard id="top_back" label={language === "tr" ? "Üst Arka" : "Top Back"} icon={TbShirt} variant="square" hideLibrary={true} />
                                     </div>
                                     <div className="space-y-3">
-                                        <AssetCard id="bottom_front" label={language === "tr" ? "Alt Ön" : "Bottom Front"} icon={PiPantsFill} variant="square" />
-                                        <AssetCard id="bottom_back" label={language === "tr" ? "Alt Arka" : "Bottom Back"} icon={PiPants} variant="square" />
+                                        <AssetCard id="bottom_front" label={language === "tr" ? "Alt Ön" : "Bottom Front"} icon={PiPantsFill} variant="square" hideLibrary={true} />
+                                        <AssetCard id="bottom_back" label={language === "tr" ? "Alt Arka" : "Bottom Back"} icon={PiPants} variant="square" hideLibrary={true} />
                                     </div>
                                 </div>
                             </div>
@@ -205,10 +206,10 @@ export function LibrarySidebar({
                                         {language === "tr" ? "ÖN DETAYLAR" : "FRONT DETAILS"}
                                     </h4>
                                     <div className="grid grid-cols-4 gap-1.5">
-                                        <AssetCard id="detail_front_1" label={language === "tr" ? "Det 1" : "Det 1"} icon={ScanLine} variant="square" />
-                                        <AssetCard id="detail_front_2" label={language === "tr" ? "Det 2" : "Det 2"} icon={ScanLine} variant="square" />
-                                        <AssetCard id="detail_front_3" label={language === "tr" ? "Det 3" : "Det 3"} icon={ScanLine} variant="square" />
-                                        <AssetCard id="detail_front_4" label={language === "tr" ? "Det 4" : "Det 4"} icon={ScanLine} variant="square" />
+                                        <AssetCard id="detail_front_1" label={language === "tr" ? "Det 1" : "Det 1"} icon={ScanLine} variant="square" hideLibrary={true} />
+                                        <AssetCard id="detail_front_2" label={language === "tr" ? "Det 2" : "Det 2"} icon={ScanLine} variant="square" hideLibrary={true} />
+                                        <AssetCard id="detail_front_3" label={language === "tr" ? "Det 3" : "Det 3"} icon={ScanLine} variant="square" hideLibrary={true} />
+                                        <AssetCard id="detail_front_4" label={language === "tr" ? "Det 4" : "Det 4"} icon={ScanLine} variant="square" hideLibrary={true} />
                                     </div>
                                 </div>
 
@@ -218,10 +219,10 @@ export function LibrarySidebar({
                                         {language === "tr" ? "ARKA DETAYLAR" : "BACK DETAILS"}
                                     </h4>
                                     <div className="grid grid-cols-4 gap-1.5">
-                                        <AssetCard id="detail_back_1" label={language === "tr" ? "Det 1" : "Det 1"} icon={ScanLine} variant="square" />
-                                        <AssetCard id="detail_back_2" label={language === "tr" ? "Det 2" : "Det 2"} icon={ScanLine} variant="square" />
-                                        <AssetCard id="detail_back_3" label={language === "tr" ? "Det 3" : "Det 3"} icon={ScanLine} variant="square" />
-                                        <AssetCard id="detail_back_4" label={language === "tr" ? "Det 4" : "Det 4"} icon={ScanLine} variant="square" />
+                                        <AssetCard id="detail_back_1" label={language === "tr" ? "Det 1" : "Det 1"} icon={ScanLine} variant="square" hideLibrary={true} />
+                                        <AssetCard id="detail_back_2" label={language === "tr" ? "Det 2" : "Det 2"} icon={ScanLine} variant="square" hideLibrary={true} />
+                                        <AssetCard id="detail_back_3" label={language === "tr" ? "Det 3" : "Det 3"} icon={ScanLine} variant="square" hideLibrary={true} />
+                                        <AssetCard id="detail_back_4" label={language === "tr" ? "Det 4" : "Det 4"} icon={ScanLine} variant="square" hideLibrary={true} />
                                     </div>
                                 </div>
                             </div>
@@ -563,7 +564,7 @@ export function LibrarySidebar({
                                     <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                         {language === "tr" ? "Eğitilmiş Modellerim" : "My Trained Models"}
                                     </h4>
-                                    <div className="grid grid-cols-2 gap-2">
+                                    <div className="grid grid-cols-3 gap-2">
                                         {models.map(model => (
                                             <div
                                                 key={model.id}
