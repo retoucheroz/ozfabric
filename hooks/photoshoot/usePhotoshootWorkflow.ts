@@ -140,7 +140,7 @@ export const usePhotoshootWorkflow = () => {
             try {
                 const savedStates = await dbOperations.getAll(STORES.PHOTOSHOOT_STATE);
                 if (savedStates && savedStates.length > 0) {
-                    const state = savedStates[savedStates.length - 1].data;
+                    const state = (savedStates[savedStates.length - 1] as any).data;
                     if (state.assets) setAssets(state.assets);
                     if (state.productName) setProductName(state.productName);
                     if (state.workflowType) setWorkflowType(state.workflowType);
