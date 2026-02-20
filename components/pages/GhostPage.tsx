@@ -63,6 +63,18 @@ const RESOLUTION_OPTIONS = [
   { id: "4K", label: "4K Ultra", labelTr: "4K Ultra" },
 ];
 
+const ASPECT_RATIO_OPTIONS = [
+  { id: "1:1", label: "Square (1:1)", labelTr: "Kare (1:1)" },
+  { id: "3:4", label: "Portrait (3:4)", labelTr: "Dikey (3:4)" },
+  { id: "4:3", label: "Landscape (4:3)", labelTr: "Yatay (4:3)" },
+  { id: "9:16", label: "Story (9:16)", labelTr: "Hikaye (9:16)" },
+  { id: "16:9", label: "Wide (16:9)", labelTr: "Geniş (16:9)" },
+  { id: "2:3", label: "Classic (2:3)", labelTr: "Klasik (2:3)" },
+  { id: "3:2", label: "Landscape (3:2)", labelTr: "Yatay (3:2)" },
+  { id: "21:9", label: "Ultra Wide (21:9)", labelTr: "Ultra Geniş (21:9)" },
+  { id: "9:21", label: "Ultra Tall (9:21)", labelTr: "Ultra Dikey (9:21)" },
+];
+
 const LOADING_MESSAGES = [
   { en: "Analyzing garment structure...", tr: "Giysi yapısı analiz ediliyor..." },
   { en: "detecting fabric details...", tr: "Kumaş detayları algılanıyor..." },
@@ -91,8 +103,10 @@ function GhostPageContent() {
 
   const [selectedAngle, setSelectedAngle] = useState<string>("front_straight")
   const [selectedResolution, setSelectedResolution] = useState("1K")
+  const [selectedAspectRatio, setSelectedAspectRatio] = useState("2:3")
   const [angleDialogOpen, setAngleDialogOpen] = useState(false)
   const [resolutionDialogOpen, setResolutionDialogOpen] = useState(false)
+  const [aspectRatioDialogOpen, setAspectRatioDialogOpen] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [resultImage, setResultImage] = useState<string | null>(null)
 
@@ -191,7 +205,8 @@ function GhostPageContent() {
         body: JSON.stringify({
           images: [mainImage, logoImage, fabricImage].filter(Boolean),
           angle: selectedAngle,
-          resolution: selectedResolution
+          resolution: selectedResolution,
+          aspectRatio: selectedAspectRatio
         }),
       });
 
@@ -386,48 +401,92 @@ function GhostPageContent() {
           </div>
         </div>
 
-        {/* Resolution Selector */}
-        <Dialog open={resolutionDialogOpen} onOpenChange={setResolutionDialogOpen}>
-          <DialogTrigger asChild>
-            <Card className="p-3 cursor-pointer hover:bg-[var(--bg-elevated)] transition-all border border-[var(--border-subtle)] hover:border-[var(--accent-primary)] group">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-[var(--bg-sidebar)] border border-[var(--border-subtle)] flex items-center justify-center shrink-0">
-                  <TbHdr className="w-5 h-5 text-[var(--text-muted)] group-hover:text-[var(--accent-primary)]" />
+        {/* Resolution and Aspect Ratio Selectors */}
+        <div className="grid grid-cols-2 gap-2">
+          <Dialog open={resolutionDialogOpen} onOpenChange={setResolutionDialogOpen}>
+            <DialogTrigger asChild>
+              <Card className="p-3 cursor-pointer hover:bg-[var(--bg-elevated)] transition-all border border-[var(--border-subtle)] hover:border-[var(--accent-primary)] group">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-[var(--bg-sidebar)] border border-[var(--border-subtle)] flex items-center justify-center shrink-0">
+                    <TbHdr className="w-5 h-5 text-[var(--text-muted)] group-hover:text-[var(--accent-primary)]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] uppercase font-black tracking-widest text-[var(--text-muted)]">{language === "tr" ? "ÇÖZÜNÜRLÜK" : "RESOLUTION"}</p>
+                    <p className="font-bold text-xs text-[var(--text-primary)]">{RESOLUTION_OPTIONS.find(r => r.id === selectedResolution)?.label}</p>
+                  </div>
+                  <TbChevronRight className="w-4 h-4 text-[var(--text-muted)] shrink-0" />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[10px] uppercase font-black tracking-widest text-[var(--text-muted)]">{language === "tr" ? "ÇÖZÜNÜRLÜK" : "RESOLUTION"}</p>
-                  <p className="font-bold text-xs text-[var(--text-primary)]">{RESOLUTION_OPTIONS.find(r => r.id === selectedResolution)?.label}</p>
-                </div>
-                <TbChevronRight className="w-4 h-4 text-[var(--text-muted)] shrink-0" />
+              </Card>
+            </DialogTrigger>
+            <DialogContent className="max-w-sm">
+              <DialogHeader>
+                <DialogTitle>{language === "tr" ? "Çözünürlük Seçin" : "Select Resolution"}</DialogTitle>
+              </DialogHeader>
+              <div className="flex flex-col gap-2 mt-4">
+                {RESOLUTION_OPTIONS.map((res) => (
+                  <Button
+                    key={res.id}
+                    variant={selectedResolution === res.id ? "default" : "outline"}
+                    className={`justify-between h-14 px-4 ${selectedResolution === res.id ? 'bg-violet-500 text-white hover:bg-violet-600' : ''}`}
+                    onClick={() => { setSelectedResolution(res.id); setResolutionDialogOpen(false); }}
+                  >
+                    <span className="font-medium">{language === "tr" ? res.labelTr : res.label}</span>
+                    <Badge variant="secondary" className={selectedResolution === res.id ? 'bg-white/20 text-white border-white/20' : ''}>
+                      {res.id}
+                    </Badge>
+                  </Button>
+                ))}
               </div>
-            </Card>
-          </DialogTrigger>
-          <DialogContent className="max-w-sm">
-            <DialogHeader>
-              <DialogTitle>{language === "tr" ? "Çözünürlük Seçin" : "Select Resolution"}</DialogTitle>
-            </DialogHeader>
-            <div className="flex flex-col gap-2 mt-4">
-              {RESOLUTION_OPTIONS.map((res) => (
-                <Button
-                  key={res.id}
-                  variant={selectedResolution === res.id ? "default" : "outline"}
-                  className={`justify-between h-14 px-4 ${selectedResolution === res.id ? 'bg-violet-500 text-white hover:bg-violet-600' : ''}`}
-                  onClick={() => { setSelectedResolution(res.id); setResolutionDialogOpen(false); }}
-                >
-                  <span className="font-medium">{language === "tr" ? res.labelTr : res.label}</span>
-                  <Badge variant="secondary" className={selectedResolution === res.id ? 'bg-white/20 text-white border-white/20' : ''}>
-                    {res.id}
-                  </Badge>
-                </Button>
-              ))}
-            </div>
-            <p className="text-[10px] text-muted-foreground mt-2 italic px-1">
-              {language === "tr"
-                ? "* Yüksek çözünürlükler (2K, 4K) daha fazla kredi tüketebilir ve işlem süresi uzayabilir."
-                : "* Higher resolutions (2K, 4K) may consume more credits and take longer to process."}
-            </p>
-          </DialogContent>
-        </Dialog>
+              <p className="text-[10px] text-muted-foreground mt-2 italic px-1">
+                {language === "tr"
+                  ? "* Yüksek çözünürlükler (2K, 4K) daha fazla kredi tüketebilir ve işlem süresi uzayabilir."
+                  : "* Higher resolutions (2K, 4K) may consume more credits and take longer to process."}
+              </p>
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={aspectRatioDialogOpen} onOpenChange={setAspectRatioDialogOpen}>
+            <DialogTrigger asChild>
+              <Card className="p-3 cursor-pointer hover:bg-[var(--bg-elevated)] transition-all border border-[var(--border-subtle)] hover:border-[var(--accent-primary)] group">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-[var(--bg-sidebar)] border border-[var(--border-subtle)] flex items-center justify-center shrink-0">
+                    <TbSquareRotated className="w-5 h-5 text-[var(--text-muted)] group-hover:text-[var(--accent-primary)]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] uppercase font-black tracking-widest text-[var(--text-muted)]">{language === "tr" ? "BOYUT" : "ASPECT RATIO"}</p>
+                    <p className="font-bold text-xs text-[var(--text-primary)]">{ASPECT_RATIO_OPTIONS.find(r => r.id === selectedAspectRatio)?.label}</p>
+                  </div>
+                  <TbChevronRight className="w-4 h-4 text-[var(--text-muted)] shrink-0" />
+                </div>
+              </Card>
+            </DialogTrigger>
+            <DialogContent className="max-w-sm">
+              <DialogHeader>
+                <DialogTitle>{language === "tr" ? "Boyut Oranı Seçin" : "Select Aspect Ratio"}</DialogTitle>
+              </DialogHeader>
+              <div className="flex flex-col gap-2 mt-4 max-h-[300px] overflow-y-auto pr-2">
+                {ASPECT_RATIO_OPTIONS.map((ratio) => (
+                  <Button
+                    key={ratio.id}
+                    variant={selectedAspectRatio === ratio.id ? "default" : "outline"}
+                    className={`justify-between h-14 px-4 ${selectedAspectRatio === ratio.id ? 'bg-violet-500 text-white hover:bg-violet-600' : ''}`}
+                    onClick={() => { setSelectedAspectRatio(ratio.id); setAspectRatioDialogOpen(false); }}
+                  >
+                    <span className="font-medium">{language === "tr" ? ratio.labelTr : ratio.label}</span>
+                    <Badge variant="secondary" className={selectedAspectRatio === ratio.id ? 'bg-white/20 text-white border-white/20' : ''}>
+                      {ratio.id}
+                    </Badge>
+                  </Button>
+                ))}
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-2 italic px-1">
+                {language === "tr"
+                  ? "* Farklı pazar yerleri ve kullanım alanlarına göre görüntü oranını belirler."
+                  : "* Determines the image ratio based on different marketplaces and use cases."}
+              </p>
+            </DialogContent>
+          </Dialog>
+        </div>
 
         {/* Active Model Indicator */}
         {activeModel && (
@@ -512,30 +571,6 @@ function GhostPageContent() {
             <p>{t("ghost.studioDesc")}</p>
           </div>
         )}
-      </div>
-
-      {/* Right: History */}
-      <div className="hidden xl:block w-[200px] border-l bg-white dark:bg-stone-950 p-4 overflow-y-auto shrink-0">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-sm">{language === 'tr' ? 'Geçmiş' : 'History'}</h3>
-        </div>
-        <div className="space-y-3">
-          {ghostHistory.length > 0 ? (
-            ghostHistory.map((item) => (
-              <div key={item.id} className="space-y-1 group cursor-pointer" onClick={() => setResultImage(item.imageUrl)}>
-                <div className="aspect-[3/4] rounded-lg overflow-hidden border-2 border-transparent group-hover:border-violet-500 transition-all bg-muted">
-                  <img src={item.imageUrl} className="w-full h-full object-cover" />
-                </div>
-                <div className="flex justify-between items-center mt-1">
-                  <p className="text-[10px] text-muted-foreground">{formatDate(item.createdAt)}</p>
-                  <Badge variant="outline" className="text-[9px] h-4 px-1 max-w-[80px] truncate">{item.description}</Badge>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p className="text-xs text-muted-foreground text-center py-8">{language === 'tr' ? 'Henüz geçmiş yok' : 'No history yet'}</p>
-          )}
-        </div>
       </div>
     </div>
   )

@@ -173,7 +173,7 @@ Clean commercial e-commerce look.`;
 
 export async function POST(req: NextRequest) {
     try {
-        const { images, angle, resolution } = await req.json();
+        const { images, angle, resolution, aspectRatio } = await req.json();
 
         if (!images || images.length === 0) {
             return NextResponse.json({ error: "At least one image required" }, { status: 400 });
@@ -184,6 +184,10 @@ export async function POST(req: NextRequest) {
         else if (angle === "front_straight") selectedPrompt = STRAIGHT_FRONT_PROMPT;
         else if (angle === "back_straight") selectedPrompt = STRAIGHT_BACK_PROMPT;
         else if (angle === "flatlay") selectedPrompt = FLATLAY_PROMPT;
+
+        const effectiveAspectRatio = aspectRatio || "2:3";
+        selectedPrompt = selectedPrompt.replace(/2:3 aspect ratio/g, `${effectiveAspectRatio} aspect ratio`);
+
         const falKey = process.env.FAL_KEY;
 
         if (!falKey) {
@@ -211,7 +215,7 @@ export async function POST(req: NextRequest) {
             body: JSON.stringify({
                 prompt: selectedPrompt,
                 image_urls: sanitizedImages, // Array of URLs (supports up to 14)
-                aspect_ratio: "2:3",
+                aspect_ratio: effectiveAspectRatio,
                 resolution: resolution || "1K"
             }),
         });
