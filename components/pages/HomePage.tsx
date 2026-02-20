@@ -31,7 +31,7 @@ export default function HomePage() {
     }
 
     return (
-        <div className="p-8 space-y-8 max-w-7xl mx-auto h-full overflow-y-auto bg-[var(--bg-base)] min-h-screen">
+        <div className="p-4 md:p-8 space-y-8 max-w-7xl mx-auto">
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
