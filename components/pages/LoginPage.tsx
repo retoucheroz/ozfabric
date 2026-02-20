@@ -105,7 +105,11 @@ export default function LoginPage() {
       {/* Background Image Layer */}
       <div className="absolute inset-0 z-0 hidden lg:block overflow-hidden pointer-events-none">
         {/* The user's image spans 75% of the screen width to give a wider reach towards the form */}
-        <div className="absolute top-0 left-0 w-[75vw] h-full bg-[url('/login-bg.jpg')] bg-cover bg-[center_top]"></div>
+        <img
+          src="/login-bg.jpg"
+          alt="rawless login background"
+          className="absolute top-0 left-0 w-[75vw] h-full object-cover object-[center_top]"
+        />
 
         {/* Right-ward smooth fade to match theme background */}
         <div className="absolute top-0 left-0 w-[75vw] h-full bg-gradient-to-r from-transparent from-20% via-background/50 via-60% to-background"></div>
