@@ -485,17 +485,7 @@ export default function PhotoshootPage() {
                     )}
                 </div>
 
-                {/* Micro-feedback Hint Area */}
-                <div className="absolute top-6 left-1/2 -translate-x-1/2 z-30 pointer-events-none h-8 flex items-center justify-center">
-                    {microFeedback && (
-                        <div className="bg-white/90 dark:bg-background/90 backdrop-blur-md border border-violet-200/50 dark:border-violet-800/50 px-4 py-1 rounded-full shadow-sm">
-                            <p className="text-[10px] font-bold text-violet-600 dark:text-violet-400 uppercase tracking-tighter flex items-center gap-2">
-                                <Sparkles size={10} className="animate-pulse" />
-                                {microFeedback}
-                            </p>
-                        </div>
-                    )}
-                </div>
+
 
                 {/* Preview Dialog */}
                 <Dialog open={showPreview} onOpenChange={setShowPreview}>
