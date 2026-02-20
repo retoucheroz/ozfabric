@@ -89,7 +89,10 @@ export default function MannequinPosePage() {
                 throw new Error("GLB modeli döndürülmedi.");
             }
 
-            setGlbUrl(data.model_glb);
+            const modelGlb = data.model_glb;
+            const finalGlbUrl = typeof modelGlb === 'string' ? modelGlb : modelGlb.url;
+
+            setGlbUrl(finalGlbUrl);
             setMetadata(data.metadata);
 
             toast.success("Render hazır!");
