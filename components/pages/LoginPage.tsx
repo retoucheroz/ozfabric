@@ -104,18 +104,23 @@ export default function LoginPage() {
     <div className="w-full min-h-screen relative flex bg-background">
 
       {/* Background Image Layer */}
-      <div className="absolute inset-0 z-0 hidden lg:block overflow-hidden pointer-events-none">
-        {/* The user's video spans 75% of the screen width to give a wider reach towards the form */}
-        <HeroVideo className="absolute top-0 left-0 w-[75vw] h-full pointer-events-auto cursor-ew-resize" />
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        {/* The user's video spans full width on mobile, 75% on desktop */}
+        <HeroVideo className="absolute top-0 left-0 w-full lg:w-[75vw] h-full pointer-events-auto cursor-ew-resize" />
 
-        {/* Right-ward smooth fade to match theme background */}
-        <div className="absolute top-0 left-0 w-[75vw] h-full bg-gradient-to-r from-transparent from-20% via-background/50 via-60% to-background"></div>
+        {/* Mobile: bottom-up strong gradient to fade out video behind the form area completely */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent lg:hidden"></div>
+        {/* Mobile: generic dark overlay to ensure the video doesn't completely blow out the white form text if the video is bright */}
+        <div className="absolute inset-0 bg-black/40 lg:hidden pointer-events-none"></div>
 
-        {/* Extra gradient from the right side, extending over the login form area securely to fade out the image's right edge */}
-        <div className="absolute inset-y-0 right-0 w-[55vw] bg-gradient-to-l from-background via-background/90 to-transparent"></div>
+        {/* Desktop: Right-ward smooth fade to match theme background */}
+        <div className="hidden lg:block absolute top-0 left-0 w-[75vw] h-full bg-gradient-to-r from-transparent from-20% via-background/50 via-60% to-background"></div>
+
+        {/* Desktop: Extra gradient from the right side, extending over the login form area securely to fade out the image's right edge */}
+        <div className="hidden lg:block absolute inset-y-0 right-0 w-[55vw] bg-gradient-to-l from-background via-background/90 to-transparent"></div>
 
         {/* Bottom-up fade for text readability */}
-        <div className="absolute inset-x-0 bottom-0 h-[50vh] bg-gradient-to-t from-background/90 from-20% to-transparent"></div>
+        <div className="hidden lg:block absolute inset-x-0 bottom-0 h-[50vh] bg-gradient-to-t from-background/90 from-20% to-transparent"></div>
       </div>
 
       {/* Content Grid */}
@@ -144,7 +149,16 @@ export default function LoginPage() {
         </div>
 
         {/* Right side: Auth Form */}
-        <div className="flex items-center justify-center py-12 px-8 relative">
+        <div className="flex items-center justify-center min-h-screen lg:min-h-0 py-12 px-8 relative">
+
+          {/* Mobile Logo */}
+          <div className="absolute top-8 left-8 lg:hidden flex items-center gap-2 font-bold text-xl tracking-tighter text-white z-20">
+            <div className="w-6 h-6 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full flex items-center justify-center">
+              <div className="w-3 h-3 bg-white rounded-full"></div>
+            </div>
+            <span className="bg-gradient-to-r from-violet-400 to-purple-500 bg-clip-text text-transparent">rawless</span>.ai
+          </div>
+
           {/* Language Switcher */}
           {mounted && (
             <div className="absolute top-4 right-4">
