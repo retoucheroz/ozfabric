@@ -544,10 +544,10 @@ export default function VideoPage() {
             let resizedEndFrame = endFrame;
 
             if (firstFrame) {
-                resizedFirstFrame = await resizeImageToMax(firstFrame, 1280, 'image/jpeg', 0.85);
+                resizedFirstFrame = await resizeImageToMax(firstFrame, 3000, 'image/jpeg', 0.90);
             }
             if (endFrame) {
-                resizedEndFrame = await resizeImageToMax(endFrame, 1280, 'image/jpeg', 0.85);
+                resizedEndFrame = await resizeImageToMax(endFrame, 3000, 'image/jpeg', 0.90);
             }
 
             // Step 1: Upload images to fal storage via our upload endpoint

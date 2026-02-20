@@ -31,7 +31,7 @@ export const useAssetManager = (
         if (key === 'pose' || key === 'lighting' || key.startsWith('detail_')) {
             return 1024;
         }
-        return 2048;
+        return 3000;
     };
 
     const resizeImage = (file: File, maxSize: number): Promise<string> => {
@@ -58,7 +58,7 @@ export const useAssetManager = (
                     ctx.imageSmoothingEnabled = true;
                     ctx.imageSmoothingQuality = 'high';
                     ctx.drawImage(img, 0, 0, width, height);
-                    const resizedDataUrl = canvas.toDataURL('image/jpeg', 0.92);
+                    const resizedDataUrl = canvas.toDataURL('image/jpeg', 0.90);
                     resolve(resizedDataUrl);
                 };
                 img.onerror = (err) => {

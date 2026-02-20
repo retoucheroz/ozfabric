@@ -43,7 +43,7 @@ import {
 import { useRouter, useSearchParams } from "next/navigation"
 import { useProjects } from "@/context/projects-context"
 import { useLanguage } from "@/context/language-context"
-import { downloadImage, cn } from "@/lib/utils"
+import { downloadImage, cn, optimizeImageForApi } from "@/lib/utils"
 import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
@@ -109,7 +109,10 @@ function GhostPageContent() {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => setMainImage(reader.result as string);
+      reader.onloadend = async () => {
+        const optimized = await optimizeImageForApi(reader.result as string, 3000, 0.90);
+        setMainImage(optimized);
+      };
       reader.readAsDataURL(file);
     }
   };
@@ -118,7 +121,10 @@ function GhostPageContent() {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => setLogoImage(reader.result as string);
+      reader.onloadend = async () => {
+        const optimized = await optimizeImageForApi(reader.result as string, 3000, 0.90);
+        setLogoImage(optimized);
+      };
       reader.readAsDataURL(file);
     }
   };
@@ -127,7 +133,10 @@ function GhostPageContent() {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => setFabricImage(reader.result as string);
+      reader.onloadend = async () => {
+        const optimized = await optimizeImageForApi(reader.result as string, 3000, 0.90);
+        setFabricImage(optimized);
+      };
       reader.readAsDataURL(file);
     }
   };

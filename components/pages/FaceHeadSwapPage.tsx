@@ -128,8 +128,8 @@ export default function FaceHeadSwapPage() {
 
         try {
             // Resize for transit
-            const resizedIdentity = await resizeImageToMax(identityImage, 1024, 'image/jpeg', 0.85)
-            const resizedBase = await resizeImageToMax(baseImage, 1024, 'image/jpeg', 0.85)
+            const resizedIdentity = await resizeImageToMax(identityImage, 3000, 'image/jpeg', 0.90)
+            const resizedBase = await resizeImageToMax(baseImage, 3000, 'image/jpeg', 0.90)
 
             // Step 1: Upload to Fal Storage
             const upload = async (img: string, name: string) => {

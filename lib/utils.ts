@@ -51,3 +51,38 @@ export async function resizeImageToThumbnail(dataUrl: string, maxWidth = 150): P
     img.onerror = (e) => reject(e);
   });
 }
+
+export async function optimizeImageForApi(dataUrl: string, maxSize = 3000, quality = 0.90): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.src = dataUrl;
+    img.onload = () => {
+      let width = img.width;
+      let height = img.height;
+
+      if (width > maxSize || height > maxSize) {
+        const ratio = Math.min(maxSize / width, maxSize / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      } else {
+        // If image is already smaller, return original
+        resolve(dataUrl);
+        return;
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        reject(new Error("No canvas context"));
+        return;
+      }
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL("image/jpeg", quality));
+    };
+    img.onerror = (e) => reject(e);
+  });
+}

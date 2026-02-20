@@ -141,7 +141,7 @@ export default function TryOnPage() {
   // Asset Upload Handler
   const handleAssetUpload = async (id: string, file: File) => {
     try {
-      const resizedUrl = await resizeImage(file, 1536);
+      const resizedUrl = await resizeImage(file, 3000);
       setAssets(prev => ({ ...prev, [id]: resizedUrl }));
 
       // Auto-analyze if it's a main garment image and product name is empty
@@ -157,7 +157,7 @@ export default function TryOnPage() {
   // Model Upload Handler
   const handleModelUpload = async (file: File) => {
     try {
-      const resizedUrl = await resizeImage(file, 1536);
+      const resizedUrl = await resizeImage(file, 3000);
       setModelImage(resizedUrl);
       toast.success(language === "tr" ? "Model görseli yüklendi" : "Model image uploaded");
     } catch (e) {
@@ -169,7 +169,7 @@ export default function TryOnPage() {
   // Innerwear Upload Handler
   const handleInnerwearUpload = async (file: File) => {
     try {
-      const resizedUrl = await resizeImage(file, 1536);
+      const resizedUrl = await resizeImage(file, 3000);
       setInnerwearImage(resizedUrl);
       toast.success(language === "tr" ? "İç giyim görseli yüklendi" : "Innerwear image uploaded");
     } catch (e) {

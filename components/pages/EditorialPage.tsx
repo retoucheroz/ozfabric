@@ -25,7 +25,7 @@ import {
 import { useProjects } from "@/context/projects-context"
 import { useLanguage } from "@/context/language-context"
 import { toast } from "sonner"
-import { resizeImageToThumbnail, cn } from "@/lib/utils"
+import { resizeImageToThumbnail, optimizeImageForApi, cn } from "@/lib/utils"
 import { CAMERAS, LOCATIONS, type CameraSpec, type LensSpec, type EditorialLocation } from "@/lib/editorial-data"
 import { motion, AnimatePresence } from "framer-motion"
 import { Separator } from "@/components/ui/separator"
@@ -402,8 +402,8 @@ export default function EditorialPage() {
 
             if (id === 'model') {
                 try {
-                    // Generate High-Res (2048px) for API
-                    const highRes = await resizeImageToThumbnail(dataUrl, 2048);
+                    // Generate High-Res (3000px) for API
+                    const highRes = await optimizeImageForApi(dataUrl, 3000, 0.90);
                     setModelImageHighRes(highRes);
 
                     // Generate Display Thumbnail (512px) for UI
@@ -415,7 +415,13 @@ export default function EditorialPage() {
                     setModelImageHighRes(dataUrl);
                 }
             } else if (id === 'outfit') {
-                setOutfitImage(dataUrl);
+                try {
+                    const optimizedOutfit = await optimizeImageForApi(dataUrl, 3000, 0.90);
+                    setOutfitImage(optimizedOutfit);
+                } catch (err) {
+                    console.error("Outfit image optimization failed", err);
+                    setOutfitImage(dataUrl);
+                }
             }
         };
         reader.readAsDataURL(file);
