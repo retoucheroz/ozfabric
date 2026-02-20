@@ -128,7 +128,7 @@ export const useAssetManager = (
             }
 
             if (key === 'model') {
-                setTempModelData({ url: highRes, name: "", gender: 'female' });
+                setTempModelData({ url: lowRes, name: "", gender: 'female' });
                 setShowSaveModelDialog(true);
             }
 
@@ -144,7 +144,7 @@ export const useAssetManager = (
             }
 
             if (['background', 'fit_pattern', 'shoes', 'jacket', 'bag', 'glasses', 'hat', 'jewelry', 'belt'].includes(key)) {
-                setTempAssetData({ key, url: highRes, name: "" });
+                setTempAssetData({ key, url: lowRes, name: "" });
                 setShowSaveAssetDialog(true);
             }
 
