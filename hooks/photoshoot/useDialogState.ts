@@ -150,11 +150,11 @@ export const useDialogState = (
     // MODEL HANDLER
     const handleSaveModel = async () => {
         if (!tempModelData) return;
-        let finalUrl = tempModelData.url;
+        const uploadSource = assetsHighRes.model || tempModelData.url;
+        let finalUrl = uploadSource;
         if (process.env.NEXT_PUBLIC_USE_R2_UPLOAD === "true") {
             try {
                 toast.info(language === "tr" ? "Model buluta kaydediliyor..." : "Saving model to cloud...");
-                const uploadSource = assetsHighRes.model || tempModelData.url;
                 const res = await fetch("/api/r2/upload", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -174,7 +174,7 @@ export const useDialogState = (
             url: finalUrl,
             name: tempModelData.name || (language === "tr" ? "Yeni Model" : "New Model"),
             gender: tempModelData.gender,
-            thumbUrl: finalUrl,
+            thumbUrl: tempModelData.url, // LowRes Base64 / Optimized
             createdAt: Date.now()
         };
         const updated = [newModel, ...savedModels];
@@ -191,12 +191,13 @@ export const useDialogState = (
     // GENERIC ASSET HANDLER
     const handleSaveAsset = async () => {
         if (!tempAssetData) return;
-        const { key, url, name } = tempAssetData;
-        let finalUrl = url;
+        const { key, url, name } = tempAssetData; // 'url' holds the lowRes thumbnail
+        const uploadSource = assetsHighRes[key] || url;
+        let finalUrl = uploadSource;
+
         if (process.env.NEXT_PUBLIC_USE_R2_UPLOAD === "true") {
             try {
                 toast.info(language === "tr" ? "Öğe buluta kaydediliyor..." : "Saving item to cloud...");
-                const uploadSource = assetsHighRes[key] || url;
                 const res = await fetch("/api/r2/upload", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -215,7 +216,7 @@ export const useDialogState = (
             id: crypto.randomUUID(),
             url: finalUrl,
             name: name || (language === "tr" ? "Yeni Öğe" : "New Item"),
-            thumbUrl: finalUrl,
+            thumbUrl: url, // LowRes Base64 / Optimized
             createdAt: Date.now()
         };
 
@@ -261,10 +262,12 @@ export const useDialogState = (
     // LIGHTING HANDLER
     const handleSaveLighting = async () => {
         if (!tempLightingData) return;
-        let finalUrl = tempLightingData.url;
+        const uploadSource = assetsHighRes.lighting || tempLightingData.url;
+        let finalUrl = uploadSource;
+
         if (process.env.NEXT_PUBLIC_USE_R2_UPLOAD === "true" && finalUrl.startsWith('data:')) {
             toast.info(language === "tr" ? "Işık referansı buluta kaydediliyor..." : "Saving lighting reference to cloud...");
-            finalUrl = await uploadToR2(tempLightingData.url, "lighting_setup.png");
+            finalUrl = await uploadToR2(uploadSource, "lighting_setup.png");
         }
 
         const newLighting: SavedLighting = {
