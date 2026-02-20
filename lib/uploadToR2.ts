@@ -31,7 +31,7 @@ export async function uploadToR2(dataUrlOrUrl: string, fileName: string) {
     throw new Error("Presign failed");
   }
 
-  const { uploadUrl } = (await presignRes.json()) as { uploadUrl: string };
+  const { uploadUrl, finalUrl } = (await presignRes.json()) as { uploadUrl: string, finalUrl: string };
 
   const putRes = await fetch(uploadUrl, {
     method: "PUT",
@@ -40,14 +40,8 @@ export async function uploadToR2(dataUrlOrUrl: string, fileName: string) {
   });
 
   if (!putRes.ok) {
-    throw new Error("R2 upload failed");
+    throw new Error("S3/R2 upload failed");
   }
 
-  const publicBase = process.env.NEXT_PUBLIC_R2_PUBLIC_BASE_URL; // örn: https://cdn.ozfabric.com
-  if (!publicBase) {
-    // Public base yoksa en azından key'i dönelim (backend ileride GET ile çekebilir)
-    return key;
-  }
-
-  return `${publicBase.replace(/\/$/, "")}/${key}`;
+  return finalUrl;
 }

@@ -101,7 +101,7 @@ export function Sidebar({ variant = "default" }: SidebarProps) {
         { label: t("sidebar.editorial"), href: '/editorial', icon: TbPhotoScan },
         { label: t("sidebar.video"), href: '/video', icon: TbMovie },
         { label: t("sidebar.faceHeadSwap"), href: '/face-head-swap', icon: TbFaceId },
-        { label: t("sidebar.ghost"), href: '/photoshoot/ghost', icon: TbGhost2 },
+        { label: t("sidebar.ghost"), href: '/photoshoot/ghost', icon: TbHanger },
     ].filter(item => isAuthorized(item.href));
 
     // ARAÇLAR Group

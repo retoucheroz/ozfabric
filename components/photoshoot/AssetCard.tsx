@@ -207,10 +207,10 @@ export function AssetCard({
                                 {Icon ? <Icon size={24} /> : <Upload size={24} />}
                             </div>
                             <div className="space-y-0.5">
-                                <span className="text-[11px] font-black uppercase tracking-wide text-white block leading-tight">
+                                <span className="text-[11px] font-black uppercase tracking-wide text-black dark:text-white block leading-tight">
                                     {label}
                                 </span>
-                                <span className="text-[9px] font-black text-white/50 uppercase tracking-tighter block group-hover/card:text-white/80 transition-colors">
+                                <span className="text-[9px] font-black text-[var(--accent-primary)] uppercase tracking-tighter block opacity-80 group-hover/card:opacity-100 transition-opacity">
                                     {description || (language === "tr" ? "YÜKLE VEYA SÜRÜKLE" : "UPLOAD OR DRAG")}
                                 </span>
                             </div>

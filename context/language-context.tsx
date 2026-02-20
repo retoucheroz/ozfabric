@@ -36,7 +36,7 @@ const translations: Translations = {
     "sidebar.retexture": { en: "Retexture", tr: "Doku" },
     "sidebar.aiModel": { en: "Generate Photo", tr: "Fotoğraf Üret" },
     "sidebar.tryOn": { en: "Detail Shot", tr: "Detay Çekim" },
-    "sidebar.ghost": { en: "Ghost Mannequin", tr: "Ghost Manken" },
+    "sidebar.ghost": { en: "Ghost / Flatlay", tr: "Ghost / Flatlay" },
     "sidebar.editorial": { en: "Campaign", tr: "Kampanya" },
     "sidebar.ecom": { en: "E-com", tr: "E-com" },
     "sidebar.collections": { en: "Collections", tr: "Koleksiyonlar" },
@@ -87,7 +87,7 @@ const translations: Translations = {
     "home.virtualTryOn": { en: "Generate Detail", tr: "Detay Üret" },
     "home.virtualTryOnDesc": { en: "Visualize garments in AI studios instantly.", tr: "Giysileri AI stüdyolar içerisinde anında görselleştirin." },
 
-    "home.ghostModelTitle": { en: "Generate Ghost Model", tr: "Ghost Model Üret" },
+    "home.ghostModelTitle": { en: "Ghost / Flatlay", tr: "Ghost / Flatlay Üret" },
     "home.ghostModelDesc": { en: "Transform hanging/flat items into 3D ghost mannequin shots.", tr: "Askıda veya düz ürünlerinizi 3D hayalet manken çekimine çevirin." },
 
     "home.trainTitle": { en: "Train Model", tr: "Model Eğit" },
@@ -283,12 +283,14 @@ const translations: Translations = {
     "tryOn.noResultDesc": { en: "Select a studio and a garment to start the virtual try-on process.", tr: "Sanal deneme işlemi başlatmak için stüdyo ve giysi seçin." },
 
     // Ghost Mannequin Page
-    "ghost.title": { en: "Ghost Mannequin", tr: "Hayalet Manken" },
-    "ghost.subtitle": { en: "Turn flat lays into 3D volume.", tr: "Düz serimleri 3D hacme dönüştürün." },
+    "ghost.title": { en: "Ghost / Flatlay", tr: "Ghost / Flatlay" },
+    "ghost.subtitle": { en: "TRANSFORM GARMENTS SHOT ON HANGER OR TABLE INTO GHOST MODEL", tr: "ASKIDA YA DA MASADA ÇEKİLEN ÜRÜNLERİ GHOST MODEL'E DÖNÜŞTÜRÜN" },
     "ghost.uploadFlatLay": { en: "Upload Flat Lay Garment", tr: "Düz Serim Giysi Yükle" },
     "ghost.generate3D": { en: "Generate 3D View", tr: "3D Görünüm Oluştur" },
     "ghost.studioTitle": { en: "3D Volume Studio", tr: "3D Hacim Stüdyosu" },
     "ghost.studioDesc": { en: "Upload a clothing item to see it transformed into a ghost mannequin product shot.", tr: "Bir giysiyi hayalet manken ürün çekimine dönüştürmek için yükleyin." },
+    "ghost.generate": { en: "Generate", tr: "Oluştur" },
+    "ghost.processing": { en: "Generating...", tr: "Oluşturuluyor..." },
 
     // Retexture Page
     "retexture.title": { en: "Retexture Studio", tr: "Doku Değiştirme Stüdyosu" },

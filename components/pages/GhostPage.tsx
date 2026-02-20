@@ -22,7 +22,7 @@ import {
   Shirt
 } from "lucide-react"
 import {
-  TbGhost,
+  TbHanger,
   TbShirt,
   TbSignature,
   TbPalette,
@@ -32,7 +32,13 @@ import {
   TbSparkles,
   TbLoader2,
   TbRefresh,
-  TbMaximize
+  TbMaximize,
+  TbSquare,
+  TbSquareRotated,
+  TbArrowUpRight,
+  TbArrowDownLeft,
+  TbLayoutBoard,
+  TbShirtFilled
 } from "react-icons/tb"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useProjects } from "@/context/projects-context"
@@ -44,8 +50,11 @@ import { Progress } from "@/components/ui/progress"
 import { SERVICE_COSTS } from "@/lib/pricingConstants";
 
 const ANGLE_OPTIONS = [
-  { id: "front", label: "Front 3/4", labelTr: "Ön 3/4", icon: "↗️" },
-  { id: "back", label: "Back 3/4", labelTr: "Arka 3/4", icon: "↙️" },
+  { id: "front_straight", label: "Front", labelTr: "Ön", icon: TbShirt },
+  { id: "back_straight", label: "Back", labelTr: "Arka", icon: TbShirt },
+  { id: "front", label: "Front 3/4", labelTr: "Ön 3/4", icon: TbArrowUpRight },
+  { id: "back", label: "Back 3/4", labelTr: "Arka 3/4", icon: TbArrowDownLeft },
+  { id: "flatlay", label: "Flatlay", labelTr: "Flatlay", icon: TbShirtFilled },
 ];
 
 const RESOLUTION_OPTIONS = [
@@ -80,7 +89,7 @@ function GhostPageContent() {
   const [logoImage, setLogoImage] = useState<string | null>(null)
   const [fabricImage, setFabricImage] = useState<string | null>(null)
 
-  const [selectedAngle, setSelectedAngle] = useState<"front" | "back">("front")
+  const [selectedAngle, setSelectedAngle] = useState<string>("front_straight")
   const [selectedResolution, setSelectedResolution] = useState("1K")
   const [angleDialogOpen, setAngleDialogOpen] = useState(false)
   const [resolutionDialogOpen, setResolutionDialogOpen] = useState(false)
@@ -125,7 +134,14 @@ function GhostPageContent() {
 
   const getAngleLabel = () => {
     const angle = ANGLE_OPTIONS.find(a => a.id === selectedAngle);
-    return `${angle?.icon} ${language === "tr" ? angle?.labelTr : angle?.label}`;
+    if (!angle) return "";
+    const Icon = angle.icon;
+    return (
+      <span className="flex items-center gap-2">
+        <Icon className="w-4 h-4 text-violet-500" />
+        {language === "tr" ? angle.labelTr : angle.label}
+      </span>
+    );
   };
 
   const handleGenerate = async () => {
@@ -182,7 +198,7 @@ function GhostPageContent() {
           title: language === "tr" ? "Hayalet Manken Çekimi" : "Ghost Mannequin Shot",
           type: "Ghost",
           imageUrl: data.imageUrl,
-          description: `${selectedResolution} • ${selectedAngle === "front" ? "Front" : "Back"}`
+          description: `${selectedResolution} • ${ANGLE_OPTIONS.find(a => a.id === selectedAngle)?.label || selectedAngle}`
         });
         toast.success(language === "tr" ? "Hayalet manken oluşturuldu!" : "Ghost mannequin generated!");
       } else if (data.error) {
@@ -222,7 +238,7 @@ function GhostPageContent() {
       <div className="w-full lg:w-[420px] lg:border-r border-b lg:border-b-0 bg-background p-4 lg:overflow-y-auto space-y-4 shrink-0">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10 rounded-xl bg-[var(--accent-soft)] flex items-center justify-center text-[var(--accent-primary)] shadow-lg shadow-[var(--accent-primary)]/10">
-            <TbGhost className="w-6 h-6" />
+            <TbHanger className="w-6 h-6" />
           </div>
           <div>
             <h2 className="text-xl font-black tracking-tight uppercase italic text-[var(--text-primary)]">{t("ghost.title")}</h2>
@@ -335,41 +351,31 @@ function GhostPageContent() {
             : "• Image 1: Main garment reference (required)\n• Image 2: Logo/text/detail lock\n• Image 3: Fabric/material lock"}
         </p>
 
-        {/* Angle Selector */}
-        <Dialog open={angleDialogOpen} onOpenChange={setAngleDialogOpen}>
-          <DialogTrigger asChild>
-            <Card className="p-3 cursor-pointer hover:bg-[var(--bg-elevated)] transition-all border border-[var(--border-subtle)] hover:border-[var(--accent-primary)] group">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-[var(--bg-sidebar)] border border-[var(--border-subtle)] flex items-center justify-center shrink-0">
-                  <TbAdjustmentsHorizontal className="w-5 h-5 text-[var(--text-muted)] group-hover:text-[var(--accent-primary)]" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[10px] uppercase font-black tracking-widest text-[var(--text-muted)]">{language === "tr" ? "GÖRÜNÜM AÇISI" : "VIEW ANGLE"}</p>
-                  <p className="font-bold text-xs text-[var(--text-primary)]">{getAngleLabel()}</p>
-                </div>
-                <TbChevronRight className="w-4 h-4 text-[var(--text-muted)] shrink-0" />
-              </div>
-            </Card>
-          </DialogTrigger>
-          <DialogContent className="max-w-sm">
-            <DialogHeader>
-              <DialogTitle>{language === "tr" ? "Görünüm Açısı Seçin" : "Select View Angle"}</DialogTitle>
-            </DialogHeader>
-            <div className="grid grid-cols-2 gap-3 mt-4">
-              {ANGLE_OPTIONS.map((angle) => (
-                <Button
-                  key={angle.id}
-                  variant={selectedAngle === angle.id ? "default" : "outline"}
-                  className={`h-20 flex-col gap-2 ${selectedAngle === angle.id ? 'bg-violet-500 text-white hover:bg-violet-600' : ''}`}
-                  onClick={() => { setSelectedAngle(angle.id as "front" | "back"); setAngleDialogOpen(false); }}
-                >
-                  <span className="text-2xl">{angle.icon}</span>
-                  <span>{language === "tr" ? angle.labelTr : angle.label}</span>
-                </Button>
-              ))}
-            </div>
-          </DialogContent>
-        </Dialog>
+        {/* Angle Grid Section */}
+        <div className="space-y-3 pt-2">
+          <label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest flex items-center gap-2 mb-1">
+            <TbAdjustmentsHorizontal className="w-4 h-4 text-[var(--accent-primary)]" />
+            {language === "tr" ? "GÖRÜNÜM AÇILARI" : "VIEW ANGLES"}
+          </label>
+          <div className="grid grid-cols-2 gap-2">
+            {ANGLE_OPTIONS.map((angle) => (
+              <Button
+                key={angle.id}
+                variant={selectedAngle === angle.id ? "default" : "outline"}
+                className={cn(
+                  "h-20 flex-col gap-1 transition-all duration-300 border-[var(--border-subtle)]",
+                  selectedAngle === angle.id
+                    ? "bg-violet-600 text-white shadow-lg shadow-violet-500/30 border-violet-600"
+                    : "bg-[var(--bg-elevated)] hover:border-violet-500/50 hover:bg-violet-500/5 text-[var(--text-primary)]"
+                )}
+                onClick={() => setSelectedAngle(angle.id)}
+              >
+                <angle.icon className={cn("w-8 h-8 mb-1", selectedAngle === angle.id ? "text-white" : "text-violet-500")} />
+                <span className="font-bold text-[10px] uppercase tracking-tight">{language === "tr" ? angle.labelTr : angle.label}</span>
+              </Button>
+            ))}
+          </div>
+        </div>
 
         {/* Resolution Selector */}
         <Dialog open={resolutionDialogOpen} onOpenChange={setResolutionDialogOpen}>

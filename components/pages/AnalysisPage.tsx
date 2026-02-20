@@ -164,7 +164,7 @@ export default function AnalysisPage() {
                 if (data.stickmanUrl) {
                     setStickmanUrl(data.stickmanUrl);
                 }
-                toast.success(language === "tr" ? "Analiz tamamlandı!" : "Analysis complete!");
+                toast.success(language === "tr" ? "Analiz tamamlandı (-20 Kredi)!" : "Analysis complete (-20 Credits)!");
             } else {
                 toast.error(data.error || "Analysis failed");
             }
@@ -412,13 +412,16 @@ export default function AnalysisPage() {
                                 ) : (
                                     <motion.div
                                         key="ready"
-                                        className="flex items-center gap-2"
+                                        className="flex flex-col items-center justify-center"
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: -10 }}
                                     >
-                                        <TbSparkles className="w-5 h-5 fill-current" />
-                                        <span className="uppercase tracking-widest px-1">{language === "tr" ? "ANALİZİ BAŞLAT" : "START ANALYSIS"}</span>
+                                        <div className="flex items-center gap-2">
+                                            <TbSparkles className="w-5 h-5 fill-current" />
+                                            <span className="uppercase tracking-widest px-1 font-black">{language === "tr" ? "ANALİZİ BAŞLAT" : "START ANALYSIS"}</span>
+                                        </div>
+                                        <span className="text-[10px] font-bold opacity-70 tracking-tighter mt-0.5">20 CREDITS</span>
                                     </motion.div>
                                 )}
                             </AnimatePresence>

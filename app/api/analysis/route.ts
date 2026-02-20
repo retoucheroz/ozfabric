@@ -3,12 +3,31 @@ import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/ge
 
 export async function POST(req: NextRequest) {
     try {
+        const { getSession, getUser, saveUser } = await import("@/lib/auth");
+        const session = await getSession();
+        if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+        const user = await getUser(session.username);
+        if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+        const ANALYZE_COST = 20;
+        if ((user.credits || 0) < ANALYZE_COST) {
+            return NextResponse.json({ error: "Insufficient credits" }, { status: 400 });
+        }
+
         const apiKey = process.env.GEMINI_API_KEY;
         const falKey = process.env.FAL_KEY;
 
         if (!apiKey) {
             return NextResponse.json({ error: "GEMINI_API_KEY is not configured" }, { status: 500 });
         }
+
+        // Deduct credits
+        const updatedUser = {
+            ...user,
+            credits: (user.credits || 0) - ANALYZE_COST
+        };
+        await saveUser(updatedUser);
 
         const body = await req.json();
         const {

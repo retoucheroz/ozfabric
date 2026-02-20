@@ -53,6 +53,7 @@ export const SERVICE_COSTS = {
         GHOST_MODEL_1_2K: 75,
         GHOST_MODEL_4K: 150,
         UPSCALER_PER_MP: 10,
+        EDITORIAL_ANALYZE: 20,
     },
     VIDEO_GENERATION: {
         KLING_3_SOUND_OFF: 75, // per second

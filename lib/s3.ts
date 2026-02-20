@@ -32,14 +32,13 @@ export async function uploadBase64(base64: string, prefix: string = "uploads") {
       ContentType: contentType,
     }));
 
-    // If R2 public URL base is defined, use it. Otherwise use S3 standard.
-    if (process.env.NEXT_PUBLIC_R2_PUBLIC_BASE_URL) {
-      return `${process.env.NEXT_PUBLIC_R2_PUBLIC_BASE_URL.replace(/\/$/, "")}/${key}`;
-    }
-
     return `https://${Bucket}.s3.${Region}.amazonaws.com/${key}`;
-  } catch (e) {
-    console.error("S3 Base64 Upload Error:", e);
+  } catch (e: any) {
+    console.error("====== AWS S3 Base64 Upload Failed ======");
+    console.error("Bucket:", Bucket);
+    console.error("Region:", Region);
+    console.error("Error Message:", e?.message || e);
+    console.error("Full Error Object:", JSON.stringify(e));
     return base64;
   }
 }

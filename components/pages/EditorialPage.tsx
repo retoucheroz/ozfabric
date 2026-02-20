@@ -327,13 +327,17 @@ export default function EditorialPage() {
                 })
             });
 
-            if (!response.ok) throw new Error("Analysis failed");
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || "Analysis failed");
+            }
             const data = await response.json();
             setAnalyzedAesthetic(data.analysis);
             setShowApprovalDialog(true);
-        } catch (error) {
+            toast.success(language === "tr" ? "Analiz tamamlandı (-20 Kredi)" : "Analysis complete (-20 Credits)");
+        } catch (error: any) {
             console.error(error);
-            toast.error(language === "tr" ? "Analiz sırasında bir hata oluştu" : "Error during analysis");
+            toast.error(error.message || (language === "tr" ? "Analiz sırasında bir hata oluştu" : "Error during analysis"));
         } finally {
             setIsAnalyzing(false);
         }
@@ -720,8 +724,11 @@ export default function EditorialPage() {
                                                 </select>
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest px-1">TOKEN</label>
-                                                <div className="h-10 bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/5 rounded-xl flex items-center justify-center text-[10px] font-black text-violet-500">{estimatedCost} TOKEN</div>
+                                                <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest px-1">{language === "tr" ? "MALİYET" : "COST"}</label>
+                                                <div className="h-10 bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/5 rounded-xl flex flex-col items-center justify-center text-[8px] font-black text-violet-500">
+                                                    <span>ANALİZ: 20 TOKEN</span>
+                                                    <span>ÜRETİM: {estimatedCost} TOKEN</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
