@@ -69,14 +69,14 @@ export default function HomePage() {
                         </div>
                     </Link>
 
-                    {/* 3. Virtual Try-On */}
-                    <Link href="/try-on" className="group block h-full">
+                    {/* 3. Face Head Swap */}
+                    <Link href="/face-head-swap" className="group block h-full">
                         <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-xl p-6 h-full shadow-[var(--shadow-card)] card-interactive hover:shadow-[var(--shadow-card-hover)] hover:border-[var(--border-accent)] border-l-[3px] border-l-fuchsia-500">
                             <div className="w-10 h-10 rounded-lg bg-fuchsia-100 dark:bg-fuchsia-900/30 flex items-center justify-center mb-4 text-fuchsia-600 dark:text-fuchsia-400 group-hover:bg-fuchsia-200 dark:group-hover:bg-fuchsia-800/50 transition-colors">
                                 <Sparkles className="w-5 h-5" />
                             </div>
-                            <h3 className="text-base font-semibold text-[var(--text-primary)] mb-1">{t("home.virtualTryOn")}</h3>
-                            <p className="text-sm text-[var(--text-secondary)] line-clamp-2">{t("home.virtualTryOnDesc")}</p>
+                            <h3 className="text-base font-semibold text-[var(--text-primary)] mb-1">{t("sidebar.faceHeadSwap") || "Face Swap"}</h3>
+                            <p className="text-sm text-[var(--text-secondary)] line-clamp-2">{language === 'tr' ? 'Modellerin yüzünü değiştirin.' : 'Swap model faces.'}</p>
                         </div>
                     </Link>
 

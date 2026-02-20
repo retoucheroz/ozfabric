@@ -29,17 +29,13 @@ import { useLanguage } from "@/context/language-context"
 const AVAILABLE_PAGES = [
     { label: 'Photoshoot (AI Model)', path: '/photoshoot' },
     { label: 'Batch Mode (Photoshoot)', path: 'photoshoot:batch' },
-    { label: 'Try-On', path: '/try-on' },
     { label: 'Editorial', path: '/editorial' },
     { label: 'Video', path: '/video' },
     { label: 'Face & Head Swap', path: '/face-head-swap' },
-    { label: 'E-Com', path: '/ecom' },
     { label: 'Analysis', path: '/analysis' },
     { label: 'Studio (Tech Pack)', path: '/studio' },
     { label: 'Train', path: '/train' },
     { label: 'Ghost Mannequin', path: '/photoshoot/ghost' },
-    { label: 'Sketch to Photo', path: '/sketch' },
-    { label: 'Patterns', path: '/design/patterns' },
 ];
 
 const getAdminHeaders = () => {

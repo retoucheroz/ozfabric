@@ -49,17 +49,13 @@ export async function GET(req: NextRequest) {
                     '/home',
                     '/photoshoot',
                     'photoshoot:batch',
-                    '/try-on',
                     '/editorial',
                     '/video',
                     '/face-head-swap',
-                    '/ecom',
                     '/analysis',
                     '/studio',
                     '/train',
-                    '/photoshoot/ghost',
-                    '/design/patterns',
-                    '/sketch'
+                    '/photoshoot/ghost'
                 ],
                 credits: 1000,
                 authType: 'google',

@@ -97,7 +97,7 @@ export function Sidebar({ variant = "default" }: SidebarProps) {
     // STÜDYO Group
     const studioItems = [
         { label: t("sidebar.photoshoot"), href: '/photoshoot', icon: TbCameraPlus },
-        { label: t("sidebar.tryOn"), href: '/try-on', icon: TbHanger },
+
         { label: t("sidebar.editorial"), href: '/editorial', icon: TbPhotoScan },
         { label: t("sidebar.video"), href: '/video', icon: TbMovie },
         { label: t("sidebar.faceHeadSwap"), href: '/face-head-swap', icon: TbFaceId },
@@ -113,17 +113,10 @@ export function Sidebar({ variant = "default" }: SidebarProps) {
 
     // KATALOG Group
     const catalogItems = [
-        { label: t("sidebar.ecom"), href: '/ecom', icon: TbShoppingBag },
         { label: t("sidebar.techPack"), href: '/studio', icon: TbClipboardText },
     ].filter(item => isAuthorized(item.href));
 
-    // TASARIM Group
-    const designItems = [
-        { label: t("sidebar.sketch"), href: '/sketch', icon: TbWand },
-        { label: t("sidebar.patterns"), href: '/design/patterns', icon: TbRotate360 },
-    ].filter(item => isAuthorized(item.href));
 
-    // Bottom Items
     const bottomItems = [
         { label: t("sidebar.history"), href: '/history', icon: TbHistory },
         { label: t("sidebar.settings"), href: '/settings', icon: TbSettings },
@@ -206,14 +199,6 @@ export function Sidebar({ variant = "default" }: SidebarProps) {
             <div className="space-y-0.5">
                 {mainItems.map(renderItem)}
                 {adminItems.map(renderItem)}
-            </div>
-
-            {/* TASARIM */}
-            <div>
-                {renderGroupHeader(t("sidebar.design"))}
-                <div className="space-y-0.5">
-                    {designItems.map(renderItem)}
-                </div>
             </div>
 
             {/* STÜDYO */}

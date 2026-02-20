@@ -232,9 +232,7 @@ function StylesPageContent() {
         <div className="absolute top-6 right-6 flex gap-2">
           {resultImage && (
             <>
-              <Button variant="secondary" onClick={() => router.push(`/try-on?garment=${encodeURIComponent(resultImage)}`)}>
-                {t("styles.tryOn")}
-              </Button>
+
               <Button variant="secondary" onClick={() => router.push(`/studio?image=${encodeURIComponent(resultImage)}`)}>
                 {t("common.getSpecs")}
               </Button>

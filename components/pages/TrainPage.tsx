@@ -90,34 +90,7 @@ export default function TrainPage() {
     };
 
     const handleStartTraining = () => {
-        if (!selectedType || !modelName || uploadedImages.length < 5) {
-            toast.error(t("train.errorMinImages"));
-            return;
-        }
-
-        setIsTraining(true);
-
-        // Simulate training start
-        setTimeout(() => {
-            addModel({
-                name: modelName,
-                type: selectedType,
-                status: "training",
-                progress: 0,
-                images: uploadedImages.length,
-                triggerWord: modelName.toLowerCase().replace(/\s/g, "_")
-            });
-
-            toast.success(t("train.trainingStarted"));
-
-            // Reset form
-            setSelectedType(null);
-            setModelName("");
-            setModelDescription("");
-            setUploadedImages([]);
-            setIsTraining(false);
-            setActiveTab("models");
-        }, 1500);
+        toast.info("Yakında!");
     };
 
     const handleDeleteModel = (id: string) => {
@@ -126,18 +99,7 @@ export default function TrainPage() {
     };
 
     const handleUseModel = (model: TrainedModel) => {
-        // Determine target page based on model type
-        let targetPath = "/design/patterns"; // Default for Styles/Patterns/Brands
-
-        if (model.type === "pose") {
-            targetPath = "/photoshoot/ghost";
-        } else if (model.type === "garment") {
-            targetPath = "/design/patterns";
-        }
-
-        // Navigate with model ID
-        router.push(`${targetPath}?modelId=${model.id}`);
-        toast.success(t("train.modelActivated") || `Using model: ${model.name}`);
+        toast.info("Yakında!");
     };
 
     const getTypeLabel = (type: TrainingType) => {

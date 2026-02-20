@@ -178,17 +178,7 @@ export default function MannequinPage() {
             </div>
           </div>
 
-          <div className="mt-auto">
-            <Button
-              className="w-full gap-2"
-              onClick={() => {
-                const m = MANNEQUINS.find(x => x.id === selectedMannequin);
-                if (m) router.push(`/try-on?mannequin=${encodeURIComponent(m.image)}`);
-              }}
-            >
-              <Save className="w-4 h-4" /> Use for Try-On
-            </Button>
-          </div>
+
         </div>
       ) : (
         <div className="w-[300px] border-l bg-muted/10 p-6 flex flex-col items-center justify-center text-center text-muted-foreground">
