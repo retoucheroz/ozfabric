@@ -76,7 +76,7 @@ export async function saveUser(user: User): Promise<void> {
 
         if (existingUser) {
             await updateUser(user.username, {
-                credits: user.credits,
+                credits: Math.round(user.credits || 0),
                 role: user.role,
                 status: user.status,
                 authorized_pages: user.authorizedPages,
