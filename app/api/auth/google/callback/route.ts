@@ -55,7 +55,8 @@ export async function GET(req: NextRequest) {
                     '/analysis',
                     '/studio',
                     '/train',
-                    '/photoshoot/ghost'
+                    '/photoshoot/ghost',
+                    '/mannequin-pose'
                 ],
                 credits: 1000,
                 authType: 'google',

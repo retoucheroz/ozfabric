@@ -36,6 +36,7 @@ const AVAILABLE_PAGES = [
     { label: 'Studio (Tech Pack)', path: '/studio' },
     { label: 'Train', path: '/train' },
     { label: 'Ghost Mannequin', path: '/photoshoot/ghost' },
+    { label: '3D Mannequin Pose', path: '/mannequin-pose' },
 ];
 
 const getAdminHeaders = () => {

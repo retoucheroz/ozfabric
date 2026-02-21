@@ -46,6 +46,7 @@ const translations: Translations = {
     "sidebar.video": { en: "Video", tr: "Video" },
     "sidebar.analysis": { en: "Analysis", tr: "Analiz" },
     "sidebar.faceHeadSwap": { en: "Face Swap", tr: "Face Swap" },
+    "sidebar.mannequinPose": { en: "Mannequin Pose", tr: "3D Manken Pozu" },
 
     "faceSwap.title": { en: "Face & Head Swap", tr: "Yüz & Kafa Değiştir" },
     "faceSwap.identitySource": { en: "Identity Source", tr: "Kimlik Kaynağı" },
