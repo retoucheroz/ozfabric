@@ -4,9 +4,10 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Switch } from "@/components/ui/switch"
 import {
     ChevronRight, ChevronLeft, ChevronDown, Sparkles, User,
-    Image as ImageIcon, Camera, X, FileText, Edit2, Glasses
+    Image as ImageIcon, Camera, X, FileText, Edit2, Glasses, Check, Shirt
 } from "lucide-react"
 import { TbSettings2, TbShirtFilled, TbJacket, TbShirt, TbHanger } from "react-icons/tb"
 import { PiHandbag, PiBaseballCap, PiDiamond, PiBelt } from "react-icons/pi"
@@ -427,6 +428,74 @@ export default function PhotoshootPage() {
                                                             {seed !== "" && <button onClick={() => setSeed("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500"><X size={14} /></button>}
                                                         </div>
                                                     </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Toplu Üretim: Açı ve Kare Seçimleri (9 boxes side by side, 50% larger representation) */}
+                                            <div className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-xl p-6 shadow-sm flex flex-col space-y-4">
+                                                <label className="text-sm font-black text-[var(--text-primary)] uppercase tracking-wider">
+                                                    {language === 'tr' ? 'Açı ve Kare Seçimleri' : 'Angle & Shot Selection'}
+                                                </label>
+                                                <div className="grid grid-cols-3 sm:grid-cols-5 xl:grid-cols-9 gap-4">
+                                                    {availableBatchShots.map((shot) => {
+                                                        const isSelected = batchShotSelection[shot.id] ?? false;
+                                                        const isMaviActive = user?.role === 'admin' && isMaviBatch;
+                                                        const hasSideOption = shot.id.includes('styling');
+
+                                                        return (
+                                                            <div
+                                                                key={shot.id}
+                                                                className={cn(
+                                                                    "relative aspect-[3/4] rounded-xl border transition-all duration-300 overflow-hidden group cursor-pointer",
+                                                                    isSelected
+                                                                        ? (isMaviActive ? "border-blue-500 ring-2 ring-blue-500/20 shadow-lg" : "border-[var(--accent-primary)] ring-2 ring-[var(--accent-primary)]/20 shadow-lg")
+                                                                        : "border-[var(--border-subtle)] opacity-40 grayscale bg-[var(--bg-elevated)] hover:opacity-80 transition-opacity"
+                                                                )}
+                                                                onClick={() => setBatchShotSelection(prev => ({ ...prev, [shot.id]: !isSelected }))}
+                                                            >
+                                                                <div className="w-full h-full relative">
+                                                                    {shot.image ? (
+                                                                        <img src={shot.image} alt={shot.label} className="w-full h-full object-cover" />
+                                                                    ) : (
+                                                                        <div className="w-full h-full flex items-center justify-center bg-muted/20">
+                                                                            <Shirt className="w-6 h-6 opacity-20" />
+                                                                        </div>
+                                                                    )}
+
+                                                                    <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
+                                                                        <p className="text-[9px] font-black text-white text-center leading-snug uppercase">
+                                                                            {language === 'tr' ? shot.label : shot.labelEn}
+                                                                        </p>
+                                                                    </div>
+
+                                                                    <div className="absolute top-2 left-2">
+                                                                        <div className={cn(
+                                                                            "w-5 h-5 rounded-md flex items-center justify-center border transition-all",
+                                                                            isSelected
+                                                                                ? (isMaviActive ? "bg-blue-600 border-blue-400 text-white" : "bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white")
+                                                                                : "bg-white/20 border-white/40 text-transparent"
+                                                                        )}>
+                                                                            <Check className="w-3.5 h-3.5" />
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {hasSideOption && isSelected && (
+                                                                        <div
+                                                                            className="absolute top-2 right-2 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10"
+                                                                            onClick={(e) => e.stopPropagation()}
+                                                                        >
+                                                                            <span className="text-[8px] font-bold text-white tracking-widest leading-none">YNC</span>
+                                                                            <Switch
+                                                                                className="scale-[0.5] origin-right !m-0"
+                                                                                checked={stylingSideOnly[shot.id] || false}
+                                                                                onCheckedChange={(val) => setStylingSideOnly({ ...stylingSideOnly, [shot.id]: val })}
+                                                                            />
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
                                                 </div>
                                             </div>
 
