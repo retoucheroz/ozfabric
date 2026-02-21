@@ -24,6 +24,9 @@ export async function POST(req: NextRequest) {
             aperture,
             locationPrompt,
             outfitImage,
+            backgroundImage,
+            poseStickman,
+            posePrompt,
             modelType = "full_body",
             language = "tr"
         } = await req.json();
@@ -82,11 +85,19 @@ Ensure the outfit integrates naturally onto the subject's body anatomy and natur
             }
         }
 
-        // 3. LOCATION BLOCK
         const locationBlock = `ENVIRONMENT STRUCTURE:
 ${locationPrompt || "Clean professional studio setting."}
 Must ensure spatial depth consistency, perspective alignment, coherent ground contact, and realistic light interaction. 
 environmental color bounce affecting subject subtly. No green-screen look.`;
+
+        // POSE BLOCK
+        let poseBlock = "";
+        if (posePrompt) {
+            poseBlock = `POSE STRUCTURE:
+${posePrompt}
+Match anatomical tensions and limb placement. Subject must express micro-movements associated with this pose.
+`;
+        }
 
         // 4. CAMERA BLOCK
         let cameraBlock = "";
@@ -130,6 +141,8 @@ ${outfitBlock}
 ${locationBlock}
 
 ${cameraBlock}
+
+${poseBlock}
 
 ${realismBlock}
 

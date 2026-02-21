@@ -25,7 +25,6 @@ import {
     TbSettings,
     TbLayoutSidebarLeftCollapse,
     TbLayoutSidebarLeftExpand,
-    TbRotate360,
 } from "react-icons/tb"
 import { useLanguage } from "@/context/language-context"
 import { useState, useEffect } from "react"
@@ -106,7 +105,6 @@ export function Sidebar({ variant = "default" }: SidebarProps) {
 
     // ARAÇLAR Group
     const toolItems = [
-        { label: t("sidebar.mannequinPose"), href: '/mannequin-pose', icon: TbRotate360 },
         { label: t("sidebar.resize"), href: '/resize', icon: TbMaximize },
         { label: t("sidebar.analysis"), href: '/analysis', icon: TbAnalyze },
         { label: t("sidebar.train"), href: '/train', icon: TbWand },

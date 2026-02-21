@@ -431,9 +431,9 @@ export default function PhotoshootPage() {
                                             </div>
 
                                             {/* BOTTOM: Batch Panel + Preview */}
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+                                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
                                                 {/* Sol Taraf: Batch Ayarları ve Seçimler */}
-                                                <div className="col-span-1 flex flex-col">
+                                                <div className="col-span-1 lg:col-span-5 flex flex-col">
                                                     <div className="flex-1 bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-xl overflow-hidden shadow-sm flex flex-col p-6">
                                                         <BatchPanel
                                                             language={language}
@@ -457,7 +457,7 @@ export default function PhotoshootPage() {
                                                 </div>
 
                                                 {/* Sağ Taraf: Önizleme / Üretim Alanı */}
-                                                <div className="col-span-1 lg:col-span-2 flex flex-col">
+                                                <div className="col-span-1 lg:col-span-7 flex flex-col">
                                                     <div className="flex-1 bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-xl overflow-hidden shadow-sm flex flex-col">
                                                         <PreviewArea
                                                             language={language}

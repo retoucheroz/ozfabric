@@ -24,9 +24,16 @@ import {
     TbHdr
 } from "react-icons/tb"
 
+const UPSCALE_CREDITS: Record<string, number> = {
+    "1x": 50,
+    "2x": 100,
+    "4x": 200,
+    "8x": 400
+};
+
 export default function ResizePage() {
     const { addProject, deductCredits } = useProjects();
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
 
     const [file, setFile] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
@@ -34,6 +41,7 @@ export default function ResizePage() {
     const [expandDirection, setExpandDirection] = useState("all");
     const [expandAmount, setExpandAmount] = useState(50);
     const [upscaleFactor, setUpscaleFactor] = useState("2x");
+    const [creativity, setCreativity] = useState(5.0);
     const [expandPrompt, setExpandPrompt] = useState("");
     const [isProcessing, setIsProcessing] = useState(false);
     const [resultImage, setResultImage] = useState<string | null>(null);
@@ -52,7 +60,7 @@ export default function ResizePage() {
     const handleProcess = async () => {
         if (!preview) return;
 
-        const creditCost = mode === "upscale" ? 2 : 3;
+        const creditCost = mode === "upscale" ? UPSCALE_CREDITS[upscaleFactor] : 3;
         if (!(await deductCredits(creditCost))) {
             toast.error(t("common.insufficientCredits"));
             return;
@@ -71,7 +79,8 @@ export default function ResizePage() {
                     upscale_factor: upscaleFactor,
                     expand_direction: expandDirection,
                     expand_amount: expandAmount / 100, // Normalized to 0-1
-                    prompt: expandPrompt
+                    prompt: expandPrompt,
+                    creativity
                 })
             });
 
@@ -189,8 +198,8 @@ export default function ResizePage() {
                     <TabsContent value="upscale" className="space-y-4 mt-4">
                         <div className="space-y-2">
                             <Label>{t("resize.upscaleFactor")}</Label>
-                            <div className="grid grid-cols-3 gap-2">
-                                {["2x", "4x", "8x"].map((factor) => (
+                            <div className="grid grid-cols-4 gap-2">
+                                {["1x", "2x", "4x", "8x"].map((factor) => (
                                     <Button
                                         key={factor}
                                         variant={upscaleFactor === factor ? "default" : "outline"}
@@ -201,6 +210,27 @@ export default function ResizePage() {
                                     </Button>
                                 ))}
                             </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                                <Label className="flex items-center gap-1.5 px-1 font-semibold text-[13px]">
+                                    <TbSparkles className="w-3.5 h-3.5 text-violet-500" />
+                                    {language === "tr" ? "Yaratıcılık" : "Creativity"}
+                                </Label>
+                                <span className="text-sm font-medium text-violet-600 dark:text-violet-400">{creativity.toFixed(1)}</span>
+                            </div>
+                            <Slider
+                                value={[creativity]}
+                                onValueChange={(v) => setCreativity(v[0])}
+                                min={0}
+                                max={10}
+                                step={0.1}
+                                className="py-2"
+                            />
+                            <p className="text-[10px] text-muted-foreground px-1">
+                                {language === "tr" ? "Yüksek değerler görsele yeni ve yaratıcı detaylar ekler." : "Higher values add new and creative details to the image."}
+                            </p>
                         </div>
 
                         <Card className="p-4 bg-muted/30 border-dashed">
@@ -262,7 +292,7 @@ export default function ResizePage() {
                             <TbSparkles className="w-5 h-5 mr-2" />
                             <span className="uppercase tracking-widest">{mode === "expand" ? t("resize.expandNow") : t("resize.upscaleNow")}</span>
                             <span className="ml-2 text-[10px] bg-white/20 px-1.5 py-0.5 rounded font-normal">
-                                {mode === "expand" ? "3" : "2"} {t("settings.credits")}
+                                {mode === "expand" ? "3" : UPSCALE_CREDITS[upscaleFactor]} {t("settings.credits")}
                             </span>
                         </>
                     )}

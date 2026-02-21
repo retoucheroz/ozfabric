@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
     try {
-        const { image, mode, upscale_factor, expand_direction, expand_amount, prompt } = await req.json();
+        const { image, mode, upscale_factor, expand_direction, expand_amount, prompt, creativity } = await req.json();
 
         const falKey = process.env.FAL_KEY;
         if (!falKey) {
@@ -17,9 +17,12 @@ export async function POST(req: NextRequest) {
         let body: any = { image_url: image };
 
         if (mode === "upscale") {
-            endpoint = "fal-ai/creative-upscaler";
+            endpoint = "clarityai/crystal-upscaler";
             // upscale_factor is usually a string like "2x", "4x"
-            // body.upscale_factor = parseInt(upscale_factor) || 2;
+            body.scale = parseInt(upscale_factor?.replace("x", "")) || 2;
+            if (creativity !== undefined) {
+                body.creativity = parseFloat(creativity as string) || 0;
+            }
         } else {
             // Expand / Outpaint
             endpoint = "fal-ai/flux-pro/outpaint"; // Example endpoint

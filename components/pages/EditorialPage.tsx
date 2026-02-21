@@ -36,6 +36,8 @@ import { SavedModel, MODEL_PRESETS } from "@/lib/photoshoot-shared"
 import { ModelSection } from "@/components/photoshoot/ModelSection"
 import { AssetCard } from "@/components/photoshoot/AssetCard"
 import { WizardProgress } from "@/components/photoshoot/WizardProgress"
+import { EditorialLibraryModal } from "@/components/photoshoot/EditorialLibraryModal"
+import { User } from "lucide-react"
 
 function DrumColumn({ items, activeIndex, onChange, render }: { items: any[], activeIndex: number, onChange: (idx: number) => void, render: (item: any, active: boolean) => React.ReactNode }) {
     const scrollRef = useRef<HTMLDivElement>(null);
@@ -131,9 +133,6 @@ export default function EditorialPage() {
     const [modelImage, setModelImage] = useState<string | null>(null);
     const [modelImageHighRes, setModelImageHighRes] = useState<string | null>(null);
     const [outfitImage, setOutfitImage] = useState<string | null>(null);
-    const [selectedLocation, setSelectedLocation] = useState<EditorialLocation | null>(null);
-    const [selectedCity, setSelectedCity] = useState<any>(null);
-    const [selectedBackground, setSelectedBackground] = useState<any>(null);
 
     const [resolution, setResolution] = useState("4K");
     const [aspectRatio, setAspectRatio] = useState("3:4");
@@ -141,6 +140,13 @@ export default function EditorialPage() {
     const [seed, setSeed] = useState<string>("");
     const [prompt, setPrompt] = useState<string>("");
     const [modelType, setModelType] = useState<'full_body' | 'face_only'>('full_body');
+
+    // Shared assets state
+    const [assets, setAssets] = useState<{ [key: string]: string | null }>({ background: null, pose: null, fit_pattern: null });
+    const [poseStickman, setPoseStickman] = useState<string | null>(null);
+    const [selectedBackgroundPrompt, setSelectedBackgroundPrompt] = useState<string | null>(null);
+    const [selectedPosePrompt, setSelectedPosePrompt] = useState<string | null>(null);
+    const [activeLibraryAsset, setActiveLibraryAsset] = useState<'model' | 'background' | 'outfit' | 'pose' | null>(null);
 
     // Camera States
     const [isManualCamera, setIsManualCamera] = useState(false);
@@ -154,7 +160,6 @@ export default function EditorialPage() {
         : SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_1_2K;
 
     // Library States
-    const [activeLibraryAsset, setActiveLibraryAsset] = useState<'model' | 'background' | 'outfit' | null>(null);
     const [savedModels, setSavedModels] = useState<SavedModel[]>([]);
     const [gender, setGender] = useState<'male' | 'female'>('female');
     const [allLocations, setAllLocations] = useState<EditorialLocation[]>(LOCATIONS);
@@ -290,7 +295,7 @@ export default function EditorialPage() {
         }
 
         if (targetStep >= 3) {
-            if (!selectedBackground) {
+            if (!assets.background && !selectedBackgroundPrompt) {
                 toast.error(language === "tr" ? "Lütfen bir arka plan seçin" : "Please select a background");
                 return false;
             }
@@ -305,7 +310,7 @@ export default function EditorialPage() {
             toast.error(language === "tr" ? "Lütfen bir model görseli yükleyin" : "Please upload a model image");
             return;
         }
-        if (!selectedBackground) {
+        if (!assets.background && !selectedBackgroundPrompt) {
             toast.error(language === "tr" ? "Lütfen kütüphaneden bir arka plan seçin" : "Please select a background from library");
             return;
         }
@@ -320,7 +325,10 @@ export default function EditorialPage() {
                     lens: isManualCamera ? activeLens?.name : "Auto",
                     focalLength: isManualCamera ? focalLength : "Auto",
                     aperture: isManualCamera ? aperture : "Auto",
-                    locationPrompt: selectedBackground?.prompt,
+                    locationPrompt: selectedBackgroundPrompt || "",
+                    backgroundImage: assets.background,
+                    poseStickman: poseStickman,
+                    posePrompt: selectedPosePrompt,
                     outfitImage: outfitImage,
                     modelType,
                     language
@@ -354,11 +362,14 @@ export default function EditorialPage() {
                 body: JSON.stringify({
                     image: modelImageHighRes || modelImage,
                     outfitImage: outfitImage,
-                    backgroundPrompt: selectedBackground.prompt,
-                    camera: activeCamera.name,
-                    lens: activeLens.name,
-                    focalLength,
-                    aperture,
+                    backgroundImage: assets.background,
+                    backgroundPrompt: selectedBackgroundPrompt,
+                    poseStickman: poseStickman,
+                    posePrompt: selectedPosePrompt,
+                    camera: isManualCamera ? activeCamera.name : "Auto",
+                    lens: isManualCamera ? activeLens.name : "Auto",
+                    focalLength: isManualCamera ? focalLength : "Auto",
+                    aperture: isManualCamera ? aperture : "Auto",
                     resolution,
                     aspectRatio,
                     modelType,
@@ -604,38 +615,40 @@ export default function EditorialPage() {
                         {wizardStep === 2 && (
                             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                                    {/* Left: Location */}
+                                    {/* Left: Background & Pose */}
                                     <div className="lg:col-span-5 space-y-4">
                                         <div className="flex items-center gap-3 mb-2 px-1">
                                             <div className="p-2 rounded-xl bg-violet-100 dark:bg-violet-900/30 text-violet-600 shadow-sm"><TbGlobe className="w-5 h-5" /></div>
                                             <div className="flex flex-col">
-                                                <label className="text-xs uppercase font-black text-foreground tracking-[0.2em]">{language === "tr" ? "LOKASYON" : "LOCATION"}</label>
-                                                <span className="text-[10px] text-muted-foreground font-black uppercase tracking-tighter opacity-60">{language === "tr" ? "MEKAN SEÇİN" : "CHOOSE A SCENE"}</span>
+                                                <label className="text-xs uppercase font-black text-foreground tracking-[0.2em]">{language === "tr" ? "KÜTÜPHANE ÖĞELERİ" : "LIBRARY ASSETS"}</label>
+                                                <span className="text-[10px] text-muted-foreground font-black uppercase tracking-tighter opacity-60">{language === "tr" ? "ARKAPLAN VE POZ SEÇİN" : "CHOOSE BACKGROUND & POSE"}</span>
                                             </div>
                                         </div>
-                                        <div
-                                            onClick={() => setActiveLibraryAsset('background')}
-                                            className={`relative rounded-[32px] border-2 border-dashed overflow-hidden transition-all duration-300 cursor-pointer h-[400px] ${selectedBackground ? "border-violet-500 bg-white dark:bg-card shadow-xl" : "border-zinc-200 dark:border-white/10 hover:border-violet-500 bg-zinc-50 dark:bg-white/5"}`}
-                                        >
-                                            {selectedBackground ? (
-                                                <div className="absolute inset-0">
-                                                    <img src={selectedBackground.url} className="w-full h-full object-cover" alt="Selected" />
-                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                                                    <div className="absolute bottom-6 left-6 right-6">
-                                                        <p className="text-[10px] font-bold text-violet-400 uppercase tracking-widest">{selectedLocation?.nameTr || selectedLocation?.name} // {selectedCity?.nameTr || selectedCity?.name}</p>
-                                                        <h3 className="text-lg font-black text-white uppercase tracking-tighter truncate">{language === "tr" ? "Seçili Arka Plan" : "Selected Background"}</h3>
-                                                    </div>
-                                                    <div className="absolute top-4 right-4"><button className="p-2 bg-white/10 backdrop-blur-md rounded-lg text-white hover:bg-white/20 transition-all text-[10px] font-bold uppercase">{language === "tr" ? "DEĞİŞTİR" : "CHANGE"}</button></div>
-                                                </div>
-                                            ) : (
-                                                <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center gap-4">
-                                                    <div className="w-16 h-16 rounded-full bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center text-violet-600"><ImageIcon size={32} /></div>
-                                                    <div className="space-y-1">
-                                                        <span className="text-sm font-black uppercase tracking-tight block">{language === "tr" ? "ARKA PLAN SEÇİN" : "SELECT BACKGROUND"}</span>
-                                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{language === "tr" ? "KÜTÜPHANEYİ AÇMAK İÇİN TIKLAYIN" : "CLICK TO OPEN LIBRARY"}</p>
-                                                    </div>
-                                                </div>
-                                            )}
+                                        <div className="grid grid-cols-2 gap-4 h-[400px]">
+                                            <AssetCard
+                                                id="background"
+                                                label={language === "tr" ? "ARKAPLAN" : "BACKGROUND"}
+                                                icon={ImageIcon}
+                                                assets={assets}
+                                                activeLibraryAsset={activeLibraryAsset}
+                                                setActiveLibraryAsset={setActiveLibraryAsset as any}
+                                                handleAssetUpload={(id, file) => handleAssetUpload(id, file)}
+                                                handleAssetRemove={handleAssetRemove}
+                                                language={language}
+                                                variant="portrait"
+                                            />
+                                            <AssetCard
+                                                id="pose"
+                                                label={language === "tr" ? "POZ" : "POSE"}
+                                                icon={User}
+                                                assets={{ ...assets, pose: poseStickman || assets.pose }}
+                                                activeLibraryAsset={activeLibraryAsset}
+                                                setActiveLibraryAsset={setActiveLibraryAsset as any}
+                                                handleAssetUpload={(id, file) => handleAssetUpload(id, file)}
+                                                handleAssetRemove={handleAssetRemove}
+                                                language={language}
+                                                variant="portrait"
+                                            />
                                         </div>
 
                                         {/* Aspect Ratio */}
@@ -863,9 +876,9 @@ export default function EditorialPage() {
                     </div>
                 </div>
 
-                {/* Library Drawer */}
+                {/* Library Drawer for Models */}
                 <AnimatePresence>
-                    {activeLibraryAsset && (
+                    {activeLibraryAsset === 'model' && (
                         <>
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/50 z-40" onClick={() => setActiveLibraryAsset(null)} />
                             <motion.div key="library-drawer" initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: "spring", stiffness: 300, damping: 30 }} className="fixed right-0 top-0 h-full w-full lg:w-[450px] bg-zinc-50 dark:bg-background flex flex-col shrink-0 relative z-50 shadow-xl">
@@ -873,99 +886,24 @@ export default function EditorialPage() {
                                     <div className="flex items-center gap-3">
                                         <button onClick={() => setActiveLibraryAsset(null)} className="p-2 hover:bg-zinc-100 dark:hover:bg-white/5 rounded-full transition-colors"><ChevronLeft size={20} /></button>
                                         <div>
-                                            <h3 className="text-sm font-bold tracking-tight">{activeLibraryAsset === 'model' ? (language === "tr" ? "Model Kütüphanesi" : "Model Library") : (language === "tr" ? "Lokasyon Kütüphanesi" : "Location Library")}</h3>
+                                            <h3 className="text-sm font-bold tracking-tight">{language === "tr" ? "Model Kütüphanesi" : "Model Library"}</h3>
                                             <p className="text-[10px] text-violet-500 font-bold uppercase tracking-widest">{language === "tr" ? "STUDYO VARLIKLARI" : "STUDIO ASSETS"}</p>
                                         </div>
                                     </div>
                                     <button onClick={() => setActiveLibraryAsset(null)} className="text-zinc-400 hover:text-foreground p-2"><X size={18} /></button>
                                 </div>
 
-                                {activeLibraryAsset === 'model' ? (
-                                    <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-                                        <ModelSection
-                                            view="library" language={language} gender={gender} setGender={setGender}
-                                            assets={{ model: modelImage }} activeLibraryAsset="model"
-                                            setActiveLibraryAsset={() => setActiveLibraryAsset(null)}
-                                            handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove}
-                                            savedModels={savedModels}
-                                            setAssets={(updater: any) => { const newVal = typeof updater === 'function' ? updater({ model: modelImage }).model : updater.model; setModelImage(newVal); }}
-                                            setAssetsHighRes={(updater: any) => { const newVal = typeof updater === 'function' ? updater({ model: modelImageHighRes }).model : updater.model; setModelImageHighRes(newVal); }}
-                                        />
-                                    </div>
-                                ) : (
-                                    <div className="flex-1 flex overflow-hidden">
-                                        <div className="w-20 border-r border-zinc-200 dark:border-white/10 bg-white dark:bg-card overflow-y-auto flex flex-col scrollbar-none">
-                                            {allLocations.map((loc) => (
-                                                <button key={loc.id} onClick={() => { setSelectedLocation(loc); setSelectedCity(null); setIsAddMode(false); }}
-                                                    className={`group flex flex-col items-center gap-1.5 py-4 transition-all relative ${selectedLocation?.id === loc.id ? 'text-violet-500' : 'text-zinc-400 hover:text-zinc-600'}`}>
-                                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${selectedLocation?.id === loc.id ? 'bg-violet-500/10 scale-110 shadow-sm' : 'bg-transparent'}`}><Globe className="w-5 h-5" /></div>
-                                                    <span className={`text-[8px] font-bold text-center px-1 break-words leading-tight uppercase tracking-tighter ${selectedLocation?.id === loc.id ? 'opacity-100' : 'opacity-60'}`}>{language === "tr" ? loc.nameTr : loc.name}</span>
-                                                    {selectedLocation?.id === loc.id && (<div className="absolute right-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-violet-500 rounded-l-full" />)}
-                                                </button>
-                                            ))}
-                                            <button onClick={() => setIsAddMode(true)} className="flex flex-col items-center gap-1.5 py-4 text-violet-500/40 hover:text-violet-500 transition-all">
-                                                <div className="w-10 h-10 rounded-xl border border-dashed border-violet-500/30 flex items-center justify-center"><Plus size={18} /></div>
-                                                <span className="text-[8px] font-bold uppercase tracking-tighter">EKLE</span>
-                                            </button>
-                                        </div>
-                                        <div className="flex-1 flex flex-col overflow-hidden bg-zinc-50 dark:bg-background">
-                                            {isAddMode ? (
-                                                <div className="flex-1 p-5 overflow-y-auto space-y-5 scrollbar-thin">
-                                                    <div className="flex items-center gap-2 mb-2">
-                                                        <div className="p-1.5 bg-violet-500/10 rounded-lg text-violet-500">{newLoc.id ? <Pencil size={14} /> : <Plus size={14} />}</div>
-                                                        <h4 className="text-xs font-bold uppercase tracking-widest">{newLoc.id ? (language === "tr" ? "Lokasyonu Düzenle" : "Edit Location") : (language === "tr" ? "Yeni Lokasyon" : "New Location")}</h4>
-                                                    </div>
-                                                    <div className="space-y-4">
-                                                        {!newLoc.id && (<>
-                                                            <div className="space-y-1.5"><label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Ülke</label><Input placeholder="Örn: Türkiye" className="h-9 bg-white dark:bg-background border-zinc-200 dark:border-card text-xs" value={newLoc.country} onChange={(e) => setNewLoc({ ...newLoc, country: e.target.value })} /></div>
-                                                            <div className="space-y-1.5"><label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Şehir</label><Input placeholder="Örn: İstanbul" className="h-9 bg-white dark:bg-background border-zinc-200 dark:border-card text-xs" value={newLoc.city} onChange={(e) => setNewLoc({ ...newLoc, city: e.target.value })} /></div>
-                                                        </>)}
-                                                        <div className="space-y-1.5">
-                                                            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Arka Plan Görseli</label>
-                                                            <div className="relative group/add">
-                                                                {newLoc.image ? (
-                                                                    <div className="relative aspect-square rounded-xl overflow-hidden border"><img src={newLoc.image} className="w-full h-full object-cover" alt="Preview" /><button onClick={() => setNewLoc({ ...newLoc, image: "" })} className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover/add:opacity-100 transition-opacity"><X size={12} /></button></div>
-                                                                ) : (
-                                                                    <label className="flex flex-col items-center justify-center aspect-square rounded-xl border-2 border-dashed border-zinc-200 dark:border-card hover:border-violet-500 transition-all cursor-pointer"><Upload className="w-5 h-5 text-muted-foreground mb-2" /><span className="text-[10px] font-bold text-muted-foreground uppercase">Yükle (512x512)</span><input type="file" className="hidden" onChange={handleLibraryImageUpload} accept="image/*" /></label>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <div className="space-y-1.5"><label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Prompt</label><textarea placeholder="Görseli anlatan detaylı prompt..." className="w-full min-h-[100px] bg-white dark:bg-background border border-zinc-200 dark:border-card rounded-xl p-3 text-xs focus:ring-1 focus:ring-violet-500 outline-none" value={newLoc.prompt} onChange={(e) => setNewLoc({ ...newLoc, prompt: e.target.value })} /></div>
-                                                        <div className="flex gap-2"><Button variant="ghost" size="sm" className="flex-1 text-xs" onClick={() => setIsAddMode(false)}>İptal</Button><Button size="sm" className="flex-1 bg-violet-600 hover:bg-violet-700 text-xs" onClick={() => saveCustomLocation(newLoc)} disabled={!newLoc.country || !newLoc.city || !newLoc.image || !newLoc.prompt}>Kaydet</Button></div>
-                                                    </div>
-                                                </div>
-                                            ) : selectedLocation ? (
-                                                <>
-                                                    <div className="p-3 flex gap-2 overflow-x-auto border-b border-zinc-200 dark:border-card bg-white dark:bg-background scrollbar-none">
-                                                        {selectedLocation.cities.map((city) => (
-                                                            <button key={city.id} onClick={() => setSelectedCity(city)} className={`px-3 py-1 rounded-full whitespace-nowrap text-[9px] font-bold transition-all border ${selectedCity?.id === city.id ? 'bg-violet-600 border-violet-600 text-white' : 'text-zinc-500 border-zinc-200 dark:border-card hover:border-violet-500/50'}`}>{language === "tr" ? city.nameTr : city.name}</button>
-                                                        ))}
-                                                    </div>
-                                                    <div className="flex-1 overflow-y-auto p-4 scrollbar-thin">
-                                                        {selectedCity ? (
-                                                            <div className="grid grid-cols-2 gap-3">
-                                                                {selectedCity.images.map((img: any) => (
-                                                                    <div key={img.id} onClick={() => { setSelectedBackground(img); setActiveLibraryAsset(null); }}
-                                                                        className={`relative aspect-square rounded-xl overflow-hidden cursor-pointer group border-2 transition-all ${selectedBackground?.id === img.id ? 'border-violet-500 ring-4 ring-violet-500/10' : 'border-transparent hover:border-violet-500/30'}`}>
-                                                                        <img src={img.url} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt={img.id} />
-                                                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
-                                                                            <span className="bg-white text-black text-[9px] font-bold px-3 py-1.5 rounded-full uppercase hover:scale-110 transition-transform flex items-center gap-1.5"><Check size={12} />{language === "tr" ? "LOKASYONU SEÇ" : "SELECT SCENE"}</span>
-                                                                        </div>
-                                                                        {selectedBackground?.id === img.id && (<div className="absolute top-2 right-2 bg-violet-500 rounded-full p-0.5 shadow-lg border border-white/20"><CheckCircle2 className="w-3 h-3 text-white" /></div>)}
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        ) : (
-                                                            <div className="h-full flex flex-col items-center justify-center text-zinc-400 opacity-40"><ImageIcon className="w-10 h-10 mb-2" /><p className="text-[9px] font-bold uppercase tracking-widest">Şehir Seçin</p></div>
-                                                        )}
-                                                    </div>
-                                                </>
-                                            ) : (
-                                                <div className="h-full flex flex-col items-center justify-center text-zinc-400 opacity-40 text-center p-6"><Globe className="w-12 h-12 mb-3" /><p className="text-[10px] font-bold uppercase tracking-widest leading-relaxed">Başlamak İçin Bir<br />Ülke Seçin</p></div>
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
+                                <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+                                    <ModelSection
+                                        view="library" language={language} gender={gender} setGender={setGender}
+                                        assets={{ model: modelImage }} activeLibraryAsset="model"
+                                        setActiveLibraryAsset={() => setActiveLibraryAsset(null)}
+                                        handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove}
+                                        savedModels={savedModels}
+                                        setAssets={(updater: any) => { const newVal = typeof updater === 'function' ? updater({ model: modelImage }).model : updater.model; setModelImage(newVal); }}
+                                        setAssetsHighRes={(updater: any) => { const newVal = typeof updater === 'function' ? updater({ model: modelImageHighRes }).model : updater.model; setModelImageHighRes(newVal); }}
+                                    />
+                                </div>
                             </motion.div>
                         </>
                     )}
@@ -993,7 +931,7 @@ export default function EditorialPage() {
                         <div className="space-y-3">
                             <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2"><FileText size={14} />{language === "tr" ? "BİRLEŞTİRİLMİŞ PROMPT" : "COMBINED PROMPT"}</label>
                             <div className="p-4 bg-black/40 rounded-2xl border border-white/5 font-mono text-[10px] text-zinc-400 h-32 overflow-y-auto scrollbar-thin">
-                                <div className="space-y-2"><p><span className="text-violet-500">SCENE:</span> {selectedBackground?.prompt}</p><p><span className="text-violet-500">STYLE:</span> {prompt || "None"}</p><p><span className="text-violet-500">OPTICS:</span> {analyzedAesthetic}</p></div>
+                                <div className="space-y-2"><p><span className="text-violet-500">SCENE:</span> {selectedBackgroundPrompt || "Custom"}</p><p><span className="text-violet-500">STYLE:</span> {prompt || "None"}</p><p><span className="text-violet-500">OPTICS:</span> {analyzedAesthetic}</p></div>
                             </div>
                         </div>
                         <div className="flex gap-3 pt-2">

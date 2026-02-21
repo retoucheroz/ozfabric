@@ -120,6 +120,17 @@ export async function POST(req: NextRequest) {
                     {
                         "description": "[The tagged structure above]"
                     }`;
+                } else if (type === 'background') {
+                    prompt = `${langInstruction} ${multiImageContext}
+                    You are an expert location scout and set designer.
+                    Analyze the given background environment image. Ignore any people in the foreground.
+                    Describe the setting, lighting, atmosphere, time of day, architecture, nature, colors, and textures explicitly in a single highly detailed prompt suitable for AI image generation.
+                    Make it extremely descriptive.
+                    
+                    JSON Response Format:
+                    {
+                        "prompt": "[Your highly detailed background prompt]"
+                    }`;
                 } else {
                     // TECH PACK MODE - Comprehensive Technical Analysis
                     const workflowStr = workflowType || 'upper';

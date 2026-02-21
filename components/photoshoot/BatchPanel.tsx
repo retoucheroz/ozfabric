@@ -106,7 +106,7 @@ export function BatchPanel({
                     <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase">
                         {language === 'tr' ? 'Açı ve Kare Seçimleri' : 'Angle & Shot Selection'}
                     </label>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3">
                         {availableBatchShots.map((shot, idx) => {
                             const isSelected = batchShotSelection[shot.id] ?? false;
                             const hasSideOption = shot.id.includes('styling');

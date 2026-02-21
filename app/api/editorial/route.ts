@@ -9,6 +9,8 @@ export async function POST(req: NextRequest) {
         const {
             image, // User uploaded model image
             outfitImage, // Optional outfit/combination image
+            backgroundImage, // Base64 or URL
+            poseStickman, // Base64 or URL
             backgroundPrompt: _, // Ignored as we use structured prompt now
             camera: __, // Ignored
             lens: ___, // Ignored
@@ -27,8 +29,17 @@ export async function POST(req: NextRequest) {
         const { ensureR2Url } = await import("@/lib/s3");
         const sanitizedModel = await ensureR2Url(image, "editorial/inputs");
         let sanitizedOutfit = null;
+        let sanitizedBackground = null;
+        let sanitizedPose = null;
+
         if (outfitImage) {
             sanitizedOutfit = await ensureR2Url(outfitImage, "editorial/inputs");
+        }
+        if (backgroundImage) {
+            sanitizedBackground = await ensureR2Url(backgroundImage, "editorial/inputs");
+        }
+        if (poseStickman) {
+            sanitizedPose = await ensureR2Url(poseStickman, "editorial/inputs");
         }
 
         const falPayload: any = {
@@ -44,6 +55,12 @@ export async function POST(req: NextRequest) {
 
         if (sanitizedOutfit) {
             falPayload.image_urls.outfit = sanitizedOutfit;
+        }
+        if (sanitizedBackground) {
+            falPayload.image_urls.scene = sanitizedBackground;
+        }
+        if (sanitizedPose) {
+            falPayload.image_urls.pose = sanitizedPose;
         }
 
         const falKey = process.env.FAL_KEY;

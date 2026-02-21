@@ -5,6 +5,7 @@ import { ProjectsProvider } from "@/context/projects-context";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { OzzieChat } from "@/components/features/OzzieChat";
+import { CookieBanner } from "@/components/cookie-banner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,6 +45,7 @@ export default function RootLayout({
               {children}
               <Toaster />
               <OzzieChat />
+              <CookieBanner />
             </ProjectsProvider>
           </LanguageProvider>
         </ThemeProvider>
