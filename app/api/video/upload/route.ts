@@ -4,6 +4,14 @@ import { fal } from "@fal-ai/client";
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
+export const config = {
+    api: {
+        bodyParser: {
+            sizeLimit: '50mb',
+        },
+    },
+};
+
 /**
  * Upload a base64 image to fal.ai storage and return the URL.
  * This endpoint exists to keep individual uploads small and avoid
