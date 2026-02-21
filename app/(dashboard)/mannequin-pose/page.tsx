@@ -74,13 +74,17 @@ export default function MannequinPosePage() {
             reader.readAsDataURL(f);
         });
 
+        // Use our fast edge endpoint
         const res = await fetch('/api/video/upload', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ image: base64Data, filename: 'model.png' })
+            body: JSON.stringify({ image: base64Data, filename: f.name || 'image.png' })
         });
 
-        if (!res.ok) throw new Error("Görsel fal storage'a yüklenemedi: " + (await res.text()));
+        if (!res.ok) {
+            const errText = await res.text();
+            throw new Error(`Görsel yüklenemedi: ${errText}`);
+        }
         const { url } = await res.json();
         return url as string;
     };
