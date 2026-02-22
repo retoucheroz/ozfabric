@@ -489,6 +489,63 @@ export const usePhotoshootWorkflow = () => {
         return true;
     };
 
+    const resetWorkflow = () => {
+        if (!confirm(language === "tr" ? "Tüm seçimleri sıfırlayarak baştan başlamak istediğinize emin misiniz?" : "Are you sure you want to reset all selections and start over?")) return;
+
+        setProductName("");
+        setIsManualProductName(false);
+        setProductCode("");
+        setWorkflowType("upper");
+        setGender("");
+        setSeed("");
+        setIsSeedManual(false);
+        setUserAddedPrompt("");
+
+        setPoseDescription(null);
+        setPoseStickman(null);
+        setProductDescription(null);
+        setFitDescription(null);
+        setUpperGarmentDescription(null);
+        setLowerGarmentDescription(null);
+        setInnerWearDescription(null);
+        setShoesDescription(null);
+        setModelDescription(null);
+
+        setTucked(false);
+        setSleevesRolled(false);
+        setClosureType("buttons");
+
+        setSocksType("none");
+        setCollarType("none");
+        setShoulderType("none");
+        setWaistType("none");
+        setRiseType("none");
+        setLegType("none");
+        setHemType("none");
+
+        const emptyAssets = {
+            model: null, background: null, main_product: null, pose: null,
+            top_front: null, bottom_front: null, shoes: null, top_back: null,
+            bottom_back: null, jacket: null, bag: null, glasses: null,
+            hat: null, jewelry: null, belt: null, inner_wear: null, lighting: null
+        };
+
+        setAssets(emptyAssets);
+        setAssetsHighRes(emptyAssets);
+
+        setBatchMode(false);
+        setIsMaviBatch(false);
+        setStylingSideOnly({});
+        setBatchShotSelection({});
+        setTechAccessories({ jacket: false, bag: false, glasses: false, hat: false, jewelry: false, belt: false });
+
+        dbOperations.delete(STORES.PHOTOSHOOT_STATE, 'current-session').catch(console.error);
+
+        setWizardStep(1);
+
+        toast.success(language === "tr" ? "Stüdyo sıfırlandı." : "Studio resetted.");
+    };
+
     return {
         projects, addProject, deductCredits, models, t, language, router,
         showExpert, setShowExpert, mounted, setMounted, showAdvanced, setShowAdvanced,
@@ -537,6 +594,6 @@ export const usePhotoshootWorkflow = () => {
         handleBatchGenerate, handleConfirmGeneration, handleConfirmBatchGeneration, batchPreviewPrompts,
         editedBatchPrompts, setEditedBatchPrompts, showBatchPreview, setShowBatchPreview,
         selectedBatchImages, setSelectedBatchImages, isStoppingBatch, handleStopBatch, estimatedCost,
-        handleAssetRemove, canMoveToStep, handleLibrarySelect, getLibraryItems, convertToStickman
+        handleAssetRemove, canMoveToStep, handleLibrarySelect, getLibraryItems, convertToStickman, resetWorkflow
     };
 };
