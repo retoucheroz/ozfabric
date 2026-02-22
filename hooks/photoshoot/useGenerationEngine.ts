@@ -219,7 +219,7 @@ export const useGenerationEngine = (
         }
 
         setIsProcessing(true);
-        if (!isReStyling && !isThreeAngles) setResultImages(null);
+        if (!isReStyling && !isThreeAngles) setResultImages([]);
 
         setActiveLibraryAsset(null);
 
@@ -469,7 +469,7 @@ export const useGenerationEngine = (
         setShowPreview(false);
         setIsProcessing(true);
         const isReStyling = pendingOptions?.isReStyling || false;
-        if (!isReStyling && !pendingOptions?.isThreeAngles) setResultImages(null);
+        if (!isReStyling && !pendingOptions?.isThreeAngles) setResultImages([]);
 
         const costToDeduct = pendingOptions?.isThreeAngles ? singleCost * 3 : singleCost;
         if (!(await deductCredits(costToDeduct))) {
