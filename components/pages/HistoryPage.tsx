@@ -37,6 +37,20 @@ export default function HistoryPage() {
     const [searchQuery, setSearchQuery] = useState("")
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
     const [filterType, setFilterType] = useState<string>("all")
+    const [isAdmin, setIsAdmin] = useState(false)
+
+    import("react").then(React => {
+        React.useEffect(() => {
+            fetch('/api/auth/session')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.authenticated && data.user?.role === 'admin') {
+                        setIsAdmin(true)
+                    }
+                })
+                .catch(() => { })
+        }, [])
+    })
 
     const filteredProjects = useMemo(() => {
         return projects
@@ -159,6 +173,7 @@ export default function HistoryPage() {
                                         language={language}
                                         onDelete={() => handleDelete(project.id)}
                                         onDownload={() => handleDownload(project.imageUrl, project.title)}
+                                        isAdmin={isAdmin}
                                     />
                                 ))}
                             </div>
@@ -171,6 +186,7 @@ export default function HistoryPage() {
                                         language={language}
                                         onDelete={() => handleDelete(project.id)}
                                         onDownload={() => handleDownload(project.imageUrl, project.title)}
+                                        isAdmin={isAdmin}
                                     />
                                 ))}
                             </div>
@@ -194,7 +210,7 @@ export default function HistoryPage() {
     )
 }
 
-function ProjectCard({ project, language, onDelete, onDownload }: { project: Project, language: string, onDelete: () => void, onDownload: () => void }) {
+function ProjectCard({ project, language, onDelete, onDownload, isAdmin }: { project: Project, language: string, onDelete: () => void, onDownload: () => void, isAdmin: boolean }) {
 
     // Extract seed and prompt from description
     const { seed, prompt } = useMemo(() => {
@@ -237,7 +253,7 @@ function ProjectCard({ project, language, onDelete, onDownload }: { project: Pro
                     >
                         <Download className="w-4 h-4" />
                     </Button>
-                    {prompt && (
+                    {prompt && isAdmin && (
                         <Button
                             size="icon"
                             variant="secondary"
@@ -249,8 +265,7 @@ function ProjectCard({ project, language, onDelete, onDownload }: { project: Pro
                         </Button>
                     )}
                 </div>
-                {/* Seed Badge on Image Bottom */}
-                {seed && (
+                {seed && isAdmin && (
                     <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
                         <div className="bg-black/60 backdrop-blur-md text-white text-[10px] px-2 py-1 rounded-md truncate">
                             Seed: {seed}
@@ -286,7 +301,7 @@ function ProjectCard({ project, language, onDelete, onDownload }: { project: Pro
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-40">
-                            {prompt && (
+                            {prompt && isAdmin && (
                                 <DropdownMenuItem className="gap-2 cursor-pointer" onClick={handleCopyPrompt}>
                                     <Copy className="w-4 h-4" />
                                     <span>{language === "tr" ? "Prompt Kopyala" : "Copy Prompt"}</span>
@@ -308,7 +323,7 @@ function ProjectCard({ project, language, onDelete, onDownload }: { project: Pro
     )
 }
 
-function ProjectRow({ project, language, onDelete, onDownload }: { project: Project, language: string, onDelete: () => void, onDownload: () => void }) {
+function ProjectRow({ project, language, onDelete, onDownload, isAdmin }: { project: Project, language: string, onDelete: () => void, onDownload: () => void, isAdmin: boolean }) {
 
     // Extract seed and prompt from description
     const { seed, prompt } = useMemo(() => {
@@ -359,7 +374,7 @@ function ProjectRow({ project, language, onDelete, onDownload }: { project: Proj
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
-                    {prompt && (
+                    {prompt && isAdmin && (
                         <Button variant="ghost" size="sm" className="h-8 text-[11px] gap-2 hidden sm:flex" onClick={handleCopyPrompt}>
                             <Copy className="w-3.5 h-3.5" />
                             {language === "tr" ? "Prompt" : "Prompt"}

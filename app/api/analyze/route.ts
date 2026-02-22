@@ -160,7 +160,7 @@ export async function POST(req: NextRequest) {
                 } else {
                     // TECH PACK MODE - Comprehensive Technical Analysis
                     const workflowStr = workflowType || 'upper';
-                    const productNameContext = productName ? `IMPORTANT: The user has specified that the product is a "${productName}". Your analysis MUST consistently treat the garment as a ${productName} and base all descriptions (especially visualPrompt and fitDescription) on this premise.` : "";
+                    const productNameContext = productName ? `CRITICAL RULE: The user explicitly defined this product as: "${productName}". This means if the user wrote a color (like "siyah" or "black"), the garment IS that color. You MUST strictly use the features and colors mentioned in "${productName}" and ignore any lighting or shadow distortions in the image that might suggest otherwise. Your visualPrompt, fitDescription, and color analysis MUST adhere 100% to "${productName}".` : "";
 
                     prompt = `${langInstruction} ${multiImageContext} You are a Senior Textile Engineer and Technical Designer. 
                     Analyze the garment in the image(s) to create a professional Technical Specification (Tech Pack).

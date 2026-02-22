@@ -122,6 +122,22 @@ export const useDialogState = (
                     }
                 }
 
+                let autoPrompt = "";
+                try {
+                    toast.info(language === "tr" ? "Poz analiz ediliyor..." : "Analyzing pose...");
+                    const resAnalyze = await fetch("/api/analyze", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ image: finalStickmanUrl, type: 'pose', language })
+                    });
+                    const analyzeData = await resAnalyze.json();
+                    if (analyzeData?.data?.description) {
+                        autoPrompt = analyzeData.data.description;
+                    }
+                } catch (e) {
+                    console.error("Pose analysis failed:", e);
+                }
+
                 const newPose: SavedPose = {
                     id: crypto.randomUUID(),
                     url: finalUrl,
@@ -130,6 +146,7 @@ export const useDialogState = (
                     originalThumb: optimizedThumb,
                     stickmanUrl: finalStickmanUrl,
                     gender: genderValue,
+                    customPrompt: autoPrompt || undefined,
                     createdAt: Date.now()
                 };
                 const updated = [newPose, ...savedPoses];
@@ -137,7 +154,10 @@ export const useDialogState = (
                 await dbOperations.add(STORES.POSES, newPose);
                 toast.success(language === "tr" ? "Poz kütüphaneye kaydedildi" : "Pose saved to library");
 
-                setAssets((prev: any) => ({ ...prev, pose: finalStickmanUrl }));
+                setAssets((prev: any) => ({ ...prev, pose: finalUrl }));
+                if (autoPrompt) {
+                    setPoseDescription(autoPrompt);
+                }
                 setPoseStickman(finalStickmanUrl);
             }
             setTempPoseData(null);

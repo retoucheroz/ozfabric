@@ -8,9 +8,23 @@ import { useLanguage } from "@/context/language-context"
 import { toast } from "sonner"
 import { COMMUNITY_DESIGNS } from "@/lib/data"
 
+import React from "react"
+
 export default function CommunityPage() {
     const router = useRouter();
     const { t } = useLanguage();
+    const [isAdmin, setIsAdmin] = React.useState(false);
+
+    React.useEffect(() => {
+        fetch('/api/auth/session')
+            .then(res => res.json())
+            .then(data => {
+                if (data.authenticated && data.user?.role === 'admin') {
+                    setIsAdmin(true)
+                }
+            })
+            .catch(() => { })
+    }, [])
 
     const handleRemix = (prompt: string) => {
         router.push(`/design/styles?prompt=${encodeURIComponent(prompt)}`);
@@ -43,14 +57,18 @@ export default function CommunityPage() {
                             <img src={design.image} alt={design.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
                                 <p className="text-white font-bold text-lg mb-1 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">{design.title}</p>
-                                <p className="text-white/70 text-xs line-clamp-2 mb-4 italic translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">"{design.prompt}"</p>
+                                {isAdmin && (
+                                    <p className="text-white/70 text-xs line-clamp-2 mb-4 italic translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">"{design.prompt}"</p>
+                                )}
                                 <div className="flex gap-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">
                                     <Button size="sm" onClick={() => handleRemix(design.prompt)} className="flex-1 bg-white text-black hover:bg-white/90 font-medium">
                                         <Wand2 className="w-4 h-4 mr-2" /> {t("community.remix")}
                                     </Button>
-                                    <Button size="sm" variant="outline" onClick={(e) => handleCopy(design.prompt, e)} className="border-white/20 text-white hover:bg-white/20 hover:text-white hover:border-white">
-                                        <Copy className="w-4 h-4" />
-                                    </Button>
+                                    {isAdmin && (
+                                        <Button size="sm" variant="outline" onClick={(e) => handleCopy(design.prompt, e)} className="border-white/20 text-white hover:bg-white/20 hover:text-white hover:border-white">
+                                            <Copy className="w-4 h-4" />
+                                        </Button>
+                                    )}
                                 </div>
                             </div>
                         </div>
