@@ -385,7 +385,14 @@ export const usePhotoshootWorkflow = () => {
             setAssetsHighRes((prev: Record<string, string | null>) => ({ ...prev, [activeLibraryAsset]: null }));
         }
 
-        if (activeLibraryAsset === 'pose') setPoseDescription(null);
+        if (activeLibraryAsset === 'pose') {
+            const pose = savedPoses.find(p => p.url === item.src);
+            if (pose) {
+                handleSavedPoseClick(pose);
+                return;
+            }
+            setPoseDescription(null);
+        }
         if (activeLibraryAsset === 'main_product' || activeLibraryAsset === 'top_front' || activeLibraryAsset === 'bottom_front') setProductDescription(null);
         if (activeLibraryAsset === 'fit_pattern') setFitDescription(null);
 
