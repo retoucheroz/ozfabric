@@ -160,7 +160,7 @@ export async function POST(req: NextRequest) {
                 } else {
                     // TECH PACK MODE - Comprehensive Technical Analysis
                     const workflowStr = workflowType || 'upper';
-                    const productNameContext = productName ? `CRITICAL RULE: The user explicitly defined this product as: "${productName}". This means if the user wrote a color (like "siyah" or "black"), the garment IS that color. You MUST strictly use the features and colors mentioned in "${productName}" and ignore any lighting or shadow distortions in the image that might suggest otherwise. Your visualPrompt, fitDescription, and color analysis MUST adhere 100% to "${productName}".` : "";
+                    const productNameContext = productName ? `CRITICAL RULE: The user explicitly defined this product as: "${productName}". If "${productName}" implies a specific color (like "siyah" or "black"), the garment is EXACTLY that color. IGNORE lighting or shadow distortions in the image. DO NOT describe the background, model, or setting. STRICTLY describe the garment itself matching the attributes of "${productName}".` : "";
 
                     prompt = `${langInstruction} ${multiImageContext} You are a Senior Textile Engineer and Technical Designer. 
                     Analyze the garment in the image(s) to create a professional Technical Specification (Tech Pack).
@@ -183,7 +183,7 @@ export async function POST(req: NextRequest) {
                         "productName": "...",
                         "sku": "...",
                         "category": "...",
-                        "visualPrompt": "One paragraph description optimized for AI image generation (dalle/midjourney style).",
+                        "visualPrompt": "One paragraph highly detailed visual description of the GARMENT ONLY. DO NOT describe the background, setting, lighting, model, mannequin or photography style. Focus purely on the garment's fabric, details, construction, texture, color, and fit.",
                         "fit": "Specific fit description (e.g., Oversized Boxy Fit)",
                         "fitDescription": "Detailed explanation of the silhouette.",
                         "fabric": {

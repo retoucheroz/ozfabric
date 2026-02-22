@@ -84,15 +84,28 @@ export function BatchPreviewDialog({
                                 <span className="text-[10px] text-muted-foreground font-mono">{selectedBatchImages[idx] ? (language === "tr" ? "Üretilecek" : "Will Generate") : (language === "tr" ? "Atlanacak" : "Skipped")}</span>
                             </div>
                             {selectedBatchImages[idx] && isAdmin && (
-                                <Textarea
-                                    value={editedBatchPrompts[idx]}
-                                    onChange={(e) => {
-                                        const updated = [...editedBatchPrompts];
-                                        updated[idx] = e.target.value;
-                                        setEditedBatchPrompts(updated);
-                                    }}
-                                    className="font-mono text-xs h-32 bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] rounded-lg p-2"
-                                />
+                                <div className="space-y-2 mt-2 border-t border-[var(--border-subtle)] pt-2">
+                                    <div className="text-[10px] text-[var(--text-secondary)] flex flex-col gap-1 pb-1">
+                                        <p><strong className="text-[var(--text-primary)]">{language === "tr" ? "Çekim Açısı (View):" : "Shot Angle (View):"}</strong> {p.spec?.view}</p>
+                                        <p><strong className="text-[var(--text-primary)]">{language === "tr" ? "Kıyafet Görselleri:" : "Garment Images:"}</strong> {p.spec?.assets?.join(', ') || (language === "tr" ? 'Belirtilmedi' : 'Not specified')}</p>
+                                        <p><strong className="text-[var(--text-primary)]">{language === "tr" ? "Hariç Tutulanlar:" : "Excluded:"}</strong> {[
+                                            p.spec?.excludeBagAsset && (language === "tr" ? 'Çanta' : 'Bag'),
+                                            p.spec?.excludeShoesAsset && (language === "tr" ? 'Ayakkabı' : 'Shoes'),
+                                            p.spec?.excludeHatAsset && (language === "tr" ? 'Şapka' : 'Hat'),
+                                            p.spec?.excludeBeltAsset && (language === "tr" ? 'Kemer' : 'Belt'),
+                                            p.spec?.excludeAllAccessories && (language === "tr" ? 'Tüm Aksesuarlar' : 'All Accessories')
+                                        ].filter(Boolean).join(', ') || (language === "tr" ? "Yok" : "None")}</p>
+                                    </div>
+                                    <Textarea
+                                        value={editedBatchPrompts[idx]}
+                                        onChange={(e) => {
+                                            const updated = [...editedBatchPrompts];
+                                            updated[idx] = e.target.value;
+                                            setEditedBatchPrompts(updated);
+                                        }}
+                                        className="font-mono text-xs h-32 bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] rounded-lg p-2"
+                                    />
+                                </div>
                             )}
                         </div>
                     ))}
