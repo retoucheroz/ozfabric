@@ -48,33 +48,35 @@ export function PreviewArea({
                 disabled={isProcessing || (batchMode && !productCode)}
             >
                 {isProcessing ? (
-                    <div className="flex items-center">
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        <span>{language === "tr" ? "İşleniyor..." : "Processing..."}</span>
-                    </div>
+                    <span className="flex items-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        {language === "tr" ? "ÜRETİLİYOR..." : "GENERATING..."}
+                    </span>
                 ) : (
-                    <>
-                        {batchMode ? <Layers className="w-4 h-4 mr-2" /> : <Sparkles className="w-4 h-4 mr-2" />}
-                        {batchMode
-                            ? (language === "tr" ? "Toplu Üretimi Başlat" : "Start Batch Generation")
-                            : (language === "tr" ? "Fotoğraf Çek" : "Generate Photo")}
-                        <span className="ml-2 text-[10px] bg-white/20 px-1.5 py-0.5 rounded font-normal">
-                            {estimatedCost} {language === "tr" ? "Kr" : "Cr"}
-                        </span>
-                    </>
+                    <span className="flex items-center gap-2">
+                        <Camera className="w-5 h-5" />
+                        {language === "tr" ? "ÜRETİMİ BAŞLAT" : "START PRODUCTION"}
+                    </span>
                 )}
             </Button>
-
+            {!isProcessing && (
+                <div className="flex items-center justify-center gap-4 text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest py-1">
+                    <span className="flex items-center gap-1.5">
+                        <Zap className="w-3 h-3 text-amber-500" />
+                        {language === 'tr' ? `Tahmini Maliyet: ${estimatedCost} Kredi` : `ESTIMATED COST: ${estimatedCost} CREDITS`}
+                    </span>
+                </div>
+            )}
         </div>
     );
 
-    const stopButton = isProcessing && batchMode && handleStopBatch && (
+    const stopButton = isProcessing && handleStopBatch && (
         <Button
-            variant="destructive"
+            variant="outline"
             size="sm"
             onClick={handleStopBatch}
             disabled={isStoppingBatch}
-            className="mt-4 animate-in fade-in slide-in-from-bottom-2 duration-300 shadow-lg shadow-red-500/20"
+            className="mb-6 h-10 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 font-bold uppercase tracking-widest text-[10px]"
         >
             {isStoppingBatch ? (
                 <span className="flex items-center gap-2">
@@ -90,10 +92,11 @@ export function PreviewArea({
         </Button>
     );
 
-    if (isProcessing) {
+    // 1. If currently processing AND no images yet -> Show full screen loader
+    if (isProcessing && (!resultImages || resultImages.length === 0)) {
         return (
             <div className="flex-1 bg-[var(--bg-base)] overflow-y-auto p-4 md:p-8 relative min-h-[400px] flex flex-col items-center justify-center">
-                <div className="h-full flex flex-col items-center justify-center space-y-8 my-auto w-full max-w-md">
+                <div className="h-full flex flex-col items-center justify-center space-y-8 my-auto w-full max-w-md animate-in fade-in duration-700">
                     <div className="relative">
                         <div className="absolute inset-0 bg-gradient-to-r from-purple-500/30 to-pink-500/30 rounded-full blur-xl animate-pulse"></div>
                         <div className="relative w-24 h-24 bg-gradient-to-br from-[var(--bg-surface)] to-[var(--bg-elevated)] rounded-2xl shadow-2xl flex items-center justify-center border border-[var(--border-subtle)]">
@@ -105,9 +108,9 @@ export function PreviewArea({
                     <StudioSteps language={language} isSuccess={isGenerationSuccess} />
 
                     <div className="w-full max-w-xs">
-                        <div className="h-1 w-full bg-[var(--bg-elevated)] overflow-hidden rounded-full">
+                        <div className="h-1.5 w-full bg-[var(--bg-elevated)] overflow-hidden rounded-full shadow-inner">
                             <div
-                                className="h-full bg-gradient-to-r from-purple-600 via-pink-500 to-purple-600 rounded-full"
+                                className="h-full bg-gradient-to-r from-[var(--accent-primary)] via-pink-500 to-[var(--accent-primary)] rounded-full"
                                 style={{
                                     width: '100%',
                                     animation: 'shimmer 2s linear infinite',
@@ -123,108 +126,107 @@ export function PreviewArea({
         );
     }
 
+    // 2. If we have images (Final OR Incremental)
     if (resultImages && resultImages.length > 0) {
         return (
             <div className="flex-1 bg-[var(--bg-base)] overflow-y-auto p-4 md:p-8 relative min-h-[400px] flex flex-col items-center">
-                <div className="w-full max-w-2xl flex flex-col gap-6 mb-8">
-                    {resultImages.length > 1 ? (
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full">
-                            {resultImages.map((img: any, i: number) => {
-                                const url = typeof img === 'string' ? img : img.url;
-                                const filename = typeof img === 'string' ? `angle_${i}_${Date.now()}.png` : img.filename;
-                                const downloadName = typeof img === 'string' ? `angle_${i}_${Date.now()}.png` : (img.downloadName || img.filename);
-
-                                return (
-                                    <div key={i} className="relative aspect-[2/3] rounded-xl overflow-hidden shadow-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] group">
-                                        <img src={url} className="w-full h-full object-cover" />
-                                        <div className="absolute top-2 right-2 flex flex-col gap-2">
-                                            <Button
-                                                size="icon"
-                                                className="h-8 w-8 rounded-full bg-white/80 hover:bg-white text-black backdrop-blur-md shadow-sm"
-                                                onClick={() => router.push(`/resize?image=${encodeURIComponent(url)}`)}
-                                                title="Upscale"
-                                            >
-                                                <Maximize2 className="w-3.5 h-3.5" />
-                                            </Button>
-                                            <Button
-                                                size="icon"
-                                                className="h-8 w-8 rounded-full bg-black/50 hover:bg-black/70 text-white backdrop-blur-md shadow-sm transition-all"
-                                                onClick={async (e) => {
-                                                    e.stopPropagation();
-                                                    e.preventDefault();
-                                                    const response = await fetch(url);
-                                                    const blob = await response.blob();
-                                                    const downloadUrl = window.URL.createObjectURL(blob);
-                                                    const link = document.createElement('a');
-                                                    link.href = downloadUrl;
-                                                    link.download = downloadName;
-                                                    document.body.appendChild(link);
-                                                    link.click();
-                                                    document.body.removeChild(link);
-                                                }}
-                                                title={language === "tr" ? "İndir" : "Download"}
-                                            >
-                                                <Download className="w-3.5 h-3.5" />
-                                            </Button>
-                                        </div>
-                                        {(typeof img === 'object' && img.filename) && (
-                                            <div className="absolute bottom-0 inset-x-0 p-2 bg-black/60 text-[10px] text-white truncate font-medium backdrop-blur-sm">
-                                                {img.filename.replace('.jpg', '').replace('.png', '')}
-                                            </div>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    ) : (() => {
-                        const img = resultImages[0];
-                        const url = typeof img === 'string' ? img : img.url;
-                        const filename = typeof img === 'string' ? `photo_${Date.now()}.png` : img.filename;
-                        const downloadName = typeof img === 'string' ? `photo_${Date.now()}.png` : (img.downloadName || img.filename);
-
-                        return (
-                            <div className="relative aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl border-4 border-white bg-white group mx-auto w-full">
-                                <img src={url} className="w-full h-full object-cover" />
-                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
-                                    <Button
-                                        variant="secondary"
-                                        className="rounded-full bg-white/90 hover:bg-white text-black"
-                                        onClick={() => router.push(`/resize?image=${encodeURIComponent(url)}`)}
-                                    >
-                                        <Maximize2 className="w-4 h-4 mr-2" />
-                                        Upscale
-                                    </Button>
-                                    <Button
-                                        variant="secondary"
-                                        className="rounded-full bg-black/70 hover:bg-black text-white"
-                                        onClick={async () => {
-                                            const response = await fetch(url);
-                                            const blob = await response.blob();
-                                            const downloadUrl = window.URL.createObjectURL(blob);
-                                            const link = document.createElement('a');
-                                            link.href = downloadUrl;
-                                            link.download = downloadName;
-                                            link.click();
-                                        }}
-                                    >
-                                        <Download className="w-4 h-4 mr-2" />
-                                        {language === "tr" ? "İndir" : "Download"}
-                                    </Button>
-                                </div>
-                                {(typeof img === 'object' && img.filename) && (
-                                    <div className="absolute bottom-0 inset-x-0 p-3 bg-black/60 text-xs text-white truncate font-bold text-center backdrop-blur-md">
-                                        {img.filename.replace('.jpg', '').replace('.png', '')}
-                                    </div>
-                                )}
+                {/* Header for Batch Progress */}
+                {isProcessing && (
+                    <div className="w-full max-w-2xl mb-8 p-4 rounded-2xl bg-[var(--accent-soft)] border border-[var(--accent-primary)]/20 flex items-center justify-between animate-in slide-in-from-top-4">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-lg bg-[var(--accent-primary)] text-white shadow-sm">
+                                <Loader2 className="w-4 h-4 animate-spin" />
                             </div>
-                        );
-                    })()}
+                            <div>
+                                <h3 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-wide">
+                                    {language === "tr" ? "Toplu Üretim Devam Ediyor" : "Batch Production in Progress"}
+                                </h3>
+                                <p className="text-[10px] font-bold text-[var(--accent-primary)] opacity-80 uppercase tracking-tighter">
+                                    {language === "tr" ? `${resultImages.length} görsel üretildi, devamı geliyor...` : `${resultImages.length} images generated, more coming...`}
+                                </p>
+                            </div>
+                        </div>
+                        {stopButton}
+                    </div>
+                )}
+
+                <div className="w-full max-w-2xl flex flex-col gap-6 mb-8">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full">
+                        {resultImages.map((img: any, i: number) => {
+                            const url = typeof img === 'string' ? img : img.url;
+                            const filename = typeof img === 'string' ? `angle_${i}_${Date.now()}.png` : img.filename;
+                            const downloadName = typeof img === 'string' ? `angle_${i}_${Date.now()}.png` : (img.downloadName || img.filename);
+
+                            return (
+                                <div key={i} className="relative aspect-[2/3] rounded-xl overflow-hidden shadow-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] group animate-in zoom-in-95 duration-500">
+                                    <img src={url} className="w-full h-full object-cover" />
+                                    <div className="absolute top-2 right-2 flex flex-col gap-2">
+                                        <Button
+                                            size="icon"
+                                            className="h-8 w-8 rounded-full bg-white/80 hover:bg-white text-black backdrop-blur-md shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                                            onClick={() => router.push(`/resize?image=${encodeURIComponent(url)}`)}
+                                            title="Upscale"
+                                        >
+                                            <Maximize2 className="w-3.5 h-3.5" />
+                                        </Button>
+                                        <Button
+                                            size="icon"
+                                            className="h-8 w-8 rounded-full bg-white/80 hover:bg-white text-black backdrop-blur-md shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                                            onClick={async (e) => {
+                                                e.stopPropagation();
+                                                const link = document.createElement('a');
+                                                link.href = url;
+                                                link.download = downloadName;
+                                                document.body.appendChild(link);
+                                                link.click();
+                                                document.body.removeChild(link);
+                                            }}
+                                            title="Download"
+                                        >
+                                            <Download className="w-3.5 h-3.5" />
+                                        </Button>
+                                    </div>
+                                    {(typeof img === 'object' && img.filename) && (
+                                        <div className="absolute bottom-0 inset-x-0 p-2 bg-black/40 backdrop-blur-sm text-[8px] text-white font-medium truncate opacity-0 group-hover:opacity-100 transition-opacity">
+                                            {img.filename.replace('.jpg', '').replace('.png', '')}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
+
+                        {/* Placeholder for next image if still processing */}
+                        {isProcessing && (
+                            <div className="relative aspect-[2/3] rounded-xl border-2 border-dashed border-[var(--border-subtle)] bg-[var(--bg-elevated)]/50 flex flex-col items-center justify-center gap-3 animate-pulse">
+                                <div className="w-10 h-10 rounded-full bg-[var(--bg-surface)] flex items-center justify-center shadow-inner">
+                                    <Camera className="w-5 h-5 text-[var(--accent-primary)] animate-bounce" />
+                                </div>
+                                <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest text-center px-4">
+                                    {language === "tr" ? "Sıradaki Kare Hazırlanıyor..." : "Readying Next Shot..."}
+                                </span>
+                            </div>
+                        )}
+                    </div>
                 </div>
-                {generateButton}
+
+                {!isProcessing && (
+                    <div className="w-full max-w-2xl pt-6 border-t border-[var(--border-subtle)] flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                            <div className="flex flex-col">
+                                <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-wider">{language === "tr" ? "TOPLAM GÖRSEL" : "TOTAL IMAGES"}</span>
+                                <span className="text-sm font-black text-[var(--text-primary)]">{resultImages.length}</span>
+                            </div>
+                        </div>
+                        <div className="flex gap-3">
+                            {generateButton}
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }
 
+    // Default: Nothing produced yet
     return (
         <div className="flex-1 bg-[var(--bg-base)] overflow-y-auto p-4 md:p-8 relative min-h-[400px] flex flex-col items-center justify-center text-center">
             <div className="max-w-md space-y-4 mb-8">

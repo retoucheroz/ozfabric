@@ -69,6 +69,7 @@ export const usePhotoshootWorkflow = () => {
     const [riseType, setRiseType] = useState<'none' | 'low' | 'mid' | 'high'>('none');
     const [legType, setLegType] = useState<'none' | 'skinny' | 'straight' | 'wide'>('none');
     const [hemType, setHemType] = useState<'none' | 'standard' | 'cuffed' | 'raw'>('none');
+    const [pantLength, setPantLength] = useState<'none' | 'cropped' | 'ankle' | 'below_ankle' | 'full_length' | 'deep_break'>('none');
 
     const [lightingPositive, setLightingPositive] = useState<string>("");
     const [lightingNegative, setLightingNegative] = useState<string>("");
@@ -161,6 +162,16 @@ export const usePhotoshootWorkflow = () => {
                     if (state.enableWind !== undefined) setEnableWind(state.enableWind);
                     if (state.enableExpression !== undefined) setEnableExpression(state.enableExpression);
                     if (state.enableGaze !== undefined) setEnableGaze(state.enableGaze);
+                    if (state.collarType) setCollarType(state.collarType);
+                    if (state.shoulderType) setShoulderType(state.shoulderType);
+                    if (state.waistType) setWaistType(state.waistType);
+                    if (state.riseType) setRiseType(state.riseType);
+                    if (state.legType) setLegType(state.legType);
+                    if (state.hemType) setHemType(state.hemType);
+                    if (state.pantLength) setPantLength(state.pantLength);
+                    if (state.techAccessories) setTechAccessories(state.techAccessories);
+                    if (state.showGarmentDetails !== undefined) setShowGarmentDetails(state.showGarmentDetails);
+                    if (state.wizardStep) setWizardStep(state.wizardStep);
                 }
             } catch (e) {
                 console.error("Failed to restore state from IndexedDB", e);
@@ -193,7 +204,8 @@ export const usePhotoshootWorkflow = () => {
                     upperGarmentDescription, lowerGarmentDescription, innerWearDescription,
                     shoesDescription, modelDescription, buttonsOpen, tucked, socksType,
                     closureType, gender, resolution, aspectRatio, enableWind,
-                    enableExpression, enableGaze
+                    enableExpression, enableGaze, collarType, shoulderType, waistType, riseType,
+                    legType, hemType, pantLength, techAccessories, showGarmentDetails, wizardStep
                 }
             };
             try {
@@ -205,7 +217,7 @@ export const usePhotoshootWorkflow = () => {
 
         const timeout = setTimeout(saveState, 500);
         return () => clearTimeout(timeout);
-    }, [assets, productName, workflowType, productDescription, fitDescription, upperGarmentDescription, lowerGarmentDescription, innerWearDescription, shoesDescription, modelDescription, buttonsOpen, tucked, socksType, closureType, gender, resolution, aspectRatio, enableWind, enableExpression, enableGaze]);
+    }, [assets, productName, workflowType, productDescription, fitDescription, upperGarmentDescription, lowerGarmentDescription, innerWearDescription, shoesDescription, modelDescription, buttonsOpen, tucked, socksType, closureType, gender, resolution, aspectRatio, enableWind, enableExpression, enableGaze, collarType, shoulderType, waistType, riseType, legType, hemType, pantLength, techAccessories, showGarmentDetails, wizardStep]);
 
     // Hooks
     const {
@@ -285,7 +297,7 @@ export const usePhotoshootWorkflow = () => {
         enableWebSearch, buttonsOpen, closureType, userAddedPrompt,
         tucked, sleevesRolled, lookAtCamera, enableWind, enableExpression,
         enableGaze, hairBehindShoulders, socksType, collarType, shoulderType,
-        waistType, riseType, legType, hemType, lightingPositive, lightingNegative,
+        waistType, riseType, legType, hemType, pantLength, lightingPositive, lightingNegative,
         lightingSendImage, poseDescription, poseStickman, productDescription,
         fitDescription, upperGarmentDescription, lowerGarmentDescription,
         innerWearDescription, shoesDescription, modelDescription, isMaviBatch,
@@ -318,6 +330,7 @@ export const usePhotoshootWorkflow = () => {
     const hasHead = isCloseup || isCowboy || isFullBody;
     const canShowWaistRiseFitTuck = isCowboy || isFullBody;
     const canShowCollarHairButtons = isCloseup || isCowboy || isFullBody;
+    const canShowLegHem = isFullBody;
 
     const [microFeedback, setMicroFeedback] = useState<string | null>(null);
 
@@ -529,6 +542,7 @@ export const usePhotoshootWorkflow = () => {
         setRiseType("none");
         setLegType("none");
         setHemType("none");
+        setPantLength("none");
 
         const emptyAssets = {
             model: null, background: null, main_product: null, pose: null,
@@ -544,7 +558,7 @@ export const usePhotoshootWorkflow = () => {
         setIsMaviBatch(false);
         setStylingSideOnly({});
         setBatchShotSelection({});
-        setTechAccessories({ jacket: false, bag: false, glasses: false, hat: false, jewelry: false, belt: false });
+        setTechAccessories({ watch: false, phone: false, laptop: false, headphones: false });
 
         dbOperations.delete(STORES.PHOTOSHOOT_STATE, 'current-session').catch(console.error);
 
@@ -569,7 +583,7 @@ export const usePhotoshootWorkflow = () => {
         lookAtCamera, setLookAtCamera, enableWind, setEnableWind, enableExpression, setEnableExpression,
         enableGaze, setEnableGaze, hairBehindShoulders, setHairBehindShoulders, socksType, setSocksType,
         collarType, setCollarType, shoulderType, setShoulderType, waistType, setWaistType, riseType, setRiseType,
-        legType, setLegType, hemType, setHemType, lightingPositive, setLightingPositive,
+        legType, setLegType, hemType, setHemType, pantLength, setPantLength, lightingPositive, setLightingPositive,
         lightingNegative, setLightingNegative, lightingSendImage, setLightingSendImage,
         assets, setAssets, assetsHighRes, setAssetsHighRes, savedPoses, setSavedPoses,
         savedModels, setSavedModels, savedBackgrounds, setSavedBackgrounds, savedFits, setSavedFits,
@@ -589,7 +603,7 @@ export const usePhotoshootWorkflow = () => {
         handleSaveLighting, handleEditItemClick, handleUpdateThumbnail, handleAssetUpload,
         removeAsset, resizeImage, resizeImageDual, poseFocus, setPoseFocus, detailView, setDetailView,
         effectiveFraming, isFullBody, isCowboy, isCloseup, hasHead, canShowWaistRiseFitTuck,
-        canShowCollarHairButtons, microFeedback, setMicroFeedback, productCode, setProductCode,
+        canShowCollarHairButtons, canShowLegHem, microFeedback, setMicroFeedback, productCode, setProductCode,
         batchMode, setBatchMode, isMaviBatch, setIsMaviBatch, stylingSideOnly, setStylingSideOnly,
         upperFraming, setUpperFraming, batchShotSelection, setBatchShotSelection, techAccessories,
         setTechAccessories, availableBatchShots, singleCost,

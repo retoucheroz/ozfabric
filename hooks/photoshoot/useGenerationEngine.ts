@@ -36,6 +36,7 @@ export const useGenerationEngine = (
     riseType: string,
     legType: string,
     hemType: string,
+    pantLength: string,
     lightingPositive: string,
     lightingNegative: string,
     lightingSendImage: boolean,
@@ -146,6 +147,8 @@ export const useGenerationEngine = (
                 buttonsOpen,
                 tucked,
                 socksType,
+                pantLength,
+                techAccessories,
                 detailView,
                 targetView,
                 upperGarmentDescription,
@@ -420,8 +423,21 @@ export const useGenerationEngine = (
             if (data.images) {
                 setIsGenerationSuccess(true);
                 await new Promise(r => setTimeout(r, 1000));
+
                 setResultImages(data.images);
                 setGenerationStage('complete');
+
+                // ADD TO HISTORY
+                data.images.forEach((img: string, idx: number) => {
+                    const finalPrompt = (data.prompts && data.prompts[idx]) ? data.prompts[idx] : `Generated for ${productName}`;
+                    addProject({
+                        title: `Photoshoot - ${productName} - ${new Date().toLocaleTimeString()}`,
+                        type: "Photoshoot",
+                        imageUrl: img,
+                        description: `Seed: ${seed || 'Random'} | Prompt: ${finalPrompt}`
+                    });
+                });
+
                 toast.success(language === "tr" ? "Oluşturuldu!" : "Generated!");
                 setIsProcessing(false);
                 setIsGenerationSuccess(false);
@@ -629,6 +645,8 @@ export const useGenerationEngine = (
                     buttonsOpen,
                     tucked,
                     socksType: preview.spec.excludeSocksInfo ? 'none' : socksType,
+                    pantLength,
+                    techAccessories,
                     closureType,
                     upperGarmentDescription,
                     lowerGarmentDescription,
@@ -794,6 +812,8 @@ export const useGenerationEngine = (
                         buttonsOpen,
                         tucked,
                         socksType: preview.spec.excludeSocksInfo ? 'none' : socksType,
+                        pantLength,
+                        techAccessories,
                         closureType,
                         upperGarmentDescription,
                         lowerGarmentDescription,

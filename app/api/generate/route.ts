@@ -91,6 +91,8 @@ export async function POST(req: NextRequest) {
             riseType = 'none',
             legType = 'none',
             hemType = 'none',
+            pantLength = 'none',
+            techAccessories = {},
             sleevesRolled = false,
             excludeBeltAsset = false,
             excludeHatAsset = false,
@@ -185,6 +187,8 @@ export async function POST(req: NextRequest) {
                 if (imgs.inner_wear) assets.push(imgs.inner_wear);
                 if (imgs.bottom_front && focus !== 'closeup') assets.push(imgs.bottom_front);
                 if (imgs.jacket) assets.push(imgs.jacket);
+                if (imgs.belt && !excludeBeltAsset && focus !== 'closeup') assets.push(imgs.belt);
+                if (imgs.bag && focus !== 'closeup') assets.push(imgs.bag);
                 assets.push(...frontDetails);
             }
 
@@ -211,9 +215,9 @@ export async function POST(req: NextRequest) {
 
             // 4. Common Assets
             if (imgs.background) assets.push(imgs.background);
-            if (imgs.belt && !excludeBeltAsset) assets.push(imgs.belt);
-            if (imgs.hat && !excludeHatAsset) assets.push(imgs.hat);
-            if (imgs.bag) assets.push(imgs.bag);
+            if (imgs.belt && !excludeBeltAsset && focus !== 'closeup') assets.push(imgs.belt);
+            if (imgs.hat && !excludeHatAsset && focus !== 'closeup') assets.push(imgs.hat);
+            if (imgs.bag && focus !== 'closeup') assets.push(imgs.bag);
             if (imgs.glasses) assets.push(imgs.glasses);
             if (imgs.lighting) assets.push(imgs.lighting);
 
@@ -303,9 +307,9 @@ export async function POST(req: NextRequest) {
                     buttons: buttonsOpen ? "open" : "closed",
                     tucked: tucked,
                     sleeves_rolled: sleevesRolled, // NEW
-                    inner_wear: uploadedImages.inner_wear ? {
+                    "inner_wear": uploadedImages.inner_wear ? {
                         visible: true,
-                        description: innerWearDescription
+                        description: innerWearDescription || "a clean minimalist inner layer garment"
                     } : null,
                     layers: {
                         jacket: uploadedImages.jacket ? {
@@ -350,6 +354,26 @@ export async function POST(req: NextRequest) {
                 },
 
                 // Removed duplicate pose block
+                // NEW: Analysis block for detailed descriptions
+                analysis: {
+                    "fabric": {
+                        "main": "Primary material name",
+                        "composition": "Percentage breakdown (e.g., 98% Cotton 2% Elastane)",
+                        "weight": "GSM or oz (e.g., 320 GSM / 11.5 oz)",
+                        "finish": "Fabric treatment (e.g., Enzyme Wash, Silicone Finish)"
+                    },
+                    "innerBrief": "Detailed visual description of the inner layer (t-shirt, sweater, etc.) if visible. Mention color and fabric texture.",
+                    "upperBrief": "Detailed visual description of the upper garment (coat, jacket, shirt) for styling blocks.",
+                    "lowerBrief": "Detailed visual description of the lower garment (pants, skirt) for styling blocks.",
+                    "shoesBrief": "Detailed visual description of footwear if visible.",
+                    "measurements": {
+                        "chest": "Model's chest measurement in cm",
+                        "waist": "Model's waist measurement in cm",
+                        "hips": "Model's hips measurement in cm",
+                        "inseam": "Model's inseam measurement in cm",
+                        "height": "Model's height in cm"
+                    }
+                }
             };
 
             // === JSON OVERRIDE CHECK ===
@@ -623,14 +647,16 @@ export async function POST(req: NextRequest) {
                 subjectBlock.push(`Identity: ${sp.subject.identity}.`);
             }
 
-            if (sp.subject.body_description) {
-                subjectBlock.push(`Physical Proportions & Body Description: ${clean(sp.subject.body_description)}`);
-            } else {
-                // Professional Default Measurements for E-Com consistency
-                if (sp.subject.type === 'male_model') {
-                    subjectBlock.push(`Physical Proportions & Body Description: Height 187 cm, Waist 79 cm (W32), Chest 97 cm (Size L / 50), Hips 97 cm, Inseam L34-L36. Lean and athletic build with long leg proportions.`);
-                } else if (sp.subject.type === 'female_model') {
-                    subjectBlock.push(`Physical Proportions & Body Description: Height 178 cm, Waist 62 cm (Size S / 36), Chest 86 cm, Hips 90 cm. Long legs with a slender, high-fashion slim build.`);
+            if (framing !== 'chest_and_face' && framing !== 'close_up') {
+                if (sp.subject.body_description) {
+                    subjectBlock.push(`Physical Proportions & Body Description: ${clean(sp.subject.body_description)}`);
+                } else {
+                    // Professional Default Measurements for E-Com consistency
+                    if (sp.subject.type === 'male_model') {
+                        subjectBlock.push(`Physical Proportions & Body Description: Height 187 cm, Waist 79 cm (W32), Chest 97 cm (Size L / 50), Hips 97 cm, Inseam L34-L36. Lean and athletic build with long leg proportions.`);
+                    } else if (sp.subject.type === 'female_model') {
+                        subjectBlock.push(`Physical Proportions & Body Description: Height 178 cm, Waist 62 cm (Size S / 36), Chest 86 cm, Hips 90 cm. Long legs with a slender, high-fashion slim build.`);
+                    }
                 }
             }
             subjectBlock.push(`[/SUBJECT_IDENTITY]`);
@@ -666,9 +692,40 @@ export async function POST(req: NextRequest) {
                 productBlock.push("Style Adjustment: Front is open and unbuttoned.");
             }
 
+            if (canShowLegHem && pantLength && pantLength !== 'none') {
+                const lengthPrompts: Record<string, string> = {
+                    cropped: "LENGTH CONSTRAINT: Pant legs end clearly above the ankle bone, exposing visible ankle space. Hem floats above the shoe upper with a visible gap. No break, no shoe contact, no stacking, no pooling. Strict cropped length. Maintain exact proportional scaling relative to model height.",
+                    ankle: "LENGTH CONSTRAINT: Pant legs end exactly at the ankle bone level. Hem sits just at the top line of the ankle without touching the shoe. No break, no fabric resting on the shoe, no stacking, no pooling. Clean ankle-length finish. Maintain exact proportional scaling relative to model height.",
+                    below_ankle: "LENGTH CONSTRAINT: Pant legs end slightly below the ankle bone with minimal contact at the top edge of the shoe. No visible break at the front. No stacking, no pooling, no extended length. Controlled ankle-below finish. Maintain exact proportional scaling relative to model height.",
+                    full_length: "LENGTH CONSTRAINT: Pant legs extend to full length, reaching heel level and visibly touching the front of the shoe upper. A light natural front break is required. No stacking, no excessive fabric pooling. Full-length silhouette. Maintain exact proportional scaling relative to model height.",
+                    deep_break: "LENGTH CONSTRAINT: Pant legs extend long enough to partially cover most of the shoe upper, with a visible soft break over the front of the shoe. The hem reaches heel level. No stacking beyond a single soft break, no heavy pooling. Maintain exact proportional scaling relative to model height."
+                };
+                if (lengthPrompts[pantLength]) {
+                    productBlock.push(lengthPrompts[pantLength]);
+                }
+            }
+
             productBlock.push(`Garment type, fabric, construction, fit and details are FINAL. The model's pose must complement these features while maintaining natural fashion movement.`);
             productBlock.push(`[/LOCKED_PRODUCT_CONSTRAINTS]`);
             sections.push(productBlock.join("\n"));
+
+            // === ACCESSORIES ===
+            const accEntries = Object.entries(techAccessories || {}).filter(([_, v]) => !!v);
+            if (accEntries.length > 0) {
+                const accBlock: string[] = [];
+                accBlock.push(`[ACCESSORIES_DESCRIPTION]`);
+                const mapping: Record<string, string> = {
+                    watch: "Model is wearing a premium minimalist smartwatch on the wrist.",
+                    phone: "Model is naturally holding a modern slim smartphone.",
+                    laptop: "A sleek modern laptop is visible in the scene, held or placed naturally.",
+                    headphones: "Model is wearing modern minimalist over-ear headphones."
+                };
+                accEntries.forEach(([key]) => {
+                    if (mapping[key]) accBlock.push(mapping[key]);
+                });
+                accBlock.push(`[/ACCESSORIES_DESCRIPTION]`);
+                sections.push(accBlock.join("\n"));
+            }
 
             // === PRIORITY 3: POSE GEOMETRY ===
             let subjectInfo = `POSE: Professional ${sp.subject.type} (Strictly match provided identity)`;

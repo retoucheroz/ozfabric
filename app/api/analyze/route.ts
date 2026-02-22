@@ -183,7 +183,11 @@ export async function POST(req: NextRequest) {
                         "productName": "...",
                         "sku": "...",
                         "category": "...",
-                        "visualPrompt": "One paragraph highly detailed visual description of the GARMENT ONLY. DO NOT describe the background, setting, lighting, model, mannequin or photography style. Focus purely on the garment's fabric, details, construction, texture, color, and fit.",
+                        "visualPrompt": "One paragraph highly detailed visual description of the GARMENT(S) ONLY. If multiple garments are provided (e.g., a coat and a sweater), describe BOTH as they would appear layered. Focus purely on the garment's fabric, details, construction, texture, color, and fit.",
+                        "innerBrief": "Detailed description of the inner layer (like a sweater, t-shirt) if present.",
+                        "upperBrief": "Detailed description of the upper garment (like a coat or jacket) if present.",
+                        "lowerBrief": "Detailed description of the lower garment (like pants/skirt) if present.",
+                        "shoesBrief": "Detailed description of the shoes if present.",
                         "fit": "Specific fit description (e.g., Oversized Boxy Fit)",
                         "fitDescription": "Detailed explanation of the silhouette.",
                         "fabric": {

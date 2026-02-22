@@ -23,6 +23,7 @@ import { LibrarySidebar } from "@/components/photoshoot/LibrarySidebar"
 import { WizardProgress } from "@/components/photoshoot/WizardProgress"
 import { PhotoshootTutorial } from "@/components/photoshoot/PhotoshootTutorial"
 import { BehaviorToggles } from "@/components/photoshoot/BehaviorToggles"
+import { ClothingDetails } from "@/components/photoshoot/ClothingDetails"
 
 // Dialogs
 import { SavePoseDialog } from "@/components/photoshoot/dialogs/SavePoseDialog"
@@ -47,6 +48,9 @@ export default function PhotoshootPage() {
         enableWind, setEnableWind, enableExpression, setEnableExpression,
         enableGaze, setEnableGaze, hairBehindShoulders, setHairBehindShoulders,
         socksType, setSocksType, lightingSendImage, setLightingSendImage,
+        collarType, setCollarType, shoulderType, setShoulderType, waistType, setWaistType, riseType, setRiseType,
+        legType, setLegType, hemType, setHemType, pantLength, setPantLength,
+        showGarmentDetails, setShowGarmentDetails,
         assets, setAssets, assetsHighRes, setAssetsHighRes,
         savedPoses, savedModels, savedBackgrounds, savedFits, savedShoes,
         savedJackets, savedBags, savedGlasses, savedHats, savedJewelry,
@@ -63,7 +67,7 @@ export default function PhotoshootPage() {
         editingItemTags, setEditingItemTags, handleSavePose, handleSaveModel, handleSaveAsset,
         handleSaveLighting, handleEditItemClick, handleUpdateThumbnail, handleAssetUpload,
         poseFocus, setPoseFocus, isFullBody, isCowboy, isCloseup, hasHead, canShowWaistRiseFitTuck,
-        canShowCollarHairButtons, microFeedback, productCode, setProductCode,
+        canShowCollarHairButtons, canShowLegHem, microFeedback, productCode, setProductCode,
         batchMode, setBatchMode, isMaviBatch, setIsMaviBatch, stylingSideOnly, setStylingSideOnly,
         upperFraming, setUpperFraming, batchShotSelection, setBatchShotSelection, techAccessories,
         setTechAccessories, availableBatchShots, activeLibraryAsset, setActiveLibraryAsset,
@@ -223,6 +227,18 @@ export default function PhotoshootPage() {
                                             socksType={socksType}
                                             setSocksType={setSocksType}
                                         />
+
+                                        <ClothingDetails
+                                            language={language}
+                                            canShowLegHem={canShowLegHem}
+                                            pantLength={pantLength}
+                                            setPantLength={setPantLength}
+                                            hasFeet={isFullBody}
+                                            socksType={socksType}
+                                            setSocksType={setSocksType}
+                                            showGarmentDetails={showGarmentDetails}
+                                            setShowGarmentDetails={setShowGarmentDetails}
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -239,6 +255,8 @@ export default function PhotoshootPage() {
                                     <AssetCard id="belt" label={language === "tr" ? "KEMER" : "BELT"} icon={PiBelt} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="square" />
                                 </div>
                             </div>
+
+
 
                             <div className="flex justify-between mt-12 pt-6 border-t border-[var(--border-subtle)]">
                                 <Button

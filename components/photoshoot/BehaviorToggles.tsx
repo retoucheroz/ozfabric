@@ -99,11 +99,11 @@ export function BehaviorToggles({
     );
 
     return (
-        <div className="flex flex-col h-full space-y-3">
+        <div className="flex flex-col space-y-4">
             <h4 className="text-[10px] font-bold text-[var(--accent-primary)] uppercase tracking-[0.15em] px-1">
                 {language === "tr" ? "DETAY AYARLARI" : "DETAIL SETTINGS"}
             </h4>
-            <div className="grid grid-cols-3 gap-2 flex-1">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {/* 1. Hair */}
                 <ToggleItem
                     label={language === "tr" ? "SAÇ ARKADA" : "HAIR BACK"}

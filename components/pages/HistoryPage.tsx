@@ -18,7 +18,7 @@ import {
     Tag,
     Copy
 } from "lucide-react"
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -39,18 +39,16 @@ export default function HistoryPage() {
     const [filterType, setFilterType] = useState<string>("all")
     const [isAdmin, setIsAdmin] = useState(false)
 
-    import("react").then(React => {
-        React.useEffect(() => {
-            fetch('/api/auth/session')
-                .then(res => res.json())
-                .then(data => {
-                    if (data.authenticated && data.user?.role === 'admin') {
-                        setIsAdmin(true)
-                    }
-                })
-                .catch(() => { })
-        }, [])
-    })
+    useEffect(() => {
+        fetch('/api/auth/session')
+            .then(res => res.json())
+            .then(data => {
+                if (data.authenticated && data.user?.role === 'admin') {
+                    setIsAdmin(true)
+                }
+            })
+            .catch(() => { })
+    }, [])
 
     const filteredProjects = useMemo(() => {
         return projects
