@@ -150,8 +150,8 @@ export async function POST(req: NextRequest) {
                     prompt = `${langInstruction} ${multiImageContext}
                     You are an expert location scout and set designer.
                     Analyze the given background environment image. Ignore any people in the foreground.
-                    Describe the setting, lighting, atmosphere, time of day, architecture, nature, colors, and textures explicitly in a single highly detailed prompt suitable for AI image generation.
-                    Make it extremely descriptive.
+                    Describe the setting, lighting, atmosphere, time of day, architecture, nature, color palette, and textures explicitly in a single highly detailed prompt. 
+                    CRITICAL: This prompt will be the primary source for the visual style, color harmony, and lighting of the entire generation. Capturing the precise color vibe is essential as the product analysis will be color-neutral.
                     
                     JSON Response Format:
                     {
@@ -165,12 +165,14 @@ export async function POST(req: NextRequest) {
                     prompt = `${langInstruction} ${multiImageContext} You are a Senior Textile Engineer and Technical Designer. 
                     Analyze the garment in the image(s) to create a professional Technical Specification (Tech Pack).
                     
+                    CRITICAL GLOBAL RULE: All text descriptions (productName, visualPrompt, innerBrief, upperBrief, lowerBrief, shoesBrief) MUST BE COLOR-NEUTRAL. DO NOT include color names (e.g., 'blue', 'red', 'navy') in these specific fields. Focus strictly on texture, fabric properties, construction, and fit. This is essential so the AI generation can adapt to the reference image context without color conflict.
+                    
                     ${productNameContext}
                     
                     The analysis must be EXTREMELY PRECISE for manufacturing. 
                     
                     FIELD REQUIREMENTS:
-                    - "productName": Concise English corporate name.
+                    - "productName": Concise English corporate name. CRITICAL: DO NOT include any color names in the product name.
                     - "sku": Generate a realistic SKU (e.g., OZ-2024-XP-01).
                     - "category": Garment category (e.g., Mens Outwear, Womens Denim).
                     - "fabric": Detailed main material analysis.
@@ -183,7 +185,7 @@ export async function POST(req: NextRequest) {
                         "productName": "...",
                         "sku": "...",
                         "category": "...",
-                        "visualPrompt": "One paragraph highly detailed visual description focusing EXCLUSIVELY on the main product specified above. CRITICAL: DO NOT describe innerwear, shirts, sweaters, pants, or shoes if they are not the main product. DO NOT use words like 'ensemble', 'outfit', 'matching', or 'paired with'. Focus only on the main garment's fabric, details, construction, texture, color, and fit. If you describe an 'ensemble' instead of just the product, the manufacturing will fail.",
+                        "visualPrompt": "One paragraph highly detailed technical script focusing EXCLUSIVELY on the garment's fabric, construction, texture, and fit. CRITICAL: DO NOT mention the color of the garment. Describe only its shape, material properties, and design details. This allows the reference image and lighting to define the final color palette. If you describe the color, the AI generation will lose consistency with the setting.",
                         "innerBrief": "Detailed description of the inner layer (like a sweater, t-shirt) if present.",
                         "upperBrief": "Detailed description of the upper garment (like a coat or jacket) if present.",
                         "lowerBrief": "Detailed description of the lower garment (like pants/skirt) if present.",

@@ -93,6 +93,7 @@ export async function POST(req: NextRequest) {
             hemType = 'none',
             pantLength = 'none',
             techAccessories = {},
+            techAccessoryDescriptions = {},
             sleevesRolled = false,
             excludeBeltAsset = false,
             excludeHatAsset = false,
@@ -189,6 +190,9 @@ export async function POST(req: NextRequest) {
                 if (imgs.jacket) assets.push(imgs.jacket);
                 if (imgs.belt && !excludeBeltAsset && focus !== 'closeup') assets.push(imgs.belt);
                 if (imgs.bag && focus !== 'closeup') assets.push(imgs.bag);
+                if (imgs.jewelry) assets.push(imgs.jewelry);
+                if (imgs.glasses) assets.push(imgs.glasses);
+                if (imgs.hat && !excludeHatAsset) assets.push(imgs.hat);
                 assets.push(...frontDetails);
             }
 
@@ -219,6 +223,7 @@ export async function POST(req: NextRequest) {
             if (imgs.hat && !excludeHatAsset && focus !== 'closeup') assets.push(imgs.hat);
             if (imgs.bag && focus !== 'closeup') assets.push(imgs.bag);
             if (imgs.glasses) assets.push(imgs.glasses);
+            if (imgs.jewelry) assets.push(imgs.jewelry);
             if (imgs.lighting) assets.push(imgs.lighting);
 
             // 5. POSE REFERENCE (Stickman)
@@ -242,6 +247,8 @@ export async function POST(req: NextRequest) {
                     if (imgs.bottom_front) assets.push(imgs.bottom_front);
                     if (imgs.dress_front) assets.push(imgs.dress_front);
                     if (imgs.inner_wear) assets.push(imgs.inner_wear);
+                    if (imgs.jewelry) assets.push(imgs.jewelry);
+                    if (imgs.glasses) assets.push(imgs.glasses);
                     assets.push(...frontDetails);
                 } else if (activeDetailView === 'back') {
                     // STRICT BACK: Back assets + Back details
@@ -259,6 +266,8 @@ export async function POST(req: NextRequest) {
                     if (imgs.bottom_back) assets.push(imgs.bottom_back);
                     if (imgs.backRefUpload) assets.push(imgs.backRefUpload);
                     if (imgs.inner_wear) assets.push(imgs.inner_wear);
+                    if (imgs.jewelry) assets.push(imgs.jewelry);
+                    if (imgs.glasses) assets.push(imgs.glasses);
                     assets.push(...frontDetails);
                     assets.push(...backDetails);
                 }
@@ -711,7 +720,33 @@ export async function POST(req: NextRequest) {
 
             // === ACCESSORIES ===
             const accEntries = Object.entries(techAccessories || {}).filter(([_, v]) => !!v);
+
+            // Helper to translate common Turkish accessory terms to English
+            const translateAcc = (text: string, defaultType: string) => {
+                if (!text) return `Model is wearing ${defaultType} from the reference image.`;
+                const lower = text.toLowerCase();
+                let enType = defaultType;
+                if (lower.includes('küpe')) enType = 'earrings';
+                else if (lower.includes('bileklik')) enType = 'bracelet';
+                else if (lower.includes('kolye')) enType = 'necklace';
+                else if (lower.includes('yüzük')) enType = 'ring';
+                else if (lower.includes('gözlük')) enType = 'glasses';
+                else if (lower.includes('şapka')) enType = 'hat';
+                else if (lower.includes('çanta')) enType = 'bag';
+                else if (lower.includes('kemer')) enType = 'belt';
+                else if (lower.includes('ceket')) enType = 'jacket';
+
+                // If it's already in English or custom, use it
+                return `Model is wearing ${enType} (${text}) strictly as shown in the reference accessory image.`;
+            };
+
             const accMapping: Record<string, string> = {
+                jacket: translateAcc(techAccessoryDescriptions.jacket, 'a jacket'),
+                bag: translateAcc(techAccessoryDescriptions.bag, 'a bag'),
+                glasses: translateAcc(techAccessoryDescriptions.glasses, 'glasses'),
+                hat: translateAcc(techAccessoryDescriptions.hat, 'a hat'),
+                jewelry: translateAcc(techAccessoryDescriptions.jewelry, 'jewelry (earrings/bracelet)'),
+                belt: translateAcc(techAccessoryDescriptions.belt, 'a belt'),
                 watch: "Model is wearing a premium minimalist smartwatch on the wrist.",
                 phone: "Model is naturally holding a modern slim smartphone.",
                 laptop: "A sleek modern laptop is visible in the scene, held or placed naturally.",
@@ -722,6 +757,7 @@ export async function POST(req: NextRequest) {
             if (matchedAccs.length > 0) {
                 const accBlock: string[] = [];
                 accBlock.push(`[ACCESSORIES_DESCRIPTION]`);
+                accBlock.push(`CRITICAL: For any accessories listed below, strictly follow the provided reference images for their specific design, shape, and placement. Do not hallucinate generic versions.`);
                 matchedAccs.forEach(text => accBlock.push(text));
                 accBlock.push(`[/ACCESSORIES_DESCRIPTION]`);
                 sections.push(accBlock.join("\n"));

@@ -25,7 +25,7 @@ import {
 import { useProjects } from "@/context/projects-context"
 import { useLanguage } from "@/context/language-context"
 import { toast } from "sonner"
-import { resizeImageToThumbnail, optimizeImageForApi, cn } from "@/lib/utils"
+import { downloadImage, resizeImageToThumbnail, optimizeImageForApi, cn } from "@/lib/utils"
 import { CAMERAS, LOCATIONS, type CameraSpec, type LensSpec, type EditorialLocation } from "@/lib/editorial-data"
 import { motion, AnimatePresence } from "framer-motion"
 import { Separator } from "@/components/ui/separator"
@@ -838,7 +838,12 @@ export default function EditorialPage() {
                                             </div>
                                             <div className="flex gap-3">
                                                 <button onClick={() => window.open(resultImages[0], '_blank')} className="h-10 px-6 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 transition-colors text-[10px] font-bold uppercase tracking-widest flex items-center gap-2"><Maximize size={14} />{language === "tr" ? "TAM BOYUT" : "FULL SIZE"}</button>
-                                                <a href={resultImages[0]} download className="h-10 px-6 rounded-xl bg-violet-600 hover:bg-violet-500 transition-all text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 shadow-[0_0_20px_rgba(124,58,237,0.3)] active:scale-95"><Download size={14} />{language === "tr" ? "İNDİR" : "DOWNLOAD"}</a>
+                                                <Button
+                                                    onClick={() => downloadImage(resultImages[0], `editorial_${Date.now()}.png`)}
+                                                    className="h-10 px-6 rounded-xl bg-violet-600 hover:bg-violet-500 transition-all text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 shadow-[0_0_20px_rgba(124,58,237,0.3)] active:scale-95 text-white border-none"
+                                                >
+                                                    <Download size={14} />{language === "tr" ? "İNDİR" : "DOWNLOAD"}
+                                                </Button>
                                             </div>
                                         </div>
                                     )}

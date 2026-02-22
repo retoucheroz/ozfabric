@@ -189,6 +189,7 @@ export default function FaceHeadSwapPage() {
         } catch (e) {
             const a = document.createElement('a')
             a.href = resultImage
+            a.target = "_blank"
             a.download = `swap_${Date.now()}.png`
             document.body.appendChild(a)
             a.click()

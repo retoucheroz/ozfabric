@@ -506,6 +506,7 @@ export default function VideoPage() {
             // Fallback for base64
             const a = document.createElement('a');
             a.href = url;
+            a.target = "_blank";
             a.download = `endframe_${Date.now()}.png`;
             document.body.appendChild(a);
             a.click();

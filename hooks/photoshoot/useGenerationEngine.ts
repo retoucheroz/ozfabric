@@ -55,6 +55,7 @@ export const useGenerationEngine = (
     batchShotSelection: Record<string, boolean>,
     stylingSideOnly: Record<string, boolean>,
     techAccessories: Record<string, boolean>,
+    techAccessoryDescriptions: Record<string, string>,
     singleCost: number,
     poseFocus: string,
     detailView: string,
@@ -409,6 +410,7 @@ export const useGenerationEngine = (
                     lightingNegative,
                     seed: seed === "" ? null : Number(seed),
                     enableWebSearch,
+                    techAccessoryDescriptions,
                     preview: true
                 })
             });

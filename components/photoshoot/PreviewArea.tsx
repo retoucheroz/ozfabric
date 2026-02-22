@@ -174,12 +174,21 @@ export function PreviewArea({
                                             className="h-8 w-8 rounded-full bg-white/80 hover:bg-white text-black backdrop-blur-md shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
                                             onClick={async (e) => {
                                                 e.stopPropagation();
-                                                const link = document.createElement('a');
-                                                link.href = url;
-                                                link.download = downloadName;
-                                                document.body.appendChild(link);
-                                                link.click();
-                                                document.body.removeChild(link);
+                                                try {
+                                                    const response = await fetch(url);
+                                                    const blob = await response.blob();
+                                                    const blobUrl = URL.createObjectURL(blob);
+                                                    const link = document.createElement('a');
+                                                    link.href = blobUrl;
+                                                    link.download = downloadName;
+                                                    document.body.appendChild(link);
+                                                    link.click();
+                                                    document.body.removeChild(link);
+                                                    URL.revokeObjectURL(blobUrl);
+                                                } catch (err) {
+                                                    // Fallback to new tab if fetch fails (e.g. CORS)
+                                                    window.open(url, '_blank');
+                                                }
                                             }}
                                             title="Download"
                                         >

@@ -190,11 +190,24 @@ export default function AnalysisPage() {
 
     const downloadStickman = () => {
         if (!stickmanUrl) return;
-        const a = document.createElement("a");
-        a.href = stickmanUrl;
-        a.download = `stickman_${Date.now()}.png`;
-        a.target = "_blank";
-        a.click();
+        try {
+            const a = document.createElement("a");
+            a.href = stickmanUrl;
+            a.download = `stickman_${Date.now()}.png`;
+            a.target = "_blank"; // Ensure it opens in a new tab for direct download
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        } catch {
+            // Fallback for base64 or other issues, ensuring target="_blank"
+            const a = document.createElement('a');
+            a.href = stickmanUrl; // Use stickmanUrl here
+            a.target = "_blank";
+            a.download = `stickman_${Date.now()}.png`; // Use stickman filename
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
     };
 
     const PRODUCT_TYPES = [

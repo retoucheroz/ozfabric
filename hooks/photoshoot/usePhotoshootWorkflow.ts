@@ -100,6 +100,9 @@ export const usePhotoshootWorkflow = () => {
     const [techAccessories, setTechAccessories] = useState<Record<string, boolean>>({
         jacket: false, bag: false, glasses: false, hat: false, jewelry: false, belt: false
     });
+    const [techAccessoryDescriptions, setTechAccessoryDescriptions] = useState<Record<string, string>>({
+        jacket: "", bag: "", glasses: "", hat: "", jewelry: "", belt: ""
+    });
     const [activeLibraryAsset, setActiveLibraryAsset] = useState<string | null>(null);
     const [activeGroup, setActiveGroup] = useState<'product' | 'accessories' | null>(null);
     const [internalAsset, setInternalAsset] = useState<string | null>(null);
@@ -170,6 +173,7 @@ export const usePhotoshootWorkflow = () => {
                     if (state.hemType) setHemType(state.hemType);
                     if (state.pantLength) setPantLength(state.pantLength);
                     if (state.techAccessories) setTechAccessories(state.techAccessories);
+                    if (state.techAccessoryDescriptions) setTechAccessoryDescriptions(state.techAccessoryDescriptions);
                     if (state.showGarmentDetails !== undefined) setShowGarmentDetails(state.showGarmentDetails);
                     if (state.wizardStep) setWizardStep(state.wizardStep);
                 }
@@ -302,7 +306,7 @@ export const usePhotoshootWorkflow = () => {
         fitDescription, upperGarmentDescription, lowerGarmentDescription,
         innerWearDescription, shoesDescription, modelDescription, isMaviBatch,
         productCode, upperFraming, batchShotSelection, stylingSideOnly,
-        techAccessories, singleCost, poseFocus, detailView,
+        techAccessories, techAccessoryDescriptions, singleCost, poseFocus, detailView,
         // Setters
         setSeed, setProductDescription, setFitDescription, setProductName,
         setUpperGarmentDescription, setLowerGarmentDescription, setInnerWearDescription,
@@ -558,7 +562,8 @@ export const usePhotoshootWorkflow = () => {
         setIsMaviBatch(false);
         setStylingSideOnly({});
         setBatchShotSelection({});
-        setTechAccessories({ watch: false, phone: false, laptop: false, headphones: false });
+        setTechAccessories({ jacket: false, bag: false, glasses: false, hat: false, jewelry: false, belt: false });
+        setTechAccessoryDescriptions({});
 
         dbOperations.delete(STORES.PHOTOSHOOT_STATE, 'current-session').catch(console.error);
 
@@ -606,7 +611,10 @@ export const usePhotoshootWorkflow = () => {
         canShowCollarHairButtons, canShowLegHem, microFeedback, setMicroFeedback, productCode, setProductCode,
         batchMode, setBatchMode, isMaviBatch, setIsMaviBatch, stylingSideOnly, setStylingSideOnly,
         upperFraming, setUpperFraming, batchShotSelection, setBatchShotSelection, techAccessories,
-        setTechAccessories, availableBatchShots, singleCost,
+        setTechAccessories,
+        techAccessoryDescriptions,
+        setTechAccessoryDescriptions,
+        availableBatchShots, singleCost,
         activeLibraryAsset, setActiveLibraryAsset, activeGroup, setActiveGroup, internalAsset,
         setInternalAsset, libraryTab, setLibraryTab, sessionLibrary, setSessionLibrary, isProcessing,
         setIsProcessing, resultImages, setResultImages, generationStage, setGenerationStage,

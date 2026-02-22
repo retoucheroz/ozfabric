@@ -550,6 +550,8 @@ export default function PhotoshootPage() {
                                                             setStylingSideOnly={setStylingSideOnly}
                                                             techAccessories={techAccessories}
                                                             setTechAccessories={setTechAccessories}
+                                                            techAccessoryDescriptions={techAccessoryDescriptions}
+                                                            setTechAccessoryDescriptions={setTechAccessoryDescriptions}
                                                             assets={assets}
                                                             productDescription={productDescription}
                                                             setProductDescription={setProductDescription}

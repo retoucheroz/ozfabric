@@ -12,6 +12,7 @@ import { Maximize2, ZoomIn, Loader2, Download, Image as ImageIcon, Sparkles, Arr
 import { useProjects } from "@/context/projects-context"
 import { useLanguage } from "@/context/language-context"
 import { toast } from "sonner"
+import { downloadImage } from "@/lib/utils"
 import {
     TbMaximize,
     TbZoomIn,
@@ -110,10 +111,7 @@ export default function ResizePage() {
 
     const handleDownload = () => {
         if (resultImage) {
-            const link = document.createElement('a');
-            link.href = resultImage;
-            link.download = `retoucheroz-${mode}.png`;
-            link.click();
+            downloadImage(resultImage, `retoucheroz-${mode}.png`);
         }
     };
 

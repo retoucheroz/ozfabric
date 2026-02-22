@@ -30,6 +30,8 @@ interface BatchPanelProps {
     assets: Record<string, string | null>;
     productDescription: string | null;
     setProductDescription: (val: string | null) => void;
+    techAccessoryDescriptions: Record<string, string>;
+    setTechAccessoryDescriptions: (val: Record<string, string>) => void;
 }
 
 export function BatchPanel({
@@ -48,7 +50,9 @@ export function BatchPanel({
     setTechAccessories,
     assets,
     productDescription,
-    setProductDescription
+    setProductDescription,
+    techAccessoryDescriptions,
+    setTechAccessoryDescriptions
 }: BatchPanelProps) {
     const isMaviActive = isAdmin && isMaviBatch;
 
@@ -139,37 +143,59 @@ export function BatchPanel({
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-2">
                             {activeAccessories.map(acc => {
                                 const Icon = acc.icon;
                                 const isActive = techAccessories[acc.id];
+                                const description = techAccessoryDescriptions[acc.id] || "";
+
                                 return (
-                                    <div
-                                        key={acc.id}
-                                        className={cn(
-                                            "flex items-center justify-between p-2 rounded-xl border transition-all cursor-pointer",
-                                            isActive
-                                                ? "bg-[var(--accent-primary)]/5 border-[var(--accent-primary)]/30"
-                                                : "bg-[var(--bg-elevated)] border-[var(--border-subtle)] hover:border-[var(--text-muted)]/30"
-                                        )}
-                                        onClick={() => setTechAccessories({ ...techAccessories, [acc.id]: !isActive })}
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            <div className={cn(
-                                                "w-6 h-6 rounded-lg flex items-center justify-center",
-                                                isActive ? "bg-[var(--accent-primary)] text-white" : "bg-muted text-muted-foreground"
-                                            )}>
-                                                <Icon size={12} />
+                                    <div key={acc.id} className="space-y-2">
+                                        <div
+                                            className={cn(
+                                                "flex items-center justify-between p-2 rounded-xl border transition-all cursor-pointer",
+                                                isActive
+                                                    ? "bg-[var(--accent-primary)]/5 border-[var(--accent-primary)]/30 shadow-sm"
+                                                    : "bg-[var(--bg-elevated)] border-[var(--border-subtle)] hover:border-[var(--text-muted)]/30"
+                                            )}
+                                            onClick={() => setTechAccessories({ ...techAccessories, [acc.id]: !isActive })}
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <div className={cn(
+                                                    "w-6 h-6 rounded-lg flex items-center justify-center",
+                                                    isActive ? "bg-[var(--accent-primary)] text-white" : "bg-muted text-muted-foreground"
+                                                )}>
+                                                    <Icon size={12} />
+                                                </div>
+                                                <span className="text-[10px] font-bold text-[var(--text-primary)]">
+                                                    {language === 'tr' ? acc.label : acc.labelEn}
+                                                </span>
                                             </div>
-                                            <span className="text-[10px] font-bold text-[var(--text-primary)]">
-                                                {language === 'tr' ? acc.label : acc.labelEn}
-                                            </span>
+                                            <Switch
+                                                checked={isActive}
+                                                onCheckedChange={(val) => setTechAccessories({ ...techAccessories, [acc.id]: val })}
+                                                onClick={(e) => e.stopPropagation()}
+                                                className="scale-75"
+                                            />
                                         </div>
-                                        <Switch
-                                            checked={isActive}
-                                            onCheckedChange={(val) => setTechAccessories({ ...techAccessories, [acc.id]: val })}
-                                            className="scale-75"
-                                        />
+
+                                        {isActive && (
+                                            <div className="px-1 animate-in slide-in-from-top-1 duration-200">
+                                                <input
+                                                    type="text"
+                                                    className="w-full text-[10px] p-2.5 rounded-lg border bg-white dark:bg-background border-[var(--border-subtle)] focus:border-[var(--accent-primary)] outline-none transition-all"
+                                                    value={description}
+                                                    onChange={(e) => setTechAccessoryDescriptions({
+                                                        ...techAccessoryDescriptions,
+                                                        [acc.id]: e.target.value
+                                                    })}
+                                                    placeholder={language === 'tr'
+                                                        ? `${acc.label} tanımı (örn: küpe, bileklik...)`
+                                                        : `${acc.labelEn} description (e.g. earring, bracelet...)`}
+                                                    onClick={(e) => e.stopPropagation()}
+                                                />
+                                            </div>
+                                        )}
                                     </div>
                                 );
                             })}
