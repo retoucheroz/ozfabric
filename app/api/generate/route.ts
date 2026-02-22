@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ensureS3Url } from "@/lib/s3";
 
 // Configure route config
 export const maxDuration = 60; // 60 seconds max duration
@@ -962,9 +963,11 @@ export async function POST(req: NextRequest) {
             if (url) results.push({ url, prompt: finalPrompt });
         }
 
+        const finalImages = await Promise.all(results.map(r => ensureS3Url(r.url, "generated")));
+
         return NextResponse.json({
             status: "completed",
-            images: results.map(r => r.url),
+            images: finalImages,
             prompts: results.map(r => r.prompt)
         });
 
