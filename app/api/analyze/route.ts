@@ -160,7 +160,7 @@ export async function POST(req: NextRequest) {
                 } else {
                     // TECH PACK MODE - Comprehensive Technical Analysis
                     const workflowStr = workflowType || 'upper';
-                    const productNameContext = productName ? `CRITICAL RULE: The user explicitly defined this product as: "${productName}". If "${productName}" implies a specific color (like "siyah" or "black"), the garment is EXACTLY that color. IGNORE lighting or shadow distortions in the image. DO NOT describe the background, model, or setting. STRICTLY describe the garment itself matching the attributes of "${productName}".` : "";
+                    const productNameContext = productName ? `CRITICAL RULE: The user is analyzing a specific product: "${productName}". describe ONLY "${productName}". DO NOT describe the background, model, or setting. STRICTLY describe the garment itself matching the attributes of "${productName}". IGNORE any other garments (like inner shirts or pants) that might be visible but are not "${productName}".` : `CRITICAL RULE: Focus EXCLUSIVELY on the main garment (the ${workflowStr} piece). DO NOT describe base layers, innerwear, pants, or footwear unless they are the product being analyzed.`;
 
                     prompt = `${langInstruction} ${multiImageContext} You are a Senior Textile Engineer and Technical Designer. 
                     Analyze the garment in the image(s) to create a professional Technical Specification (Tech Pack).
@@ -183,7 +183,7 @@ export async function POST(req: NextRequest) {
                         "productName": "...",
                         "sku": "...",
                         "category": "...",
-                        "visualPrompt": "One paragraph highly detailed visual description of the GARMENT(S) ONLY. If multiple garments are provided (e.g., a coat and a sweater), describe BOTH as they would appear layered. Focus purely on the garment's fabric, details, construction, texture, color, and fit.",
+                        "visualPrompt": "One paragraph highly detailed visual description focusing EXCLUSIVELY on the main product specified above. CRITICAL: DO NOT describe innerwear, shirts, sweaters, pants, or shoes if they are not the main product. DO NOT use words like 'ensemble', 'outfit', 'matching', or 'paired with'. Focus only on the main garment's fabric, details, construction, texture, color, and fit. If you describe an 'ensemble' instead of just the product, the manufacturing will fail.",
                         "innerBrief": "Detailed description of the inner layer (like a sweater, t-shirt) if present.",
                         "upperBrief": "Detailed description of the upper garment (like a coat or jacket) if present.",
                         "lowerBrief": "Detailed description of the lower garment (like pants/skirt) if present.",

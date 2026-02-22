@@ -80,7 +80,7 @@ export const useGenerationEngine = (
     // Hook-local states
     const [stylingIteration, setStylingIteration] = useState(0);
     const [isProcessing, setIsProcessing] = useState(false);
-    const [resultImages, setResultImages] = useState<any[] | null>(null);
+    const [resultImages, setResultImages] = useState<any[]>([]);
     const [generationStage, setGenerationStage] = useState<'idle' | 'generating' | 'complete'>('idle');
     const [previewData, setPreviewData] = useState<any>(null);
     const [showPreview, setShowPreview] = useState(false);
@@ -523,7 +523,7 @@ export const useGenerationEngine = (
         }
 
         setIsProcessing(true);
-        setResultImages(null);
+        setResultImages([]);
 
         try {
             let currentProductDesc = productDescription;
@@ -707,7 +707,7 @@ export const useGenerationEngine = (
     const handleConfirmBatchGeneration = async () => {
         setShowBatchPreview(false);
         setIsProcessing(true);
-        setResultImages(null);
+        setResultImages([]);
         setIsStoppingBatch(false);
         isStoppingBatchRef.current = false;
 
@@ -848,7 +848,9 @@ export const useGenerationEngine = (
                         const fullFilename = `${productCode || 'shot'}_${nameSuffix}.jpg`;
                         const newImg = { filename: fullFilename, url: imageUrl, downloadName: fullFilename };
                         generatedImages.push(newImg);
-                        setResultImages(prev => [...(prev || []), newImg]);
+
+                        // Force update with latest array to ensure PreviewArea sees it
+                        setResultImages([...generatedImages]);
 
                         addProject({
                             title: `Batch: ${productCode} - ${preview.title}`,
@@ -856,7 +858,13 @@ export const useGenerationEngine = (
                             imageUrl: imageUrl,
                             description: `Seed: ${finalSeed} | Prompt: ${editedBatchPrompts[i]}`
                         });
+                    } else {
+                        toast.error(`${preview.title}: ${language === 'tr' ? 'Görsel URL alınamadı' : 'Image URL not found'}`);
                     }
+                } else {
+                    const errorData = await res.json().catch(() => ({}));
+                    console.error("Batch item error:", errorData);
+                    toast.error(`${preview.title}: ${errorData.error || (language === 'tr' ? 'Üretim hatası' : 'Generation error')}`);
                 }
             }
 
@@ -864,6 +872,7 @@ export const useGenerationEngine = (
                 setIsGenerationSuccess(true);
                 setGenerationStage('complete');
                 await new Promise(r => setTimeout(r, 800));
+                // Final sync
                 setResultImages([...generatedImages]);
             }
         } catch (e: any) {

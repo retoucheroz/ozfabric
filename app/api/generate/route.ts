@@ -711,18 +711,18 @@ export async function POST(req: NextRequest) {
 
             // === ACCESSORIES ===
             const accEntries = Object.entries(techAccessories || {}).filter(([_, v]) => !!v);
-            if (accEntries.length > 0) {
+            const accMapping: Record<string, string> = {
+                watch: "Model is wearing a premium minimalist smartwatch on the wrist.",
+                phone: "Model is naturally holding a modern slim smartphone.",
+                laptop: "A sleek modern laptop is visible in the scene, held or placed naturally.",
+                headphones: "Model is wearing modern minimalist over-ear headphones."
+            };
+            const matchedAccs = accEntries.map(([k]) => accMapping[k]).filter(Boolean);
+
+            if (matchedAccs.length > 0) {
                 const accBlock: string[] = [];
                 accBlock.push(`[ACCESSORIES_DESCRIPTION]`);
-                const mapping: Record<string, string> = {
-                    watch: "Model is wearing a premium minimalist smartwatch on the wrist.",
-                    phone: "Model is naturally holding a modern slim smartphone.",
-                    laptop: "A sleek modern laptop is visible in the scene, held or placed naturally.",
-                    headphones: "Model is wearing modern minimalist over-ear headphones."
-                };
-                accEntries.forEach(([key]) => {
-                    if (mapping[key]) accBlock.push(mapping[key]);
-                });
+                matchedAccs.forEach(text => accBlock.push(text));
                 accBlock.push(`[/ACCESSORIES_DESCRIPTION]`);
                 sections.push(accBlock.join("\n"));
             }
