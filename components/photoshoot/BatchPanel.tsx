@@ -28,6 +28,8 @@ interface BatchPanelProps {
     techAccessories: Record<string, boolean>;
     setTechAccessories: (val: Record<string, boolean>) => void;
     assets: Record<string, string | null>;
+    productDescription: string | null;
+    setProductDescription: (val: string | null) => void;
 }
 
 export function BatchPanel({
@@ -44,7 +46,9 @@ export function BatchPanel({
     setStylingSideOnly,
     techAccessories,
     setTechAccessories,
-    assets
+    assets,
+    productDescription,
+    setProductDescription
 }: BatchPanelProps) {
     const isMaviActive = isAdmin && isMaviBatch;
 
@@ -98,6 +102,26 @@ export function BatchPanel({
                         value={productCode}
                         onChange={(e) => setProductCode(e.target.value)}
                         placeholder={language === 'tr' ? "Örn: 23132_6546" : "e.g. 23132_6546"}
+                    />
+                </div>
+
+                {/* AI Analysis Result (Editable) */}
+                <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase flex items-center gap-2">
+                        {language === 'tr' ? 'Yapay Zeka Kumaş Analizi (Düzenlenebilir)' : 'AI Fabric Analysis (Editable)'}
+                    </label>
+                    <textarea
+                        className={cn(
+                            "w-full text-xs p-3 rounded-xl border transition-all duration-200 outline-none scrollbar-thin resize-y min-h-[80px]",
+                            productDescription
+                                ? "bg-green-50/50 border-green-200 dark:bg-green-950/20 dark:border-green-800 text-green-800 dark:text-green-300 focus:border-green-500 focus:ring-green-500/20"
+                                : "bg-[var(--bg-elevated)] border-[var(--border-subtle)] focus:border-[var(--accent-primary)] focus:ring-2 focus:ring-[var(--accent-primary)]/10 text-[var(--text-secondary)]"
+                        )}
+                        value={productDescription || ''}
+                        onChange={(e) => setProductDescription(e.target.value)}
+                        placeholder={language === 'tr'
+                            ? "Henüz analiz yapılmadı. Özel isim girdiyseniz (örn: 'siyah ceket'), üretime başlarken o isim üzerinden analiz edilecektir."
+                            : "No analysis yet. If you put a special name (e.g. 'black jacket'), it will be analyzed using that name upon generation."}
                     />
                 </div>
 

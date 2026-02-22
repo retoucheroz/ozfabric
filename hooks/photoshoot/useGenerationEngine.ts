@@ -256,7 +256,7 @@ export const useGenerationEngine = (
                 const res = await fetch("/api/analyze", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ images: garmentImages, type: 'fabric', language, workflowType })
+                    body: JSON.stringify({ images: garmentImages, type: 'fabric', language, workflowType, productName: productCode || productName })
                 });
                 const data = await res.json();
                 if (data.data) {
@@ -539,7 +539,7 @@ export const useGenerationEngine = (
                 const res = await fetch("/api/analyze", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ images: garmentImages, type: 'fabric', language: 'en', workflowType })
+                    body: JSON.stringify({ images: garmentImages, type: 'fabric', language: 'en', workflowType, productName: productCode || productName })
                 });
                 const data = await res.json();
                 if (data.data) {
@@ -747,6 +747,7 @@ export const useGenerationEngine = (
                 if (preview.spec.excludeBeltAsset) delete uploadedImages.belt;
                 if (preview.spec.excludeHatAsset) delete uploadedImages.hat;
                 if (preview.spec.excludeShoesAsset) delete uploadedImages.shoes;
+                if (preview.spec.excludeBagAsset) delete uploadedImages.bag;
                 if (preview.spec.excludeAllAccessories) {
                     delete uploadedImages.jacket;
                     delete uploadedImages.belt;

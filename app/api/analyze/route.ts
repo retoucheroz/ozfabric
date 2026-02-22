@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
         await saveUser(updatedUser);
 
         const body = await req.json();
-        const { image, images, language, type = 'techPack', workflowType } = body; // type: 'techPack' | 'pose'
+        const { image, images, language, type = 'techPack', workflowType, productName } = body; // type: 'techPack' | 'pose'
 
         if (!image && (!images || !Array.isArray(images) || images.length === 0)) {
             return NextResponse.json({ error: "Image or images array required" }, { status: 400 });
@@ -101,24 +101,50 @@ export async function POST(req: NextRequest) {
 
                 if (type === 'pose') {
                     prompt = `${langInstruction} ${multiImageContext} 
+                    You are an expert fashion photographer, stylist, and prompt engineer. Analyze this stickman/pose image and describe it in a SINGLE PARAGRAPH.
                     
-                    ### POSE_REFERENCE_POLICY (HARD RULE) ###
-                    EXTRACT POSE GEOMETRY ONLY.
-                    
-                    The output must be structured exactly as follows:
-                    [POSE_GEOMETRY_ONLY]
-                    - Body orientation: [precise angle relative to camera]
-                    - Weight distribution: [supporting leg and balance notes]
-                    - Limb positions: [mathematical limb/joint placement]
-                    - Head angle: [tilt and rotation degrees]
-                    - Gaze direction: [gaze vector]
-                    [/POSE_GEOMETRY_ONLY]
+                    Follow these rules EXACTLY:
 
-                    STRICT DISCARD RULE: If you see clothing, brands, materials, or style-related terms (e.g., "fashionable", "chic", "casual"), DISCARD THEM IMMEDIATELY. They MUST NOT appear in the output.
+                    Pose Behavior (internal understanding only):
+                    Translate pose visually, not mathematically.
+                    No degrees. No percentages. No anatomy jargon.
+
+                    1) STRUCTURAL ANATOMY LOCK
+                    Preserve bone structure, proportions, natural asymmetry.
+                    No gender, hair, clothing description.
+
+                    2) FRAME PLACEMENT & SCALE
+                    - Maintain original subject-to-frame proportion
+                    - Remain secondary if environmental
+                    - Keep camera distance consistent
+                    - Do not allow subject to fill frame
+                    - Preserve negative space
+
+                    3) ANCHOR CONTACTS
+                    (Note points of contact with ground/props)
+
+                    4) POSE DESCRIPTION (VISUAL LANGUAGE ONLY)
+                    - Body slightly turned or angled
+                    - Weight resting more on one leg if visible
+                    - Hips shifted if present
+                    - Shoulders relaxed or squared
+                    - Arms relaxed / bent / resting
+                    - Head turned or facing camera
+                    - Chin slightly lowered or lifted
+                    - Eye direction
+                    - Emotional tone
+
+                    No degrees. No percentages. No anatomical terminology.
+
+                    5) GRAVITY & PROPORTION SAFEGUARDS
+                    - No elongation
+                    - No floating feet
+                    - No distortion
+                    - Maintain natural balance
                     
                     JSON Response Format:
                     {
-                        "description": "[The tagged structure above]"
+                        "description": "[SINGLE PARAGRAPH POSE DESCRIPTION FOLLOWNG THE RULES OVERWRITING ANY PREVIOUS STYLE]"
                     }`;
                 } else if (type === 'background') {
                     prompt = `${langInstruction} ${multiImageContext}
@@ -134,9 +160,12 @@ export async function POST(req: NextRequest) {
                 } else {
                     // TECH PACK MODE - Comprehensive Technical Analysis
                     const workflowStr = workflowType || 'upper';
+                    const productNameContext = productName ? `IMPORTANT: The user has specified that the product is a "${productName}". Your analysis MUST consistently treat the garment as a ${productName} and base all descriptions (especially visualPrompt and fitDescription) on this premise.` : "";
 
                     prompt = `${langInstruction} ${multiImageContext} You are a Senior Textile Engineer and Technical Designer. 
                     Analyze the garment in the image(s) to create a professional Technical Specification (Tech Pack).
+                    
+                    ${productNameContext}
                     
                     The analysis must be EXTREMELY PRECISE for manufacturing. 
                     

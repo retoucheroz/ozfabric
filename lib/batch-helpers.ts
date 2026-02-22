@@ -18,6 +18,7 @@ export interface BatchSpec {
     excludeShoesAsset?: boolean; // Don't send shoes asset to API
     excludeBeltAsset?: boolean; // Don't send belt asset
     excludeHatAsset?: boolean; // Don't send hat asset
+    excludeBagAsset?: boolean; // Don't send bag asset
     excludeAllAccessories?: boolean; // Strip ALL accessories (belt, bag, hat, glasses, jewelry) from API & prompt
     enableWind?: boolean; // Subtle airflow toggle
     isStyling?: boolean; // Flag to identify styling shots
@@ -380,6 +381,7 @@ export function buildStandardBatchSpecs(
             assets: ['front'],
             fitDescriptionMode: 'full',
             excludeShoesAsset: true,
+            excludeBagAsset: true,
             isStyling: false
         }
     ];

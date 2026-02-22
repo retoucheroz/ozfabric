@@ -73,7 +73,8 @@ export default function PhotoshootPage() {
         handleBatchGenerate, handleConfirmGeneration, handleConfirmBatchGeneration, batchPreviewPrompts,
         editedBatchPrompts, setEditedBatchPrompts, showBatchPreview, setShowBatchPreview,
         selectedBatchImages, setSelectedBatchImages, isStoppingBatch, handleStopBatch, estimatedCost,
-        handleAssetRemove, canMoveToStep, handleLibrarySelect, convertToStickman, models, setLightingPositive, setLightingNegative
+        handleAssetRemove, canMoveToStep, handleLibrarySelect, convertToStickman, models, setLightingPositive, setLightingNegative,
+        productDescription, setProductDescription
     } = usePhotoshootWorkflow();
 
     if (!mounted) return null;
@@ -521,6 +522,8 @@ export default function PhotoshootPage() {
                                                             techAccessories={techAccessories}
                                                             setTechAccessories={setTechAccessories}
                                                             assets={assets}
+                                                            productDescription={productDescription}
+                                                            setProductDescription={setProductDescription}
                                                         />
                                                     </div>
                                                 </div>
