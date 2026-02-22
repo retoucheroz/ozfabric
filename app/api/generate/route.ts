@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { ensureS3Url } from "@/lib/s3";
 
 // Configure route config
-export const maxDuration = 60; // 60 seconds max duration
+export const maxDuration = 300; // 300 seconds max duration (5 minutes)
 export const dynamic = 'force-dynamic';
 
 // Negative prompts for common issues
