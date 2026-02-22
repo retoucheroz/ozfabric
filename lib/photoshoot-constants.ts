@@ -76,7 +76,7 @@ export const ASPECT_RATIOS = [
 ];
 
 export const RESOLUTION_OPTIONS = [
-    { id: "1K", label: "1K Standard", labelTr: "1K Standart", credits: 4 },
-    { id: "2K", label: "2K High", labelTr: "2K Yüksek", credits: 4 },
-    { id: "4K", label: "4K Ultra", labelTr: "4K Ultra", credits: 8 },
+    { id: "1K", label: "1K Standard", labelTr: "1K Standart", credits: 50 },
+    { id: "2K", label: "2K High", labelTr: "2K Yüksek", credits: 50 },
+    { id: "4K", label: "4K Ultra", labelTr: "4K Ultra", credits: 100 },
 ];

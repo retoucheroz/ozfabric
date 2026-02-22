@@ -278,7 +278,7 @@ export const usePhotoshootWorkflow = () => {
         ? (workflowType === 'upper' ? UPPER_SHOTS : LOWER_SHOTS)
         : STANDARD_SHOTS;
 
-    const singleCost = resolution === "4K" ? 1.5 : 0.8;
+    const singleCost = resolution === "4K" ? 100 : 50;
 
     const {
         isProcessing, setIsProcessing, resultImages, setResultImages,
