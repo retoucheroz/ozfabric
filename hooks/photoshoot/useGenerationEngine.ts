@@ -863,8 +863,8 @@ export const useGenerationEngine = (
                     }
                 } else {
                     const errorData = await res.json().catch(() => ({}));
-                    console.error("Batch item error:", errorData);
-                    toast.error(`${preview.title}: ${errorData.error || (language === 'tr' ? 'Üretim hatası' : 'Generation error')}`);
+                    console.error("Batch item error:", res.status, errorData);
+                    toast.error(`${preview.title}: ${language === 'tr' ? 'Hata' : 'Error'} ${res.status} (${errorData.error || (language === 'tr' ? 'Sunucu Hatası' : 'Server Error')})`);
                 }
             }
 
