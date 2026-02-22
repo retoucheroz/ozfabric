@@ -269,27 +269,30 @@ export function buildStandardBatchSpecs(
     return [
         {
             view: "std_styling_full",
-            pose: stylingSideOnly["std_styling_full"] ? getRandomPose('angled') : (poseLibraryPrompt || getRandomPose('random')),
+            pose: poseLibraryPrompt ? poseLibraryPrompt : (stylingSideOnly["std_styling_full"] ? getRandomPose('angled') : getRandomPose('random')),
             dynamic: true,
             lookAtCamera: !stylingSideOnly["std_styling_full"],
             hairBehind: hairBehindShoulders,
             camera: { shot_type: 'full_body', framing: 'head_to_toe', angle: stylingSideOnly["std_styling_full"] ? "angled" : "front" },
-            assets: ['front', 'back'],
+            assets: stylingSideOnly["std_styling_full"] ? ['front', 'back'] : ['front'],
             fitDescriptionMode: 'full',
             enableWind: enableWind,
-            isStyling: true
+            isStyling: true,
+            useStickman: true,
+            includeGlasses: true
         },
         {
             view: "std_styling_upper",
-            pose: stylingSideOnly["std_styling_upper"] ? getRandomPose('angled') : (poseLibraryPrompt || getRandomPose('random')),
+            pose: poseLibraryPrompt ? poseLibraryPrompt : (stylingSideOnly["std_styling_upper"] ? getRandomPose('angled') : getRandomPose('random')),
             dynamic: true,
             lookAtCamera: !stylingSideOnly["std_styling_upper"],
             hairBehind: hairBehindShoulders,
             camera: { shot_type: 'cowboy_shot', framing: 'cowboy_shot', angle: stylingSideOnly["std_styling_upper"] ? "angled" : "front" },
-            assets: ['front', 'back'],
+            assets: stylingSideOnly["std_styling_upper"] ? ['front', 'back'] : ['front'],
             fitDescriptionMode: 'full',
             enableWind: enableWind,
-            isStyling: true
+            isStyling: true,
+            excludeShoesAsset: true
         },
         {
             view: "std_tech_full_front",
@@ -300,7 +303,6 @@ export function buildStandardBatchSpecs(
             camera: { shot_type: 'full_body', framing: 'head_to_toe', angle: "front" },
             assets: ['front'],
             fitDescriptionMode: 'full',
-            excludeAllAccessories: true,
             isStyling: false
         },
         {
@@ -313,7 +315,6 @@ export function buildStandardBatchSpecs(
             assets: ['back'],
             fitDescriptionMode: 'full',
             excludeHairInfo: true,
-            excludeAllAccessories: true,
             isStyling: false
         },
         {
@@ -325,7 +326,7 @@ export function buildStandardBatchSpecs(
             camera: { shot_type: 'cowboy_shot', framing: 'cowboy_shot', angle: "front" },
             assets: ['front'],
             fitDescriptionMode: 'full',
-            excludeAllAccessories: true,
+            excludeShoesAsset: true,
             isStyling: false
         },
         {
@@ -338,7 +339,7 @@ export function buildStandardBatchSpecs(
             assets: ['back'],
             fitDescriptionMode: 'full',
             excludeHairInfo: true,
-            excludeAllAccessories: true,
+            excludeShoesAsset: true,
             isStyling: false
         },
         {
@@ -353,7 +354,6 @@ export function buildStandardBatchSpecs(
             excludeHairInfo: true,
             excludeSocksInfo: true,
             excludeShoesAsset: true,
-            excludeBeltAsset: true,
             isStyling: false
         },
         {
@@ -368,7 +368,6 @@ export function buildStandardBatchSpecs(
             excludeHairInfo: true,
             excludeSocksInfo: true,
             excludeShoesAsset: true,
-            excludeBeltAsset: true,
             isStyling: false
         },
         {
@@ -380,6 +379,7 @@ export function buildStandardBatchSpecs(
             camera: { shot_type: 'close_up', framing: 'chest_and_face', angle: "front" },
             assets: ['front'],
             fitDescriptionMode: 'full',
+            excludeShoesAsset: true,
             isStyling: false
         }
     ];

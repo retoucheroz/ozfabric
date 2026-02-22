@@ -12,3 +12,268 @@
 
  ✓ Starting...
  ✓ Ready in 1295ms
+ ✓ Compiled /middleware in 142ms (114 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 804ms (894 modules)
+ GET / 200 in 1076ms
+ ✓ Compiled /favicon.ico in 222ms (924 modules)
+ GET /favicon.ico 200 in 290ms
+🏁 Session API: No session found
+ GET /api/auth/session 200 in 319ms
+🏁 Session API: No session found
+ GET /api/auth/session 200 in 8ms
+ ✓ Compiled /api/auth/login in 255ms (927 modules)
+🔐 Login attempt started...
+👤 User: admin, AdminPass configured: true
+⭐ Admin override detected
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🔑 Auth: createSession(admin) [0zit89fpke8mlxhhpg5]
+ POST /api/auth/login 200 in 3195ms
+ ○ Compiling /home ...
+ ✓ Compiled /home in 766ms (1008 modules)
+ GET /home 200 in 928ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 723ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 669ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 674ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 676ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 737ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 760ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 5171ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 7063ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 376ms
+ ○ Compiling /photoshoot ...
+ ✓ Compiled /photoshoot in 1305ms (1194 modules)
+ GET /photoshoot 200 in 1512ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 126ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 96ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 304ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 297ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 295ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 113ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 310ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 284ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 295ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 300ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 292ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 369ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 286ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 290ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 113ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 893ms
+ ✓ Compiled /api/translate in 343ms (1100 modules)
+ POST /api/translate 200 in 1053ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 361ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 295ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 316ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 289ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 303ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 298ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 288ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 111ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 114ms
+ ✓ Compiled /_not-found in 283ms (1102 modules)
+ GET /LIGHTING_SET 404 in 499ms
+ GET /LIGHTING_SET 404 in 31ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 304ms
+ ✓ Compiled /api/pose in 380ms (1140 modules)
+Pose API: Sanitizing image URL...
+Pose API: Sanitized URL (length): 91983
+Pose API: Running fal-ai/dwpose...
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 299ms
+ GET /LIGHTING_SET 404 in 166ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 296ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 287ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 287ms
+Pose API: Fal Result received
+ POST /api/pose 200 in 94672ms
+ ✓ Compiled /api/analyze in 312ms (1098 modules)
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+💾 Auth: saveUser(admin) -> Existing: true, Role: admin, Pages: 1
+ POST /api/analyze 200 in 5741ms
+ ✓ Compiled /api/generate in 232ms (1102 modules)
+ POST /api/generate 200 in 276ms
+ POST /api/generate 200 in 276ms
+ POST /api/generate 200 in 266ms
+ POST /api/generate 200 in 297ms
+ ✓ Compiled /api/auth/session in 90ms (602 modules)
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 413ms
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 303ms
+ ✓ Compiled /api/user/credits/deduct in 324ms (1097 modules)
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+💾 Auth: saveUser(admin) -> Existing: true, Role: admin, Pages: 1
+ POST /api/user/credits/deduct 200 in 750ms
+ ✓ Compiled /api/generate in 76ms (599 modules)
+Generation error: Error: Fal API Error (front): {"detail":[{"loc":["body","image_urls"],"msg":"At least one image URL is required.","type":"value_error","url":"https://docs.fal.ai/errors#value_error","input":[]}]}
+    at generateOne (app/api/generate/route.ts:858:23)
+    at async POST (app/api/generate/route.ts:961:25)
+  856 |             if (!response.ok) {
+  857 |                 const err = await response.text();
+> 858 |                 throw new Error(`Fal API Error (${view}): ${err}`);
+      |                       ^
+  859 |             }
+  860 |             const data = await response.json();
+  861 |             const falUrl = data.images?.[0]?.url;
+ POST /api/generate 500 in 814ms
+Generation error: Error: Fal API Error (front): {"detail":[{"loc":["body","image_urls"],"msg":"At least one image URL is required.","type":"value_error","url":"https://docs.fal.ai/errors#value_error","input":[]}]}
+    at generateOne (app/api/generate/route.ts:858:23)
+    at async POST (app/api/generate/route.ts:961:25)
+  856 |             if (!response.ok) {
+  857 |                 const err = await response.text();
+> 858 |                 throw new Error(`Fal API Error (${view}): ${err}`);
+      |                       ^
+  859 |             }
+  860 |             const data = await response.json();
+  861 |             const falUrl = data.images?.[0]?.url;
+ POST /api/generate 500 in 267ms
+Generation error: Error: Fal API Error (back): {"detail":[{"loc":["body","image_urls"],"msg":"At least one image URL is required.","type":"value_error","url":"https://docs.fal.ai/errors#value_error","input":[]}]}
+    at generateOne (app/api/generate/route.ts:858:23)
+    at async POST (app/api/generate/route.ts:961:25)
+  856 |             if (!response.ok) {
+  857 |                 const err = await response.text();
+> 858 |                 throw new Error(`Fal API Error (${view}): ${err}`);
+      |                       ^
+  859 |             }
+  860 |             const data = await response.json();
+  861 |             const falUrl = data.images?.[0]?.url;
+ POST /api/generate 500 in 248ms
+Generation error: Error: Fal API Error (front): {"detail":[{"loc":["body","image_urls"],"msg":"At least one image URL is required.","type":"value_error","url":"https://docs.fal.ai/errors#value_error","input":[]}]}
+    at generateOne (app/api/generate/route.ts:858:23)
+    at async POST (app/api/generate/route.ts:961:25)
+  856 |             if (!response.ok) {
+  857 |                 const err = await response.text();
+> 858 |                 throw new Error(`Fal API Error (${view}): ${err}`);
+      |                       ^
+  859 |             }
+  860 |             const data = await response.json();
+  861 |             const falUrl = data.images?.[0]?.url;
+ POST /api/generate 500 in 406ms
+ ✓ Compiled /api/auth/session in 97ms (595 modules)
+🔑 Auth: getSession(0zit89fpke8mlxhhpg5) -> Found (admin)
+👤 Auth: getUser(admin) -> Role: admin, Pages: 1
+🏁 Session API: Success for [admin] as [admin]
+ GET /api/auth/session 200 in 507ms

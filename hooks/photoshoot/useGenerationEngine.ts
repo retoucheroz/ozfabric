@@ -728,15 +728,27 @@ export const useGenerationEngine = (
                     uploadedImages.shoes = assetsHighRes.shoes || assets.shoes;
                 }
                 if (assetsHighRes.inner_wear || assets.inner_wear) uploadedImages.inner_wear = assetsHighRes.inner_wear || assets.inner_wear;
+                if (assetsHighRes.jacket || assets.jacket) uploadedImages.jacket = assetsHighRes.jacket || assets.jacket;
                 if (assetsHighRes.hat || assets.hat) uploadedImages.hat = assetsHighRes.hat || assets.hat;
                 if (assetsHighRes.bag || assets.bag) uploadedImages.bag = assetsHighRes.bag || assets.bag;
                 if (assetsHighRes.belt || assets.belt) uploadedImages.belt = assetsHighRes.belt || assets.belt;
+                if (assetsHighRes.jewelry || assets.jewelry) uploadedImages.jewelry = assetsHighRes.jewelry || assets.jewelry;
                 if (lightingSendImage && (assetsHighRes.lighting || assets.lighting)) uploadedImages.lighting = assetsHighRes.lighting || assets.lighting;
+
+                if (!preview.spec.isStyling) {
+                    if (!techAccessories.jacket) delete uploadedImages.jacket;
+                    if (!techAccessories.bag) delete uploadedImages.bag;
+                    if (!techAccessories.glasses) delete uploadedImages.glasses;
+                    if (!techAccessories.hat) delete uploadedImages.hat;
+                    if (!techAccessories.jewelry) delete uploadedImages.jewelry;
+                    if (!techAccessories.belt) delete uploadedImages.belt;
+                }
 
                 if (preview.spec.excludeBeltAsset) delete uploadedImages.belt;
                 if (preview.spec.excludeHatAsset) delete uploadedImages.hat;
                 if (preview.spec.excludeShoesAsset) delete uploadedImages.shoes;
                 if (preview.spec.excludeAllAccessories) {
+                    delete uploadedImages.jacket;
                     delete uploadedImages.belt;
                     delete uploadedImages.bag;
                     delete uploadedImages.hat;
@@ -801,6 +813,7 @@ export const useGenerationEngine = (
                         enableGaze,
                         lightingPositive,
                         lightingNegative,
+                        poseStickman: preview.spec.useStickman ? poseStickman : undefined,
                         preview: false
                     })
                 });
