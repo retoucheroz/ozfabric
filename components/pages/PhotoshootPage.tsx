@@ -79,7 +79,7 @@ export default function PhotoshootPage() {
         editedBatchPrompts, setEditedBatchPrompts, showBatchPreview, setShowBatchPreview,
         selectedBatchImages, setSelectedBatchImages, isStoppingBatch, handleStopBatch, estimatedCost,
         handleAssetRemove, canMoveToStep, handleLibrarySelect, convertToStickman, models, setLightingPositive, setLightingNegative,
-        productDescription, setProductDescription, resetWorkflow
+        productDescription, setProductDescription, resetWorkflow, addToGlobalLibrary
     } = usePhotoshootWorkflow();
 
     if (!mounted) return null;
@@ -853,6 +853,7 @@ export default function PhotoshootPage() {
                 handleLibrarySelect={handleLibrarySelect}
                 sessionLibrary={sessionLibrary}
                 isAdmin={user?.role === 'admin'}
+                addToGlobalLibrary={addToGlobalLibrary}
             />
         </div >
     );

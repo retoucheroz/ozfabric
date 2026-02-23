@@ -30,8 +30,8 @@ interface BehaviorTogglesProps {
     setEnableExpression: (val: boolean) => void;
     enableGaze: boolean;
     setEnableGaze: (val: boolean) => void;
-    socksType: 'none' | 'white' | 'black';
-    setSocksType: (val: 'none' | 'white' | 'black') => void;
+    socksType: 'none' | 'white' | 'black' | 'grey' | 'navy';
+    setSocksType: (val: 'none' | 'white' | 'black' | 'grey' | 'navy') => void;
 }
 
 export function BehaviorToggles({
@@ -195,6 +195,8 @@ export function BehaviorToggles({
                     onClick={() => {
                         if (socksType === 'none') setSocksType('white');
                         else if (socksType === 'white') setSocksType('black');
+                        else if (socksType === 'black') setSocksType('grey');
+                        else if (socksType === 'grey') setSocksType('navy');
                         else setSocksType('none');
                     }}
                 >
@@ -213,12 +215,16 @@ export function BehaviorToggles({
                             "text-[8px] font-bold uppercase tracking-tight",
                             socksType !== 'none' ? "text-[var(--accent-primary)]" : "text-[var(--text-muted)]"
                         )}>
-                            {language === "tr" ? (socksType === 'black' ? "SİYAH" : socksType === 'white' ? "BEYAZ" : "YOK") : (socksType === 'black' ? "BLACK" : socksType === 'white' ? "WHITE" : "NONE")}
+                            {language === "tr"
+                                ? (socksType === 'black' ? "SİYAH" : socksType === 'white' ? "BEYAZ" : socksType === 'grey' ? "GRİ" : socksType === 'navy' ? "LACİVERT" : "YOK")
+                                : (socksType === 'black' ? "BLACK" : socksType === 'white' ? "WHITE" : socksType === 'grey' ? "GREY" : socksType === 'navy' ? "NAVY" : "NONE")}
                         </span>
                         <div className="flex gap-1 mt-0.5">
                             <div className={cn("w-1 h-1 rounded-full transition-all", socksType === 'none' ? "bg-[var(--accent-primary)] scale-125" : "bg-[var(--bg-muted)]")} />
                             <div className={cn("w-1 h-1 rounded-full transition-all", socksType === 'white' ? "bg-[var(--accent-primary)] scale-125" : "bg-[var(--bg-muted)]")} />
                             <div className={cn("w-1 h-1 rounded-full transition-all", socksType === 'black' ? "bg-[var(--accent-primary)] scale-125" : "bg-[var(--bg-muted)]")} />
+                            <div className={cn("w-1 h-1 rounded-full transition-all", socksType === 'grey' ? "bg-[var(--accent-primary)] scale-125" : "bg-[var(--bg-muted)]")} />
+                            <div className={cn("w-1 h-1 rounded-full transition-all", socksType === 'navy' ? "bg-[var(--accent-primary)] scale-125" : "bg-[var(--bg-muted)]")} />
                         </div>
                     </div>
                 </div>

@@ -82,6 +82,32 @@ export const useLibraryState = (
             const innerWears = await dbOperations.getAll<SavedInnerWear>(STORES.INNER_WEAR);
             setSavedInnerWears(innerWears.sort((a, b) => b.createdAt - a.createdAt));
 
+            // Fetch Global Library
+            try {
+                const globalRes = await fetch('/api/admin/library');
+                if (globalRes.ok) {
+                    const globals = await globalRes.json();
+                    globals.forEach((item: any) => {
+                        const data = { ...item.data, id: item.id, isGlobal: true };
+                        if (item.category === 'pose') setSavedPoses(prev => [data, ...prev]);
+                        else if (item.category === 'model') setSavedModels(prev => [data, ...prev]);
+                        else if (item.category === 'background') setSavedBackgrounds(prev => [data, ...prev]);
+                        else if (item.category === 'fit_pattern') setSavedFits(prev => [data, ...prev]);
+                        else if (item.category === 'shoes') setSavedShoes(prev => [data, ...prev]);
+                        else if (item.category === 'jacket') setSavedJackets(prev => [data, ...prev]);
+                        else if (item.category === 'bag') setSavedBags(prev => [data, ...prev]);
+                        else if (item.category === 'glasses') setSavedGlasses(prev => [data, ...prev]);
+                        else if (item.category === 'hat') setSavedHats(prev => [data, ...prev]);
+                        else if (item.category === 'jewelry') setSavedJewelry(prev => [data, ...prev]);
+                        else if (item.category === 'belt') setSavedBelts(prev => [data, ...prev]);
+                        else if (item.category === 'inner_wear') setSavedInnerWears(prev => [data, ...prev]);
+                        else if (item.category === 'lighting') setSavedLightings(prev => [data, ...prev]);
+                    });
+                }
+            } catch (err) {
+                console.warn("Global library fetch failed, using local only");
+            }
+
         } catch (e) {
             console.error("Failed to load libraries form DB", e);
         }
@@ -151,7 +177,35 @@ export const useLibraryState = (
             setSavedLightings(updated);
             await dbOperations.delete(STORES.LIGHTING, id);
         }
+
+        // Also try to delete from global if it was a global item
+        try {
+            await fetch('/api/admin/library', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            });
+        } catch (e) { /* ignore if not admin or not global */ }
+
         toast.info(language === "tr" ? "Öğe silindi" : "Item deleted");
+    };
+
+    const addToGlobalLibrary = async (category: string, data: any) => {
+        try {
+            const res = await fetch('/api/admin/library', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ category, data })
+            });
+            if (res.ok) {
+                toast.success("Added to global library");
+                loadLibraries(); // Refresh
+            } else {
+                toast.error("Failed to add to global library");
+            }
+        } catch (e) {
+            toast.error("Error adding to global library");
+        }
     };
 
     const handleSavedModelClick = (model: SavedModel) => {
@@ -268,6 +322,7 @@ export const useLibraryState = (
         handleSavedJewelryClick,
         handleSavedBeltClick,
         handleSavedInnerWearClick,
-        handleSavedLightingClick
+        handleSavedLightingClick,
+        addToGlobalLibrary
     };
 };

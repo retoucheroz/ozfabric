@@ -24,6 +24,7 @@ export interface LibraryItem {
     name: string;       // Display name
     thumbUrl?: string;  // OPTIONAL: Custom preview image
     createdAt: number;
+    isGlobal?: boolean;
 }
 
 export interface SavedPose extends LibraryItem {

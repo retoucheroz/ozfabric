@@ -2,7 +2,7 @@
 
 import React from "react";
 import { TbUserCircle, TbGenderFemale, TbGenderMale } from "react-icons/tb";
-import { User, X, Edit2 } from "lucide-react";
+import { User, X, Edit2, Sparkles } from "lucide-react";
 import { AssetCard } from "./AssetCard";
 import { cn } from "@/lib/utils";
 import { MODEL_PRESETS } from "@/lib/photoshoot-shared";
@@ -23,6 +23,8 @@ interface ModelSectionProps {
     handleEditItemClick?: (type: string, id: string) => void;
     setAssets?: React.Dispatch<React.SetStateAction<{ [key: string]: string | null }>>;
     setAssetsHighRes?: React.Dispatch<React.SetStateAction<{ [key: string]: string | null }>>;
+    isAdmin?: boolean;
+    addToGlobalLibrary?: (category: string, data: any) => void;
 }
 
 export function ModelSection({
@@ -40,6 +42,8 @@ export function ModelSection({
     handleEditItemClick,
     setAssets,
     setAssetsHighRes,
+    isAdmin,
+    addToGlobalLibrary
 }: ModelSectionProps) {
     if (view === "library") {
         return (
@@ -65,10 +69,24 @@ export function ModelSection({
                                                 setActiveLibraryAsset(null);
                                             }}
                                         />
-                                        <div className="absolute bottom-0 inset-x-0 p-1 bg-black/60 text-[9px] text-white truncate">{model.name}</div>
+                                        <div className="absolute bottom-0 inset-x-0 p-1 bg-black/60 text-[9px] text-white truncate flex items-center gap-1">
+                                            {model.isGlobal && <Sparkles size={8} className="text-amber-400" />}
+                                            {model.name}
+                                        </div>
                                         <div className="absolute top-1 right-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            {!isPreset && deleteSavedModel && <button onClick={(e) => { e.stopPropagation(); deleteSavedModel(model.id); }} className="p-1 bg-red-500 text-white rounded hover:bg-red-600"><X size={10} /></button>}
+                                            {(!isPreset || (model.isGlobal && isAdmin)) && deleteSavedModel && <button onClick={(e) => { e.stopPropagation(); deleteSavedModel(model.id); }} className="p-1 bg-red-500 text-white rounded hover:bg-red-600"><X size={10} /></button>}
                                             {!isPreset && handleEditItemClick && <button onClick={(e) => { e.stopPropagation(); handleEditItemClick('model', model.id); }} className="p-1 bg-[var(--accent-primary)] text-white rounded hover:bg-[var(--accent-hover)]"><Edit2 size={10} /></button>}
+                                            {!model.isGlobal && isAdmin && addToGlobalLibrary && (
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        addToGlobalLibrary('model', { ...model, id: undefined, createdAt: Date.now() });
+                                                    }}
+                                                    className="p-1 bg-amber-500 text-white rounded hover:bg-amber-600"
+                                                >
+                                                    <Sparkles size={10} />
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                 );

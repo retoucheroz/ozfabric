@@ -44,6 +44,8 @@ function dbUserToUser(dbUser: DbUser): User {
         customLogo: dbUser.custom_logo || undefined,
         authType: (dbUser.auth_type || 'credentials') as 'credentials' | 'google',
         avatar: dbUser.avatar_url || undefined,
+        lastSeenAt: dbUser.last_seen_at ? new Date(dbUser.last_seen_at).getTime() : undefined,
+        lastSeenPage: dbUser.last_seen_page || undefined,
     };
 }
 
@@ -179,6 +181,8 @@ export async function getAllUsers(): Promise<Omit<User, 'passwordHash'>[]> {
             customLogo: u.custom_logo || undefined,
             authType: (u.auth_type || 'credentials') as 'credentials' | 'google',
             avatar: u.avatar_url || undefined,
+            lastSeenAt: u.last_seen_at ? new Date(u.last_seen_at).getTime() : undefined,
+            lastSeenPage: u.last_seen_page || undefined,
         }));
     } catch (e) {
         console.error('getAllUsers Error:', e);

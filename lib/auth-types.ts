@@ -21,6 +21,8 @@ export interface User {
     lastLogin?: number;
     authType?: 'credentials' | 'google';
     avatar?: string;
+    lastSeenAt?: number;
+    lastSeenPage?: string;
 }
 
 export interface Session {

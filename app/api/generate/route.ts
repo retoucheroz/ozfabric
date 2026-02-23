@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
             targetView = null,
             hairBehindShoulders = false,
             lookAtCamera = true, // Default to true
-            socksType = 'none', // 'none' | 'white' | 'black'
+            socksType = 'none', // 'none' | 'white' | 'black' | 'grey' | 'navy'
             enableWind = false, // NEW: Subtle airflow toggle
             isStylingShot = true, // NEW: Flag to identify styling
             lightingPositive = null, // NEW
@@ -706,8 +706,8 @@ export async function POST(req: NextRequest) {
                     cropped: "LENGTH CONSTRAINT: Pant legs end clearly above the ankle bone, exposing visible ankle space. Hem floats above the shoe upper with a visible gap. No break, no shoe contact, no stacking, no pooling. Strict cropped length. Maintain exact proportional scaling relative to model height.",
                     ankle: "LENGTH CONSTRAINT: Pant legs end exactly at the ankle bone level. Hem sits just at the top line of the ankle without touching the shoe. No break, no fabric resting on the shoe, no stacking, no pooling. Clean ankle-length finish. Maintain exact proportional scaling relative to model height.",
                     below_ankle: "LENGTH CONSTRAINT: Pant legs end slightly below the ankle bone with minimal contact at the top edge of the shoe. No visible break at the front. No stacking, no pooling, no extended length. Controlled ankle-below finish. Maintain exact proportional scaling relative to model height.",
-                    full_length: "LENGTH CONSTRAINT: Pant legs extend to full length, reaching heel level and visibly touching the front of the shoe upper. A light natural front break is required. No stacking, no excessive fabric pooling. Full-length silhouette. Maintain exact proportional scaling relative to model height.",
-                    deep_break: "LENGTH CONSTRAINT: Pant legs extend long enough to partially cover most of the shoe upper, with a visible soft break over the front of the shoe. The hem reaches heel level. No stacking beyond a single soft break, no heavy pooling. Maintain exact proportional scaling relative to model height."
+                    full_length: "LENGTH CONSTRAINT: Pant legs extend to the floor/heel level, slightly breaking over the shoes. This 'Full Length' (Topuğa Kadar) style means the hem sits exactly where the shoe meets the floor at the back, with a single minimal fold at the front. MUST conceal any socks.",
+                    deep_break: "LENGTH CONSTRAINT: Pant legs are extra long, fully covering the upper part of the shoe and the heel. This 'Over-the-shoe' (Ayakkabının Üstünü Kapatacak) style ensures the hem puddles slightly over the footwear, hiding most of the shoe and completely concealing socks. The pant leg is the dominant feature at the foot level."
                 };
                 if (lengthPrompts[pantLength]) {
                     productBlock.push(lengthPrompts[pantLength]);
@@ -846,7 +846,7 @@ export async function POST(req: NextRequest) {
                 }
             }
 
-            if (canShowLegHem) {
+            if (canShowLegHem && !['full_length', 'deep_break'].includes(pantLength)) {
                 if (sp.styling.socks && sp.styling.socks !== 'none') extras.push(`wearing ${sp.styling.socks} socks`);
             }
 

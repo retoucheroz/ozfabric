@@ -21,6 +21,8 @@ export interface DbUser {
     custom_logo: string | null;
     auth_type: string | null;
     avatar_url: string | null;
+    last_seen_at: Date | null;
+    last_seen_page: string | null;
 }
 
 export interface CreditTransaction {
@@ -94,9 +96,9 @@ export async function addCredits(email: string, amount: number, description: str
 
 export async function getAllUsers(): Promise<Omit<DbUser, 'password_hash'>[]> {
     const result = await sql`
-        SELECT id, email, name, credits, role, status, authorized_pages, custom_title, custom_logo, auth_type, created_at, updated_at 
+        SELECT id, email, name, credits, role, status, authorized_pages, custom_title, custom_logo, auth_type, created_at, updated_at, last_seen_at, last_seen_page
         FROM users 
-        ORDER BY created_at DESC
+        ORDER BY last_seen_at DESC NULLS LAST, created_at DESC
     `;
     return result as Omit<DbUser, 'password_hash'>[];
 }
@@ -167,6 +169,8 @@ export async function updateUser(email: string, updates: {
     custom_logo?: string;
     auth_type?: string;
     avatar_url?: string | null;
+    last_seen_at?: Date | null;
+    last_seen_page?: string | null;
 }): Promise<DbUser | null> {
     const result = await sql`
         UPDATE users 
@@ -179,11 +183,21 @@ export async function updateUser(email: string, updates: {
             custom_logo = COALESCE(${updates.custom_logo ?? null}, custom_logo),
             auth_type = COALESCE(${updates.auth_type ?? null}, auth_type),
             avatar_url = COALESCE(${updates.avatar_url ?? null}, avatar_url),
+            last_seen_at = COALESCE(${updates.last_seen_at ?? null}::timestamptz, last_seen_at),
+            last_seen_page = COALESCE(${updates.last_seen_page ?? null}, last_seen_page),
             updated_at = CURRENT_TIMESTAMP
         WHERE email = ${email}
         RETURNING *
     `;
     return result[0] as DbUser || null;
+}
+
+export async function updateUserActivity(email: string, page: string): Promise<void> {
+    await sql`
+        UPDATE users 
+        SET last_seen_at = CURRENT_TIMESTAMP, last_seen_page = ${page}, updated_at = CURRENT_TIMESTAMP
+        WHERE email = ${email}
+    `;
 }
 
 export async function getCreditTransactions(email: string): Promise<CreditTransaction[]> {

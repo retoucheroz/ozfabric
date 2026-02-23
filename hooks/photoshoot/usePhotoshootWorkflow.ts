@@ -61,7 +61,7 @@ export const usePhotoshootWorkflow = () => {
     const [enableExpression, setEnableExpression] = useState(false);
     const [enableGaze, setEnableGaze] = useState(false);
     const [hairBehindShoulders, setHairBehindShoulders] = useState(false);
-    const [socksType, setSocksType] = useState<'none' | 'white' | 'black'>('none');
+    const [socksType, setSocksType] = useState<'none' | 'white' | 'black' | 'grey' | 'navy'>('none');
 
     const [collarType, setCollarType] = useState<'none' | 'standard' | 'v-neck' | 'polo'>('none');
     const [shoulderType, setShoulderType] = useState<'none' | 'standard' | 'dropped' | 'padded'>('none');
@@ -236,7 +236,8 @@ export const usePhotoshootWorkflow = () => {
         handleSavedPoseClick, handleSavedFitClick, handleSavedShoeClick,
         handleSavedJacketClick, handleSavedBagClick, handleSavedGlassesClick,
         handleSavedHatClick, handleSavedJewelryClick, handleSavedBeltClick,
-        handleSavedInnerWearClick, handleSavedLightingClick
+        handleSavedInnerWearClick, handleSavedLightingClick,
+        addToGlobalLibrary
     } = useLibraryState(
         setAssets, setAssetsHighRes, setPoseStickman, setPoseDescription,
         setModelDescription, setFitDescription, setShoesDescription,
@@ -623,6 +624,7 @@ export const usePhotoshootWorkflow = () => {
         handleBatchGenerate, handleConfirmGeneration, handleConfirmBatchGeneration, batchPreviewPrompts,
         editedBatchPrompts, setEditedBatchPrompts, showBatchPreview, setShowBatchPreview,
         selectedBatchImages, setSelectedBatchImages, isStoppingBatch, handleStopBatch, estimatedCost,
-        handleAssetRemove, canMoveToStep, handleLibrarySelect, getLibraryItems, convertToStickman, resetWorkflow
+        handleAssetRemove, canMoveToStep, handleLibrarySelect, getLibraryItems, convertToStickman, resetWorkflow,
+        addToGlobalLibrary
     };
 };

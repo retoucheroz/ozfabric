@@ -259,7 +259,14 @@ export default function AdminPanel() {
                                 <div className="flex items-center gap-2">
                                     <div className={`w-2 h-2 rounded-full ${onlineStats.users.includes(user.username) ? 'bg-green-500 animate-pulse' : 'bg-muted'}`} />
                                     <CardTitle className="text-sm font-black break-all flex-1">{user.username}</CardTitle>
-                                    <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>{user.role}</Badge>
+                                    <div className="flex flex-col items-end gap-1">
+                                        <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>{user.role}</Badge>
+                                        {user.lastSeenAt && (
+                                            <span className="text-[9px] font-bold text-violet-500 uppercase tracking-tighter">
+                                                {new Date(user.lastSeenAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            </span>
+                                        )}
+                                    </div>
                                     {user.authType === 'google' && (
                                         <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-500/20 gap-1">
                                             <svg className="h-2.5 w-2.5" viewBox="0 0 24 24">
@@ -291,9 +298,22 @@ export default function AdminPanel() {
                                     )}
                                 </div>
                             </div>
-                            <CardDescription className="text-[10px] uppercase font-bold tracking-wider">
-                                Joined: {new Date(user.createdAt || Date.now()).toLocaleDateString()}
-                            </CardDescription>
+                            <div className="flex items-center justify-between mt-1">
+                                <CardDescription className="text-[10px] uppercase font-bold tracking-wider">
+                                    Joined: {new Date(user.createdAt || Date.now()).toLocaleDateString()}
+                                </CardDescription>
+                                {user.lastSeenPage && (
+                                    <Badge variant="outline" className="text-[9px] font-bold bg-violet-500/5 text-violet-600 border-violet-500/20 max-w-[150px] truncate">
+                                        <Layout className="w-2.5 h-2.5 mr-1" />
+                                        {user.lastSeenPage}
+                                    </Badge>
+                                )}
+                            </div>
+                            {user.lastSeenAt && (
+                                <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-tight mt-1">
+                                    Last Active: {new Date(user.lastSeenAt).toLocaleString()}
+                                </div>
+                            )}
                         </CardHeader>
                         <CardContent className="space-y-5">
                             <div className="grid grid-cols-2 gap-2">
