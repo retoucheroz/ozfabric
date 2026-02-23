@@ -51,7 +51,7 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
         const taskId = createTaskData.data?.taskId;
         if (!taskId) throw new Error("Kie API missing taskId");
 
-        let maxRetries = 60; // Poll for up to 60 seconds
+        let maxRetries = 240; // Poll for up to 240 seconds (4 minutes)
         while (maxRetries > 0) {
             await new Promise(r => setTimeout(r, 1000));
             maxRetries--;
