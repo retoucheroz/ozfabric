@@ -95,6 +95,20 @@ export async function addCredits(email: string, amount: number, description: str
 }
 
 export async function getAllUsers(): Promise<Omit<DbUser, 'password_hash'>[]> {
+    // Basic migration check: Ensure columns exist
+    try {
+        await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS last_seen_at TIMESTAMPTZ`;
+        await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS last_seen_page TEXT`;
+        await sql`CREATE TABLE IF NOT EXISTS global_library (
+            id TEXT PRIMARY KEY,
+            category TEXT NOT NULL,
+            data JSONB NOT NULL,
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        )`;
+    } catch (e) {
+        console.warn("Migration warning (some might already exist or permission denied):", e);
+    }
+
     const result = await sql`
         SELECT id, email, name, credits, role, status, authorized_pages, custom_title, custom_logo, auth_type, created_at, updated_at, last_seen_at, last_seen_page
         FROM users 
@@ -193,11 +207,15 @@ export async function updateUser(email: string, updates: {
 }
 
 export async function updateUserActivity(email: string, page: string): Promise<void> {
-    await sql`
-        UPDATE users 
-        SET last_seen_at = CURRENT_TIMESTAMP, last_seen_page = ${page}, updated_at = CURRENT_TIMESTAMP
-        WHERE email = ${email}
-    `;
+    try {
+        await sql`
+            UPDATE users 
+            SET last_seen_at = CURRENT_TIMESTAMP, last_seen_page = ${page}, updated_at = CURRENT_TIMESTAMP
+            WHERE email = ${email}
+        `;
+    } catch (e) {
+        // Silently ignore if columns don't exist yet
+    }
 }
 
 export async function getCreditTransactions(email: string): Promise<CreditTransaction[]> {

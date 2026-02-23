@@ -167,27 +167,22 @@ export async function getOnlineUsers(): Promise<string[]> {
 }
 
 export async function getAllUsers(): Promise<Omit<User, 'passwordHash'>[]> {
-    try {
-        const dbUsers = await pgGetAllUsers();
-        return dbUsers.map(u => ({
-            username: u.email,
-            email: u.email,
-            name: u.name || undefined,
-            role: (u.role === 'admin' ? 'admin' : 'user') as 'admin' | 'user',
-            credits: u.credits,
-            status: (u.status || 'active') as 'active' | 'pending' | 'disabled',
-            authorizedPages: u.authorized_pages || [],
-            customTitle: u.custom_title || undefined,
-            customLogo: u.custom_logo || undefined,
-            authType: (u.auth_type || 'credentials') as 'credentials' | 'google',
-            avatar: u.avatar_url || undefined,
-            lastSeenAt: u.last_seen_at ? new Date(u.last_seen_at).getTime() : undefined,
-            lastSeenPage: u.last_seen_page || undefined,
-        }));
-    } catch (e) {
-        console.error('getAllUsers Error:', e);
-        return [];
-    }
+    const dbUsers = await pgGetAllUsers();
+    return dbUsers.map(u => ({
+        username: u.email,
+        email: u.email,
+        name: u.name || undefined,
+        role: (u.role === 'admin' ? 'admin' : 'user') as 'admin' | 'user',
+        credits: u.credits,
+        status: (u.status || 'active') as 'active' | 'pending' | 'disabled',
+        authorizedPages: u.authorized_pages || [],
+        customTitle: u.custom_title || undefined,
+        customLogo: u.custom_logo || undefined,
+        authType: (u.auth_type || 'credentials') as 'credentials' | 'google',
+        avatar: u.avatar_url || undefined,
+        lastSeenAt: u.last_seen_at ? new Date(u.last_seen_at).getTime() : undefined,
+        lastSeenPage: u.last_seen_page || undefined,
+    }));
 }
 
 export async function deleteUser(username: string): Promise<void> {

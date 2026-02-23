@@ -60,7 +60,12 @@ export default function AdminPanel() {
                 fetch('/api/admin/online', { headers })
             ]);
 
-            if (usersRes.ok) setUsers(await usersRes.json());
+            if (usersRes.ok) {
+                setUsers(await usersRes.json());
+            } else {
+                const err = await usersRes.json();
+                toast.error(err.error || "Failed to load users");
+            }
             if (onlineRes.ok) setOnlineStats(await onlineRes.json());
         } catch (error) {
             toast.error("Failed to fetch admin data");

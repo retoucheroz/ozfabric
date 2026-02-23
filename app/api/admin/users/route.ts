@@ -21,11 +21,16 @@ async function checkAdmin(req?: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-    if (!await checkAdmin(req)) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    try {
+        if (!await checkAdmin(req)) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+        const users = await getAllUsers();
+        return NextResponse.json(users);
+    } catch (e: any) {
+        console.error('ADMIN_GET_USERS_ERROR:', e);
+        return NextResponse.json({ error: e.message || 'Internal Error' }, { status: 500 });
     }
-    const users = await getAllUsers();
-    return NextResponse.json(users);
 }
 
 export async function PATCH(req: NextRequest) {
