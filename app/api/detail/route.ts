@@ -434,14 +434,6 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // 4. REAL GENERATION
-    // Check key
-    const falKey = process.env.FAL_KEY;
-    if (!falKey) {
-      console.error("Critical: FAL_KEY is missing in server environment.");
-      return NextResponse.json({ error: "Configuration Error: FAL_KEY missing" }, { status: 500 });
-    }
-
     // Check assets
     if (assets.length === 0) {
       return NextResponse.json({ error: "No relevant assets found for this view. Please upload at least one image (Top/Bottom/Main) matching the selected view." }, { status: 400 });
@@ -471,41 +463,21 @@ export async function POST(req: NextRequest) {
     console.log(`Negative prompt: ${negativePrompt}`);
 
     // Use Nano Banana Pro consistent with main app
-    const endpoint = "fal-ai/nano-banana-pro/edit";
+    const { generateWithNanoBanana } = await import('@/lib/nano-banana');
 
-    console.log(`Sending request to ${endpoint} with ${assets.length} assets. Primary: ${assets[0]?.slice(0, 30)}...`);
-
-    const falRes = await fetch(`https://fal.run/${endpoint}`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Key ${falKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    try {
+      const generatedImageUrl = await generateWithNanoBanana({
         prompt: finalPrompt,
         negative_prompt: negativePrompt,
-        image_urls: assets, // Send ALL assets as reference
+        image_urls: assets,
         aspect_ratio: aspectRatio,
-        resolution: resolution === "1K" ? undefined : resolution // Pass if strict
-      }),
-    });
-
-    if (!falRes.ok) {
-      const err = await falRes.text();
-      console.error("FAL API Error:", err);
-      // Try to parse JSON error if possible
-      let errMsg = err;
-      try {
-        const eJson = JSON.parse(err);
-        if (eJson.detail) errMsg = eJson.detail;
-        if (eJson.message) errMsg = eJson.message;
-      } catch { }
-
-      return NextResponse.json({ error: `AI Service Error: ${errMsg}` }, { status: falRes.status });
+        resolution: resolution === "1K" ? "1K" : String(resolution)
+      });
+      return NextResponse.json({ images: [{ url: generatedImageUrl }] });
+    } catch (apiError: any) {
+      console.error("Detail Generation Error:", apiError);
+      return NextResponse.json({ error: `AI Service Error: ${apiError.message}` }, { status: 500 });
     }
-
-    const data = await falRes.json();
-    return NextResponse.json(data);
 
   } catch (e: any) {
     console.error("Detail API Fatal Error:", e);

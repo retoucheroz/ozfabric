@@ -50,14 +50,16 @@ export default function AdminPanel() {
     const [selectedUserForHistory, setSelectedUserForHistory] = useState<string | null>(null);
     const [creditHistory, setCreditHistory] = useState<any[]>([]);
     const [isHistoryLoading, setIsHistoryLoading] = useState(false);
+    const [provider, setProvider] = useState<string>('fal_ai');
 
     const fetchData = async () => {
         setIsLoading(true);
         try {
             const headers = getAdminHeaders();
-            const [usersRes, onlineRes] = await Promise.all([
+            const [usersRes, onlineRes, settingsRes] = await Promise.all([
                 fetch('/api/admin/users', { headers }),
-                fetch('/api/admin/online', { headers })
+                fetch('/api/admin/online', { headers }),
+                fetch('/api/admin/settings', { headers })
             ]);
 
             if (usersRes.ok) {
@@ -67,6 +69,10 @@ export default function AdminPanel() {
                 toast.error(err.error || "Failed to load users");
             }
             if (onlineRes.ok) setOnlineStats(await onlineRes.json());
+            if (settingsRes.ok) {
+                const data = await settingsRes.json();
+                if (data.nano_banana_provider) setProvider(data.nano_banana_provider);
+            }
         } catch (error) {
             toast.error("Failed to fetch admin data");
         } finally {
@@ -162,6 +168,28 @@ export default function AdminPanel() {
         }
     };
 
+    const updateProvider = async (newProvider: string) => {
+        setProvider(newProvider);
+        try {
+            const res = await fetch('/api/admin/settings', {
+                method: 'POST',
+                headers: getAdminHeaders(),
+                body: JSON.stringify({ nano_banana_provider: newProvider })
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                toast.error(data.error || "Failed to update provider");
+                fetchData(); // rollback
+            } else {
+                toast.success('API Provider updated successfully');
+            }
+        } catch (error) {
+            toast.error("Network error");
+            fetchData(); // rollback
+        }
+    };
+
     const togglePageAccess = (user: Omit<User, 'passwordHash'>, path: string) => {
         const current = user.authorizedPages || [];
         const updated = current.includes(path)
@@ -191,70 +219,94 @@ export default function AdminPanel() {
                 </div>
             </header>
 
-            <Card className="border-violet-500/20 bg-zinc-50/50 dark:bg-background/50">
-                <CardHeader className="pb-4">
-                    <CardTitle className="text-sm font-bold flex items-center gap-2">
-                        <Users className="w-4 h-4 text-violet-500" /> {t('admin.createNewUser')}
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <form className="flex flex-wrap items-end gap-4" onSubmit={async (e) => {
-                        e.preventDefault();
-                        const formData = new FormData(e.currentTarget);
-                        const username = formData.get('username') as string;
-                        const password = formData.get('password') as string;
-                        const role = formData.get('role') as string;
-                        const customTitle = formData.get('customTitle') as string;
-
-                        if (!username || !password) return toast.error(t('login.errorBothImages'));
-
-                        try {
-                            const res = await fetch('/api/admin/users', {
-                                method: 'POST',
-                                headers: getAdminHeaders(),
-                                body: JSON.stringify({ username, password, role, customTitle })
-                            });
-                            if (res.ok) {
-                                toast.success(t('admin.addUser'));
-                                fetchData();
-                                (e.target as HTMLFormElement).reset();
-                            } else {
-                                const data = await res.json();
-                                toast.error(data.error || "Hata oluştu");
-                            }
-                        } catch (err) {
-                            toast.error("İşlem başarısız");
-                        }
-                    }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <Card className="border-violet-500/20 bg-zinc-50/50 dark:bg-background/50">
+                    <CardHeader className="pb-4">
+                        <CardTitle className="text-sm font-bold flex items-center gap-2">
+                            <Settings2 className="w-4 h-4 text-violet-500" /> System Settings
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
                         <div className="space-y-1.5 flex-1 min-w-[200px]">
-                            <Label htmlFor="username">{t('admin.username')}</Label>
-                            <Input id="username" name="username" placeholder="örn: mehmet" required />
-                        </div>
-                        <div className="space-y-1.5 flex-1 min-w-[200px]">
-                            <Label htmlFor="password">{t('admin.password')}</Label>
-                            <Input id="password" name="password" type="password" placeholder="••••••••" required />
-                        </div>
-                        <div className="space-y-1.5 flex-1 min-w-[200px]">
-                            <Label htmlFor="customTitle">{t('admin.brandedTitle')}</Label>
-                            <Input id="customTitle" name="customTitle" placeholder="örn: Autography" />
-                        </div>
-                        <div className="space-y-1.5 w-[140px]">
-                            <Label htmlFor="role">{t('admin.role')}</Label>
+                            <Label htmlFor="provider">Nano Banana Pro Provider</Label>
                             <select
-                                id="role"
-                                name="role"
+                                id="provider"
                                 className="w-full h-10 px-3 rounded-md border bg-background text-sm focus:ring-2 ring-violet-500 outline-none"
+                                value={provider}
+                                onChange={(e) => updateProvider(e.target.value)}
                             >
-                                <option value="user">User</option>
-                                <option value="admin">Admin</option>
+                                <option value="fal_ai">Fal.ai API</option>
+                                <option value="kie_ai">Kie.ai API</option>
                             </select>
                         </div>
-                        <Button type="submit" className="bg-violet-600 hover:bg-violet-700">
-                            {t('admin.addUser')}
-                        </Button>
-                    </form>
-                </CardContent>
-            </Card>
+                    </CardContent>
+                </Card>
+
+                <Card className="col-span-1 md:col-span-1 lg:col-span-2 border-violet-500/20 bg-zinc-50/50 dark:bg-background/50">
+                    <CardHeader className="pb-4">
+                        <CardTitle className="text-sm font-bold flex items-center gap-2">
+                            <Users className="w-4 h-4 text-violet-500" /> {t('admin.createNewUser')}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <form className="flex flex-wrap items-end gap-4" onSubmit={async (e) => {
+                            e.preventDefault();
+                            const formData = new FormData(e.currentTarget);
+                            const username = formData.get('username') as string;
+                            const password = formData.get('password') as string;
+                            const role = formData.get('role') as string;
+                            const customTitle = formData.get('customTitle') as string;
+
+                            if (!username || !password) return toast.error(t('login.errorBothImages'));
+
+                            try {
+                                const res = await fetch('/api/admin/users', {
+                                    method: 'POST',
+                                    headers: getAdminHeaders(),
+                                    body: JSON.stringify({ username, password, role, customTitle })
+                                });
+                                if (res.ok) {
+                                    toast.success(t('admin.addUser'));
+                                    fetchData();
+                                    (e.target as HTMLFormElement).reset();
+                                } else {
+                                    const data = await res.json();
+                                    toast.error(data.error || "Hata oluştu");
+                                }
+                            } catch (err) {
+                                toast.error("İşlem başarısız");
+                            }
+                        }}>
+                            <div className="space-y-1.5 flex-1 min-w-[200px]">
+                                <Label htmlFor="username">{t('admin.username')}</Label>
+                                <Input id="username" name="username" placeholder="örn: mehmet" required />
+                            </div>
+                            <div className="space-y-1.5 flex-1 min-w-[200px]">
+                                <Label htmlFor="password">{t('admin.password')}</Label>
+                                <Input id="password" name="password" type="password" placeholder="••••••••" required />
+                            </div>
+                            <div className="space-y-1.5 flex-1 min-w-[200px]">
+                                <Label htmlFor="customTitle">{t('admin.brandedTitle')}</Label>
+                                <Input id="customTitle" name="customTitle" placeholder="örn: Autography" />
+                            </div>
+                            <div className="space-y-1.5 w-[140px]">
+                                <Label htmlFor="role">{t('admin.role')}</Label>
+                                <select
+                                    id="role"
+                                    name="role"
+                                    className="w-full h-10 px-3 rounded-md border bg-background text-sm focus:ring-2 ring-violet-500 outline-none"
+                                >
+                                    <option value="user">User</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                            <Button type="submit" className="bg-violet-600 hover:bg-violet-700">
+                                {t('admin.addUser')}
+                            </Button>
+                        </form>
+                    </CardContent>
+                </Card>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {users.map((user) => (

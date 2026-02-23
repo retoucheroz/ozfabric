@@ -42,61 +42,31 @@ export async function POST(req: NextRequest) {
             sanitizedPose = await ensureR2Url(poseStickman, "editorial/inputs");
         }
 
-        const falPayload: any = {
-            prompt: finalPrompt,
-            image_urls: {
-                model: sanitizedModel
-            },
-            aspect_ratio: aspectRatio,
-            resolution: resolution === "4K" ? "4K" : resolution === "2K" ? "2K" : "1K",
-            seed: finalSeed,
-            output_format: "png"
+        const imageUrlsPayload: any = {
+            model: sanitizedModel
         };
 
         if (sanitizedOutfit) {
-            falPayload.image_urls.outfit = sanitizedOutfit;
+            imageUrlsPayload.outfit = sanitizedOutfit;
         }
         if (sanitizedBackground) {
-            falPayload.image_urls.scene = sanitizedBackground;
+            imageUrlsPayload.scene = sanitizedBackground;
         }
         if (sanitizedPose) {
-            falPayload.image_urls.pose = sanitizedPose;
+            imageUrlsPayload.pose = sanitizedPose;
         }
 
-        const falKey = process.env.FAL_KEY;
-        if (!falKey) throw new Error("FAL_KEY missing");
-
-        const response = await fetch("https://fal.run/fal-ai/nano-banana-pro/edit", {
-            method: "POST",
-            headers: {
-                "Authorization": `Key ${falKey}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(falPayload),
+        const { generateWithNanoBanana } = await import('@/lib/nano-banana');
+        const imageUrl = await generateWithNanoBanana({
+            prompt: finalPrompt,
+            image_urls: imageUrlsPayload,
+            aspect_ratio: aspectRatio,
+            resolution: resolution === "4K" ? "4K" : resolution === "2K" ? "2K" : "1K",
+            seed: finalSeed
         });
 
-        if (!response.ok) {
-            const err = await response.text();
-            return NextResponse.json({ error: `Fal API Error: ${err}` }, { status: 500 });
-        }
-
-        const data = await response.json();
-        const falUrls = data.images?.map((img: any) => img.url) || [];
-
-        // Persist to R2/S3
-        let finalUrls = falUrls;
-        if (falUrls.length > 0) {
-            try {
-                const { uploadFromUrl } = await import("@/lib/s3");
-                finalUrls = await Promise.all(falUrls.map((url: string) => uploadFromUrl(url, "editorial")));
-                console.log('Editorial Persisted to S3:', finalUrls);
-            } catch (r2Error) {
-                console.error('S3 editorial persistence error:', r2Error);
-            }
-        }
-
         return NextResponse.json({
-            images: finalUrls,
+            images: [imageUrl],
             prompt: finalPrompt,
             seed: finalSeed
         });

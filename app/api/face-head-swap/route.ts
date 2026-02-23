@@ -79,46 +79,20 @@ export async function POST(req: NextRequest) {
 
         const prompt = swapMode === 'head_swap' ? HEAD_SWAP_PROMPT : FACE_SWAP_PROMPT;
 
-        const falPayload: any = {
+        const { generateWithNanoBanana } = await import('@/lib/nano-banana');
+
+        const payload: any = {
             image_urls: [sanitizedRef, sanitizedBase],
             prompt,
-            output_format: "png",
             resolution,
             aspect_ratio: aspectRatio
         };
 
         if (seed !== null && seed !== undefined && seed !== "") {
-            falPayload.seed = Number(seed);
+            payload.seed = Number(seed);
         }
 
-        const response = await fetch("https://fal.run/fal-ai/nano-banana-pro/edit", {
-            method: "POST",
-            headers: {
-                "Authorization": `Key ${falKey}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(falPayload),
-        });
-
-        if (!response.ok) {
-            const err = await response.text();
-            return NextResponse.json({ error: `Fal API Error: ${err}` }, { status: 500 });
-        }
-
-        const data = await response.json();
-        let imageUrl = data.images?.[0]?.url;
-        const usedSeed = data.seed;
-
-        // Persist to R2/S3
-        if (imageUrl) {
-            try {
-                const { uploadFromUrl } = await import("@/lib/s3");
-                imageUrl = await uploadFromUrl(imageUrl, "face-swap");
-                console.log('FaceSwap Persisted to S3:', imageUrl);
-            } catch (r2Error) {
-                console.error('S3 faceswap persistence error:', r2Error);
-            }
-        }
+        const imageUrl = await generateWithNanoBanana(payload);
 
         // Deduct credits after success (or before, depending on policy)
         if (user.role !== 'admin') {
@@ -127,7 +101,7 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({
             image: imageUrl,
-            seed: usedSeed,
+            seed: payload.seed || null,
             status: "success"
         });
 

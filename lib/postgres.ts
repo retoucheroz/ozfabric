@@ -105,6 +105,11 @@ export async function getAllUsers(): Promise<Omit<DbUser, 'password_hash'>[]> {
             data JSONB NOT NULL,
             created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         )`;
+        await sql`CREATE TABLE IF NOT EXISTS app_settings (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL,
+            updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        )`;
     } catch (e) {
         console.warn("Migration warning (some might already exist or permission denied):", e);
     }
@@ -232,4 +237,25 @@ export async function logCreditTransaction(email: string, amount: number, descri
         INSERT INTO credit_transactions (user_email, amount, description, type)
         VALUES (${email}, ${amount}, ${description}, ${type})
     `;
+}
+
+export async function getGlobalSetting(key: string): Promise<string | null> {
+    try {
+        const result = await sql`SELECT value FROM app_settings WHERE key = ${key}`;
+        return result[0]?.value || null;
+    } catch {
+        return null;
+    }
+}
+
+export async function setGlobalSetting(key: string, value: string): Promise<void> {
+    try {
+        await sql`
+            INSERT INTO app_settings (key, value)
+            VALUES (${key}, ${value})
+            ON CONFLICT (key) DO UPDATE SET value = ${value}, updated_at = CURRENT_TIMESTAMP
+        `;
+    } catch (e) {
+        console.error("Failed to set global setting:", e);
+    }
 }

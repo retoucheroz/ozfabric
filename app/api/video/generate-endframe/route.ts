@@ -111,34 +111,16 @@ Now analyze the provided first frame image and generate the end frame prompt.
         // User wants "4K" quality but we don't expose this to them
         const resolution = "4K";
 
-        const falPayload = {
+        const { generateWithNanoBanana } = await import('@/lib/nano-banana');
+        const generatedImageUrl = await generateWithNanoBanana({
             prompt: generatedPrompt,
             negative_prompt: "blurry, low quality, distorted face, extra fingers, extra limbs, deformed, disfigured, bad anatomy, watermark, text, logo, signature, cropped, worst quality, low resolution, jpeg artifacts, ugly, duplicate, morbid, mutilated",
             image_urls: [firstFrameImage],
             aspect_ratio: aspectRatio || "16:9",
             resolution: resolution,
             seed: Math.floor(Math.random() * 1000000000),
-            enable_web_search: false,
-            output_format: "png"
-        };
-
-        const falResponse = await fetch("https://fal.run/fal-ai/nano-banana-pro/edit", {
-            method: "POST",
-            headers: {
-                "Authorization": `Key ${falKey}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(falPayload),
+            enable_web_search: false
         });
-
-        if (!falResponse.ok) {
-            const errText = await falResponse.text();
-            console.error("[EndFrame] Fal API Error:", errText);
-            return NextResponse.json({ error: `Image generation failed: ${errText}` }, { status: 500 });
-        }
-
-        const falData = await falResponse.json();
-        const generatedImageUrl = falData.images?.[0]?.url;
 
         if (!generatedImageUrl) {
             return NextResponse.json({ error: "No image generated" }, { status: 500 });

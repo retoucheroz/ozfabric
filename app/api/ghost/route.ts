@@ -205,39 +205,15 @@ export async function POST(req: NextRequest) {
             images.filter(Boolean).map((img: string) => ensureR2Url(img, "ghost/inputs"))
         );
 
-        // fal.ai/nano-banana-pro/edit (Exact schema based on docs)
-        const response = await fetch("https://fal.run/fal-ai/nano-banana-pro/edit", {
-            method: "POST",
-            headers: {
-                "Authorization": `Key ${falKey}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                prompt: selectedPrompt,
-                image_urls: sanitizedImages, // Array of URLs (supports up to 14)
-                aspect_ratio: effectiveAspectRatio,
-                resolution: resolution || "1K"
-            }),
+        const { generateWithNanoBanana } = await import('@/lib/nano-banana');
+        const imageUrl = await generateWithNanoBanana({
+            prompt: selectedPrompt,
+            image_urls: sanitizedImages,
+            aspect_ratio: effectiveAspectRatio,
+            resolution: resolution || "1K"
         });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error("Fal API error:", response.status, errorText);
-            return NextResponse.json({ error: "Image generation failed", details: errorText }, { status: 500 });
-        }
-
-        const data = await response.json();
-        let imageUrl = data.images?.[0]?.url;
-
         if (imageUrl) {
-            // Persist to R2/S3
-            try {
-                const { uploadFromUrl } = await import("@/lib/s3");
-                imageUrl = await uploadFromUrl(imageUrl, "ghost");
-                console.log('Ghost Persisted to S3:', imageUrl);
-            } catch (r2Error) {
-                console.error('S3 ghost persistence error:', r2Error);
-            }
             return NextResponse.json({ status: "completed", imageUrl: imageUrl });
         }
 

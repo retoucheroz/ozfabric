@@ -924,43 +924,16 @@ export async function POST(req: NextRequest) {
                 if (resolution.includes('4K')) finalRes = '4K';
             }
 
-            const falPayload = {
+            const { generateWithNanoBanana } = await import('@/lib/nano-banana');
+            return await generateWithNanoBanana({
                 prompt: reqData.prompt,
-                negative_prompt: reqData.negative_prompt,
                 image_urls: reqData.input_images,
                 aspect_ratio: aspectRatio,
                 resolution: finalRes,
+                negative_prompt: reqData.negative_prompt,
                 seed: requestSeed,
-                enable_web_search: enableWebSearch,
-                output_format: "png"
-            };
-
-            const falKey = process.env.FAL_KEY;
-            if (!falKey) throw new Error("FAL_KEY missing");
-
-            const response = await fetch("https://fal.run/fal-ai/nano-banana-pro/edit", {
-                method: "POST",
-                headers: {
-                    "Authorization": `Key ${falKey}`,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(falPayload),
+                enable_web_search: enableWebSearch
             });
-
-            if (!response.ok) {
-                const err = await response.text();
-                throw new Error(`Fal API Error (${view}): ${err}`);
-            }
-            const data = await response.json();
-            const falUrl = data.images?.[0]?.url;
-
-            // Persist the image to R2/S3
-            if (falUrl) {
-                const { uploadFromUrl } = await import("@/lib/s3");
-                return await uploadFromUrl(falUrl, "generations");
-            }
-
-            return falUrl;
         };
 
         // === PREVIEW MODE ===
