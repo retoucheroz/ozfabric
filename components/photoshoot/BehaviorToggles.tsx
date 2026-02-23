@@ -32,6 +32,7 @@ interface BehaviorTogglesProps {
     setEnableGaze: (val: boolean) => void;
     socksType: 'none' | 'white' | 'black' | 'grey' | 'navy';
     setSocksType: (val: 'none' | 'white' | 'black' | 'grey' | 'navy') => void;
+    pantLength?: string;
 }
 
 export function BehaviorToggles({
@@ -60,8 +61,18 @@ export function BehaviorToggles({
     setEnableGaze,
     socksType,
     setSocksType,
+    pantLength
 }: BehaviorTogglesProps) {
-    const ToggleItem = ({ label, icon: Icon, active, onClick, color = "bg-[var(--accent-primary)]", brief, detailed }: { label: string, icon: any, active: boolean, onClick: () => void, color?: string, brief: string, detailed: string }) => (
+    const isSocksDisabled = pantLength === 'full_length' || pantLength === 'deep_break';
+
+    // If socks are disabled by pant length but they have a value, reset to none on render
+    React.useEffect(() => {
+        if (isSocksDisabled && socksType !== 'none') {
+            setSocksType('none');
+        }
+    }, [isSocksDisabled, socksType, setSocksType]);
+
+    const ToggleItem = ({ label, icon: Icon, active, onClick, color = "bg-[var(--accent-primary)]", brief, detailed, disabled = false }: { label: string, icon: any, active: boolean, onClick: () => void, color?: string, brief: string, detailed: string, disabled?: boolean }) => (
         <TooltipProvider>
             <Tooltip>
                 <TooltipTrigger asChild>
@@ -174,60 +185,65 @@ export function BehaviorToggles({
                     onClick={() => setEnableExpression(!enableExpression)}
                 />
 
-                {/* 8. Gaze */}
-                <ToggleItem
-                    label={language === "tr" ? "BAKIŞ" : "GAZE"}
-                    brief={language === "tr" ? "Bakış derinliği" : "Look intensity"}
-                    detailed={language === "tr" ? "Modelin yapaylıktan uzak olması için bakış detaylarının eklenmesini sağlar." : "Adds gaze details to prevent the model from looking artificial."}
-                    icon={TbEye}
-                    active={enableGaze}
-                    onClick={() => setEnableGaze(!enableGaze)}
-                />
-
                 {/* 9. Socks Toggle (Cyclic) */}
-                <div
-                    className={cn(
-                        "flex flex-col items-center justify-between p-2.5 h-full rounded-xl border-2 transition-all cursor-pointer group select-none shadow-sm",
-                        socksType !== 'none'
-                            ? "bg-[var(--accent-soft)] border-[var(--accent-primary)]"
-                            : "bg-[var(--bg-elevated)] border-[var(--border-subtle)] hover:border-[var(--accent-primary)]/50"
-                    )}
-                    onClick={() => {
-                        if (socksType === 'none') setSocksType('white');
-                        else if (socksType === 'white') setSocksType('black');
-                        else if (socksType === 'black') setSocksType('grey');
-                        else if (socksType === 'grey') setSocksType('navy');
-                        else setSocksType('none');
-                    }}
-                >
-                    <div className="flex flex-col items-center gap-1.5 pt-1">
-                        <PiSock className={cn("w-5 h-5 transition-transform group-hover:scale-110", socksType !== 'none' ? "text-[var(--accent-primary)]" : "text-[var(--text-muted)]")} />
-                        <span className={cn(
-                            "text-[9px] font-bold uppercase tracking-[0.05em] text-center leading-tight transition-colors",
-                            socksType !== 'none' ? "text-[var(--accent-primary)]" : "text-[var(--text-muted)] group-hover:text-[var(--text-primary)]"
-                        )}>
-                            {language === "tr" ? "ÇORAP" : "SOCKS"}
-                        </span>
-                    </div>
+                <TooltipProvider delayDuration={300}>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <div
+                                className={cn(
+                                    "flex flex-col items-center justify-between p-2.5 h-full rounded-xl border-2 transition-all group select-none shadow-sm",
+                                    isSocksDisabled ? "opacity-50 cursor-not-allowed bg-[var(--bg-muted)] border-[var(--border-subtle)]"
+                                        : (socksType !== 'none'
+                                            ? "cursor-pointer bg-[var(--accent-soft)] border-[var(--accent-primary)]"
+                                            : "cursor-pointer bg-[var(--bg-elevated)] border-[var(--border-subtle)] hover:border-[var(--accent-primary)]/50")
+                                )}
+                                onClick={() => {
+                                    if (isSocksDisabled) return;
+                                    if (socksType === 'none') setSocksType('white');
+                                    else if (socksType === 'white') setSocksType('black');
+                                    else if (socksType === 'black') setSocksType('grey');
+                                    else if (socksType === 'grey') setSocksType('navy');
+                                    else setSocksType('none');
+                                }}
+                            >
+                                <div className="flex flex-col items-center gap-1.5 pt-1">
+                                    <PiSock className={cn("w-5 h-5 transition-transform", !isSocksDisabled && "group-hover:scale-110", socksType !== 'none' ? "text-[var(--accent-primary)]" : "text-[var(--text-muted)]")} />
+                                    <span className={cn(
+                                        "text-[9px] font-bold uppercase tracking-[0.05em] text-center leading-tight transition-colors",
+                                        socksType !== 'none' ? "text-[var(--accent-primary)]" : cn("text-[var(--text-muted)]", !isSocksDisabled && "group-hover:text-[var(--text-primary)]")
+                                    )}>
+                                        {language === "tr" ? "ÇORAP" : "SOCKS"}
+                                    </span>
+                                </div>
 
-                    <div className="flex flex-col items-center gap-1 pt-1 w-full">
-                        <span className={cn(
-                            "text-[8px] font-bold uppercase tracking-tight",
-                            socksType !== 'none' ? "text-[var(--accent-primary)]" : "text-[var(--text-muted)]"
-                        )}>
-                            {language === "tr"
-                                ? (socksType === 'black' ? "SİYAH" : socksType === 'white' ? "BEYAZ" : socksType === 'grey' ? "GRİ" : socksType === 'navy' ? "LACİVERT" : "YOK")
-                                : (socksType === 'black' ? "BLACK" : socksType === 'white' ? "WHITE" : socksType === 'grey' ? "GREY" : socksType === 'navy' ? "NAVY" : "NONE")}
-                        </span>
-                        <div className="flex gap-1 mt-0.5">
-                            <div className={cn("w-1 h-1 rounded-full transition-all", socksType === 'none' ? "bg-[var(--accent-primary)] scale-125" : "bg-[var(--bg-muted)]")} />
-                            <div className={cn("w-1 h-1 rounded-full transition-all", socksType === 'white' ? "bg-[var(--accent-primary)] scale-125" : "bg-[var(--bg-muted)]")} />
-                            <div className={cn("w-1 h-1 rounded-full transition-all", socksType === 'black' ? "bg-[var(--accent-primary)] scale-125" : "bg-[var(--bg-muted)]")} />
-                            <div className={cn("w-1 h-1 rounded-full transition-all", socksType === 'grey' ? "bg-[var(--accent-primary)] scale-125" : "bg-[var(--bg-muted)]")} />
-                            <div className={cn("w-1 h-1 rounded-full transition-all", socksType === 'navy' ? "bg-[var(--accent-primary)] scale-125" : "bg-[var(--bg-muted)]")} />
-                        </div>
-                    </div>
-                </div>
+                                <div className="flex flex-col items-center gap-1 pt-1 w-full">
+                                    <span className={cn(
+                                        "text-[8px] font-bold uppercase tracking-tight",
+                                        socksType !== 'none' ? "text-[var(--accent-primary)]" : "text-[var(--text-muted)]"
+                                    )}>
+                                        {language === "tr"
+                                            ? (socksType === 'black' ? "SİYAH" : socksType === 'white' ? "BEYAZ" : socksType === 'grey' ? "GRİ" : socksType === 'navy' ? "LACİVERT" : "YOK")
+                                            : (socksType === 'black' ? "BLACK" : socksType === 'white' ? "WHITE" : socksType === 'grey' ? "GREY" : socksType === 'navy' ? "NAVY" : "NONE")}
+                                    </span>
+                                    <div className="flex gap-1 mt-0.5">
+                                        <div className={cn("w-1 h-1 rounded-full transition-all", socksType === 'none' ? "bg-[var(--accent-primary)] scale-125" : "bg-[var(--bg-muted)]")} />
+                                        <div className={cn("w-1 h-1 rounded-full transition-all", socksType === 'white' ? "bg-[var(--accent-primary)] scale-125" : "bg-[var(--bg-muted)]")} />
+                                        <div className={cn("w-1 h-1 rounded-full transition-all", socksType === 'black' ? "bg-[var(--accent-primary)] scale-125" : "bg-[var(--bg-muted)]")} />
+                                        <div className={cn("w-1 h-1 rounded-full transition-all", socksType === 'grey' ? "bg-[var(--accent-primary)] scale-125" : "bg-[var(--bg-muted)]")} />
+                                        <div className={cn("w-1 h-1 rounded-full transition-all", socksType === 'navy' ? "bg-[var(--accent-primary)] scale-125" : "bg-[var(--bg-muted)]")} />
+                                    </div>
+                                </div>
+                            </div>
+                        </TooltipTrigger>
+                        {isSocksDisabled && (
+                            <TooltipContent side="top" className="text-xs max-w-[200px] text-center bg-violet-600 text-white font-bold p-3">
+                                {language === "tr"
+                                    ? "Uzun paça kullanıldığında çoraplar görünmez."
+                                    : "Socks are not visible when using full length pants."}
+                            </TooltipContent>
+                        )}
+                    </Tooltip>
+                </TooltipProvider>
             </div>
         </div>
     );

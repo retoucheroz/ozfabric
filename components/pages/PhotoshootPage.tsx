@@ -227,6 +227,7 @@ export default function PhotoshootPage() {
                                             setEnableGaze={setEnableGaze}
                                             socksType={socksType}
                                             setSocksType={setSocksType}
+                                            pantLength={pantLength}
                                         />
 
                                         <ClothingDetails
