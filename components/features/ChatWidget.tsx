@@ -17,7 +17,7 @@ interface Message {
 export function ChatWidget() {
     const [isOpen, setIsOpen] = useState(false)
     const [messages, setMessages] = useState<Message[]>([
-        { role: 'assistant', content: 'Merhaba! Ben OzFabric asistanıyım. Hayalet Manken, Teknik Föy oluşturma veya site kullanımı hakkında bana her şeyi sorabilirsiniz.' }
+        { role: 'assistant', content: 'Merhaba! Ben ModeOn.ai asistanıyım. Hayalet Manken, Teknik Föy oluşturma veya site kullanımı hakkında bana her şeyi sorabilirsiniz.' }
     ])
     const [input, setInput] = useState("")
     const [isLoading, setIsLoading] = useState(false)
@@ -68,7 +68,7 @@ export function ChatWidget() {
                                 <Sparkles className="w-4 h-4 text-yellow-300" />
                             </div>
                             <div>
-                                <h3 className="font-bold text-sm text-white">OzFabric AI</h3>
+                                <h3 className="font-bold text-sm text-white">ModeOn AI</h3>
                                 <div className="text-[10px] opacity-80 flex items-center gap-1 text-gray-300">
                                     <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
                                     Online

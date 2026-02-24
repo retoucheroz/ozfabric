@@ -195,7 +195,7 @@ export default function EditorialPage() {
 
     // Load custom locations and models
     useEffect(() => {
-        const saved = localStorage.getItem("ozfabric_custom_locations");
+        const saved = localStorage.getItem("modeon_custom_locations");
         if (saved) {
             try {
                 const custom = JSON.parse(saved);
@@ -215,7 +215,7 @@ export default function EditorialPage() {
 
     // Save or Update custom locations
     const saveCustomLocation = (location: any) => {
-        const custom = JSON.parse(localStorage.getItem("ozfabric_custom_locations") || "[]");
+        const custom = JSON.parse(localStorage.getItem("modeon_custom_locations") || "[]");
 
         if (location.id) {
             // EDIT MODE
@@ -231,7 +231,7 @@ export default function EditorialPage() {
                     })
                 }))
             }));
-            localStorage.setItem("ozfabric_custom_locations", JSON.stringify(updated));
+            localStorage.setItem("modeon_custom_locations", JSON.stringify(updated));
             setAllLocations([...LOCATIONS, ...updated]);
             toast.success(language === "tr" ? "Lokasyon güncellendi!" : "Location updated!");
         } else {
@@ -265,7 +265,7 @@ export default function EditorialPage() {
                 prompt: location.prompt
             });
 
-            localStorage.setItem("ozfabric_custom_locations", JSON.stringify(custom));
+            localStorage.setItem("modeon_custom_locations", JSON.stringify(custom));
             setAllLocations([...LOCATIONS, ...custom]);
             toast.success(language === "tr" ? "Lokasyon eklendi!" : "Location added!");
         }

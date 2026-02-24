@@ -241,7 +241,7 @@ function GhostPageContent() {
 
   const handleDownload = () => {
     if (resultImage) {
-      const filename = `rawless_image_${Date.now()}.png`;
+      const filename = `modeon_image_${Date.now()}.png`;
       downloadImage(resultImage, filename);
     }
   }

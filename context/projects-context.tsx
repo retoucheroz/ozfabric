@@ -64,9 +64,9 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
 
     // Load from LocalStorage on mount
     useEffect(() => {
-        const savedProjects = localStorage.getItem("ozfabric_projects");
-        const savedCollections = localStorage.getItem("ozfabric_collections");
-        const savedModels = localStorage.getItem("ozfabric_models");
+        const savedProjects = localStorage.getItem("modeon_projects");
+        const savedCollections = localStorage.getItem("modeon_collections");
+        const savedModels = localStorage.getItem("modeon_models");
 
         if (savedProjects) {
             try { setProjects(JSON.parse(savedProjects)); } catch (e) { console.error(e); }
@@ -125,9 +125,9 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
 
     // Save to LocalStorage on change
     useEffect(() => {
-        if (projects.length > 0) localStorage.setItem("ozfabric_projects", JSON.stringify(projects));
-        if (collections.length > 0) localStorage.setItem("ozfabric_collections", JSON.stringify(collections));
-        if (models.length > 0) localStorage.setItem("ozfabric_models", JSON.stringify(models));
+        if (projects.length > 0) localStorage.setItem("modeon_projects", JSON.stringify(projects));
+        if (collections.length > 0) localStorage.setItem("modeon_collections", JSON.stringify(collections));
+        if (models.length > 0) localStorage.setItem("modeon_models", JSON.stringify(models));
     }, [projects, collections, models]);
 
     const addProject = (project: Omit<Project, "id" | "createdAt">): string => {

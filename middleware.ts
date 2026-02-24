@@ -16,7 +16,7 @@ export async function middleware(request: NextRequest) {
 
     // Simple cookie check for dashboard routes
     // Detailed validation happens in Server Components / API routes
-    const sessionId = request.cookies.get('ozfabric_session')?.value;
+    const sessionId = request.cookies.get('modeon_session')?.value;
 
     if (!sessionId) {
         // No session cookie, redirect to login

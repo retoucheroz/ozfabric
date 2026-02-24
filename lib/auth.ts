@@ -13,7 +13,7 @@ import {
     deleteDbSession
 } from './postgres';
 
-const SESSION_COOKIE_NAME = 'ozfabric_session';
+const SESSION_COOKIE_NAME = 'modeon_session';
 const SESSION_TTL = 60 * 60 * 24 * 7; // 1 week
 
 export const isKvActive = true;

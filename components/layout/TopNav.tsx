@@ -67,7 +67,7 @@ export function TopNav() {
                                         <span className="bg-gradient-to-r from-violet-500 to-purple-600 bg-clip-text text-transparent font-black">{user.customTitle}</span>
                                     ) : (
                                         <>
-                                            <span className="bg-gradient-to-r from-violet-500 to-purple-600 bg-clip-text text-transparent font-black">rawless</span><span className="font-black">.ai</span>
+                                            <span className="bg-gradient-to-r from-violet-500 to-purple-600 bg-clip-text text-transparent font-black">ModeOn</span><span className="font-black">.ai</span>
                                         </>
                                     )}
                                 </Link>
@@ -87,7 +87,7 @@ export function TopNav() {
                         <span className="bg-gradient-to-r from-violet-500 to-purple-600 bg-clip-text text-transparent font-black">{user.customTitle}</span>
                     ) : (
                         <>
-                            <span className="bg-gradient-to-r from-violet-500 to-purple-600 bg-clip-text text-transparent font-black">rawless</span><span className="font-black">.ai</span>
+                            <span className="bg-gradient-to-r from-violet-500 to-purple-600 bg-clip-text text-transparent font-black">ModeOn</span><span className="font-black">.ai</span>
                         </>
                     )}
                 </Link>

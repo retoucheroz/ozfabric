@@ -1,5 +1,5 @@
 
-const DB_NAME = 'OzFabricDB';
+const DB_NAME = 'ModeOnDB';
 const DB_VERSION = 5;
 
 // Store names

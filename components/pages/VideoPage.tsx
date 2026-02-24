@@ -96,8 +96,8 @@ const PRODUCTION_MODELS = [
     },
     {
         id: "custom",
-        label: "Custom (OzFabric Studio)",
-        labelTr: "Özel (OzFabric Studio)",
+        label: "Custom (ModeOn Studio)",
+        labelTr: "Özel (ModeOn Studio)",
         icon: "🎨",
         description: "Context-aware fashion storytelling",
         descriptionTr: "Bağlam duyarlı moda hikayeciliği"
@@ -648,7 +648,7 @@ export default function VideoPage() {
             const downloadUrl = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = downloadUrl;
-            a.download = `ozfabric_video_${Date.now()}.mp4`;
+            a.download = `modeon_video_${Date.now()}.mp4`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -899,7 +899,7 @@ export default function VideoPage() {
                                             <TbSparkles className="w-10 h-10 text-[var(--accent-primary)]" />
                                         </div>
                                         <div className="max-w-md mx-auto space-y-3">
-                                            <h3 className="text-2xl font-black uppercase italic tracking-tight text-[var(--text-primary)]">OzFabric Storyboard Engine</h3>
+                                            <h3 className="text-2xl font-black uppercase italic tracking-tight text-[var(--text-primary)]">ModeOn Storyboard Engine</h3>
                                             <p className="text-xs font-medium text-[var(--text-muted)] leading-relaxed">
                                                 {language === 'tr'
                                                     ? 'Mavi AI, girdiğiniz hikayeyi analiz ederek 5 ardışık sahne oluşturur. Karakter, mekân ve stil tutarlılığı otomatik olarak denetlenir.'
@@ -1532,8 +1532,8 @@ export default function VideoPage() {
                             <TbShieldCheck className="w-4 h-4 text-[var(--accent-primary)] shrink-0" />
                             <p className="text-[10px] font-black text-[var(--accent-primary)] uppercase tracking-widest leading-relaxed">
                                 {language === 'tr'
-                                    ? 'Bu işlem OzFabric kredisi harcayacaktır.'
-                                    : 'This operation will consume OzFabric credits.'}
+                                    ? 'Bu işlem ModeOn kredisi harcayacaktır.'
+                                    : 'This operation will consume ModeOn credits.'}
                             </p>
                         </div>
 

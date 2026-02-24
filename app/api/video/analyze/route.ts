@@ -3,24 +3,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function POST(req: NextRequest) {
-    try {
-        const apiKey = process.env.GEMINI_API_KEY;
-        if (!apiKey) {
-            return NextResponse.json({ error: "GEMINI_API_KEY is not configured" }, { status: 500 });
-        }
+  try {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({ error: "GEMINI_API_KEY is not configured" }, { status: 500 });
+    }
 
-        const body = await req.json();
-        const { story, gender, modelSource, language = 'tr' } = body;
+    const body = await req.json();
+    const { story, gender, modelSource, language = 'tr' } = body;
 
-        if (!story) {
-            return NextResponse.json({ error: "Story is required" }, { status: 400 });
-        }
+    if (!story) {
+      return NextResponse.json({ error: "Story is required" }, { status: 400 });
+    }
 
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-        const prompt = `
-You are an expert AI Video Director & Storyboard Artist for a high-end fashion AI platform called OzFabric.
+    const prompt = `
+You are an expert AI Video Director & Storyboard Artist for a high-end fashion AI platform called ModeOn.ai.
 Your task is to take a short story or idea and break it down into exactly 5 consistent video scenes (shots).
 
 **User Input Story:** "${story}"
@@ -53,21 +53,21 @@ Your task is to take a short story or idea and break it down into exactly 5 cons
 Respond ONLY with the JSON block.
 `;
 
-        const result = await model.generateContent(prompt);
-        const response = result.response.text();
+    const result = await model.generateContent(prompt);
+    const response = result.response.text();
 
-        // Clean up JSON response
-        const jsonMatch = response.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) {
-            throw new Error("Failed to parse AI response as JSON");
-        }
-
-        const storyboard = JSON.parse(jsonMatch[0]);
-
-        return NextResponse.json(storyboard);
-
-    } catch (error) {
-        console.error("Video Analyze Error:", error);
-        return NextResponse.json({ error: "Failed to create storyboard: " + (error as Error).message }, { status: 500 });
+    // Clean up JSON response
+    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error("Failed to parse AI response as JSON");
     }
+
+    const storyboard = JSON.parse(jsonMatch[0]);
+
+    return NextResponse.json(storyboard);
+
+  } catch (error) {
+    console.error("Video Analyze Error:", error);
+    return NextResponse.json({ error: "Failed to create storyboard: " + (error as Error).message }, { status: 500 });
+  }
 }

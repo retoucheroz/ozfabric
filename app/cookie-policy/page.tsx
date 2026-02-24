@@ -13,7 +13,7 @@ export default function CookiePolicyPage() {
                 Son Güncelleme: <strong>21 Şubat 2026</strong>
             </p>
             <p>
-                Rawless.ai ("Biz", "Bizi" veya "Bizim") olarak gizliliğinize değer veriyoruz.
+                ModeOn.ai ("Biz", "Bizi" veya "Bizim") olarak gizliliğinize değer veriyoruz.
                 Bu Çerez Politikası, web sitemizi ziyaret ettiğinizde (veya uygulamamızı kullandığınızda) hizmetlerimizi sağlamak
                 ve geliştirmek amacıyla hangi çerezlerin ve benzer teknolojilerin kullanıldığını açıklamaktadır.
             </p>
@@ -59,7 +59,7 @@ export default function CookiePolicyPage() {
                 Last Updated: <strong>February 21, 2026</strong>
             </p>
             <p>
-                At Rawless.ai ("We", "Us" or "Our"), we value your privacy.
+                At ModeOn.ai ("We", "Us" or "Our"), we value your privacy.
                 This Cookie Policy explains how cookies and similar technologies are used on our website
                 (and application) to provide and improve our services when you visit us.
             </p>

@@ -134,7 +134,7 @@ export default function LoginPage() {
               <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full flex items-center justify-center">
                 <div className="w-4 h-4 bg-white rounded-full"></div>
               </div>
-              <span className="bg-gradient-to-r from-violet-400 to-purple-500 bg-clip-text text-transparent">rawless</span>.ai
+              <span className="bg-gradient-to-r from-violet-400 to-purple-500 bg-clip-text text-transparent">ModeOn</span>.ai
             </div>
           </div>
           <div className="relative z-10 max-w-lg space-y-4 text-white">
@@ -156,7 +156,7 @@ export default function LoginPage() {
             <div className="w-6 h-6 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full flex items-center justify-center">
               <div className="w-3 h-3 bg-white rounded-full"></div>
             </div>
-            <span className="bg-gradient-to-r from-violet-400 to-purple-500 bg-clip-text text-transparent">rawless</span>.ai
+            <span className="bg-gradient-to-r from-violet-400 to-purple-500 bg-clip-text text-transparent">ModeOn</span>.ai
           </div>
 
           {/* Language Switcher */}

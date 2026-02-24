@@ -239,7 +239,7 @@ function StylesPageContent() {
               <div className="w-px h-8 bg-border mx-2" />
             </>
           )}
-          <Button variant="secondary" size="icon" disabled={!resultImage} onClick={() => resultImage && downloadImage(resultImage, 'ozfabric-style.png')}><Download className="w-4 h-4" /></Button>
+          <Button variant="secondary" size="icon" disabled={!resultImage} onClick={() => resultImage && downloadImage(resultImage, 'modeon-style.png')}><Download className="w-4 h-4" /></Button>
 
 
           {mounted && (
