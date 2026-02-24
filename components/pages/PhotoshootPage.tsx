@@ -45,8 +45,8 @@ export default function PhotoshootPage() {
         aspectRatio, setAspectRatio, gender, setGender, seed, setSeed,
         buttonsOpen, setButtonsOpen, userAddedPrompt, setUserAddedPrompt,
         tucked, setTucked, sleevesRolled, setSleevesRolled, lookAtCamera, setLookAtCamera,
-        enableWind, setEnableWind, enableExpression, setEnableExpression,
-        enableGaze, setEnableGaze, hairBehindShoulders, setHairBehindShoulders,
+        enableWind, setEnableWind, selectedMoodId, setSelectedMoodId,
+        hairBehindShoulders, setHairBehindShoulders,
         socksType, setSocksType, lightingSendImage, setLightingSendImage,
         collarType, setCollarType, shoulderType, setShoulderType, waistType, setWaistType, riseType, setRiseType,
         legType, setLegType, hemType, setHemType, pantLength, setPantLength,
@@ -221,10 +221,12 @@ export default function PhotoshootPage() {
                                             enableWind={enableWind}
                                             setEnableWind={setEnableWind}
                                             hasHead={hasHead}
-                                            enableExpression={enableExpression}
-                                            setEnableExpression={setEnableExpression}
-                                            enableGaze={enableGaze}
-                                            setEnableGaze={setEnableGaze}
+                                            selectedMoodId={selectedMoodId}
+                                            setSelectedMoodId={setSelectedMoodId}
+                                            batchMode={batchMode}
+                                            batchShotSelection={batchShotSelection}
+                                            availableBatchShots={availableBatchShots}
+                                            poseFocus={poseFocus as string}
                                             socksType={socksType}
                                             setSocksType={setSocksType}
                                             pantLength={pantLength}

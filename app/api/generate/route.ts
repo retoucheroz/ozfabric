@@ -19,31 +19,102 @@ const NEGATIVE_PROMPTS = {
     technicalDistortions: "bent body, rotated torso, angled stance, curved spine, wrinkled garment, folded hem, curled hemline, uneven hem, wavy fabric at bottom, diagonal hemline, distorted silhouette"
 };
 
-const EXPRESSIONS = [
-    "Expression: calm confident neutral, slight squinch (lower eyelids gently raised), lips softly closed, tiny asymmetry (one mouth corner ~2% higher), relaxed brows.",
-    "Expression: friendly-neutral, micro-smile only in one corner, jaw relaxed, cheeks subtly lifted, eyes engaged not wide.",
-    "Expression: serious with intention, micro-squint, lips very lightly pressed (not tight), one brow a touch lower, no frown lines.",
-    "Expression: subtle curiosity, inner brows slightly raised, lips parted 1–2 mm, eyes alert but soft, no exaggerated smile.",
-    "Expression: thoughtful neutral, gaze steady, eyelids relaxed, lips gently together with a slight lower-lip softness, mild brow knit (very subtle).",
-    "Expression: warm and professional, faint micro-smile, slight squinch, eyebrows relaxed (not arched), calm eyes.",
-    "Expression: barely playful, eyes soften, no teeth, keep it understated and natural.",
-    "Expression: tiny smirk (only one corner), micro-squint, chin neutral, keep symmetry imperfect and realistic.",
-    "Expression: calm intensity, lower eyelids slightly tightened, lips neutral, minimal brow tension, ‘present’ look (not blank).",
-    "Expression: relaxed neutral, slight asymmetry in brows and mouth, gentle squinch, avoid frozen lips and perfectly mirrored features."
-];
+interface MoodPreset {
+    id: string;
+    promptAddition: string;
+    negativePromptAddition: string;
+}
 
-const GAZES = [
-    "Gaze: looking directly into the camera lens, eyes centered in the sockets, engaged.",
-    "Gaze: looking at a point just to the right of the lens (tiny offset), eyes still centered, calm.",
-    "Gaze: looking at a point just to the left of the lens (tiny offset), soft focus, not wide-eyed.",
-    "Gaze: looking slightly above the lens (a few degrees), then settle back to neutral, composed.",
-    "Gaze: looking slightly below the lens (a few degrees), relaxed eyelids, subtle confidence.",
-    "Gaze: looking past the camera as if noticing something near the lens, eyes not cranked to the side.",
-    "Gaze: ‘face this way, eyes back to camera’ look—head stays angled, eyes return toward lens without showing too much white.",
-    "Gaze: near-camera contact (at the camera edge), soft and friendly, eyes centered.",
-    "Gaze: short ‘micro-shift’—eyes slightly off-lens but still forward, like a candid in-between moment.",
-    "Gaze: calm ‘present’ stare—steady focus, no startled look, eyelids gently relaxed."
-];
+const MOOD_PRESETS: Record<string, MoodPreset> = {
+    natural: {
+        id: 'natural',
+        promptAddition: 'captured in a candid moment between takes, natural resting expression with quiet confidence, eyes alive and present, as if the photographer caught a real unguarded moment, shot on 35mm film',
+        negativePromptAddition: 'stiff expression, dead eyes, blank stare, mannequin-like, forced smile, robotic gaze, vacant look, overly posed, plastic skin, doll-like, uncanny valley, wax figure',
+    },
+    warm: {
+        id: 'warm',
+        promptAddition: 'as if just noticed someone familiar across the room, genuine subtle warmth in expression, approachable and relaxed energy, the ease of a real person who happens to be beautiful, natural soft expression',
+        negativePromptAddition: 'toothy grin, exaggerated smile, stiff, dead eyes, mannequin-like, forced happiness, plastic skin, doll-like, uncanny valley, overly enthusiastic, fake smile',
+    },
+    powerful: {
+        id: 'powerful',
+        promptAddition: 'editorial confidence, powerful self-assured gaze commanding the frame, the magnetic intensity of a supermodel mid-editorial shoot for Vogue, owning the space with effortless authority',
+        negativePromptAddition: 'aggressive, angry, stiff, dead eyes, blank stare, mannequin-like, timid, uncertain, vacant, robotic, forced intensity, over-dramatic',
+    },
+    relaxed: {
+        id: 'relaxed',
+        promptAddition: 'off-duty model moment, effortlessly cool and casual, the ease of someone completely comfortable in their own skin, caught mid-thought in a beautiful way, unstudied natural beauty',
+        negativePromptAddition: 'stiff, posed, dead eyes, mannequin-like, forced expression, rigid posture, robotic, uncanny valley, overly styled, trying too hard',
+    },
+    professional: {
+        id: 'professional',
+        promptAddition: 'professional e-commerce model pose, calm neutral expression with natural life in the eyes, the quiet confidence of a professional catalog model, present and engaged, clean commercial photography',
+        negativePromptAddition: 'dead eyes, blank stare, mannequin-like, robotic, stiff, vacant, doll-like, uncanny valley, wax figure, lifeless, zombie-like, glazed over eyes',
+    },
+    subtle: {
+        id: 'subtle',
+        promptAddition: 'natural relaxed demeanor, subtle calm presence, composed and at ease',
+        negativePromptAddition: 'dead eyes, stiff, mannequin-like, robotic, forced, blank stare, uncanny valley',
+    },
+};
+
+type FaceProminence = 'full' | 'partial' | 'none';
+type ShotType = 'styling' | 'technical';
+
+const ANGLE_METADATA: Record<string, { shotType: ShotType; faceProminence: FaceProminence }> = {
+    // Styling
+    'styling_front': { shotType: 'styling', faceProminence: 'full' },
+    'styling_angled': { shotType: 'styling', faceProminence: 'full' },
+    'std_styling_full': { shotType: 'styling', faceProminence: 'full' },
+    'std_styling_upper': { shotType: 'styling', faceProminence: 'full' },
+
+    // Technical, full face
+    'technical_front': { shotType: 'technical', faceProminence: 'full' },
+    'std_tech_full_front': { shotType: 'technical', faceProminence: 'full' },
+    'std_tech_upper_front': { shotType: 'technical', faceProminence: 'full' },
+
+    // Technical, partial face
+    'std_closeup_front': { shotType: 'technical', faceProminence: 'partial' },
+
+    // Technical, no face
+    'technical_back': { shotType: 'technical', faceProminence: 'none' },
+    'detail_front': { shotType: 'technical', faceProminence: 'none' },
+    'detail_back': { shotType: 'technical', faceProminence: 'none' },
+    'std_tech_full_back': { shotType: 'technical', faceProminence: 'none' },
+    'std_tech_upper_back': { shotType: 'technical', faceProminence: 'none' },
+    'std_detail_front': { shotType: 'technical', faceProminence: 'none' },
+    'std_detail_back': { shotType: 'technical', faceProminence: 'none' },
+};
+
+function resolveMood(angleId: string | null | undefined, userMoodId?: string, shotRole?: 'styling' | 'technical' | null): MoodPreset | null {
+    if (angleId) {
+        const angleMeta = ANGLE_METADATA[angleId];
+        if (angleMeta) {
+            if (angleMeta.faceProminence === 'none') return null;
+
+            if (angleMeta.shotType === 'technical') {
+                return angleMeta.faceProminence === 'partial' ? MOOD_PRESETS['subtle'] : MOOD_PRESETS['professional'];
+            }
+
+            if (angleMeta.shotType === 'styling') {
+                const moodKey = userMoodId && MOOD_PRESETS[userMoodId] ? userMoodId : 'natural';
+                return MOOD_PRESETS[moodKey];
+            }
+        }
+    }
+
+    // Fallback for single generations where angleId might be missing or generic
+    if (shotRole === 'styling') {
+        const moodKey = userMoodId && MOOD_PRESETS[userMoodId] ? userMoodId : 'natural';
+        return MOOD_PRESETS[moodKey];
+    } else if (shotRole === 'technical') {
+        // Assume front technical shot by default for fallback unless angleId explicitly says back
+        if (angleId && (angleId.includes('back') || angleId.includes('detail'))) return null;
+        return MOOD_PRESETS['professional'];
+    }
+
+    return null;
+}
 
 export async function POST(req: NextRequest) {
     try {
@@ -81,10 +152,10 @@ export async function POST(req: NextRequest) {
             lightingNegative = null, // NEW
             seed = null, // NEW
             enableWebSearch = false, // NEW
-            enableExpression = false, // NEW: Expression variation toggle
-            enableGaze = false, // NEW: Gaze variation toggle
+            selectedMoodId = 'natural', // NEW: Mood Selector
             shotIndex = 1, // NEW: 1-indexed shot order in batch
             shotRole = null, // NEW: 'styling' (hero) or 'technical' (angles/detail)
+            angleId = null, // NEW: ID of the angle/shot being generated
             collarType = 'none',
             shoulderType = 'none',
             waistType = 'none',
@@ -590,13 +661,33 @@ export async function POST(req: NextRequest) {
                 finalPrompt += ` ${customPrompt}`;
             }
 
+            let combinedNegative = negativePrompt + (lightingNegative ? ", " + lightingNegative : "");
+
+            // Ensure facial symmetry and realism for shots with faces
+            if (!view.includes('back') && !view.includes('detail') && structuredPrompt.camera.framing !== 'waist_to_above_knees') {
+                const faceRealismNegatives = "symmetrical face, perfectly mirrored features, wax figure, CGI face, 3D render face, AI generated look";
+                if (!combinedNegative.includes("symmetrical face")) {
+                    combinedNegative += ", " + faceRealismNegatives;
+                }
+            }
+
+            // === MOOD INJECTION ===
+            const resolvedMood = resolveMood(angleId, selectedMoodId);
+            if (resolvedMood) {
+                if (resolvedMood.promptAddition) {
+                    finalPrompt += `, ${resolvedMood.promptAddition}`;
+                }
+                if (resolvedMood.negativePromptAddition) {
+                    combinedNegative += ", " + resolvedMood.negativePromptAddition;
+                }
+            }
 
             // === ASSET FILTERING ===
             const activeAssets = buildAssetList(view, uploadedImages, poseFocus, workflowType);
 
             return {
                 prompt: finalPrompt,
-                negative_prompt: negativePrompt + (lightingNegative ? ", " + lightingNegative : ""),
+                negative_prompt: combinedNegative,
                 input_images: activeAssets,
                 structured: structuredPrompt
             };
@@ -887,24 +978,8 @@ export async function POST(req: NextRequest) {
                 if (sp.subject.wind) hairFace += " Dynamic studio airflow/wind effect is visible, hair and fabric suggest movement.";
             }
 
-            // 8. Expressions & Gaze (Strict Role & Index Rules)
-            const isTechnicalForGaze = effectiveRole === 'technical' || isBackView || view.includes('side') || view.includes('detail') || framing === 'chest_and_face' || framing === 'waist_to_above_knees';
-            const isTechnicalForExpression = isTechnicalForGaze || view.includes('angled') || sp.camera.angle === 'angled';
+            // 8. Expressions & Gaze -> Modern Mood System
 
-            // Expression: enabled for ALL styling shots (not technical)
-            const canHaveExpression = effectiveRole === 'styling' && !isTechnicalForExpression && enableExpression;
-
-            // Gaze: enabled for ALL styling shots (not technical, gaze allowed on Angled)
-            const canHaveGaze = effectiveRole === 'styling' && !isTechnicalForGaze && enableGaze;
-
-            if (canHaveExpression) {
-                const randomExpression = EXPRESSIONS[Math.floor(Math.random() * EXPRESSIONS.length)];
-                sections.push(`Facial Expression: ${randomExpression}`);
-            }
-            if (canHaveGaze) {
-                const randomGaze = GAZES[Math.floor(Math.random() * GAZES.length)];
-                sections.push(`Gaze Direction: ${randomGaze}`);
-            }
 
             if (hairFace) sections.push(hairFace);
             if (environmental.length > 0) sections.push(environmental.join(" "));

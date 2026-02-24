@@ -139,24 +139,24 @@ export const UPPER_SHOTS = [
 ];
 
 export const LOWER_SHOTS = [
-    { id: 'styling_front', label: 'Styling 1. Kare', labelEn: 'Styling Front', descriptionTr: 'Ön styling karesi.', descriptionEn: 'Front styling shot.', image: '/crops/styling_tam_boy.jpg' },
-    { id: 'styling_angled', label: 'Styling 2. Yan Kare', labelEn: 'Styling Angled', descriptionTr: 'Yan açı styling karesi.', descriptionEn: 'Angled styling shot.', image: '/crops/styling_tam_boy.jpg' },
-    { id: 'technical_front', label: 'Düz Ön 3. Kare', labelEn: 'Technical Front', descriptionTr: 'Düz ön teknik çekim.', descriptionEn: 'Straight front technical shot.', image: '/crops/on_tam_boy.jpg' },
-    { id: 'technical_back', label: 'Düz Arka 4. Kare', labelEn: 'Technical Back', descriptionTr: 'Düz arka teknik çekim.', descriptionEn: 'Straight back technical shot.', image: '/crops/arka_tam_boy.jpg' },
-    { id: 'detail_front', label: 'Detay Ön Kare', labelEn: 'Detail Front', descriptionTr: 'Ön detay çekimi.', descriptionEn: 'Front detail shot.', image: '/crops/alt_on_detay.jpg' },
-    { id: 'detail_back', label: 'Detay Arka Kare', labelEn: 'Detail Back', descriptionTr: 'Arka detay çekimi.', descriptionEn: 'Back detail shot.', image: '/crops/alt_arka_detay.jpg' },
+    { id: 'styling_front', label: 'Styling 1. Kare', labelEn: 'Styling Front', descriptionTr: 'Ön styling karesi.', descriptionEn: 'Front styling shot.', image: '/crops/styling_tam_boy.jpg', shotType: 'styling', faceProminence: 'full' },
+    { id: 'styling_angled', label: 'Styling 2. Yan Kare', labelEn: 'Styling Angled', descriptionTr: 'Yan açı styling karesi.', descriptionEn: 'Angled styling shot.', image: '/crops/styling_tam_boy.jpg', shotType: 'styling', faceProminence: 'full' },
+    { id: 'technical_front', label: 'Düz Ön 3. Kare', labelEn: 'Technical Front', descriptionTr: 'Düz ön teknik çekim.', descriptionEn: 'Straight front technical shot.', image: '/crops/on_tam_boy.jpg', shotType: 'technical', faceProminence: 'full' },
+    { id: 'technical_back', label: 'Düz Arka 4. Kare', labelEn: 'Technical Back', descriptionTr: 'Düz arka teknik çekim.', descriptionEn: 'Straight back technical shot.', image: '/crops/arka_tam_boy.jpg', shotType: 'technical', faceProminence: 'none' },
+    { id: 'detail_front', label: 'Detay Ön Kare', labelEn: 'Detail Front', descriptionTr: 'Ön detay çekimi.', descriptionEn: 'Front detail shot.', image: '/crops/alt_on_detay.jpg', shotType: 'technical', faceProminence: 'none' },
+    { id: 'detail_back', label: 'Detay Arka Kare', labelEn: 'Detail Back', descriptionTr: 'Arka detay çekimi.', descriptionEn: 'Back detail shot.', image: '/crops/alt_arka_detay.jpg', shotType: 'technical', faceProminence: 'none' },
 ];
 
 export const STANDARD_SHOTS = [
-    { id: 'std_styling_full', label: 'Tam Boy Styling', labelEn: 'Full Body Styling', descriptionTr: 'Tam boy, artistik pozlama.', descriptionEn: 'Full body, artistic posing.', image: '/crops/styling_tam_boy.jpg' },
-    { id: 'std_styling_upper', label: 'Üst Vücut Styling', labelEn: 'Upper Body Styling', descriptionTr: 'Üst vücut, artistik pozlama.', descriptionEn: 'Upper body, artistic posing.', image: '/crops/styling_ust_vucut.jpg' },
-    { id: 'std_tech_full_front', label: 'Ön Tam Boy', labelEn: 'Front Full Body', descriptionTr: 'Tam boy ön, kollar yanlarda.', descriptionEn: 'Full body front, arms at sides.', image: '/crops/on_tam_boy.jpg' },
-    { id: 'std_tech_full_back', label: 'Arka Tam Boy', labelEn: 'Back Full Body', descriptionTr: 'Tam boy arka, kollar yanlarda.', descriptionEn: 'Full body back, arms at sides.', image: '/crops/arka_tam_boy.jpg' },
-    { id: 'std_tech_upper_front', label: 'Ön Üst Vücut', labelEn: 'Front Upper Body', descriptionTr: 'Üst vücut ön, kollar yanlarda.', descriptionEn: 'Upper body front, arms at sides.', image: '/crops/on_ust_vucut.jpg' },
-    { id: 'std_tech_upper_back', label: 'Arka Üst Vücut', labelEn: 'Back Upper Body', descriptionTr: 'Üst vücut arka, kollar yanlarda.', descriptionEn: 'Upper body back, arms at sides.', image: '/crops/arka_ust_vucut.jpg' },
-    { id: 'std_detail_front', label: 'Alt Ürün Ön Detay', labelEn: 'Lower Front Detail', descriptionTr: 'Belden dize kadar ön detay çekimi.', descriptionEn: 'Lower front detail from waist to knee.', image: '/crops/alt_on_detay.jpg' },
-    { id: 'std_detail_back', label: 'Alt Ürün Arka Detay', labelEn: 'Lower Back Detail', descriptionTr: 'Belden dize kadar arka detay çekimi.', descriptionEn: 'Lower back detail from waist to knee.', image: '/crops/alt_arka_detay.jpg' },
-    { id: 'std_closeup_front', label: 'Üst Ürün Ön Yakın Çekim', labelEn: 'Upper Front Closeup', descriptionTr: 'Yüzden göğüs altına yakın çekim.', descriptionEn: 'Close-up from face to chest.', image: '/crops/ust_closeup.jpg' },
+    { id: 'std_styling_full', label: 'Tam Boy Styling', labelEn: 'Full Body Styling', descriptionTr: 'Tam boy, artistik pozlama.', descriptionEn: 'Full body, artistic posing.', image: '/crops/styling_tam_boy.jpg', shotType: 'styling', faceProminence: 'full' },
+    { id: 'std_styling_upper', label: 'Üst Vücut Styling', labelEn: 'Upper Body Styling', descriptionTr: 'Üst vücut, artistik pozlama.', descriptionEn: 'Upper body, artistic posing.', image: '/crops/styling_ust_vucut.jpg', shotType: 'styling', faceProminence: 'full' },
+    { id: 'std_tech_full_front', label: 'Ön Tam Boy', labelEn: 'Front Full Body', descriptionTr: 'Tam boy ön, kollar yanlarda.', descriptionEn: 'Full body front, arms at sides.', image: '/crops/on_tam_boy.jpg', shotType: 'technical', faceProminence: 'full' },
+    { id: 'std_tech_full_back', label: 'Arka Tam Boy', labelEn: 'Back Full Body', descriptionTr: 'Tam boy arka, kollar yanlarda.', descriptionEn: 'Full body back, arms at sides.', image: '/crops/arka_tam_boy.jpg', shotType: 'technical', faceProminence: 'none' },
+    { id: 'std_tech_upper_front', label: 'Ön Üst Vücut', labelEn: 'Front Upper Body', descriptionTr: 'Üst vücut ön, kollar yanlarda.', descriptionEn: 'Upper body front, arms at sides.', image: '/crops/on_ust_vucut.jpg', shotType: 'technical', faceProminence: 'full' },
+    { id: 'std_tech_upper_back', label: 'Arka Üst Vücut', labelEn: 'Back Upper Body', descriptionTr: 'Üst vücut arka, kollar yanlarda.', descriptionEn: 'Upper body back, arms at sides.', image: '/crops/arka_ust_vucut.jpg', shotType: 'technical', faceProminence: 'none' },
+    { id: 'std_detail_front', label: 'Alt Ürün Ön Detay', labelEn: 'Lower Front Detail', descriptionTr: 'Belden dize kadar ön detay çekimi.', descriptionEn: 'Lower front detail from waist to knee.', image: '/crops/alt_on_detay.jpg', shotType: 'technical', faceProminence: 'none' },
+    { id: 'std_detail_back', label: 'Alt Ürün Arka Detay', labelEn: 'Lower Back Detail', descriptionTr: 'Belden dize kadar arka detay çekimi.', descriptionEn: 'Lower back detail from waist to knee.', image: '/crops/alt_arka_detay.jpg', shotType: 'technical', faceProminence: 'none' },
+    { id: 'std_closeup_front', label: 'Üst Ürün Ön Yakın Çekim', labelEn: 'Upper Front Closeup', descriptionTr: 'Yüzden göğüs altına yakın çekim.', descriptionEn: 'Close-up from face to chest.', image: '/crops/ust_closeup.jpg', shotType: 'technical', faceProminence: 'partial' },
 ];
 export const MODEL_PRESETS: SavedModel[] = [
     // Female Models

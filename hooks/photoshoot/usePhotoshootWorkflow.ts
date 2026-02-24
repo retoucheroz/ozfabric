@@ -58,8 +58,7 @@ export const usePhotoshootWorkflow = () => {
     const [sleevesRolled, setSleevesRolled] = useState(false);
     const [lookAtCamera, setLookAtCamera] = useState(true);
     const [enableWind, setEnableWind] = useState(false);
-    const [enableExpression, setEnableExpression] = useState(false);
-    const [enableGaze, setEnableGaze] = useState(false);
+    const [selectedMoodId, setSelectedMoodId] = useState<string>('natural');
     const [hairBehindShoulders, setHairBehindShoulders] = useState(false);
     const [socksType, setSocksType] = useState<'none' | 'white' | 'black' | 'grey' | 'navy'>('none');
 
@@ -163,8 +162,7 @@ export const usePhotoshootWorkflow = () => {
                     if (state.resolution) setResolution(state.resolution);
                     if (state.aspectRatio) setAspectRatio(state.aspectRatio);
                     if (state.enableWind !== undefined) setEnableWind(state.enableWind);
-                    if (state.enableExpression !== undefined) setEnableExpression(state.enableExpression);
-                    if (state.enableGaze !== undefined) setEnableGaze(state.enableGaze);
+                    if (state.selectedMoodId !== undefined) setSelectedMoodId(state.selectedMoodId);
                     if (state.collarType) setCollarType(state.collarType);
                     if (state.shoulderType) setShoulderType(state.shoulderType);
                     if (state.waistType) setWaistType(state.waistType);
@@ -208,7 +206,7 @@ export const usePhotoshootWorkflow = () => {
                     upperGarmentDescription, lowerGarmentDescription, innerWearDescription,
                     shoesDescription, modelDescription, buttonsOpen, tucked, socksType,
                     closureType, gender, resolution, aspectRatio, enableWind,
-                    enableExpression, enableGaze, collarType, shoulderType, waistType, riseType,
+                    selectedMoodId, collarType, shoulderType, waistType, riseType,
                     legType, hemType, pantLength, techAccessories, showGarmentDetails, wizardStep
                 }
             };
@@ -221,7 +219,7 @@ export const usePhotoshootWorkflow = () => {
 
         const timeout = setTimeout(saveState, 500);
         return () => clearTimeout(timeout);
-    }, [assets, productName, workflowType, productDescription, fitDescription, upperGarmentDescription, lowerGarmentDescription, innerWearDescription, shoesDescription, modelDescription, buttonsOpen, tucked, socksType, closureType, gender, resolution, aspectRatio, enableWind, enableExpression, enableGaze, collarType, shoulderType, waistType, riseType, legType, hemType, pantLength, techAccessories, showGarmentDetails, wizardStep]);
+    }, [assets, productName, workflowType, productDescription, fitDescription, upperGarmentDescription, lowerGarmentDescription, innerWearDescription, shoesDescription, modelDescription, buttonsOpen, tucked, socksType, closureType, gender, resolution, aspectRatio, enableWind, selectedMoodId, collarType, shoulderType, waistType, riseType, legType, hemType, pantLength, techAccessories, showGarmentDetails, wizardStep]);
 
     // Hooks
     const {
@@ -300,8 +298,8 @@ export const usePhotoshootWorkflow = () => {
         language, assets, assetsHighRes, savedPoses, savedModels, savedFits, savedShoes,
         productName, workflowType, resolution, aspectRatio, gender, seed,
         enableWebSearch, buttonsOpen, closureType, userAddedPrompt,
-        tucked, sleevesRolled, lookAtCamera, enableWind, enableExpression,
-        enableGaze, hairBehindShoulders, socksType, collarType, shoulderType,
+        tucked, sleevesRolled, lookAtCamera, enableWind, selectedMoodId,
+        hairBehindShoulders, socksType, collarType, shoulderType,
         waistType, riseType, legType, hemType, pantLength, lightingPositive, lightingNegative,
         lightingSendImage, poseDescription, poseStickman, productDescription,
         fitDescription, upperGarmentDescription, lowerGarmentDescription,
@@ -586,8 +584,8 @@ export const usePhotoshootWorkflow = () => {
         upperGarmentDescription, setUpperGarmentDescription, lowerGarmentDescription, setLowerGarmentDescription,
         innerWearDescription, setInnerWearDescription, shoesDescription, setShoesDescription,
         modelDescription, setModelDescription, tucked, setTucked, sleevesRolled, setSleevesRolled,
-        lookAtCamera, setLookAtCamera, enableWind, setEnableWind, enableExpression, setEnableExpression,
-        enableGaze, setEnableGaze, hairBehindShoulders, setHairBehindShoulders, socksType, setSocksType,
+        lookAtCamera, setLookAtCamera, enableWind, setEnableWind, selectedMoodId, setSelectedMoodId,
+        hairBehindShoulders, setHairBehindShoulders, socksType, setSocksType,
         collarType, setCollarType, shoulderType, setShoulderType, waistType, setWaistType, riseType, setRiseType,
         legType, setLegType, hemType, setHemType, pantLength, setPantLength, lightingPositive, setLightingPositive,
         lightingNegative, setLightingNegative, lightingSendImage, setLightingSendImage,
