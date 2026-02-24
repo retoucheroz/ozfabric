@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch"
+import { Separator } from "@/components/ui/separator"
 import {
     ChevronRight, ChevronLeft, ChevronDown, Sparkles, User,
     Image as ImageIcon, Camera, X, FileText, Edit2, Glasses, Check, Shirt
@@ -388,57 +389,155 @@ export default function PhotoshootPage() {
                                 <div className="max-w-5xl mx-auto px-1 md:px-0 space-y-6">
 
                                     {/* TOP: Horizontal Technical Settings Bar */}
-                                    <div className="p-4 rounded-2xl bg-[var(--bg-elevated)] border border-[var(--border-subtle)] shadow-inner">
-                                        <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider mb-3">{language === "tr" ? "TEKNİK AYARLAR" : "TECHNICAL SETTINGS"}</p>
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wide px-1">{language === "tr" ? "GÖRSEL ORANI" : "ASPECT RATIO"}</label>
+                                    <div className="p-3 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-subtle)] shadow-inner">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <p className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider m-0">{language === "tr" ? "TEKNİK AYARLAR" : "TECHNICAL SETTINGS"}</p>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                            <div className="space-y-1">
+                                                <label className="text-[9px] uppercase font-bold text-[var(--text-muted)] tracking-wide px-1">{language === "tr" ? "GÖRSEL ORANI" : "ASPECT RATIO"}</label>
                                                 <div className="relative">
-                                                    <select className="w-full text-xs px-3 py-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] transition-all font-bold appearance-none" value={aspectRatio} onChange={(e) => setAspectRatio(e.target.value)}>
+                                                    <select className="w-full text-xs px-2 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] transition-all font-bold appearance-none" value={aspectRatio} onChange={(e) => setAspectRatio(e.target.value)}>
                                                         {ASPECT_RATIOS.map(opt => (
                                                             <option key={opt.id} value={opt.id}>{language === 'tr' ? opt.labelTr : opt.label}</option>
                                                         ))}
                                                     </select>
-                                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none" />
+                                                    <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none" />
                                                 </div>
                                             </div>
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wide px-1">{language === "tr" ? "ÇÖZÜNÜRLÜK" : "RESOLUTION"}</label>
+                                            <div className="space-y-1">
+                                                <label className="text-[9px] uppercase font-bold text-[var(--text-muted)] tracking-wide px-1">{language === "tr" ? "ÇÖZÜNÜRLÜK" : "RESOLUTION"}</label>
                                                 <div className="relative">
-                                                    <select className="w-full text-xs px-3 py-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] transition-all font-bold appearance-none" value={resolution} onChange={(e) => setResolution(e.target.value)}>
+                                                    <select className="w-full text-xs px-2 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] transition-all font-bold appearance-none" value={resolution} onChange={(e) => setResolution(e.target.value)}>
                                                         {RESOLUTION_OPTIONS.map(opt => (
                                                             <option key={opt.id} value={opt.id}>{language === 'tr' ? opt.labelTr : opt.label}</option>
                                                         ))}
                                                     </select>
-                                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none" />
+                                                    <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none" />
                                                 </div>
                                             </div>
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wide px-1">{language === "tr" ? "TEKRAR TUTARLILIĞI" : "CONSISTENCY"}</label>
+                                            <div className="space-y-1">
+                                                <label className="text-[9px] uppercase font-bold text-[var(--text-muted)] tracking-wide px-1">{language === "tr" ? "TEKRAR TUTARLILIĞI" : "CONSISTENCY"}</label>
                                                 <div className="relative">
-                                                    <input type="number" className="w-full text-xs px-3 py-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] transition-all font-bold placeholder:text-[var(--text-disabled)]" value={seed === "" ? "" : seed} onChange={(e) => setSeed(e.target.value === "" ? "" : Number(e.target.value))} placeholder="RANDOM" />
-                                                    {seed !== "" && <button onClick={() => setSeed("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500"><X size={14} /></button>}
+                                                    <input type="number" className="w-full text-xs px-2 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] transition-all font-bold placeholder:text-[var(--text-disabled)]" value={seed === "" ? "" : seed} onChange={(e) => setSeed(e.target.value === "" ? "" : Number(e.target.value))} placeholder="RANDOM" />
+                                                    {seed !== "" && <button onClick={() => setSeed("")} className="absolute right-2 top-1/2 -translate-y-1/2 text-red-500"><X size={14} /></button>}
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Toplu Üretim: Açı ve Kare Seçimleri (9 boxes side by side, 50% larger representation) */}
-                                    <div className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-xl p-6 shadow-sm flex flex-col space-y-4">
+                                    {/* Toplu Üretim: Açı ve Kare Seçimleri */}
+                                    <div className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-xl p-6 shadow-sm flex flex-col space-y-6">
                                         <label className="text-sm font-black text-[var(--text-primary)] uppercase tracking-wider">
                                             {language === 'tr' ? 'Açı ve Kare Seçimleri' : 'Angle & Shot Selection'}
                                         </label>
-                                        <div className="grid grid-cols-3 sm:grid-cols-5 xl:grid-cols-9 gap-4">
-                                            {availableBatchShots.map((shot) => {
+
+                                        {/* Styling Row - 50% larger, side by side */}
+                                        <div className="grid grid-cols-2 gap-6 w-full lg:w-2/3 mx-auto">
+                                            {availableBatchShots.filter(s => s.id.includes('styling')).map((shot) => {
                                                 const isSelected = batchShotSelection[shot.id] ?? false;
                                                 const isMaviActive = user?.role === 'admin' && isMaviBatch;
-                                                const hasSideOption = shot.id.includes('styling');
+
+                                                return (
+                                                    <div key={shot.id} className="flex flex-col gap-3">
+                                                        <div
+                                                            className={cn(
+                                                                "relative aspect-[3/4] rounded-xl border transition-all duration-300 overflow-hidden group cursor-pointer w-full",
+                                                                isSelected
+                                                                    ? (isMaviActive ? "border-blue-500 ring-2 ring-blue-500/20 shadow-lg" : "border-[var(--accent-primary)] ring-2 ring-[var(--accent-primary)]/20 shadow-lg")
+                                                                    : "border-[var(--border-subtle)] opacity-40 grayscale bg-[var(--bg-elevated)] hover:opacity-80 transition-opacity"
+                                                            )}
+                                                            onClick={() => setBatchShotSelection(prev => ({ ...prev, [shot.id]: !isSelected }))}
+                                                        >
+                                                            <div className="w-full h-full relative">
+                                                                {shot.image ? (
+                                                                    <img src={shot.image} alt={shot.label} className="w-full h-full object-cover" />
+                                                                ) : (
+                                                                    <div className="w-full h-full flex items-center justify-center bg-muted/20">
+                                                                        <Shirt className="w-8 h-8 opacity-20" />
+                                                                    </div>
+                                                                )}
+
+                                                                <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
+                                                                    <p className="text-sm font-black text-white text-center leading-snug uppercase">
+                                                                        {language === 'tr' ? shot.label : shot.labelEn}
+                                                                    </p>
+                                                                </div>
+
+                                                                <div className="absolute top-3 left-3">
+                                                                    <div className={cn(
+                                                                        "w-6 h-6 rounded-md flex items-center justify-center border transition-all",
+                                                                        isSelected
+                                                                            ? (isMaviActive ? "bg-blue-600 border-blue-400 text-white" : "bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white")
+                                                                            : "bg-white/20 border-white/40 text-transparent"
+                                                                    )}>
+                                                                        <Check className="w-4 h-4" />
+                                                                    </div>
+                                                                </div>
+
+                                                                {isSelected && (
+                                                                    <div
+                                                                        className="absolute top-3 right-3 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10"
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                    >
+                                                                        <span className="text-xs font-bold text-white tracking-widest leading-none">YNC</span>
+                                                                        <Switch
+                                                                            className="scale-75 origin-right !m-0"
+                                                                            checked={stylingSideOnly[shot.id] || false}
+                                                                            onCheckedChange={(val) => setStylingSideOnly({ ...stylingSideOnly, [shot.id]: val })}
+                                                                        />
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Poz Seç - right below */}
+                                                        {isSelected && (
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setActiveGroup('product');
+                                                                    setTargetPoseShot(shot.id);
+                                                                    setActiveLibraryAsset('pose');
+                                                                }}
+                                                                className={cn(
+                                                                    "flex items-center justify-center gap-2 w-full py-3 rounded-lg border shadow-sm transition-colors cursor-pointer group/pose-btn",
+                                                                    assets[`pose_${shot.id}`]
+                                                                        ? "border-green-500/30 bg-green-500/10 text-green-600 dark:text-green-400 hover:bg-green-500 hover:text-white"
+                                                                        : "border-[var(--accent-primary)]/30 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] hover:bg-[var(--accent-primary)] hover:text-white"
+                                                                )}
+                                                            >
+                                                                {assets[`pose_${shot.id}`] ? (
+                                                                    <>
+                                                                        <Check className="w-4 h-4 group-hover/pose-btn:text-white" />
+                                                                        <span className="text-xs font-bold uppercase tracking-wider">{language === 'tr' ? 'Özel Poz Seçili' : 'Custom Pose Selected'}</span>
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <div className="w-2 h-2 rounded-full bg-orange-400 animate-pulse group-hover/pose-btn:bg-white" />
+                                                                        <span className="text-xs font-bold uppercase tracking-wider">{language === 'tr' ? 'Poz Seç (İsteğe Bağlı)' : 'Select Pose (Optional)'}</span>
+                                                                    </>
+                                                                )}
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+
+                                        <Separator className="my-4 opacity-50" />
+
+                                        {/* Technical Row - 4 items per row, 25% larger equivalent by using 4 cols */}
+                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
+                                            {availableBatchShots.filter(s => !s.id.includes('styling')).map((shot) => {
+                                                const isSelected = batchShotSelection[shot.id] ?? false;
+                                                const isMaviActive = user?.role === 'admin' && isMaviBatch;
 
                                                 return (
                                                     <div key={shot.id} className="flex flex-col gap-2">
                                                         <div
                                                             className={cn(
-                                                                "relative aspect-[3/4] rounded-xl border transition-all duration-300 overflow-hidden group cursor-pointer flex-1",
+                                                                "relative aspect-[3/4] rounded-xl border transition-all duration-300 overflow-hidden group cursor-pointer w-full",
                                                                 isSelected
                                                                     ? (isMaviActive ? "border-blue-500 ring-2 ring-blue-500/20 shadow-lg" : "border-[var(--accent-primary)] ring-2 ring-[var(--accent-primary)]/20 shadow-lg")
                                                                     : "border-[var(--border-subtle)] opacity-40 grayscale bg-[var(--bg-elevated)] hover:opacity-80 transition-opacity"
@@ -454,8 +553,8 @@ export default function PhotoshootPage() {
                                                                     </div>
                                                                 )}
 
-                                                                <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
-                                                                    <p className="text-[9px] font-black text-white text-center leading-snug uppercase">
+                                                                <div className="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
+                                                                    <p className="text-[10px] font-black text-white text-center leading-snug uppercase">
                                                                         {language === 'tr' ? shot.label : shot.labelEn}
                                                                     </p>
                                                                 </div>
@@ -470,51 +569,8 @@ export default function PhotoshootPage() {
                                                                         <Check className="w-3.5 h-3.5" />
                                                                     </div>
                                                                 </div>
-
-                                                                {hasSideOption && isSelected && (
-                                                                    <div
-                                                                        className="absolute top-2 right-2 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10"
-                                                                        onClick={(e) => e.stopPropagation()}
-                                                                    >
-                                                                        <span className="text-[8px] font-bold text-white tracking-widest leading-none">YNC</span>
-                                                                        <Switch
-                                                                            className="scale-[0.5] origin-right !m-0"
-                                                                            checked={stylingSideOnly[shot.id] || false}
-                                                                            onCheckedChange={(val) => setStylingSideOnly({ ...stylingSideOnly, [shot.id]: val })}
-                                                                        />
-                                                                    </div>
-                                                                )}
                                                             </div>
                                                         </div>
-
-                                                        {hasSideOption && isSelected && (
-                                                            <button
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    setActiveGroup('product');
-                                                                    setTargetPoseShot(shot.id);
-                                                                    setActiveLibraryAsset('pose');
-                                                                }}
-                                                                className={cn(
-                                                                    "flex items-center justify-center gap-1.5 w-full py-2 rounded-lg border shadow-sm transition-colors cursor-pointer group/pose-btn",
-                                                                    assets[`pose_${shot.id}`]
-                                                                        ? "border-green-500/30 bg-green-500/10 text-green-600 dark:text-green-400 hover:bg-green-500 hover:text-white"
-                                                                        : "border-[var(--accent-primary)]/30 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] hover:bg-[var(--accent-primary)] hover:text-white"
-                                                                )}
-                                                            >
-                                                                {assets[`pose_${shot.id}`] ? (
-                                                                    <>
-                                                                        <Check className="w-3.5 h-3.5 group-hover/pose-btn:text-white" />
-                                                                        <span className="text-[9px] font-bold uppercase tracking-wider">{language === 'tr' ? 'Özel Poz Seçili' : 'Custom Pose Selected'}</span>
-                                                                    </>
-                                                                ) : (
-                                                                    <>
-                                                                        <div className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse group-hover/pose-btn:bg-white" />
-                                                                        <span className="text-[9px] font-bold uppercase tracking-wider">{language === 'tr' ? 'Poz Seç (İsteğe Bağlı)' : 'Select Pose (Optional)'}</span>
-                                                                    </>
-                                                                )}
-                                                            </button>
-                                                        )}
                                                     </div>
                                                 );
                                             })}

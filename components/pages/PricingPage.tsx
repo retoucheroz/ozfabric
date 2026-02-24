@@ -1,36 +1,74 @@
 "use client"
 
-import { useState } from "react"
-import { Check, Zap, Crown, Rocket, Sparkles, Star, ChevronRight } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Check, Zap, Crown, Rocket, Sparkles, Star, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/context/language-context"
 import { motion } from "framer-motion"
-import { SERVICE_COSTS } from "@/lib/pricingConstants";
-import { useEffect } from "react";
-
-import { PRICING_PLANS, CREDIT_PACKS } from "@/lib/pricingConstants";
-// ... imports
+import { SERVICE_COSTS, PRICING_PLANS, CREDIT_PACKS } from "@/lib/pricingConstants"
+import { useSession } from "next-auth/react"
+import { toast } from "sonner"
 
 export default function PricingPage() {
     const { t, language } = useLanguage();
-    // Removed isAnnual state as plans are currently simplified to monthly
-    // const [isAnnual, setIsAnnual] = useState(true); 
-    const [user, setUser] = useState<any>(null);
+    const { data: session } = useSession();
+    const user = session?.user as any;
+    const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+    const [loadingPack, setLoadingPack] = useState<number | null>(null);
 
-    useEffect(() => {
-        fetch('/api/auth/session')
-            .then(res => res.json())
-            .then(data => {
-                if (data?.user) {
-                    setUser(data.user);
-                }
-            })
-            .catch(err => console.error("Session fetch failed", err));
-    }, []);
+    // Checkout handler — works for both plans and credit packs
+    async function handleCheckout(productKey: string, loadingKey: string | number) {
+        if (!session?.user) {
+            toast.error(language === "tr" ? "Lütfen önce giriş yapın" : "Please sign in first");
+            return;
+        }
 
-    // Plans are now imported from constants
+        // Set loading state
+        if (typeof loadingKey === "string") {
+            setLoadingPlan(loadingKey);
+        } else {
+            setLoadingPack(loadingKey);
+        }
+
+        try {
+            const res = await fetch("/api/checkout", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ productKey }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || "Checkout failed");
+            }
+
+            // Redirect to Lemon Squeezy checkout
+            window.location.href = data.url;
+        } catch (error: any) {
+            console.error("Checkout error:", error);
+            toast.error(
+                language === "tr"
+                    ? "Ödeme sayfası açılamadı. Lütfen tekrar deneyin."
+                    : "Could not open checkout. Please try again."
+            );
+        } finally {
+            setLoadingPlan(null);
+            setLoadingPack(null);
+        }
+    }
+
+    // Map plan IDs to checkout product keys
+    const planProductKeys: Record<string, string> = {
+        free: "free",
+        pro: "sub_pro",
+        business: "sub_business",
+    };
+
+    // Map credit pack index to product keys
+    const packProductKeys = ["credits_500", "credits_1100", "credits_6000", "credits_13000"];
 
     return (
         <div className="min-h-screen bg-[var(--bg-base)] py-8 px-6 overflow-y-auto">
@@ -63,8 +101,6 @@ export default function PricingPage() {
                                 : "Choose the perfect plan for your business. Cancel or switch anytime."}
                         </p>
                     </motion.div>
-
-                    {/* Billing Toggle Removed - Simplification */}
                 </div>
 
                 {/* Pricing Grid */}
@@ -72,6 +108,8 @@ export default function PricingPage() {
                     {PRICING_PLANS.map((plan, idx) => {
                         const Icon = idx === 0 ? Rocket : (idx === 1 ? Crown : Zap);
                         const isMain = plan.highlight;
+                        const isFree = plan.price === "0";
+                        const isLoading = loadingPlan === plan.id;
 
                         return (
                             <motion.div
@@ -105,7 +143,7 @@ export default function PricingPage() {
                                 <div className="mb-6 text-center">
                                     <div className="flex items-baseline gap-1 justify-center">
                                         <span className={cn("text-4xl font-black heading-font", isMain ? "text-white" : "text-[var(--text-primary)]")}>${plan.price}</span>
-                                        {plan.price !== "0" && <span className={cn("text-sm font-medium", isMain ? "text-white/60" : "text-[var(--text-muted)]")}>/{language === "tr" ? "ay" : "mo"}</span>}
+                                        {!isFree && <span className={cn("text-sm font-medium", isMain ? "text-white/60" : "text-[var(--text-muted)]")}>/{language === "tr" ? "ay" : "mo"}</span>}
                                     </div>
                                     <Badge variant="secondary" className={cn("mt-3 font-bold", isMain ? "bg-white/20 text-white border-none" : "bg-violet-500/10 text-violet-500 border-violet-500/20")}>
                                         {plan.credits.toLocaleString()} {language === "tr" ? "KREDİ" : "CREDITS"}
@@ -125,14 +163,25 @@ export default function PricingPage() {
 
                                 <Button
                                     size="lg"
+                                    disabled={isLoading || isFree}
+                                    onClick={() => {
+                                        if (isFree) return;
+                                        handleCheckout(planProductKeys[plan.id], plan.id);
+                                    }}
                                     className={cn(
                                         "w-full h-12 rounded-xl font-bold text-xs uppercase tracking-widest transition-all duration-300",
                                         isMain
-                                            ? "bg-white text-violet-600 hover:bg-white/90 shadow-xl"
-                                            : "bg-[var(--bg-elevated)] hover:bg-[var(--bg-muted)] text-[var(--text-primary)] border border-[var(--border-subtle)]"
+                                            ? "bg-white text-violet-600 hover:bg-white/90 shadow-xl disabled:opacity-70"
+                                            : "bg-[var(--bg-elevated)] hover:bg-[var(--bg-muted)] text-[var(--text-primary)] border border-[var(--border-subtle)] disabled:opacity-50"
                                     )}
                                 >
-                                    {language === "tr" ? (plan.price === "0" ? "Şimdi Başla" : "Seç") : (plan.price === "0" ? "Start Now" : "Select Plan")}
+                                    {isLoading ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : isFree ? (
+                                        language === "tr" ? "Şimdi Başla" : "Start Now"
+                                    ) : (
+                                        language === "tr" ? "Seç" : "Select Plan"
+                                    )}
                                 </Button>
                             </motion.div>
                         );
@@ -145,20 +194,33 @@ export default function PricingPage() {
                         {language === "tr" ? "Kredi Paketleri" : "Credit Packs"}
                     </h2>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {CREDIT_PACKS.map((pack, i) => (
-                            <div key={i} className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-center hover:border-violet-500/30 transition-all relative overflow-hidden group">
-                                {pack.label === "Pro" || pack.label === "Ultra" ? (
-                                    <div className="absolute top-0 right-0 bg-violet-500/10 text-violet-500 text-[9px] font-bold px-2 py-0.5 rounded-bl-lg">
-                                        BONUS
-                                    </div>
-                                ) : null}
-                                <div className="text-2xl font-black text-[var(--text-primary)] mb-1">{pack.credits.toLocaleString()}</div>
-                                <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider font-bold mb-3">{language === "tr" ? "KREDİ" : "CREDITS"}</div>
-                                <Button size="sm" variant="outline" className="w-full text-xs font-bold border-violet-500/20 text-violet-500 hover:bg-violet-500/10 hover:text-violet-600 transition-all group-hover:scale-105 active:scale-95">
-                                    {pack.price} {language === "tr" ? "Satın Al" : "Buy Now"}
-                                </Button>
-                            </div>
-                        ))}
+                        {CREDIT_PACKS.map((pack, i) => {
+                            const isLoading = loadingPack === i;
+                            return (
+                                <div key={i} className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-center hover:border-violet-500/30 transition-all relative overflow-hidden group">
+                                    {(pack.label === "Pro" || pack.label === "Ultra") && (
+                                        <div className="absolute top-0 right-0 bg-violet-500/10 text-violet-500 text-[9px] font-bold px-2 py-0.5 rounded-bl-lg">
+                                            BONUS
+                                        </div>
+                                    )}
+                                    <div className="text-2xl font-black text-[var(--text-primary)] mb-1">{pack.credits.toLocaleString()}</div>
+                                    <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider font-bold mb-3">{language === "tr" ? "KREDİ" : "CREDITS"}</div>
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        disabled={isLoading}
+                                        onClick={() => handleCheckout(packProductKeys[i], i)}
+                                        className="w-full text-xs font-bold border-violet-500/20 text-violet-500 hover:bg-violet-500/10 hover:text-violet-600 transition-all group-hover:scale-105 active:scale-95 disabled:opacity-70"
+                                    >
+                                        {isLoading ? (
+                                            <Loader2 className="w-3 h-3 animate-spin" />
+                                        ) : (
+                                            <>{pack.price} {language === "tr" ? "Satın Al" : "Buy Now"}</>
+                                        )}
+                                    </Button>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
 
