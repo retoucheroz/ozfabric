@@ -1,24 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSession, getUser, isKvActive } from '@/lib/auth';
-import { updateUser } from '@/lib/postgres';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth-options';
+import { prisma } from '@/lib/prisma';
 
 export async function POST(req: NextRequest) {
     try {
-        const session = await getSession();
-        if (!session) {
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.id) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         const { name, avatar } = await req.json();
 
-        const updatedUser = await updateUser(session.username, {
-            ...(name !== undefined && { name }),
-            ...(avatar !== undefined && { avatar_url: avatar })
+        const updatedUser = await prisma.user.update({
+            where: { id: session.user.id },
+            data: {
+                ...(name !== undefined && { name }),
+                ...(avatar !== undefined && { image: avatar }),
+            },
         });
-
-        if (!updatedUser) {
-            return NextResponse.json({ error: 'User not found' }, { status: 404 });
-        }
 
         return NextResponse.json({ success: true, user: updatedUser });
 

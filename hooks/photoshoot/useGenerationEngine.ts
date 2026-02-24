@@ -472,12 +472,7 @@ export const useGenerationEngine = (
         const isReStyling = pendingOptions?.isReStyling || false;
         if (!isReStyling && !pendingOptions?.isThreeAngles) setResultImages([]);
 
-        const costToDeduct = pendingOptions?.isThreeAngles ? singleCost * 3 : singleCost;
-        if (!(await deductCredits(costToDeduct))) {
-            toast.error(language === 'tr' ? "Yetersiz kredi!" : "Insufficient credits!");
-            setIsProcessing(false);
-            return;
-        }
+        // Credit deduction is now handled on the server side in /api/generate
 
         try {
             await executeRealGeneration({
@@ -723,16 +718,8 @@ export const useGenerationEngine = (
         const finalSeed = (seed !== null && seed !== "") ? Number(seed) : Math.floor(Math.random() * 1000000000);
         if (seed === "") setSeed(finalSeed);
 
+        // Credit deduction is now handled on the server side in /api/generate
         const finalSelectionCount = selectedBatchImages.filter(Boolean).length;
-        const totalBatchCost = singleCost * finalSelectionCount;
-
-        if (totalBatchCost > 0) {
-            if (!(await deductCredits(totalBatchCost))) {
-                toast.error(language === "tr" ? "Yetersiz kredi!" : "Insufficient credits!");
-                setIsProcessing(false);
-                return;
-            }
-        }
 
         try {
             const generatedImages: any[] = [];

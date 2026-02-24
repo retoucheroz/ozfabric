@@ -1,4 +1,9 @@
-import { getGlobalSetting } from "@/lib/postgres";
+import { prisma } from "@/lib/prisma";
+
+async function getGlobalSetting(key: string): Promise<string | null> {
+    const setting = await prisma.appSetting.findUnique({ where: { key } });
+    return setting?.value || null;
+}
 
 interface NanoBananaPayload {
     prompt: string;

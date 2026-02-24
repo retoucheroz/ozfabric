@@ -1,9 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { deductCredits } from "@/lib/auth-helpers";
+import { prisma } from "@/lib/prisma";
 
 const MOCK_RESULT = "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=1000";
+const VTON_COST = 50;
 
 export async function POST(req: NextRequest) {
     try {
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+        const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { id: true, credits: true, role: true } });
+        if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+        if (user.role !== 'admin' && (user.credits || 0) < VTON_COST) {
+            return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
+        }
+
         const { humanImage, garmentImage, category, garmentDescription } = await req.json();
 
         if (!humanImage || !garmentImage) {
@@ -37,7 +52,7 @@ export async function POST(req: NextRequest) {
             body: JSON.stringify({
                 human_image_url: sanitizedHuman,
                 garment_image_url: sanitizedGarment,
-                category: category || "tops", // fashn uses "tops", "bottoms", "one-pieces"
+                category: category || "tops",
                 garment_description: garmentDescription || "fashion garment"
             }),
         });
@@ -56,10 +71,14 @@ export async function POST(req: NextRequest) {
             try {
                 const { uploadFromUrl } = await import("@/lib/s3");
                 imageUrl = await uploadFromUrl(imageUrl, "vton");
-                console.log('VTON Persisted to S3:', imageUrl);
             } catch (r2Error) {
                 console.error('S3 persistence error:', r2Error);
             }
+        }
+
+        // Deduct credits if successful
+        if (user.role !== 'admin') {
+            await deductCredits(user.id, VTON_COST, "Virtual Try-On");
         }
 
         return NextResponse.json({

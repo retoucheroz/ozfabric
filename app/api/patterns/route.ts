@@ -1,10 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { deductCredits } from "@/lib/auth-helpers";
+import { prisma } from "@/lib/prisma";
 
-export const maxDuration = 60; // Set timeout to 60s for generation
+const PATTERN_COST = 10;
+export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
     try {
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+        const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { id: true, credits: true, role: true } });
+        if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+        if (user.role !== 'admin' && (user.credits || 0) < PATTERN_COST) {
+            return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
+        }
+
         const { prompt: userPrompt } = await req.json();
         if (!userPrompt) return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
 
@@ -12,54 +27,21 @@ export async function POST(req: NextRequest) {
         const geminiKey = process.env.GEMINI_API_KEY;
 
         if (!hfToken || !geminiKey) {
-            return NextResponse.json({ error: "Configuration missing (HF_TOKEN or GEMINI_API_KEY)" }, { status: 500 });
+            return NextResponse.json({ error: "Configuration missing" }, { status: 500 });
         }
 
         const genAI = new GoogleGenerativeAI(geminiKey);
+        const model = genAI.getGenerativeModel({
+            model: "gemini-1.5-flash",
+            systemInstruction: "You are a Translator and Keyword Extractor. Extract MAIN SUBJECTS only. Output comma-separated keywords."
+        });
 
-        // Models to try for prompt optimization (prioritize stable 1.5-flash)
-        const modelsToTry = [
-            "gemini-1.5-flash",
-            "gemini-1.5-flash-latest",
-            "gemini-2.0-flash",
-            "gemini-pro"
-        ];
-
-        let optimizedPrompt = "";
-        let modelUsed = "";
-
-        // 1. Prompt Optimization with Gemini (Keywords Only)
-        for (const modelName of modelsToTry) {
-            try {
-                const model = genAI.getGenerativeModel({
-                    model: modelName,
-                    systemInstruction: "You are a Translator and Keyword Extractor. Your goal is to extract the MAIN SUBJECTS from the user's input and translate them to English.\n\nRULES:\n1. Output ONLY the comma-separated keywords.\n2. Do NOT add 'pattern', 'seamless', 'texture' or artistic words.\n3. Example: if user says 'aslan ve yaprak', output: 'lion, leaves'.\n4. If user describes a style, extract it as a keyword too."
-                });
-
-                const result = await model.generateContent(userPrompt);
-                const text = result.response.text().trim();
-
-                if (text && !text.includes("Error")) {
-                    // We assume valid keywords
-                    // Switch to "Wrapping Paper" style to force distinct object generation
-                    optimizedPrompt = `seamless wrapping paper pattern featuring many small distinct (${text}) on white background, simple flat vector art, children's book illustration style, cute, clearly defined, high quality`;
-                    modelUsed = modelName;
-                    break;
-                }
-            } catch (e: any) {
-                console.warn(`Failed with ${modelName}:`, e.message);
-                continue;
-            }
-        }
-
-        if (!modelUsed || !optimizedPrompt) {
-            console.warn("All Gemini models failed. Using algorithmic fallback.");
-            optimizedPrompt = `seamless wrapping paper pattern featuring many small distinct ${userPrompt}, white background, flat vector art, simple illustration, high quality`;
-        }
+        const result = await model.generateContent(userPrompt);
+        const text = result.response.text().trim();
+        const optimizedPrompt = `seamless wrapping paper pattern featuring many small distinct (${text}) on white background, simple flat vector art, children's book illustration style, cute, clearly defined, high quality`;
 
         console.log("Final Prompt to SDXL:", optimizedPrompt);
 
-        // 2. Generate Image with SDXL via Hugging Face Inference API
         const response = await fetch("https://router.huggingface.co/hf-inference/models/stabilityai/stable-diffusion-xl-base-1.0", {
             method: "POST",
             headers: {
@@ -71,7 +53,7 @@ export async function POST(req: NextRequest) {
                 parameters: {
                     negative_prompt: "symmetry, mirror, kaleidoscope, geometric, abstract, distorted, blurry, complex, dark, shadows, 3d, realistic, painting, oil",
                     num_inference_steps: 35,
-                    guidance_scale: 9.0, // Increased to 9.0 to force sticking to the 'distinct objects' instruction
+                    guidance_scale: 9.0,
                     width: 1024,
                     height: 1024
                 }
@@ -80,29 +62,20 @@ export async function POST(req: NextRequest) {
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error("HF API Error:", errorText);
-
-            if (response.status === 503) {
-                return NextResponse.json({ error: "Model yükleniyor, lütfen 20 saniye sonra tekrar deneyin" }, { status: 503 });
-            }
+            if (response.status === 503) return NextResponse.json({ error: "Model loading, try again in 20s" }, { status: 503 });
             return NextResponse.json({ error: `HF API Error: ${errorText}` }, { status: response.status });
         }
 
-        // 3. Process Response
         const arrayBuffer = await response.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
-        const base64Image = buffer.toString("base64");
-        const dataUrl = `data:image/jpeg;base64,${base64Image}`;
+        const dataUrl = `data:image/jpeg;base64,${buffer.toString("base64")}`;
 
-        // Persist to S3
-        let finalUrl = dataUrl;
-        try {
-            const { uploadBase64 } = await import("@/lib/s3");
-            const savedUrl = await uploadBase64(dataUrl, "patterns");
-            if (savedUrl) finalUrl = savedUrl;
-            console.log("Pattern persisted to S3:", finalUrl);
-        } catch (s3Error) {
-            console.error("S3 pattern persistence error:", s3Error);
+        const { uploadBase64 } = await import("@/lib/s3");
+        const finalUrl = await uploadBase64(dataUrl, "patterns") || dataUrl;
+
+        // Deduct credits
+        if (user.role !== 'admin') {
+            await deductCredits(user.id, PATTERN_COST, "Pattern Generation");
         }
 
         return NextResponse.json({
@@ -114,6 +87,6 @@ export async function POST(req: NextRequest) {
 
     } catch (error: any) {
         console.error("Pattern Generation Error:", error);
-        return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

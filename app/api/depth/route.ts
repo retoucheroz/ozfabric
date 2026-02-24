@@ -1,11 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { deductCredits } from "@/lib/auth-helpers";
+import { prisma } from "@/lib/prisma";
 
+const DEPTH_COST = 10;
 export const maxDuration = 30;
 export const dynamic = 'force-dynamic';
 
-// Depth estimation using fal.ai Marigold (sync endpoint)
 export async function POST(req: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { id: true, credits: true, role: true } });
+    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+    if (user.role !== 'admin' && (user.credits || 0) < DEPTH_COST) {
+      return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
+    }
+
     const body = await req.json();
     const { image_url } = body;
 
@@ -14,11 +28,8 @@ export async function POST(req: NextRequest) {
     }
 
     const FAL_KEY = process.env.FAL_KEY;
-    if (!FAL_KEY) {
-      return NextResponse.json({ error: "FAL_KEY not configured" }, { status: 500 });
-    }
+    if (!FAL_KEY) return NextResponse.json({ error: "FAL_KEY not configured" }, { status: 500 });
 
-    // Call Marigold Depth Estimation — fal.run accepts data URIs directly
     const response = await fetch("https://fal.run/fal-ai/imageutils/marigold-depth", {
       method: "POST",
       headers: {
@@ -32,31 +43,24 @@ export async function POST(req: NextRequest) {
       }),
     });
 
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error("Marigold API error:", response.status, errText);
-      throw new Error(`Depth API error: ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`Depth API error: ${response.status}`);
 
     const data = await response.json();
-
-    // Response: { image: { url: "https://...", content_type: "image/png", ... } }
     const depthMapUrl = data?.image?.url;
 
-    if (!depthMapUrl) {
-      console.error("Unexpected response:", JSON.stringify(data).slice(0, 500));
-      throw new Error("No depth map URL in response");
-    }
+    if (!depthMapUrl) throw new Error("No depth map URL in response");
 
-    const { ensureS3Url } = await import("@/lib/s3");
-    const savedDepthUrl = await ensureS3Url(depthMapUrl, "depth-maps");
+    const { uploadFromUrl } = await import("@/lib/s3");
+    const savedDepthUrl = await uploadFromUrl(depthMapUrl, "depth-maps");
+
+    // Deduct credits
+    if (user.role !== 'admin') {
+      await deductCredits(user.id, DEPTH_COST, "Depth Estimation");
+    }
 
     return NextResponse.json({ depthMapUrl: savedDepthUrl });
   } catch (error: any) {
     console.error("Depth estimation error:", error);
-    return NextResponse.json(
-      { error: error.message || "Depth estimation failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Depth estimation failed" }, { status: 500 });
   }
 }

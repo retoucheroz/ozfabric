@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { getToken } from 'next-auth/jwt';
 
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
@@ -7,28 +8,31 @@ export async function middleware(request: NextRequest) {
     // Public routes - always allow
     if (
         pathname === '/' ||
+        pathname === '/login' ||
         pathname.startsWith('/api/auth') ||
+        pathname.startsWith('/api/webhooks') ||
         pathname.startsWith('/_next') ||
+        pathname.startsWith('/cookie-policy') ||
         pathname.includes('favicon.ico')
     ) {
         return NextResponse.next();
     }
 
-    // Simple cookie check for dashboard routes
-    // Detailed validation happens in Server Components / API routes
-    const sessionId = request.cookies.get('modeon_session')?.value;
+    // Check NextAuth JWT token
+    const token = await getToken({
+        req: request,
+        secret: process.env.NEXTAUTH_SECRET,
+    });
 
-    if (!sessionId) {
-        // No session cookie, redirect to login
+    if (!token) {
+        // No valid session, redirect to login
         const loginUrl = new URL('/', request.url);
         return NextResponse.redirect(loginUrl);
     }
 
-    // Allow the request to proceed. 
-    // The individual pages and API routes will validate the session against Redis.
     return NextResponse.next();
 }
 
 export const config = {
-    matcher: ['/((?!api/auth|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|mp4|webm)$).*)'],
+    matcher: ['/((?!api/auth|api/webhooks|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|mp4|webm)$).*)'],
 }

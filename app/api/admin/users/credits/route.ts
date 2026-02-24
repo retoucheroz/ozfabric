@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSession, getUser } from '@/lib/auth';
-import { getCreditTransactions, addCredits, logCreditTransaction, getUserByEmail } from '@/lib/postgres';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth-options';
+import { prisma } from '@/lib/prisma';
+import { addCredits, deductCredits } from '@/lib/auth-helpers';
 
 export const dynamic = 'force-dynamic';
 
 async function checkAdmin() {
-    const session = await getSession();
-    if (!session) return null;
-    const user = await getUser(session.username);
-    if (!user || user.role !== 'admin') return null;
-    return user;
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id || session.user.role !== 'admin') return null;
+    return session.user;
 }
 
 export async function GET(req: NextRequest) {
@@ -25,7 +25,18 @@ export async function GET(req: NextRequest) {
     }
 
     try {
-        const history = await getCreditTransactions(email);
+        // Find user by email or name
+        const user = await prisma.user.findFirst({
+            where: { OR: [{ email }, { name: email }] },
+        });
+        if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+
+        const history = await prisma.creditTransaction.findMany({
+            where: { userId: user.id },
+            orderBy: { createdAt: 'desc' },
+            take: 50,
+        });
+
         return NextResponse.json(history);
     } catch (e) {
         return NextResponse.json({ error: 'Failed to fetch history' }, { status: 500 });
@@ -44,15 +55,19 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Missing data' }, { status: 400 });
         }
 
-        // Use addCredits for both positive and negative if we want to log it
-        // Actually addCredits adds, and we can pass negative to subtract? 
-        // Let's check postgres.ts addCredits: SET credits = credits + ${amount}
-        // Yes, it works for negative too.
+        // Find user by email or name
+        const user = await prisma.user.findFirst({
+            where: { OR: [{ email }, { name: email }] },
+        });
+        if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-        const updatedUser = await addCredits(email, amount, description || (amount > 0 ? 'Admin Deposit' : 'Admin Correction'));
-
-        if (!updatedUser) {
-            return NextResponse.json({ error: 'User not found or update failed' }, { status: 404 });
+        let updatedUser;
+        if (amount > 0) {
+            updatedUser = await addCredits(user.id, amount, description || 'Admin Deposit', type || 'adjustment');
+        } else if (amount < 0) {
+            updatedUser = await deductCredits(user.id, Math.abs(amount), description || 'Admin Correction');
+        } else {
+            return NextResponse.json({ success: true, credits: user.credits });
         }
 
         return NextResponse.json({ success: true, credits: updatedUser.credits });

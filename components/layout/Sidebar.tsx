@@ -55,7 +55,7 @@ export function Sidebar({ variant = "default" }: SidebarProps) {
             .then(res => res.json())
             .then(data => {
                 setIsKvActive(data.isKvActive);
-                if (data.authenticated) {
+                if (data?.user) {
                     setUser(data.user);
                 }
             })

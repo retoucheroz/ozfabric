@@ -1,61 +1,55 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { deductCredits } from "@/lib/auth-helpers";
+import { prisma } from "@/lib/prisma";
 
+const POSE_COST = 10;
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     try {
-        const { image_url } = await req.json();
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-        if (!image_url) {
-            return NextResponse.json({ error: "Image URL is required" }, { status: 400 });
+        const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { id: true, credits: true, role: true } });
+        if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+        if (user.role !== 'admin' && (user.credits || 0) < POSE_COST) {
+            return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
         }
 
-        const { ensureR2Url } = await import("@/lib/s3");
-        console.log("Pose API: Sanitizing image URL...");
-        const sanitizedUrl = await ensureR2Url(image_url, "poses/extraction");
-        console.log("Pose API: Sanitized URL (length):", sanitizedUrl?.length);
+        const { image_url } = await req.json();
+        if (!image_url) return NextResponse.json({ error: "Image URL is required" }, { status: 400 });
 
         const falKey = process.env.FAL_KEY;
-        if (!falKey) {
-            console.error("Pose API Error: FAL_KEY missing");
-            return NextResponse.json({ error: "FAL_KEY is not configured" }, { status: 500 });
-        }
+        if (!falKey) return NextResponse.json({ error: "FAL_KEY is not configured" }, { status: 500 });
+
+        const { ensureR2Url, uploadFromUrl } = await import("@/lib/s3");
+        const sanitizedUrl = await ensureR2Url(image_url, "poses/extraction");
 
         const { fal } = await import("@fal-ai/client");
         fal.config({ credentials: falKey });
 
-        console.log("Pose API: Running fal-ai/dwpose...");
-        try {
-            const result: any = await fal.run("fal-ai/dwpose", {
-                input: {
-                    image_url: sanitizedUrl
-                }
-            });
+        const result: any = await fal.run("fal-ai/dwpose", {
+            input: { image_url: sanitizedUrl }
+        });
 
-            console.log("Pose API: Fal Result received");
+        const rawPoseUrl = result.image?.url || result.url;
+        if (!rawPoseUrl) throw new Error("No image in response");
 
-            const poseData = result.data || result;
-            const rawPoseUrl = poseData.image?.url || poseData.url;
+        const savedPoseUrl = await uploadFromUrl(rawPoseUrl, "poses/results");
 
-            if (rawPoseUrl) {
-                const { ensureS3Url } = await import("@/lib/s3");
-                const savedPoseUrl = await ensureS3Url(rawPoseUrl, "poses/results");
-                return NextResponse.json({ pose_image: savedPoseUrl });
-            } else {
-                console.error("Pose API Error: Invalid response structure", result);
-                return NextResponse.json({ error: "Invalid response from AI service" }, { status: 500 });
-            }
-        } catch (falError: any) {
-            console.error("Pose API: Fal.ai service error:", falError);
-            return NextResponse.json({ error: `AI Service Error: ${falError.message || 'Unknown'}` }, { status: 500 });
+        // Deduct credits
+        if (user.role !== 'admin') {
+            await deductCredits(user.id, POSE_COST, "Pose Extraction");
         }
 
+        return NextResponse.json({ pose_image: savedPoseUrl });
+
     } catch (error: any) {
-        console.error("Pose API Global Error:", error);
-        return NextResponse.json(
-            { error: error.message || "Something went wrong" },
-            { status: 500 }
-        );
+        console.error("Pose API Error:", error);
+        return NextResponse.json({ error: error.message || "Pose extraction failed" }, { status: 500 });
     }
 }

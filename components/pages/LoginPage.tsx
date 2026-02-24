@@ -8,6 +8,7 @@ import { useState, useEffect } from "react"
 import { Loader2, Globe } from "lucide-react"
 import { useLanguage } from "@/context/language-context"
 import { toast } from "sonner"
+import { signIn, useSession } from "next-auth/react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,6 +22,7 @@ import QUOTES from "@/lib/quotes.json"
 export default function LoginPage() {
   const router = useRouter();
   const { t, language, setLanguage } = useLanguage();
+  const { data: session, status } = useSession();
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [randomQuote, setRandomQuote] = useState(QUOTES[0]);
@@ -30,16 +32,14 @@ export default function LoginPage() {
   useEffect(() => {
     setMounted(true);
     setRandomQuote(QUOTES[Math.floor(Math.random() * QUOTES.length)]);
-
-    // Check if already authenticated
-    fetch('/api/auth/session')
-      .then(res => res.json())
-      .then(data => {
-        if (data.authenticated) {
-          router.push('/home');
-        }
-      });
   }, []);
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (status === 'authenticated') {
+      router.push('/home');
+    }
+  }, [status, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,18 +50,17 @@ export default function LoginPage() {
 
     setIsLoading(true);
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+      const result = await signIn('credentials', {
+        login: username,
+        password,
+        redirect: false,
       });
-      const data = await res.json();
 
-      if (data.success) {
+      if (result?.ok) {
         toast.success(language === 'tr' ? 'Giriş başarılı' : 'Login successful');
         router.push('/home');
       } else {
-        setError(data.error);
+        setError(result?.error || (language === 'tr' ? 'Geçersiz kullanıcı adı veya şifre' : 'Invalid username or password'));
         setIsLoading(false);
       }
     } catch (err) {
@@ -72,32 +71,7 @@ export default function LoginPage() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    const formData = new FormData(e.target as HTMLFormElement);
-    const username = formData.get("username") as string;
-    const password = formData.get("password") as string;
-
-    setIsLoading(true);
-    try {
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      });
-      const data = await res.json();
-
-      if (data.success) {
-        toast.success(data.message);
-        setIsRegistering(false);
-        setIsLoading(false);
-      } else {
-        setError(data.error);
-        setIsLoading(false);
-      }
-    } catch (err) {
-      setError("Connection error");
-      setIsLoading(false);
-    }
+    setError(language === 'tr' ? 'Kayıt işlemi admin tarafından yapılmaktadır.' : 'Registration is handled by admin.');
   }
 
   return (
@@ -230,7 +204,7 @@ export default function LoginPage() {
                 type="button"
                 variant="outline"
                 className="w-full font-bold gap-2"
-                onClick={() => window.location.href = '/api/auth/google'}
+                onClick={() => signIn('google', { callbackUrl: '/home' })}
                 disabled={isLoading}
               >
                 <svg className="h-4 w-4" viewBox="0 0 24 24">

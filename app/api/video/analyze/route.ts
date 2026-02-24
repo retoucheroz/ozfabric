@@ -1,73 +1,72 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { deductCredits } from "@/lib/auth-helpers";
+import { prisma } from "@/lib/prisma";
+
+const ANALYZE_VIDEO_COST = 20;
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { id: true, credits: true, role: true } });
+    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+    if (user.role !== 'admin' && (user.credits || 0) < ANALYZE_VIDEO_COST) {
+      return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
+    }
+
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       return NextResponse.json({ error: "GEMINI_API_KEY is not configured" }, { status: 500 });
     }
 
     const body = await req.json();
-    const { story, gender, modelSource, language = 'tr' } = body;
+    const { story, gender, modelSource } = body;
 
     if (!story) {
       return NextResponse.json({ error: "Story is required" }, { status: 400 });
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
 
     const prompt = `
-You are an expert AI Video Director & Storyboard Artist for a high-end fashion AI platform called ModeOn.ai.
+You are an expert AI Video Director & Storyboard Artist.
 Your task is to take a short story or idea and break it down into exactly 5 consistent video scenes (shots).
 
-**User Input Story:** "${story}"
-**Subject Info:** ${gender} model, Source: ${modelSource}
+Story: "${story}"
+Subject: ${gender} model, Source: ${modelSource}
 
-**Instructions:**
-1. Break the story into 5 logical scenes.
-2. Maintain absolute consistency: The model's appearance, clothing (if described), and environment must stay identical across all shots.
-3. Use a "Master Seed/Style" logic: Describe a "Visual Dictionary" shared by all shots.
-4. Each shot must have:
-   - A clear, descriptive AI Video Prompt (optimized for Kling 3.0 or Luma).
-   - A duration (between 2 and 4 seconds, total must be exactly 15 seconds).
-   - Camera movement description (e.g., "slow zoom in", "panning left", "static cinematic").
-
-**Output Format (JSON strictly):**
+Output JSON format exactly:
 {
-  "visualDictionary": "A concise description of the model (hair, skin, eyes) and outfit to maintain consistency.",
+  "visualDictionary": "...",
   "shots": [
-    {
-      "id": "1",
-      "title": "Opening Shot",
-      "prompt": "...",
-      "duration": 3,
-      "camera": "..."
-    },
-    ... (total 5 shots)
+    { "id": "1", "title": "Opening Shot", "prompt": "...", "duration": 3, "camera": "..." },
+    ...
   ]
 }
-
-Respond ONLY with the JSON block.
 `;
 
     const result = await model.generateContent(prompt);
-    const response = result.response.text();
-
-    // Clean up JSON response
-    const jsonMatch = response.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error("Failed to parse AI response as JSON");
-    }
+    const responseText = result.response.text();
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error("Invalid AI response");
 
     const storyboard = JSON.parse(jsonMatch[0]);
+
+    // Deduct credits
+    if (user.role !== 'admin') {
+      await deductCredits(user.id, ANALYZE_VIDEO_COST, "Video Storyboard Analysis");
+    }
 
     return NextResponse.json(storyboard);
 
   } catch (error) {
     console.error("Video Analyze Error:", error);
-    return NextResponse.json({ error: "Failed to create storyboard: " + (error as Error).message }, { status: 500 });
+    return NextResponse.json({ error: "Failed to create storyboard" }, { status: 500 });
   }
 }

@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { deductCredits } from "@/lib/auth-helpers";
+import { prisma } from "@/lib/prisma";
 
 // Configure route config
 export const maxDuration = 60; // 60 seconds max duration
@@ -283,6 +287,10 @@ const ANGLED_DETAIL_TEMPLATE = (productName: string, gender: string, framing: st
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const body = await req.json();
     const {
       productName,
       workflowType, // upper, lower, dress
@@ -299,7 +307,24 @@ export async function POST(req: NextRequest) {
       innerwearImage = null, // Undershirt/t-shirt reference image
       modelImage = null, // Model reference image (required for upper body)
       preview = false
-    } = await req.json();
+    } = body;
+
+    // Credit Deduction Logic
+    if (!preview) {
+      const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { id: true, credits: true, role: true }
+      });
+      if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+      if (user.role !== 'admin') {
+        const cost = resolution === "4K" ? 100 : 50;
+        if ((user.credits || 0) < cost) {
+          return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
+        }
+        await deductCredits(user.id, cost, "Detail Generation");
+      }
+    }
 
     // Enhancements: Smart Prompt Construction
     let finalProductName = productName;

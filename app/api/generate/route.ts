@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ensureS3Url } from "@/lib/s3";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { deductCredits } from "@/lib/auth-helpers";
+import { prisma } from "@/lib/prisma";
 
 // Configure route config
 export const maxDuration = 300; // 300 seconds max duration (5 minutes)
@@ -118,6 +122,10 @@ function resolveMood(angleId: string | null | undefined, userMoodId?: string, sh
 
 export async function POST(req: NextRequest) {
     try {
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+        const body = await req.json();
         const {
             productName,
             workflowType: requestedWorkflowType,
@@ -170,7 +178,27 @@ export async function POST(req: NextRequest) {
             excludeHatAsset = false,
             excludeShoesAsset = false,
             modelDescription = null // NEW
-        } = await req.json();
+        } = body;
+
+        // Credit Deduction Logic
+        if (!preview) {
+            const user = await prisma.user.findUnique({
+                where: { id: session.user.id },
+                select: { id: true, credits: true, role: true }
+            });
+            if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+            if (user.role !== 'admin') {
+                const singleCost = resolution === "4K" ? 100 : 50;
+                const isMultiAngle = isAngles && !targetView;
+                const totalCost = isMultiAngle ? singleCost * 3 : singleCost;
+
+                if ((user.credits || 0) < totalCost) {
+                    return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
+                }
+                await deductCredits(user.id, totalCost, `Photoshoot Generation (${isMultiAngle ? '3-Angles' : 'Single Shot'})`);
+            }
+        }
 
         // One-time random seed for consistency across angles
         const requestSeed = (seed !== null && seed !== undefined) ? Number(seed) : Math.floor(Math.random() * 1000000000);

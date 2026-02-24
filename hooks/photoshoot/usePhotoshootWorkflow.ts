@@ -190,7 +190,7 @@ export const usePhotoshootWorkflow = () => {
         fetch('/api/auth/session')
             .then(res => res.json())
             .then((data: any) => {
-                if (data.authenticated) {
+                if (data?.user) {
                     setUser(data.user);
                 }
             })

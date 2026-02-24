@@ -13,6 +13,7 @@ import { useLanguage } from "@/context/language-context"
 import { useTheme } from "next-themes"
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet"
 import { Sidebar } from "@/components/layout/Sidebar"
+import { useSession, signOut } from "next-auth/react"
 
 export function TopNav() {
     const pathname = usePathname();
@@ -21,20 +22,12 @@ export function TopNav() {
     const { language, setLanguage, t } = useLanguage();
     const { theme, setTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
-    const [user, setUser] = useState<any>(null);
+    const { data: session } = useSession();
+    const user = session?.user as any;
 
     useEffect(() => {
         setMounted(true);
-        refreshCredits(); // Ensure credits are up to date when the nav mounts
-
-        fetch('/api/auth/session')
-            .then(res => res.json())
-            .then(data => {
-                if (data.authenticated) {
-                    setUser(data.user);
-                }
-            })
-            .catch(err => console.error("Session fetch failed", err));
+        refreshCredits();
     }, []);
 
     const navItems = [
@@ -168,15 +161,15 @@ export function TopNav() {
                             <DropdownMenuTrigger asChild>
                                 <Avatar className="w-9 h-9 border cursor-pointer hover:ring-2 ring-violet-500 transition-all">
                                     <AvatarImage src={user?.avatar} />
-                                    <AvatarFallback>{user?.name?.substring(0, 2).toUpperCase() || user?.username?.substring(0, 2).toUpperCase() || "RO"}</AvatarFallback>
+                                    <AvatarFallback>{user?.name?.substring(0, 2).toUpperCase() || user?.email?.substring(0, 2).toUpperCase() || "RO"}</AvatarFallback>
                                 </Avatar>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-64">
                                 {/* User Info */}
                                 <DropdownMenuLabel className="font-normal">
                                     <div className="flex flex-col space-y-1">
-                                        <p className="text-sm font-medium leading-none">{user?.name || user?.username || "RetoucherOZ"}</p>
-                                        <p className="text-xs leading-none text-muted-foreground">{user?.email || user?.username}</p>
+                                        <p className="text-sm font-medium leading-none">{user?.name || user?.email || "RetoucherOZ"}</p>
+                                        <p className="text-xs leading-none text-muted-foreground">{user?.email || user?.email}</p>
                                     </div>
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
@@ -216,8 +209,7 @@ export function TopNav() {
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
                                     onClick={async () => {
-                                        await fetch('/api/auth/logout', { method: 'POST' });
-                                        router.replace('/');
+                                        await signOut({ callbackUrl: '/' });
                                     }}
                                     className="cursor-pointer text-red-500 focus:text-red-500"
                                 >

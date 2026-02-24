@@ -1,16 +1,35 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { deductCredits } from "@/lib/auth-helpers";
+import { prisma } from "@/lib/prisma";
 
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
     try {
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+        const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { id: true, credits: true, role: true } });
+        if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+        const POSE_ANALYZE_COST = 20;
+        if (user.role !== 'admin' && (user.credits || 0) < POSE_ANALYZE_COST) {
+            return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
+        }
+
         const { imageUrl } = await req.json();
 
         if (!imageUrl) {
             return NextResponse.json({ error: "Image URL is required" }, { status: 400 });
+        }
+
+        // Deduct credits
+        if (user.role !== 'admin') {
+            await deductCredits(user.id, POSE_ANALYZE_COST, "Pose Analysis");
         }
 
         const apiKey = process.env.GEMINI_API_KEY;

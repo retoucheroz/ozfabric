@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSession, getUser } from '@/lib/auth';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth-options';
 import { getGlobalLibraryItems, addGlobalLibraryItem, updateGlobalLibraryItem, deleteGlobalLibraryItem } from '@/lib/library-service';
 
 async function checkAdmin() {
-    const session = await getSession();
-    if (!session) return null;
-    const user = await getUser(session.username);
-    if (!user || user.role !== 'admin') return null;
-    return user;
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id || session.user.role !== 'admin') return null;
+    return session.user;
 }
 
 export async function GET(req: NextRequest) {

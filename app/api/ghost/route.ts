@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { deductCredits } from "@/lib/auth-helpers";
+import { prisma } from "@/lib/prisma";
+import { SERVICE_COSTS } from "@/lib/pricingConstants";
 
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
-const MOCK_GHOST = "https://images.unsplash.com/photo-1576566588028-4147f3842f27?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80";
-
-// Ghost Mannequin Prompts
 const FRONT_ANGLE_PROMPT = `IMPORTANT ORIENTATION & POSE LOCK:
 - CAMERA VIEW: Front 3/4 (Front-Left Three-Quarter).
 - POSE DIRECTION: The garment's arms and overall orientation must point toward the CAMERA-LEFT (Sırtı sağa, göğsü sola doğru).
@@ -173,7 +175,21 @@ Clean commercial e-commerce look.`;
 
 export async function POST(req: NextRequest) {
     try {
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+        const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { id: true, credits: true, role: true } });
+        if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
         const { images, angle, resolution, aspectRatio } = await req.json();
+
+        const cost = resolution === "4K"
+            ? SERVICE_COSTS.IMAGE_GENERATION.GHOST_MODEL_4K
+            : SERVICE_COSTS.IMAGE_GENERATION.GHOST_MODEL_1_2K;
+
+        if (user.role !== 'admin' && (user.credits || 0) < cost) {
+            return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
+        }
 
         if (!images || images.length === 0) {
             return NextResponse.json({ error: "At least one image required" }, { status: 400 });
@@ -189,16 +205,7 @@ export async function POST(req: NextRequest) {
         selectedPrompt = selectedPrompt.replace(/2:3 aspect ratio/g, `${effectiveAspectRatio} aspect ratio`);
 
         const falKey = process.env.FAL_KEY;
-
-        if (!falKey) {
-            console.log("[MOCK GHOST] No FAL_KEY set.");
-            await new Promise((r) => setTimeout(r, 2500));
-            return NextResponse.json({
-                status: "completed",
-                imageUrl: MOCK_GHOST,
-                message: "Mock mode (set key)"
-            });
-        }
+        if (!falKey) return NextResponse.json({ error: "FAL_KEY missing" }, { status: 500 });
 
         const { ensureR2Url } = await import("@/lib/s3");
         const sanitizedImages = await Promise.all(
@@ -213,14 +220,18 @@ export async function POST(req: NextRequest) {
             resolution: resolution || "1K"
         });
 
-        if (imageUrl) {
-            return NextResponse.json({ status: "completed", imageUrl: imageUrl });
+        if (!imageUrl) return NextResponse.json({ error: "No image in response" }, { status: 500 });
+
+        // Deduct credits
+        if (user.role !== 'admin') {
+            await deductCredits(user.id, cost, `Ghost Mannequin (${angle})`);
         }
 
-        return NextResponse.json({ error: "No image in response" }, { status: 500 });
+        return NextResponse.json({ status: "completed", imageUrl });
 
     } catch (error) {
         console.error("Ghost API Error:", error);
         return NextResponse.json({ error: "Server Error" }, { status: 500 });
     }
 }
+

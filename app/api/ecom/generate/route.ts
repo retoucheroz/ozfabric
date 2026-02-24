@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { deductCredits } from "@/lib/auth-helpers";
+import { prisma } from "@/lib/prisma";
 
 // Configure route
 export const maxDuration = 120
@@ -29,13 +33,33 @@ interface FalResult {
 
 export async function POST(req: NextRequest) {
     try {
-        const { prompt, images, options }: GenerateRequest = await req.json()
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+        const body = await req.json();
+        const { prompt, images, options }: GenerateRequest = body;
+
+        const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { id: true, credits: true, role: true } });
+        if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+        // Calculate cost
+        const singleCost = options.resolution === "4K" ? 100 : 50;
+        const totalCost = singleCost * (options.numImages || 1);
+
+        if (user.role !== 'admin' && (user.credits || 0) < totalCost) {
+            return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
+        }
 
         if (!prompt) {
             return NextResponse.json(
                 { error: 'Prompt is required' },
                 { status: 400 }
             )
+        }
+
+        // Deduct credits
+        if (user.role !== 'admin') {
+            await deductCredits(user.id, totalCost, "E-Com Generation");
         }
 
         console.log('\n=== E-COM GENERATE REQUEST ===')

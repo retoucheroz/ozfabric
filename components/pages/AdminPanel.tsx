@@ -23,8 +23,26 @@ import {
     Image as ImageIcon
 } from "lucide-react"
 import { toast } from "sonner"
-import { User } from "@/lib/auth-types"
 import { useLanguage } from "@/context/language-context"
+
+// Local User type (matches API response)
+type User = {
+    username: string;
+    email?: string;
+    name?: string;
+    image?: string;
+    role: string;
+    credits: number;
+    status: string;
+    authorizedPages: string[];
+    customTitle?: string;
+    customLogo?: string;
+    authType?: string;
+    lastSeenAt?: number;
+    lastSeenPage?: string;
+    avatar?: string;
+    createdAt?: number;
+}
 
 const AVAILABLE_PAGES = [
     { label: 'Photoshoot (AI Model)', path: '/photoshoot' },
@@ -580,8 +598,8 @@ export default function AdminPanel() {
                                         {creditHistory.map((tx) => (
                                             <tr key={tx.id} className="hover:bg-muted/30 transition-colors">
                                                 <td className="p-4">
-                                                    <div className="text-xs font-medium">{new Date(tx.created_at).toLocaleDateString()}</div>
-                                                    <div className="text-[9px] text-muted-foreground">{new Date(tx.created_at).toLocaleTimeString()}</div>
+                                                    <div className="text-xs font-medium">{new Date(tx.createdAt).toLocaleDateString()}</div>
+                                                    <div className="text-[9px] text-muted-foreground">{new Date(tx.createdAt).toLocaleTimeString()}</div>
                                                 </td>
                                                 <td className="p-4">
                                                     <div className="text-xs font-bold">{tx.description || '-'}</div>

@@ -19,7 +19,7 @@ export default function CommunityPage() {
         fetch('/api/auth/session')
             .then(res => res.json())
             .then(data => {
-                if (data.authenticated && data.user?.role === 'admin') {
+                if (data?.user?.role === 'admin') {
                     setIsAdmin(true)
                 }
             })

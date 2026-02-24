@@ -23,7 +23,7 @@ export default function PricingPage() {
         fetch('/api/auth/session')
             .then(res => res.json())
             .then(data => {
-                if (data.authenticated) {
+                if (data?.user) {
                     setUser(data.user);
                 }
             })

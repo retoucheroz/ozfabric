@@ -103,9 +103,8 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
             const res = await fetch('/api/auth/session');
             if (res.ok) {
                 const data = await res.json();
-                if (data.authenticated && data.user) {
+                if (data?.user) {
                     setCredits(data.user.credits || 0);
-                    // Also console log for debugging
                     console.log(`💳 Credits Refreshed: ${data.user.credits}`);
                 }
             }

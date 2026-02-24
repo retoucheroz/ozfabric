@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { OzzieChat } from "@/components/features/OzzieChat";
 import { CookieBanner } from "@/components/cookie-banner";
 import { ActivityTracker } from "@/components/activity-tracker";
+import { AuthSessionProvider } from "@/components/providers/session-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,13 +43,15 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <LanguageProvider>
-            <ProjectsProvider>
-              {children}
-              <Toaster />
-              <OzzieChat />
-              <CookieBanner />
-              <ActivityTracker />
-            </ProjectsProvider>
+            <AuthSessionProvider session={null}>
+              <ProjectsProvider>
+                {children}
+                <Toaster />
+                <OzzieChat />
+                <CookieBanner />
+                <ActivityTracker />
+              </ProjectsProvider>
+            </AuthSessionProvider>
           </LanguageProvider>
         </ThemeProvider>
       </body>

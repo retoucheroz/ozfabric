@@ -1,7 +1,23 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { deductCredits } from "@/lib/auth-helpers";
+import { prisma } from "@/lib/prisma";
 
-export async function POST(req: Request) {
+const SKETCH_COST = 20;
+
+export async function POST(req: NextRequest) {
     try {
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+        const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { id: true, credits: true, role: true } });
+        if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+        if (user.role !== 'admin' && (user.credits || 0) < SKETCH_COST) {
+            return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
+        }
+
         const { image, prompt, strength = 0.75 } = await req.json();
 
         if (!image) {
@@ -13,13 +29,6 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "FAL_KEY is not configured" }, { status: 500 });
         }
 
-        // FINAL ATTEMPT: Using the standard, robust Flux Dev ControlNet endpoint
-        // This is the official way to do Canny with Flux on Fal.ai
-        const model = "fal-ai/flux/dev/controlnet";
-
-        console.log("Using Standard Flux ControlNet: fal-ai/flux/dev/controlnet");
-
-        // Using raw fetch 
         const body = {
             prompt: prompt || "A realistic photo of the sketch",
             control_image_url: image,
@@ -31,7 +40,7 @@ export async function POST(req: Request) {
             enable_safety_checker: false
         };
 
-        const response = await fetch(`https://fal.run/${model}`, {
+        const response = await fetch(`https://fal.run/fal-ai/flux/dev/controlnet`, {
             method: "POST",
             headers: {
                 "Authorization": `Key ${falKey}`,
@@ -43,15 +52,7 @@ export async function POST(req: Request) {
         if (!response.ok) {
             const errorText = await response.text();
             console.error("Fal API Error:", response.status, errorText);
-            try {
-                const errorJson = JSON.parse(errorText);
-                return NextResponse.json({
-                    error: errorJson.body?.message || errorJson.error || "Generation failed (API Error)",
-                    details: errorJson
-                }, { status: response.status });
-            } catch {
-                return NextResponse.json({ error: `Generation failed (${response.status})`, details: errorText }, { status: response.status });
-            }
+            return NextResponse.json({ error: "Generation failed" }, { status: response.status });
         }
 
         const result = await response.json();
@@ -61,24 +62,22 @@ export async function POST(req: Request) {
             try {
                 const { uploadFromUrl } = await import("@/lib/s3");
                 const savedUrl = await uploadFromUrl(imageUrl, "sketch/results");
-
-                // Update the result object with the new URL
                 if (result.images?.[0]) result.images[0].url = savedUrl;
                 if (result.image) result.image.url = savedUrl;
-
-                console.log("Sketch result persisted to S3:", savedUrl);
             } catch (e) {
                 console.error("S3 persistence error for sketch:", e);
             }
+        }
+
+        // Deduct credits
+        if (user.role !== 'admin') {
+            await deductCredits(user.id, SKETCH_COST, "Sketch to Image");
         }
 
         return NextResponse.json(result);
 
     } catch (error: any) {
         console.error("Sketch API Error:", error);
-        return NextResponse.json(
-            { error: error.message || "Something went wrong" },
-            { status: 500 }
-        );
+        return NextResponse.json({ error: "Server Error" }, { status: 500 });
     }
 }

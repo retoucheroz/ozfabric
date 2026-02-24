@@ -1,15 +1,18 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { deductCredits } from "@/lib/auth-helpers";
+import { prisma } from "@/lib/prisma";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function POST(req: NextRequest) {
     try {
-        const { getSession, getUser, saveUser } = await import("@/lib/auth");
-        const session = await getSession();
-        if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-        const user = await getUser(session.username);
+        const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { id: true, credits: true, role: true } });
         if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
         const ANALYZE_COST = 20;
@@ -32,11 +35,7 @@ export async function POST(req: NextRequest) {
         } = await req.json();
 
         // Deduct credits
-        const updatedUser = {
-            ...user,
-            credits: (user.credits || 0) - ANALYZE_COST
-        };
-        await saveUser(updatedUser);
+        await deductCredits(user.id, ANALYZE_COST, "Editorial Analyze");
 
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 

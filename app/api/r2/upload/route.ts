@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { r2 } from "@/lib/s3";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
 
 export async function POST(req: NextRequest) {
     try {
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
         const { base64, fileName, contentType, folder = "library" } = await req.json();
 
         if (!base64) {

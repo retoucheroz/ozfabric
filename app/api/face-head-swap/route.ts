@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession, getUser } from "@/lib/auth";
-import { deductCredits } from "@/lib/postgres";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { prisma } from "@/lib/prisma";
+import { deductCredits } from "@/lib/auth-helpers";
 import { SERVICE_COSTS } from "@/lib/pricingConstants";
 
 export const maxDuration = 300;
@@ -57,9 +59,10 @@ export async function POST(req: NextRequest) {
         }
 
         // --- CREDIT CHECK ---
-        const session = await getSession();
-        if (!session) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
-        const user = await getUser(session.username);
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.id) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+
+        const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { id: true, credits: true, role: true } });
         if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
         const cost = resolution === "4K"
@@ -94,9 +97,9 @@ export async function POST(req: NextRequest) {
 
         const imageUrl = await generateWithNanoBanana(payload);
 
-        // Deduct credits after success (or before, depending on policy)
+        // Deduct credits after success
         if (user.role !== 'admin') {
-            await deductCredits(user.username, cost, `${swapMode === 'head_swap' ? 'Head' : 'Face'} Swap (${resolution})`);
+            await deductCredits(user.id, cost, `${swapMode === 'head_swap' ? 'Head' : 'Face'} Swap (${resolution})`);
         }
 
         return NextResponse.json({

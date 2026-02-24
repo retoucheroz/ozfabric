@@ -45,7 +45,7 @@ function SettingsContent() {
             const res = await fetch('/api/auth/session');
             if (res.ok) {
                 const data = await res.json();
-                if (data.authenticated) {
+                if (data?.user) {
                     setUser(data.user);
                 }
             }
@@ -159,10 +159,10 @@ function SettingsContent() {
                                     </div>
                                     <div className="flex-1 text-center sm:text-left">
                                         <div className="text-xl font-black uppercase italic tracking-tight text-[var(--text-primary)]">
-                                            {user?.name || user?.username || t("common.user")}
+                                            {user?.name || user?.email || t("common.user")}
                                         </div>
                                         <div className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest">
-                                            {user?.email || user?.username}
+                                            {user?.email || user?.email}
                                         </div>
                                         <div className="mt-3 flex flex-wrap justify-center sm:justify-start gap-2">
                                             <Badge variant="outline" className="border-[var(--accent-primary)]/20 text-[var(--accent-primary)] bg-[var(--accent-soft)] text-[9px] font-black uppercase tracking-widest">

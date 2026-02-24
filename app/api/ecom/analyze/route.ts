@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory } from "@google/generative-ai"
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { deductCredits } from "@/lib/auth-helpers";
+import { prisma } from "@/lib/prisma";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
@@ -29,7 +33,24 @@ const LIGHTING_MAP: Record<string, string> = {
 
 export async function POST(req: NextRequest) {
     try {
-        const { userPrompt, images, language, framing, viewAngle, lighting } = await req.json()
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+        const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { id: true, credits: true, role: true } });
+        if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+        const ANALYZE_COST = 20;
+        if (user.role !== 'admin' && (user.credits || 0) < ANALYZE_COST) {
+            return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
+        }
+
+        const body = await req.json()
+        const { userPrompt, images, language, framing, viewAngle, lighting } = body;
+
+        // Deduct credits
+        if (user.role !== 'admin') {
+            await deductCredits(user.id, ANALYZE_COST, "E-Com Analysis");
+        }
 
         // Build the analysis prompt
         const analysisPrompt = buildAnalysisPrompt(userPrompt, framing, viewAngle, lighting)

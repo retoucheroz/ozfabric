@@ -1,27 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSession, getUser } from '@/lib/auth';
-import { getGlobalSetting, setGlobalSetting } from '@/lib/postgres';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth-options';
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
-async function checkAdmin(req?: NextRequest) {
-    const adminPassword = process.env.ADMIN_PASSWORD;
-    if (adminPassword && req) {
-        const providedSecret = req.headers.get('x-admin-secret');
-        if (providedSecret === adminPassword) {
-            return { username: 'admin', role: 'admin' } as any;
-        }
-    }
+async function checkAdmin() {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id || session.user.role !== 'admin') return null;
+    return session.user;
+}
 
-    const session = await getSession();
-    if (!session) return null;
-    const user = await getUser(session.username);
-    if (!user || user.role !== 'admin') return null;
-    return user;
+// Prisma-based get/set for app_settings
+async function getGlobalSetting(key: string): Promise<string | null> {
+    const setting = await prisma.appSetting.findUnique({ where: { key } });
+    return setting?.value || null;
+}
+
+async function setGlobalSetting(key: string, value: string): Promise<void> {
+    await prisma.appSetting.upsert({
+        where: { key },
+        update: { value },
+        create: { key, value },
+    });
 }
 
 export async function GET(req: NextRequest) {
-    if (!await checkAdmin(req)) {
+    if (!await checkAdmin()) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     const apiProvider = await getGlobalSetting('nano_banana_provider') || 'fal_ai';
@@ -29,7 +34,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-    if (!await checkAdmin(req)) {
+    if (!await checkAdmin()) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

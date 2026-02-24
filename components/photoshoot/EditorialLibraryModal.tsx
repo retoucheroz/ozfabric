@@ -34,7 +34,7 @@ export function EditorialLibraryModal({ isOpen, onClose, activeType, onSelect, l
         fetch('/api/auth/session')
             .then(res => res.json())
             .then(data => {
-                if (data.authenticated) {
+                if (data?.user) {
                     setUser(data.user);
                     setIsAdmin(data.user?.role === 'admin');
                 }
@@ -111,7 +111,7 @@ export function EditorialLibraryModal({ isOpen, onClose, activeType, onSelect, l
             customPrompt: prompt,
             createdAt: Date.now(),
             creatorRole: isAdmin ? 'admin' : 'user', // Used to tell if the user added it
-            creatorId: user?.username || 'local',
+            creatorId: user?.email || 'local',
             type: activeType
         };
 
@@ -144,7 +144,7 @@ export function EditorialLibraryModal({ isOpen, onClose, activeType, onSelect, l
     };
 
     // Limits
-    const userUploadedCount = items.filter(i => i.creatorRole !== 'admin' && i.creatorId === (user?.username || 'local')).length;
+    const userUploadedCount = items.filter(i => i.creatorRole !== 'admin' && i.creatorId === (user?.email || 'local')).length;
     const canUpload = isAdmin || userUploadedCount < 1;
 
     return (
@@ -268,7 +268,7 @@ export function EditorialLibraryModal({ isOpen, onClose, activeType, onSelect, l
                                         )}
                                     </div>
 
-                                    {(isAdmin || (item.creatorRole !== 'admin' && item.creatorId === user?.username)) && (
+                                    {(isAdmin || (item.creatorRole !== 'admin' && item.creatorId === user?.email)) && (
                                         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <Button size="icon" variant="destructive" className="h-7 w-7 rounded-sm" onClick={(e) => handleDelete(item.id, e)}>
                                                 <Trash2 className="w-3.5 h-3.5" />
