@@ -671,12 +671,9 @@ export async function POST(req: NextRequest) {
                 }
             }
 
-            // === MOOD INJECTION ===
-            const resolvedMood = resolveMood(angleId, selectedMoodId);
+            // === MOOD NEGATIVE INJECTION ===
+            const resolvedMood = resolveMood(angleId, selectedMoodId, effectiveRole);
             if (resolvedMood) {
-                if (resolvedMood.promptAddition) {
-                    finalPrompt += `, ${resolvedMood.promptAddition}`;
-                }
                 if (resolvedMood.negativePromptAddition) {
                     combinedNegative += ", " + resolvedMood.negativePromptAddition;
                 }
@@ -979,7 +976,10 @@ export async function POST(req: NextRequest) {
             }
 
             // 8. Expressions & Gaze -> Modern Mood System
-
+            const resolvedMood = resolveMood(angleId, selectedMoodId, effectiveRole);
+            if (resolvedMood && resolvedMood.promptAddition) {
+                sections.push(`[MODEL_MOOD]\nExpression & Vibe: ${resolvedMood.promptAddition}\n[/MODEL_MOOD]`);
+            }
 
             if (hairFace) sections.push(hairFace);
             if (environmental.length > 0) sections.push(environmental.join(" "));
