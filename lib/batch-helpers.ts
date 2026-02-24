@@ -202,6 +202,19 @@ export function buildBatchSpecs(
                 excludeAllAccessories: true,
                 isStyling: false
             },
+            // 4.5. Technical 3/4 Front — NO ACCESSORIES
+            {
+                view: "technical_threequarter_front",
+                pose: "upright posture, three-quarter profile view facing right, shoulders level and relaxed, natural shoulder alignment, arms resting straight along the sides, hands relaxed with fingers slightly curved, no hand-to-body interaction, weight subtly distributed with slight emphasis on rear leg, neutral balanced stance, feet parallel and slightly apart, knees softly extended, neutral gaze directed forward in profile direction, head aligned with spine, chin neutral, elongated neck line",
+                dynamic: false,
+                lookAtCamera: false,
+                hairBehind: true,
+                camera: { shot_type: 'full_body', framing: 'head_to_toe', angle: "angled" },
+                assets: ['front', 'back'],
+                fitDescriptionMode: 'full',
+                excludeAllAccessories: true,
+                isStyling: false
+            },
             // 5. Detail Front
             {
                 view: "detail_front",
@@ -316,6 +329,18 @@ export function buildStandardBatchSpecs(
             assets: ['back'],
             fitDescriptionMode: 'full',
             excludeHairInfo: true,
+            isStyling: false
+        },
+        {
+            view: "std_tech_threequarter_front",
+            pose: "upright posture, three-quarter profile view facing right, shoulders level and relaxed, natural shoulder alignment, arms resting straight along the sides, hands relaxed with fingers slightly curved, no hand-to-body interaction, weight subtly distributed with slight emphasis on rear leg, neutral balanced stance, feet parallel and slightly apart, knees softly extended, neutral gaze directed forward in profile direction, head aligned with spine, chin neutral, elongated neck line",
+            dynamic: false,
+            lookAtCamera: false,
+            hairBehind: true,
+            camera: { shot_type: 'full_body', framing: 'head_to_toe', angle: "angled" },
+            assets: ['front', 'back'],
+            fitDescriptionMode: 'full',
+            excludeAllAccessories: true,
             isStyling: false
         },
         {

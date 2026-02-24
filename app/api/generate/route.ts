@@ -793,8 +793,8 @@ export async function POST(req: NextRequest) {
                     cropped: "LENGTH CONSTRAINT: Pant legs end clearly above the ankle bone, exposing visible ankle space. Hem floats above the shoe upper with a visible gap. No break, no shoe contact, no stacking, no pooling. Strict cropped length. Maintain exact proportional scaling relative to model height.",
                     ankle: "LENGTH CONSTRAINT: Pant legs end exactly at the ankle bone level. Hem sits just at the top line of the ankle without touching the shoe. No break, no fabric resting on the shoe, no stacking, no pooling. Clean ankle-length finish. Maintain exact proportional scaling relative to model height.",
                     below_ankle: "LENGTH CONSTRAINT: Pant legs end slightly below the ankle bone with minimal contact at the top edge of the shoe. No visible break at the front. No stacking, no pooling, no extended length. Controlled ankle-below finish. Maintain exact proportional scaling relative to model height.",
-                    full_length: "LENGTH CONSTRAINT: Pant legs extend to the floor/heel level, slightly breaking over the shoes. This 'Full Length' (Topuğa Kadar) style means the hem sits exactly where the shoe meets the floor at the back, with a single minimal fold at the front. MUST conceal any socks.",
-                    deep_break: "LENGTH CONSTRAINT: Pant legs are extra long, fully covering the upper part of the shoe and the heel. This 'Over-the-shoe' (Ayakkabının Üstünü Kapatacak) style ensures the hem puddles slightly over the footwear, hiding most of the shoe and completely concealing socks. The pant leg is the dominant feature at the foot level."
+                    full_length: "LENGTH CONSTRAINT: Pant legs extend to the floor/heel level, slightly breaking over the shoes. This 'Full Length' style means the hem sits exactly where the shoe meets the floor at the back, with a single minimal fold at the front. MUST conceal any socks.",
+                    deep_break: "LENGTH CONSTRAINT: Pant legs are extra long, fully covering the upper part of the shoe and the heel. This 'Over-the-shoe' style ensures the hem puddles slightly over the footwear, hiding most of the shoe and completely concealing socks. The pant leg is the dominant feature at the foot level."
                 };
                 if (lengthPrompts[pantLength]) {
                     productBlock.push(lengthPrompts[pantLength]);
@@ -850,31 +850,26 @@ export async function POST(req: NextRequest) {
                 sections.push(accBlock.join("\n"));
             }
 
-            // === PRIORITY 3: POSE GEOMETRY ===
-            let subjectInfo = `POSE: Professional ${sp.subject.type} (Strictly match provided identity)`;
-            if (isBackView) subjectInfo += " seen from BACK.";
-            else if (sp.camera.angle === 'side' || sp.camera.angle === 'angled' || view.includes('angled')) subjectInfo += " in 3/4 ANGLED view.";
-            else subjectInfo += " in FRONT view.";
+            // === PRIORITY 3: POSE GEOMETRY (structured [POSE] block) ===
+            const poseBlock: string[] = [];
+            poseBlock.push(`[POSE]`);
+            poseBlock.push(`Subject: Professional ${sp.subject.type} (Strictly match provided identity).`);
 
             if (sp.pose.description) {
                 let bio = clean(sp.pose.description);
                 if (sp.pose.dynamic) {
                     bio = bio.replace(/arms (hang|stay|placed) (naturally )?at sides/gi, "arms in dynamic fashion placement");
                 }
-                subjectInfo += ` ${bio}.`;
+                poseBlock.push(bio);
             }
             if (sp.pose.reference && sp.pose.reference.includes("stickman")) {
-                subjectInfo += " ControlNet: Strictly follow the provided stickman geometry.";
+                poseBlock.push("ControlNet: Strictly follow the provided stickman geometry.");
             }
-            sections.push(subjectInfo);
+            poseBlock.push(`[/POSE]`);
+            sections.push(poseBlock.join("\n"));
 
-            // === PRIORITY 4: STYLING & ENVIRONMENT ===
-            const environmental: string[] = [];
+            // === PRIORITY 4: STYLING & ENVIRONMENT (structured blocks) ===
             const stylingItems: string[] = [];
-
-            // Atmosphere / Lighting
-            if (lightingPositive) environmental.push(`Lighting: ${clean(lightingPositive)}.`);
-            else if (sp.scene.lighting) environmental.push(`Lighting: ${clean(sp.scene.lighting)}.`);
 
             // Layering (Secondary Priority)
             if (sp.styling.layers.jacket?.visible && canShowCollarHairButtons) {
@@ -914,12 +909,11 @@ export async function POST(req: NextRequest) {
                 }
             }
 
-
             if (stylingItems.length > 0) {
-                sections.push("Styling Strategy: " + stylingItems.join(", ") + ".");
+                sections.push(`[STYLING]\n${stylingItems.join(". ")}.\n[/STYLING]`);
             }
 
-            // 5. Accessories & Extras
+            // 5. Footwear & Accessories (structured)
             const extras: string[] = [];
             if (canShowFootwear && sp.accessories.shoes) {
                 let style = clean(sp.accessories.shoes.style);
@@ -927,9 +921,9 @@ export async function POST(req: NextRequest) {
                 const size = clean(sp.accessories.shoes.size);
 
                 if (uploadedImages.shoes) {
-                    extras.push(`Footwear: **MANDATORY - MUST MATCH PROVIDED SHOE IMAGE EXACTLY** in color, texture, and silhouette. ${style}${size ? ` (${size})` : ""}`);
+                    extras.push(`[FOOTWEAR]\n**MANDATORY - MUST MATCH PROVIDED SHOE IMAGE EXACTLY** in color, texture, and silhouette. ${style}${size ? ` (${size})` : ""}\n[/FOOTWEAR]`);
                 } else {
-                    extras.push(`Footwear: ${style}${size ? ` (${size})` : ""}`);
+                    extras.push(`[FOOTWEAR]\n${style}${size ? ` (${size})` : ""}\n[/FOOTWEAR]`);
                 }
             }
 
@@ -947,31 +941,35 @@ export async function POST(req: NextRequest) {
                 if (sp.accessories?.belt) extras.push("Wearing the provided belt");
             }
 
-            if (extras.length > 0) sections.push(extras.join(", ") + ".");
+            if (extras.length > 0) sections.push(extras.join(" "));
 
-            // 6. Background
-            sections.push("Background: Use the provided reference background images to match environment perfectly.");
+            // 6. Background (structured)
+            sections.push(`[BACKGROUND]\nUse the provided reference background images to match environment perfectly.\n[/BACKGROUND]`);
 
-            // 7. Hair & Face (Visibility controlled)
-            let hairFace = "";
+            // 7. Hair & Face (structured)
+            const hairFaceItems: string[] = [];
 
             if (canShowCollarHairButtons || canShowFaceDetails) {
                 if (isBackView) {
-                    hairFace = "Model is looking away from the camera.";
+                    hairFaceItems.push("Model is looking away from the camera.");
                 } else if (sp.subject.look_at_camera === true) {
-                    hairFace = "Model is making direct eye contact with the camera.";
+                    hairFaceItems.push("Model is making direct eye contact with the camera.");
                 } else if (sp.subject.look_at_camera === false) {
-                    hairFace = "Model is looking slightly away from the camera, avoiding direct eye contact.";
+                    hairFaceItems.push("Model is looking slightly away from the camera, avoiding direct eye contact.");
                 }
 
                 if (sp.subject.type !== 'male_model') {
                     if (sp.subject.hair_behind_shoulders === true) {
-                        hairFace += " Hair is neatly placed BEHIND the shoulders.";
+                        hairFaceItems.push("Hair is neatly placed BEHIND the shoulders.");
                     } else {
-                        hairFace += " Hair: Natural and well-groomed.";
+                        hairFaceItems.push("Hair: Natural and well-groomed.");
                     }
                 }
-                if (sp.subject.wind) hairFace += " Dynamic studio airflow/wind effect is visible, hair and fabric suggest movement.";
+                if (sp.subject.wind) hairFaceItems.push("Dynamic studio airflow/wind effect is visible, hair and fabric suggest movement.");
+            }
+
+            if (hairFaceItems.length > 0) {
+                sections.push(`[MODEL_APPEARANCE]\n${hairFaceItems.join(" ")}\n[/MODEL_APPEARANCE]`);
             }
 
             // 8. Expressions & Gaze -> Modern Mood System
@@ -980,8 +978,14 @@ export async function POST(req: NextRequest) {
                 sections.push(`[MODEL_MOOD]\nExpression & Vibe: ${resolvedMood.promptAddition}\n[/MODEL_MOOD]`);
             }
 
-            if (hairFace) sections.push(hairFace);
-            if (environmental.length > 0) sections.push(environmental.join(" "));
+            // 9. Lighting (structured - ALWAYS included when available)
+            if (lightingPositive) {
+                sections.push(`[LIGHTING]\n${clean(lightingPositive)}\n[/LIGHTING]`);
+            } else if (sp.scene.lighting) {
+                sections.push(`[LIGHTING]\n${clean(sp.scene.lighting)}\n[/LIGHTING]`);
+            } else {
+                sections.push(`[LIGHTING]\nsoft_fashion_lighting\n[/LIGHTING]`);
+            }
 
             return sections.map(s => s.trim()).filter(Boolean).join(" ");
         }
