@@ -232,101 +232,62 @@ export default function PhotoshootPage() {
                                     <div className="grid grid-cols-3 gap-4 flex-1">
                                         <AssetCard id="background" label={language === "tr" ? "ARKAPLAN" : "BACKGROUND"} icon={ImageIcon} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="portrait" />
                                         <AssetCard id="lighting" label={language === "tr" ? "IŞIK" : "LIGHT"} icon={Camera} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} lightingSendImage={lightingSendImage} setLightingSendImage={setLightingSendImage} variant="portrait" />
-                                        <Dialog>
-                                            <DialogTrigger asChild>
-                                                <div className="group/card relative w-full h-full min-h-[140px]">
-                                                    <div className={cn(
-                                                        "relative h-full rounded-3xl border-2 flex flex-col items-center justify-center overflow-hidden transition-all duration-500 cursor-pointer shadow-sm hover:shadow-md",
-                                                        selectedMoodId ? "bg-[var(--bg-elevated)] border-[var(--accent-primary)] ring-2 ring-[var(--accent-primary)]/20" : "bg-[var(--bg-elevated)] border-[var(--border-subtle)] border-dashed hover:border-[var(--accent-primary)]"
-                                                    )}>
-                                                        <div className="flex flex-col items-center gap-2.5 p-3 text-center transition-all group-hover/card:scale-105">
-                                                            <div className="p-3.5 rounded-2xl bg-[var(--accent-soft)]/50 text-[var(--accent-primary)] shadow-inner">
-                                                                <span className="text-2xl">{
-                                                                    [
-                                                                        { id: 'natural', icon: '✦' }, { id: 'warm', icon: '☀' },
-                                                                        { id: 'powerful', icon: '◆' }, { id: 'relaxed', icon: '~' },
-                                                                        { id: 'professional', icon: '👔' }, { id: 'subtle', icon: '🍃' }
-                                                                    ].find(m => m.id === selectedMoodId)?.icon || '✦'
-                                                                }</span>
-                                                            </div>
-                                                            <div className="space-y-0.5 pointer-events-none">
-                                                                <span className="text-[11px] font-black uppercase tracking-wide text-[var(--text-primary)] block leading-tight">
-                                                                    {language === "tr" ? "HAVASI" : "MOOD"}
-                                                                </span>
-                                                                <span className="text-[9px] font-black tracking-tighter text-[var(--accent-primary)] uppercase opacity-90 block transition-colors">
-                                                                    {language === "tr"
-                                                                        ? [
-                                                                            { id: 'natural', label: 'Doğal' }, { id: 'warm', label: 'Sıcak' },
-                                                                            { id: 'powerful', label: 'Güçlü' }, { id: 'relaxed', label: 'Rahat' },
-                                                                            { id: 'professional', label: 'Profesyonel' }, { id: 'subtle', label: 'Sakin' }
-                                                                        ].find(m => m.id === selectedMoodId)?.label || "SEÇİLMEDİ"
-                                                                        : [
-                                                                            { id: 'natural', labelEn: 'Natural' }, { id: 'warm', labelEn: 'Warm' },
-                                                                            { id: 'powerful', labelEn: 'Powerful' }, { id: 'relaxed', labelEn: 'Relaxed' },
-                                                                            { id: 'professional', labelEn: 'Professional' }, { id: 'subtle', labelEn: 'Subtle' }
-                                                                        ].find(m => m.id === selectedMoodId)?.labelEn || "NOT SELECTED"}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        <div className={cn(
-                                                            "absolute top-3 right-3 p-1.5 rounded-lg border shadow-lg transition-all z-20",
-                                                            selectedMoodId
-                                                                ? "bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white ring-2 ring-[var(--accent-primary)]/30"
-                                                                : "bg-[var(--bg-surface)] border-[var(--border-subtle)] text-[var(--text-muted)] group-hover/card:text-[var(--text-primary)] group-hover/card:border-[var(--accent-primary)]"
-                                                        )}>
-                                                            <Sparkles size={14} />
-                                                        </div>
+                                        <div
+                                            className="group/card relative w-full h-full min-h-[140px]"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                const moods = ['natural', 'warm', 'powerful', 'relaxed', 'professional', 'subtle'];
+                                                const currentIndex = selectedMoodId ? moods.indexOf(selectedMoodId) : -1;
+                                                const nextIndex = (currentIndex + 1) % moods.length;
+                                                setSelectedMoodId(moods[nextIndex]);
+                                            }}
+                                        >
+                                            <div className={cn(
+                                                "relative h-full rounded-3xl border-2 flex flex-col items-center justify-center overflow-hidden transition-all duration-500 cursor-pointer shadow-sm hover:shadow-md",
+                                                selectedMoodId ? "bg-[var(--bg-elevated)] border-[var(--accent-primary)] ring-2 ring-[var(--accent-primary)]/20" : "bg-[var(--bg-elevated)] border-[var(--border-subtle)] border-dashed hover:border-[var(--accent-primary)]"
+                                            )}>
+                                                <div className="flex flex-col items-center gap-2.5 p-3 text-center transition-all group-hover/card:scale-105">
+                                                    <div className="p-3.5 rounded-2xl bg-[var(--accent-soft)]/50 text-[var(--accent-primary)] shadow-inner">
+                                                        <span className="text-2xl">{
+                                                            [
+                                                                { id: 'natural', icon: '✦' }, { id: 'warm', icon: '☀' },
+                                                                { id: 'powerful', icon: '◆' }, { id: 'relaxed', icon: '~' },
+                                                                { id: 'professional', icon: '👔' }, { id: 'subtle', icon: '🍃' }
+                                                            ].find(m => m.id === selectedMoodId)?.icon || '✦'
+                                                        }</span>
+                                                    </div>
+                                                    <div className="space-y-0.5 pointer-events-none">
+                                                        <span className="text-[11px] font-black uppercase tracking-wide text-[var(--text-primary)] block leading-tight">
+                                                            {language === "tr" ? "HAVASI" : "MOOD"}
+                                                        </span>
+                                                        <span className="text-[9px] font-black tracking-tighter text-[var(--accent-primary)] uppercase opacity-90 block transition-colors mt-0.5">
+                                                            {language === "tr"
+                                                                ? [
+                                                                    { id: 'natural', label: 'Doğal' }, { id: 'warm', label: 'Sıcak' },
+                                                                    { id: 'powerful', label: 'Güçlü' }, { id: 'relaxed', label: 'Rahat' },
+                                                                    { id: 'professional', label: 'Profesyonel' }, { id: 'subtle', label: 'Sakin' }
+                                                                ].find(m => m.id === selectedMoodId)?.label || "SEÇİLMEDİ"
+                                                                : [
+                                                                    { id: 'natural', labelEn: 'Natural' }, { id: 'warm', labelEn: 'Warm' },
+                                                                    { id: 'powerful', labelEn: 'Powerful' }, { id: 'relaxed', labelEn: 'Relaxed' },
+                                                                    { id: 'professional', labelEn: 'Professional' }, { id: 'subtle', labelEn: 'Subtle' }
+                                                                ].find(m => m.id === selectedMoodId)?.labelEn || "NOT SELECTED"}
+                                                        </span>
+                                                        <span className="text-[7px] text-[var(--text-muted)] block">
+                                                            {language === "tr" ? "Değiştirmek için tıkla" : "Click to change"}
+                                                        </span>
                                                     </div>
                                                 </div>
-                                            </DialogTrigger>
-                                            <DialogContent className="max-w-md p-6 bg-[var(--bg-card)] border-[var(--border-subtle)] rounded-2xl">
-                                                <DialogHeader>
-                                                    <DialogTitle className="text-sm font-black uppercase tracking-wider text-[var(--text-primary)] mb-2">
-                                                        {language === "tr" ? "Model Havası Seçin" : "Select Model Mood"}
-                                                    </DialogTitle>
-                                                </DialogHeader>
-                                                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                                    {[
-                                                        { id: 'natural', icon: '✦', label: 'Doğal', labelEn: 'Natural', desc: 'Doğal/candid', descEn: 'Natural/candid' },
-                                                        { id: 'warm', icon: '☀', label: 'Sıcak', labelEn: 'Warm', desc: 'Samimi', descEn: 'Friendly' },
-                                                        { id: 'powerful', icon: '◆', label: 'Güçlü', labelEn: 'Powerful', desc: 'Editorial güç', descEn: 'Editorial power' },
-                                                        { id: 'relaxed', icon: '~', label: 'Rahat', labelEn: 'Relaxed', desc: 'Cool/rahat', descEn: 'Cool/relaxed' },
-                                                        { id: 'professional', icon: '👔', label: 'Profesyonel', labelEn: 'Professional', desc: 'Ciddi', descEn: 'Serious' },
-                                                        { id: 'subtle', icon: '🍃', label: 'Sakin', labelEn: 'Subtle', desc: 'Hafif/soft', descEn: 'Light/soft' }
-                                                    ].map(mood => (
-                                                        <div
-                                                            key={mood.id}
-                                                            onClick={() => setSelectedMoodId(mood.id)}
-                                                            className={cn(
-                                                                "flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all cursor-pointer group select-none",
-                                                                selectedMoodId === mood.id
-                                                                    ? "bg-[var(--accent-soft)] border-[var(--accent-primary)] shadow-sm scale-[1.02]"
-                                                                    : "bg-[var(--bg-elevated)] border-[var(--border-subtle)] hover:border-[var(--accent-primary)]/50 hover:bg-[var(--bg-surface)] hover:scale-[1.02]"
-                                                            )}
-                                                        >
-                                                            <span className={cn(
-                                                                "text-2xl mb-1.5 transition-transform duration-300",
-                                                                selectedMoodId === mood.id ? "text-[var(--accent-primary)] scale-110" : "text-[var(--text-muted)] group-hover:scale-110 group-hover:text-[var(--text-primary)]"
-                                                            )}>
-                                                                {mood.icon}
-                                                            </span>
-                                                            <span className={cn(
-                                                                "text-[10px] font-black uppercase tracking-wide text-center leading-none mb-1",
-                                                                selectedMoodId === mood.id ? "text-[var(--accent-primary)]" : "text-[var(--text-primary)]"
-                                                            )}>
-                                                                {language === "tr" ? mood.label : mood.labelEn}
-                                                            </span>
-                                                            <span className={cn(
-                                                                "text-[8px] text-center leading-tight transition-colors mt-0.5 font-medium",
-                                                                selectedMoodId === mood.id ? "text-[var(--text-primary)]" : "text-[var(--text-muted)]"
-                                                            )}>
-                                                                {language === "tr" ? mood.desc : mood.descEn}
-                                                            </span>
-                                                        </div>
-                                                    ))}
+                                                <div className={cn(
+                                                    "absolute top-3 right-3 p-1.5 rounded-lg border shadow-lg transition-all z-20",
+                                                    selectedMoodId
+                                                        ? "bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white ring-2 ring-[var(--accent-primary)]/30"
+                                                        : "bg-[var(--bg-surface)] border-[var(--border-subtle)] text-[var(--text-muted)] group-hover/card:text-[var(--text-primary)] group-hover/card:border-[var(--accent-primary)]"
+                                                )}>
+                                                    <Sparkles size={14} />
                                                 </div>
-                                            </DialogContent>
-                                        </Dialog>
+                                            </div>
+                                        </div>
                                         <AssetCard id="fit_pattern" label={language === "tr" ? "KALIP" : "FIT"} icon={TbShirtFilled} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="portrait" />
                                         <AssetCard id="shoes" label={language === "tr" ? "AYAKKABI" : "SHOES"} icon={TbHanger} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="portrait" />
                                         <AssetCard id="inner_wear" label={language === "tr" ? "İÇ GİYİM" : "INNER WEAR"} icon={TbShirt} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="portrait" />
@@ -472,56 +433,86 @@ export default function PhotoshootPage() {
                                                 const hasSideOption = shot.id.includes('styling');
 
                                                 return (
-                                                    <div
-                                                        key={shot.id}
-                                                        className={cn(
-                                                            "relative aspect-[3/4] rounded-xl border transition-all duration-300 overflow-hidden group cursor-pointer",
-                                                            isSelected
-                                                                ? (isMaviActive ? "border-blue-500 ring-2 ring-blue-500/20 shadow-lg" : "border-[var(--accent-primary)] ring-2 ring-[var(--accent-primary)]/20 shadow-lg")
-                                                                : "border-[var(--border-subtle)] opacity-40 grayscale bg-[var(--bg-elevated)] hover:opacity-80 transition-opacity"
-                                                        )}
-                                                        onClick={() => setBatchShotSelection(prev => ({ ...prev, [shot.id]: !isSelected }))}
-                                                    >
-                                                        <div className="w-full h-full relative">
-                                                            {shot.image ? (
-                                                                <img src={shot.image} alt={shot.label} className="w-full h-full object-cover" />
-                                                            ) : (
-                                                                <div className="w-full h-full flex items-center justify-center bg-muted/20">
-                                                                    <Shirt className="w-6 h-6 opacity-20" />
-                                                                </div>
+                                                    <div key={shot.id} className="flex flex-col gap-2">
+                                                        <div
+                                                            className={cn(
+                                                                "relative aspect-[3/4] rounded-xl border transition-all duration-300 overflow-hidden group cursor-pointer flex-1",
+                                                                isSelected
+                                                                    ? (isMaviActive ? "border-blue-500 ring-2 ring-blue-500/20 shadow-lg" : "border-[var(--accent-primary)] ring-2 ring-[var(--accent-primary)]/20 shadow-lg")
+                                                                    : "border-[var(--border-subtle)] opacity-40 grayscale bg-[var(--bg-elevated)] hover:opacity-80 transition-opacity"
                                                             )}
+                                                            onClick={() => setBatchShotSelection(prev => ({ ...prev, [shot.id]: !isSelected }))}
+                                                        >
+                                                            <div className="w-full h-full relative">
+                                                                {shot.image ? (
+                                                                    <img src={shot.image} alt={shot.label} className="w-full h-full object-cover" />
+                                                                ) : (
+                                                                    <div className="w-full h-full flex items-center justify-center bg-muted/20">
+                                                                        <Shirt className="w-6 h-6 opacity-20" />
+                                                                    </div>
+                                                                )}
 
-                                                            <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
-                                                                <p className="text-[9px] font-black text-white text-center leading-snug uppercase">
-                                                                    {language === 'tr' ? shot.label : shot.labelEn}
-                                                                </p>
-                                                            </div>
-
-                                                            <div className="absolute top-2 left-2">
-                                                                <div className={cn(
-                                                                    "w-5 h-5 rounded-md flex items-center justify-center border transition-all",
-                                                                    isSelected
-                                                                        ? (isMaviActive ? "bg-blue-600 border-blue-400 text-white" : "bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white")
-                                                                        : "bg-white/20 border-white/40 text-transparent"
-                                                                )}>
-                                                                    <Check className="w-3.5 h-3.5" />
+                                                                <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
+                                                                    <p className="text-[9px] font-black text-white text-center leading-snug uppercase">
+                                                                        {language === 'tr' ? shot.label : shot.labelEn}
+                                                                    </p>
                                                                 </div>
-                                                            </div>
 
-                                                            {hasSideOption && isSelected && (
-                                                                <div
-                                                                    className="absolute top-2 right-2 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10"
-                                                                    onClick={(e) => e.stopPropagation()}
-                                                                >
-                                                                    <span className="text-[8px] font-bold text-white tracking-widest leading-none">YNC</span>
-                                                                    <Switch
-                                                                        className="scale-[0.5] origin-right !m-0"
-                                                                        checked={stylingSideOnly[shot.id] || false}
-                                                                        onCheckedChange={(val) => setStylingSideOnly({ ...stylingSideOnly, [shot.id]: val })}
-                                                                    />
+                                                                <div className="absolute top-2 left-2">
+                                                                    <div className={cn(
+                                                                        "w-5 h-5 rounded-md flex items-center justify-center border transition-all",
+                                                                        isSelected
+                                                                            ? (isMaviActive ? "bg-blue-600 border-blue-400 text-white" : "bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white")
+                                                                            : "bg-white/20 border-white/40 text-transparent"
+                                                                    )}>
+                                                                        <Check className="w-3.5 h-3.5" />
+                                                                    </div>
                                                                 </div>
-                                                            )}
+
+                                                                {hasSideOption && isSelected && (
+                                                                    <div
+                                                                        className="absolute top-2 right-2 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10"
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                    >
+                                                                        <span className="text-[8px] font-bold text-white tracking-widest leading-none">YNC</span>
+                                                                        <Switch
+                                                                            className="scale-[0.5] origin-right !m-0"
+                                                                            checked={stylingSideOnly[shot.id] || false}
+                                                                            onCheckedChange={(val) => setStylingSideOnly({ ...stylingSideOnly, [shot.id]: val })}
+                                                                        />
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                         </div>
+
+                                                        {hasSideOption && isSelected && (
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    // Sadece kütüphaneyi aç, 2. adıma dönme!
+                                                                    setActiveGroup('product');
+                                                                    setActiveLibraryAsset('pose');
+                                                                }}
+                                                                className={cn(
+                                                                    "flex items-center justify-center gap-1.5 w-full py-2 rounded-lg border shadow-sm transition-colors cursor-pointer group/pose-btn",
+                                                                    assets.pose
+                                                                        ? "border-green-500/30 bg-green-500/10 text-green-600 dark:text-green-400 hover:bg-green-500 hover:text-white"
+                                                                        : "border-[var(--accent-primary)]/30 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] hover:bg-[var(--accent-primary)] hover:text-white"
+                                                                )}
+                                                            >
+                                                                {assets.pose ? (
+                                                                    <>
+                                                                        <Check className="w-3.5 h-3.5 group-hover/pose-btn:text-white" />
+                                                                        <span className="text-[9px] font-bold uppercase tracking-wider">{language === 'tr' ? 'Özel Poz Seçili' : 'Custom Pose Selected'}</span>
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <div className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse group-hover/pose-btn:bg-white" />
+                                                                        <span className="text-[9px] font-bold uppercase tracking-wider">{language === 'tr' ? 'Poz Seç (İsteğe Bağlı)' : 'Select Pose (Optional)'}</span>
+                                                                    </>
+                                                                )}
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 );
                                             })}
