@@ -1,9 +1,10 @@
 "use client"
+import React, { useRef, useState, useEffect } from "react"
 import { useLanguage } from "@/context/language-context"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch"
 import {
     ChevronRight, ChevronLeft, ChevronDown, Sparkles, User,
@@ -82,6 +83,46 @@ export default function PhotoshootPage() {
         productDescription, setProductDescription, resetWorkflow, addToGlobalLibrary
     } = usePhotoshootWorkflow();
 
+    // Block navigation when generation is in progress
+    useEffect(() => {
+        if (!isProcessing) return;
+
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            const msg = language === 'tr' ? 'Üretim devam ediyor. Çıkmak istediğinize emin misiniz?' : 'Generation is in progress. Are you sure you want to leave?';
+            e.preventDefault();
+            e.returnValue = msg;
+            return msg;
+        };
+
+        const handleClick = (e: MouseEvent) => {
+            const target = e.target as HTMLElement;
+            const anchor = target.closest('a');
+
+            if (anchor && anchor.href && !anchor.hasAttribute('target')) {
+                // If it's a link to the current page (e.g. hash link), ignore
+                if (anchor.href === window.location.href || anchor.href.startsWith(window.location.href + '#')) {
+                    return;
+                }
+                const msg = language === 'tr'
+                    ? 'Üretim devam ediyor. Sayfadan ayrılırsanız üretim iptal olabilir. Çıkmak istediğinize emin misiniz?'
+                    : 'Generation is in progress. Leaving will cancel the generation. Are you sure you want to leave?';
+                if (!window.confirm(msg)) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        // Use capture phase to intercept click before NextJS router
+        document.addEventListener('click', handleClick, { capture: true });
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+            document.removeEventListener('click', handleClick, { capture: true });
+        };
+    }, [isProcessing, language]);
+
     if (!mounted) return null;
 
     return (
@@ -111,7 +152,7 @@ export default function PhotoshootPage() {
                                 onClick={resetWorkflow}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg>
-                                {language === "tr" ? "YENİ ÜRÜN" : "NEW PRODUCT"}
+                                {language === "tr" ? "SIFIRLA" : "RESET"}
                             </Button>
                         </div>
                         <h1 className="text-xl font-black uppercase tracking-tight text-[var(--text-primary)]">📸 {t("home.photoshootTitle")}</h1>
@@ -191,7 +232,101 @@ export default function PhotoshootPage() {
                                     <div className="grid grid-cols-3 gap-4 flex-1">
                                         <AssetCard id="background" label={language === "tr" ? "ARKAPLAN" : "BACKGROUND"} icon={ImageIcon} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="portrait" />
                                         <AssetCard id="lighting" label={language === "tr" ? "IŞIK" : "LIGHT"} icon={Camera} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} lightingSendImage={lightingSendImage} setLightingSendImage={setLightingSendImage} variant="portrait" />
-                                        <AssetCard id="pose" label={language === "tr" ? "POZ" : "POSE"} icon={User} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} convertToStickman={convertToStickman} variant="portrait" />
+                                        <Dialog>
+                                            <DialogTrigger asChild>
+                                                <div className="group/card relative w-full h-full min-h-[140px]">
+                                                    <div className={cn(
+                                                        "relative h-full rounded-3xl border-2 flex flex-col items-center justify-center overflow-hidden transition-all duration-500 cursor-pointer shadow-sm hover:shadow-md",
+                                                        selectedMoodId ? "bg-[var(--bg-elevated)] border-[var(--accent-primary)] ring-2 ring-[var(--accent-primary)]/20" : "bg-[var(--bg-elevated)] border-[var(--border-subtle)] border-dashed hover:border-[var(--accent-primary)]"
+                                                    )}>
+                                                        <div className="flex flex-col items-center gap-2.5 p-3 text-center transition-all group-hover/card:scale-105">
+                                                            <div className="p-3.5 rounded-2xl bg-[var(--accent-soft)]/50 text-[var(--accent-primary)] shadow-inner">
+                                                                <span className="text-2xl">{
+                                                                    [
+                                                                        { id: 'natural', icon: '✦' }, { id: 'warm', icon: '☀' },
+                                                                        { id: 'powerful', icon: '◆' }, { id: 'relaxed', icon: '~' },
+                                                                        { id: 'professional', icon: '👔' }, { id: 'subtle', icon: '🍃' }
+                                                                    ].find(m => m.id === selectedMoodId)?.icon || '✦'
+                                                                }</span>
+                                                            </div>
+                                                            <div className="space-y-0.5 pointer-events-none">
+                                                                <span className="text-[11px] font-black uppercase tracking-wide text-[var(--text-primary)] block leading-tight">
+                                                                    {language === "tr" ? "HAVASI" : "MOOD"}
+                                                                </span>
+                                                                <span className="text-[9px] font-black tracking-tighter text-[var(--accent-primary)] uppercase opacity-90 block transition-colors">
+                                                                    {language === "tr"
+                                                                        ? [
+                                                                            { id: 'natural', label: 'Doğal' }, { id: 'warm', label: 'Sıcak' },
+                                                                            { id: 'powerful', label: 'Güçlü' }, { id: 'relaxed', label: 'Rahat' },
+                                                                            { id: 'professional', label: 'Profesyonel' }, { id: 'subtle', label: 'Sakin' }
+                                                                        ].find(m => m.id === selectedMoodId)?.label || "SEÇİLMEDİ"
+                                                                        : [
+                                                                            { id: 'natural', labelEn: 'Natural' }, { id: 'warm', labelEn: 'Warm' },
+                                                                            { id: 'powerful', labelEn: 'Powerful' }, { id: 'relaxed', labelEn: 'Relaxed' },
+                                                                            { id: 'professional', labelEn: 'Professional' }, { id: 'subtle', labelEn: 'Subtle' }
+                                                                        ].find(m => m.id === selectedMoodId)?.labelEn || "NOT SELECTED"}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div className={cn(
+                                                            "absolute top-3 right-3 p-1.5 rounded-lg border shadow-lg transition-all z-20",
+                                                            selectedMoodId
+                                                                ? "bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white ring-2 ring-[var(--accent-primary)]/30"
+                                                                : "bg-[var(--bg-surface)] border-[var(--border-subtle)] text-[var(--text-muted)] group-hover/card:text-[var(--text-primary)] group-hover/card:border-[var(--accent-primary)]"
+                                                        )}>
+                                                            <Sparkles size={14} />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </DialogTrigger>
+                                            <DialogContent className="max-w-md p-6 bg-[var(--bg-card)] border-[var(--border-subtle)] rounded-2xl">
+                                                <DialogHeader>
+                                                    <DialogTitle className="text-sm font-black uppercase tracking-wider text-[var(--text-primary)] mb-2">
+                                                        {language === "tr" ? "Model Havası Seçin" : "Select Model Mood"}
+                                                    </DialogTitle>
+                                                </DialogHeader>
+                                                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                                    {[
+                                                        { id: 'natural', icon: '✦', label: 'Doğal', labelEn: 'Natural', desc: 'Doğal/candid', descEn: 'Natural/candid' },
+                                                        { id: 'warm', icon: '☀', label: 'Sıcak', labelEn: 'Warm', desc: 'Samimi', descEn: 'Friendly' },
+                                                        { id: 'powerful', icon: '◆', label: 'Güçlü', labelEn: 'Powerful', desc: 'Editorial güç', descEn: 'Editorial power' },
+                                                        { id: 'relaxed', icon: '~', label: 'Rahat', labelEn: 'Relaxed', desc: 'Cool/rahat', descEn: 'Cool/relaxed' },
+                                                        { id: 'professional', icon: '👔', label: 'Profesyonel', labelEn: 'Professional', desc: 'Ciddi', descEn: 'Serious' },
+                                                        { id: 'subtle', icon: '🍃', label: 'Sakin', labelEn: 'Subtle', desc: 'Hafif/soft', descEn: 'Light/soft' }
+                                                    ].map(mood => (
+                                                        <div
+                                                            key={mood.id}
+                                                            onClick={() => setSelectedMoodId(mood.id)}
+                                                            className={cn(
+                                                                "flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all cursor-pointer group select-none",
+                                                                selectedMoodId === mood.id
+                                                                    ? "bg-[var(--accent-soft)] border-[var(--accent-primary)] shadow-sm scale-[1.02]"
+                                                                    : "bg-[var(--bg-elevated)] border-[var(--border-subtle)] hover:border-[var(--accent-primary)]/50 hover:bg-[var(--bg-surface)] hover:scale-[1.02]"
+                                                            )}
+                                                        >
+                                                            <span className={cn(
+                                                                "text-2xl mb-1.5 transition-transform duration-300",
+                                                                selectedMoodId === mood.id ? "text-[var(--accent-primary)] scale-110" : "text-[var(--text-muted)] group-hover:scale-110 group-hover:text-[var(--text-primary)]"
+                                                            )}>
+                                                                {mood.icon}
+                                                            </span>
+                                                            <span className={cn(
+                                                                "text-[10px] font-black uppercase tracking-wide text-center leading-none mb-1",
+                                                                selectedMoodId === mood.id ? "text-[var(--accent-primary)]" : "text-[var(--text-primary)]"
+                                                            )}>
+                                                                {language === "tr" ? mood.label : mood.labelEn}
+                                                            </span>
+                                                            <span className={cn(
+                                                                "text-[8px] text-center leading-tight transition-colors mt-0.5 font-medium",
+                                                                selectedMoodId === mood.id ? "text-[var(--text-primary)]" : "text-[var(--text-muted)]"
+                                                            )}>
+                                                                {language === "tr" ? mood.desc : mood.descEn}
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </DialogContent>
+                                        </Dialog>
                                         <AssetCard id="fit_pattern" label={language === "tr" ? "KALIP" : "FIT"} icon={TbShirtFilled} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="portrait" />
                                         <AssetCard id="shoes" label={language === "tr" ? "AYAKKABI" : "SHOES"} icon={TbHanger} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="portrait" />
                                         <AssetCard id="inner_wear" label={language === "tr" ? "İÇ GİYİM" : "INNER WEAR"} icon={TbShirt} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="portrait" />
@@ -286,168 +421,171 @@ export default function PhotoshootPage() {
                         <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
 
-<div className="w-full">
-                                        <div className="max-w-5xl mx-auto px-1 md:px-0 space-y-6">
+                            <div className="w-full">
+                                <div className="max-w-5xl mx-auto px-1 md:px-0 space-y-6">
 
-                                            {/* TOP: Horizontal Technical Settings Bar */}
-                                            <div className="p-4 rounded-2xl bg-[var(--bg-elevated)] border border-[var(--border-subtle)] shadow-inner">
-                                                <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider mb-3">{language === "tr" ? "TEKNİK AYARLAR" : "TECHNICAL SETTINGS"}</p>
-                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                    <div className="space-y-1.5">
-                                                        <label className="text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wide px-1">{language === "tr" ? "GÖRSEL ORANI" : "ASPECT RATIO"}</label>
-                                                        <div className="relative">
-                                                            <select className="w-full text-xs px-3 py-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] transition-all font-bold appearance-none" value={aspectRatio} onChange={(e) => setAspectRatio(e.target.value)}>
-                                                                {ASPECT_RATIOS.map(opt => (
-                                                                    <option key={opt.id} value={opt.id}>{language === 'tr' ? opt.labelTr : opt.label}</option>
-                                                                ))}
-                                                            </select>
-                                                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none" />
-                                                        </div>
-                                                    </div>
-                                                    <div className="space-y-1.5">
-                                                        <label className="text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wide px-1">{language === "tr" ? "ÇÖZÜNÜRLÜK" : "RESOLUTION"}</label>
-                                                        <div className="relative">
-                                                            <select className="w-full text-xs px-3 py-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] transition-all font-bold appearance-none" value={resolution} onChange={(e) => setResolution(e.target.value)}>
-                                                                {RESOLUTION_OPTIONS.map(opt => (
-                                                                    <option key={opt.id} value={opt.id}>{language === 'tr' ? opt.labelTr : opt.label}</option>
-                                                                ))}
-                                                            </select>
-                                                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none" />
-                                                        </div>
-                                                    </div>
-                                                    <div className="space-y-1.5">
-                                                        <label className="text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wide px-1">{language === "tr" ? "TEKRAR TUTARLILIĞI" : "CONSISTENCY"}</label>
-                                                        <div className="relative">
-                                                            <input type="number" className="w-full text-xs px-3 py-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] transition-all font-bold placeholder:text-[var(--text-disabled)]" value={seed === "" ? "" : seed} onChange={(e) => setSeed(e.target.value === "" ? "" : Number(e.target.value))} placeholder="RANDOM" />
-                                                            {seed !== "" && <button onClick={() => setSeed("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500"><X size={14} /></button>}
-                                                        </div>
-                                                    </div>
+                                    {/* TOP: Horizontal Technical Settings Bar */}
+                                    <div className="p-4 rounded-2xl bg-[var(--bg-elevated)] border border-[var(--border-subtle)] shadow-inner">
+                                        <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider mb-3">{language === "tr" ? "TEKNİK AYARLAR" : "TECHNICAL SETTINGS"}</p>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div className="space-y-1.5">
+                                                <label className="text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wide px-1">{language === "tr" ? "GÖRSEL ORANI" : "ASPECT RATIO"}</label>
+                                                <div className="relative">
+                                                    <select className="w-full text-xs px-3 py-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] transition-all font-bold appearance-none" value={aspectRatio} onChange={(e) => setAspectRatio(e.target.value)}>
+                                                        {ASPECT_RATIOS.map(opt => (
+                                                            <option key={opt.id} value={opt.id}>{language === 'tr' ? opt.labelTr : opt.label}</option>
+                                                        ))}
+                                                    </select>
+                                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none" />
                                                 </div>
                                             </div>
-
-                                            {/* Toplu Üretim: Açı ve Kare Seçimleri (9 boxes side by side, 50% larger representation) */}
-                                            <div className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-xl p-6 shadow-sm flex flex-col space-y-4">
-                                                <label className="text-sm font-black text-[var(--text-primary)] uppercase tracking-wider">
-                                                    {language === 'tr' ? 'Açı ve Kare Seçimleri' : 'Angle & Shot Selection'}
-                                                </label>
-                                                <div className="grid grid-cols-3 sm:grid-cols-5 xl:grid-cols-9 gap-4">
-                                                    {availableBatchShots.map((shot) => {
-                                                        const isSelected = batchShotSelection[shot.id] ?? false;
-                                                        const isMaviActive = user?.role === 'admin' && isMaviBatch;
-                                                        const hasSideOption = shot.id.includes('styling');
-
-                                                        return (
-                                                            <div
-                                                                key={shot.id}
-                                                                className={cn(
-                                                                    "relative aspect-[3/4] rounded-xl border transition-all duration-300 overflow-hidden group cursor-pointer",
-                                                                    isSelected
-                                                                        ? (isMaviActive ? "border-blue-500 ring-2 ring-blue-500/20 shadow-lg" : "border-[var(--accent-primary)] ring-2 ring-[var(--accent-primary)]/20 shadow-lg")
-                                                                        : "border-[var(--border-subtle)] opacity-40 grayscale bg-[var(--bg-elevated)] hover:opacity-80 transition-opacity"
-                                                                )}
-                                                                onClick={() => setBatchShotSelection(prev => ({ ...prev, [shot.id]: !isSelected }))}
-                                                            >
-                                                                <div className="w-full h-full relative">
-                                                                    {shot.image ? (
-                                                                        <img src={shot.image} alt={shot.label} className="w-full h-full object-cover" />
-                                                                    ) : (
-                                                                        <div className="w-full h-full flex items-center justify-center bg-muted/20">
-                                                                            <Shirt className="w-6 h-6 opacity-20" />
-                                                                        </div>
-                                                                    )}
-
-                                                                    <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
-                                                                        <p className="text-[9px] font-black text-white text-center leading-snug uppercase">
-                                                                            {language === 'tr' ? shot.label : shot.labelEn}
-                                                                        </p>
-                                                                    </div>
-
-                                                                    <div className="absolute top-2 left-2">
-                                                                        <div className={cn(
-                                                                            "w-5 h-5 rounded-md flex items-center justify-center border transition-all",
-                                                                            isSelected
-                                                                                ? (isMaviActive ? "bg-blue-600 border-blue-400 text-white" : "bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white")
-                                                                                : "bg-white/20 border-white/40 text-transparent"
-                                                                        )}>
-                                                                            <Check className="w-3.5 h-3.5" />
-                                                                        </div>
-                                                                    </div>
-
-                                                                    {hasSideOption && isSelected && (
-                                                                        <div
-                                                                            className="absolute top-2 right-2 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10"
-                                                                            onClick={(e) => e.stopPropagation()}
-                                                                        >
-                                                                            <span className="text-[8px] font-bold text-white tracking-widest leading-none">YNC</span>
-                                                                            <Switch
-                                                                                className="scale-[0.5] origin-right !m-0"
-                                                                                checked={stylingSideOnly[shot.id] || false}
-                                                                                onCheckedChange={(val) => setStylingSideOnly({ ...stylingSideOnly, [shot.id]: val })}
-                                                                            />
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                        );
-                                                    })}
+                                            <div className="space-y-1.5">
+                                                <label className="text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wide px-1">{language === "tr" ? "ÇÖZÜNÜRLÜK" : "RESOLUTION"}</label>
+                                                <div className="relative">
+                                                    <select className="w-full text-xs px-3 py-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] transition-all font-bold appearance-none" value={resolution} onChange={(e) => setResolution(e.target.value)}>
+                                                        {RESOLUTION_OPTIONS.map(opt => (
+                                                            <option key={opt.id} value={opt.id}>{language === 'tr' ? opt.labelTr : opt.label}</option>
+                                                        ))}
+                                                    </select>
+                                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none" />
                                                 </div>
                                             </div>
-
-                                            {/* BOTTOM: Batch Panel + Preview */}
-                                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-                                                {/* Sol Taraf: Batch Ayarları ve Seçimler */}
-                                                <div className="col-span-1 lg:col-span-5 flex flex-col">
-                                                    <div className="flex-1 bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-xl overflow-hidden shadow-sm flex flex-col p-6">
-                                                        <BatchPanel
-                                                            productName={productName}
-                                                            selectedMoodId={selectedMoodId}
-                                                            language={language}
-                                                            batchMode={batchMode}
-                                                            setBatchMode={setBatchMode}
-                                                            productCode={productCode}
-                                                            setProductCode={setProductCode}
-                                                            availableBatchShots={availableBatchShots}
-                                                            batchShotSelection={batchShotSelection}
-                                                            setBatchShotSelection={setBatchShotSelection}
-                                                            isAdmin={user?.role === 'admin'}
-                                                            isMaviBatch={isMaviBatch}
-                                                            setIsMaviBatch={setIsMaviBatch}
-                                                            stylingSideOnly={stylingSideOnly}
-                                                            setStylingSideOnly={setStylingSideOnly}
-                                                            techAccessories={techAccessories}
-                                                            setTechAccessories={setTechAccessories}
-                                                            techAccessoryDescriptions={techAccessoryDescriptions}
-                                                            setTechAccessoryDescriptions={setTechAccessoryDescriptions}
-                                                            assets={assets}
-                                                            productDescription={productDescription}
-                                                            setProductDescription={setProductDescription}
-                                                        />
-                                                    </div>
-                                                </div>
-
-                                                {/* Sağ Taraf: Önizleme / Üretim Alanı */}
-                                                <div className="col-span-1 lg:col-span-7 flex flex-col">
-                                                    <div className="flex-1 bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-xl overflow-hidden shadow-sm flex flex-col">
-                                                        <PreviewArea
-                                                            language={language}
-                                                            isProcessing={isProcessing}
-                                                            isStoppingBatch={isStoppingBatch}
-                                                            handleStopBatch={handleStopBatch}
-                                                            isGenerationSuccess={isGenerationSuccess}
-                                                            resultImages={resultImages}
-                                                            router={router}
-                                                            StudioSteps={StudioSteps}
-                                                            handleGenerate={handleGenerate}
-                                                            handleBatchGenerate={handleBatchGenerate}
-                                                            batchMode={true}
-                                                            productCode={productCode}
-                                                            estimatedCost={estimatedCost}
-                                                        />
-                                                    </div>
+                                            <div className="space-y-1.5">
+                                                <label className="text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wide px-1">{language === "tr" ? "TEKRAR TUTARLILIĞI" : "CONSISTENCY"}</label>
+                                                <div className="relative">
+                                                    <input type="number" className="w-full text-xs px-3 py-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] transition-all font-bold placeholder:text-[var(--text-disabled)]" value={seed === "" ? "" : seed} onChange={(e) => setSeed(e.target.value === "" ? "" : Number(e.target.value))} placeholder="RANDOM" />
+                                                    {seed !== "" && <button onClick={() => setSeed("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500"><X size={14} /></button>}
                                                 </div>
                                             </div>
                                         </div>
-</div>
+                                    </div>
+
+                                    {/* Toplu Üretim: Açı ve Kare Seçimleri (9 boxes side by side, 50% larger representation) */}
+                                    <div className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-xl p-6 shadow-sm flex flex-col space-y-4">
+                                        <label className="text-sm font-black text-[var(--text-primary)] uppercase tracking-wider">
+                                            {language === 'tr' ? 'Açı ve Kare Seçimleri' : 'Angle & Shot Selection'}
+                                        </label>
+                                        <div className="grid grid-cols-3 sm:grid-cols-5 xl:grid-cols-9 gap-4">
+                                            {availableBatchShots.map((shot) => {
+                                                const isSelected = batchShotSelection[shot.id] ?? false;
+                                                const isMaviActive = user?.role === 'admin' && isMaviBatch;
+                                                const hasSideOption = shot.id.includes('styling');
+
+                                                return (
+                                                    <div
+                                                        key={shot.id}
+                                                        className={cn(
+                                                            "relative aspect-[3/4] rounded-xl border transition-all duration-300 overflow-hidden group cursor-pointer",
+                                                            isSelected
+                                                                ? (isMaviActive ? "border-blue-500 ring-2 ring-blue-500/20 shadow-lg" : "border-[var(--accent-primary)] ring-2 ring-[var(--accent-primary)]/20 shadow-lg")
+                                                                : "border-[var(--border-subtle)] opacity-40 grayscale bg-[var(--bg-elevated)] hover:opacity-80 transition-opacity"
+                                                        )}
+                                                        onClick={() => setBatchShotSelection(prev => ({ ...prev, [shot.id]: !isSelected }))}
+                                                    >
+                                                        <div className="w-full h-full relative">
+                                                            {shot.image ? (
+                                                                <img src={shot.image} alt={shot.label} className="w-full h-full object-cover" />
+                                                            ) : (
+                                                                <div className="w-full h-full flex items-center justify-center bg-muted/20">
+                                                                    <Shirt className="w-6 h-6 opacity-20" />
+                                                                </div>
+                                                            )}
+
+                                                            <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
+                                                                <p className="text-[9px] font-black text-white text-center leading-snug uppercase">
+                                                                    {language === 'tr' ? shot.label : shot.labelEn}
+                                                                </p>
+                                                            </div>
+
+                                                            <div className="absolute top-2 left-2">
+                                                                <div className={cn(
+                                                                    "w-5 h-5 rounded-md flex items-center justify-center border transition-all",
+                                                                    isSelected
+                                                                        ? (isMaviActive ? "bg-blue-600 border-blue-400 text-white" : "bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white")
+                                                                        : "bg-white/20 border-white/40 text-transparent"
+                                                                )}>
+                                                                    <Check className="w-3.5 h-3.5" />
+                                                                </div>
+                                                            </div>
+
+                                                            {hasSideOption && isSelected && (
+                                                                <div
+                                                                    className="absolute top-2 right-2 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10"
+                                                                    onClick={(e) => e.stopPropagation()}
+                                                                >
+                                                                    <span className="text-[8px] font-bold text-white tracking-widest leading-none">YNC</span>
+                                                                    <Switch
+                                                                        className="scale-[0.5] origin-right !m-0"
+                                                                        checked={stylingSideOnly[shot.id] || false}
+                                                                        onCheckedChange={(val) => setStylingSideOnly({ ...stylingSideOnly, [shot.id]: val })}
+                                                                    />
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    {/* BOTTOM: Batch Panel + Preview */}
+                                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                                        {/* Sol Taraf: Batch Ayarları ve Seçimler */}
+                                        <div className="col-span-1 lg:col-span-5 flex flex-col">
+                                            <div className="flex-1 bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-xl overflow-hidden shadow-sm flex flex-col p-6">
+                                                <BatchPanel
+                                                    productName={productName}
+                                                    selectedMoodId={selectedMoodId}
+                                                    language={language}
+                                                    batchMode={batchMode}
+                                                    setBatchMode={setBatchMode}
+                                                    productCode={productCode}
+                                                    setProductCode={setProductCode}
+                                                    availableBatchShots={availableBatchShots}
+                                                    batchShotSelection={batchShotSelection}
+                                                    setBatchShotSelection={setBatchShotSelection}
+                                                    isAdmin={user?.role === 'admin'}
+                                                    isMaviBatch={isMaviBatch}
+                                                    setIsMaviBatch={setIsMaviBatch}
+                                                    stylingSideOnly={stylingSideOnly}
+                                                    setStylingSideOnly={setStylingSideOnly}
+                                                    techAccessories={techAccessories}
+                                                    setTechAccessories={setTechAccessories}
+                                                    techAccessoryDescriptions={techAccessoryDescriptions}
+                                                    setTechAccessoryDescriptions={setTechAccessoryDescriptions}
+                                                    assets={assets}
+                                                    productDescription={productDescription}
+                                                    setProductDescription={setProductDescription}
+                                                    setWizardStep={setWizardStep}
+                                                    setActiveGroup={setActiveGroup}
+                                                    setActiveLibraryAsset={setActiveLibraryAsset}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Sağ Taraf: Önizleme / Üretim Alanı */}
+                                        <div className="col-span-1 lg:col-span-7 flex flex-col">
+                                            <div className="flex-1 bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-xl overflow-hidden shadow-sm flex flex-col">
+                                                <PreviewArea
+                                                    language={language}
+                                                    isProcessing={isProcessing}
+                                                    isStoppingBatch={isStoppingBatch}
+                                                    handleStopBatch={handleStopBatch}
+                                                    isGenerationSuccess={isGenerationSuccess}
+                                                    resultImages={resultImages}
+                                                    router={router}
+                                                    StudioSteps={StudioSteps}
+                                                    handleGenerate={handleGenerate}
+                                                    handleBatchGenerate={handleBatchGenerate}
+                                                    batchMode={true}
+                                                    productCode={productCode}
+                                                    estimatedCost={estimatedCost}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     )}
                 </div>

@@ -34,6 +34,9 @@ interface BatchPanelProps {
     setTechAccessoryDescriptions: (val: Record<string, string>) => void;
     productName: string;
     selectedMoodId: string;
+    setWizardStep?: React.Dispatch<React.SetStateAction<1 | 2 | 3>>;
+    setActiveGroup?: (group: 'product' | 'accessories' | null) => void;
+    setActiveLibraryAsset?: (asset: string | null) => void;
 }
 
 export function BatchPanel({
@@ -56,7 +59,10 @@ export function BatchPanel({
     techAccessoryDescriptions,
     setTechAccessoryDescriptions,
     productName,
-    selectedMoodId
+    selectedMoodId,
+    setWizardStep,
+    setActiveGroup,
+    setActiveLibraryAsset
 }: BatchPanelProps) {
     const isMaviActive = isAdmin && isMaviBatch;
 
@@ -113,63 +119,151 @@ export function BatchPanel({
                     />
                 </div>
 
-                {/* Editor Summary (Read Only display of composition) */}
+                {/* Editor Summary (Missing Configurations) */}
                 <div className="space-y-2">
                     <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase flex items-center gap-2">
-                        {language === 'tr' ? 'Kreatif Direktör Özeti' : 'Creative Director Summary'}
+                        {language === 'tr' ? 'Düzenlenebilir Çekim Seçenekleri' : 'Editable Shoot Options'}
                     </label>
-                    <div className="w-full text-[13px] p-4 rounded-xl border transition-all duration-200 bg-[var(--bg-elevated)] border-[var(--border-subtle)] text-[var(--accent-primary)] dark:text-purple-300 font-medium leading-relaxed italic relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-1 h-full bg-[var(--accent-primary)] opacity-50"></div>
+                    <div className="w-full flex flex-col gap-2 p-4 rounded-xl border transition-all duration-200 bg-[var(--bg-elevated)] border-[var(--border-subtle)] overflow-hidden">
                         {(() => {
-                            const activeShotCount = Object.values(batchShotSelection).filter(Boolean).length;
-                            let summary = `${productName || (language === 'tr' ? 'Bu ürün' : 'This product')} ${language === 'tr' ? 'için profesyonel çekim kompozisyonu ayarlandı.' : 'has a professional photoshoot composition ready.'} `;
+                            const unselectedItems: { key: string; labelTr: string; labelEn: string; group: string }[] = [];
 
-                            if (assets.model) summary += language === 'tr' ? "Seçili manken ile " : "With the selected model, ";
-                            else summary += language === 'tr' ? "Manken olmadan " : "Without a human model, ";
+                            const itemsToCheck = [
+                                { key: 'model', labelTr: 'Stüdyo Mankeni', labelEn: 'Studio Model', group: 'product' },
+                                { key: 'pose', labelTr: 'Özel Poz', labelEn: 'Custom Pose', group: 'product' },
+                                { key: 'background', labelTr: 'Arka Plan', labelEn: 'Background', group: 'product' },
+                                { key: 'bag', labelTr: 'Çanta', labelEn: 'Bag', group: 'accessories' },
+                                { key: 'glasses', labelTr: 'Gözlük', labelEn: 'Glasses', group: 'accessories' },
+                                { key: 'hat', labelTr: 'Şapka', labelEn: 'Hat', group: 'accessories' },
+                                { key: 'jacket', labelTr: 'Dış Giyim', labelEn: 'Outerwear', group: 'accessories' },
+                                { key: 'jewelry', labelTr: 'Takı', labelEn: 'Jewelry', group: 'accessories' }
+                            ];
 
-                            if (assets.background) summary += language === 'tr' ? "özel konsept ortamında " : "in a custom concept environment, ";
-                            else summary += language === 'tr' ? "temiz stüdyo ışığında " : "under clean studio lighting, ";
+                            itemsToCheck.forEach(item => {
+                                if (!assets[item.key]) {
+                                    unselectedItems.push(item);
+                                }
+                            });
 
-                            const accessoryListTr = [];
-                            const accessoryListEn = [];
-                            if (assets.jacket) { accessoryListTr.push("dış giyim"); accessoryListEn.push("outerwear"); }
-                            if (assets.bag) { accessoryListTr.push("çanta"); accessoryListEn.push("bag"); }
-                            if (assets.glasses) { accessoryListTr.push("gözlük"); accessoryListEn.push("glasses"); }
-                            if (assets.hat) { accessoryListTr.push("şapka"); accessoryListEn.push("hat"); }
-                            if (assets.jewelry) { accessoryListTr.push("takı"); accessoryListEn.push("jewelry"); }
-                            if (assets.belt) { accessoryListTr.push("kemer"); accessoryListEn.push("belt"); }
-                            if (assets.shoes) { accessoryListTr.push("ayakkabı"); accessoryListEn.push("shoes"); }
-
-                            if (accessoryListTr.length > 0) {
-                                summary += language === 'tr'
-                                    ? `ve ${accessoryListTr.join(', ')} gibi aksesuarlarla kombinlenerek `
-                                    : `combined with accessories like ${accessoryListEn.join(', ')} `;
+                            if (unselectedItems.length === 0) {
+                                return (
+                                    <div className="text-xs text-green-500 font-medium">
+                                        {language === 'tr' ? 'Birlikte kombinlemek için tüm temel elemanlar seçili!' : 'All basic elements selected for styling!'}
+                                    </div>
+                                );
                             }
 
-                            summary += language === 'tr' ? "görselleştirilecek. " : "it will be visualized. ";
+                            return unselectedItems.map((item, idx) => (
+                                <div key={idx} className="flex items-center justify-between py-1.5 border-b border-[var(--border-subtle)] last:border-0 last:pb-0">
+                                    <span className="text-xs font-medium text-[var(--text-secondary)]">
+                                        {language === 'tr' ? item.labelTr : item.labelEn}
+                                        <span className="text-red-400 ml-2 italic font-normal text-[10px] opacity-80">
+                                            {language === 'tr' ? 'seçilmedi' : 'not selected'}
+                                        </span>
+                                    </span>
+                                    <button
+                                        onClick={() => {
+                                            if (setWizardStep) {
+                                                setWizardStep(2);
+                                            }
+                                            if (setActiveGroup && setActiveLibraryAsset) {
+                                                setActiveGroup(item.group as any);
+                                                setActiveLibraryAsset(item.key);
+                                            }
+                                        }}
+                                        className="text-[10px] font-bold text-[var(--accent-primary)] hover:underline uppercase px-2"
+                                    >
+                                        {language === 'tr' ? 'Düzenle' : 'Edit'}
+                                    </button>
+                                </div>
+                            ));
 
-                            const moodLabelsTr: Record<string, string> = {
-                                'natural': 'doğal', 'warm': 'samimi ve sıcak', 'powerful': 'güçlü',
-                                'relaxed': 'rahat', 'professional': 'profesyonel', 'subtle': 'sakin'
-                            };
-                            const moodLabelsEn: Record<string, string> = {
-                                'natural': 'natural', 'warm': 'warm & inviting', 'powerful': 'powerful',
-                                'relaxed': 'relaxed', 'professional': 'professional', 'subtle': 'subtle'
-                            };
-
-                            if (assets.model) {
-                                const moodName = language === 'tr' ? (moodLabelsTr[selectedMoodId] || 'doğal') : (moodLabelsEn[selectedMoodId] || 'natural');
-                                summary += language === 'tr'
-                                    ? `Karelerde mankenin daha ${moodName} bir yapı sergilemesi hedefleniyor. `
-                                    : `The model will be presented with a ${moodName} look in the final shots. `;
-                            }
-
-                            summary += language === 'tr'
-                                ? `Sistem, ürününüzü ${activeShotCount > 0 ? activeShotCount : 'seçilecek olan'} farklı açıdan render edecek.`
-                                : `The AI assistant will render from ${activeShotCount > 0 ? activeShotCount : 'selected'} different angles.`;
-
-                            return summary;
                         })()}
+                    </div>
+                </div>
+
+                {/* Shots Selection */}
+                <div className="space-y-3 pt-2">
+                    <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase flex items-center gap-2">
+                        {language === 'tr' ? 'Çekilecek Kareler' : 'Shots to Generate'}
+                    </label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-3">
+                        {availableBatchShots.map((shot) => {
+                            const isSelected = !!batchShotSelection[shot.id];
+                            const isStylingShot = shot.id.includes('styling');
+                            const hasPose = isStylingShot && !!assets.pose;
+
+                            return (
+                                <div
+                                    key={shot.id}
+                                    className={cn(
+                                        "relative group flex flex-col p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 select-none",
+                                        isSelected
+                                            ? "border-[var(--accent-primary)] bg-[var(--accent-soft)]/50 shadow-md shadow-[var(--accent-primary)]/10"
+                                            : "border-[var(--border-subtle)] bg-[var(--bg-card)] hover:border-[var(--accent-primary)]/50"
+                                    )}
+                                    // Make sure we update selection
+                                    onClick={() => setBatchShotSelection(prev => ({ ...prev, [shot.id]: !isSelected }))}
+                                >
+                                    <div className="flex items-start justify-between mb-3 gap-2">
+                                        <div className="flex flex-col">
+                                            <span className={cn(
+                                                "text-[12px] font-black uppercase tracking-wider",
+                                                isSelected ? "text-[var(--accent-primary)]" : "text-[var(--text-primary)] group-hover:text-[var(--accent-primary)]"
+                                            )}>
+                                                {language === 'tr' ? shot.label : shot.labelEn}
+                                            </span>
+                                            {(shot.descriptionTr || shot.descriptionEn) && (
+                                                <span className="text-[10px] font-medium text-[var(--text-muted)] mt-1 leading-tight">
+                                                    {language === 'tr' ? shot.descriptionTr : shot.descriptionEn}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className={cn(
+                                            "w-6 h-6 rounded flex items-center justify-center shrink-0 mt-0.5 shadow-sm transition-colors",
+                                            isSelected ? "bg-[var(--accent-primary)] text-white" : "bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-transparent group-hover:border-[var(--accent-primary)]/30"
+                                        )}>
+                                            <Check className="w-4 h-4" strokeWidth={3} />
+                                        </div>
+                                    </div>
+
+                                    {/* POSE SELECTION INTEGRATION */}
+                                    {isStylingShot && (
+                                        <div className="mt-auto pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between">
+                                            {hasPose ? (
+                                                <div className="flex items-center gap-1.5 text-green-500">
+                                                    <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center">
+                                                        <Check className="w-3.5 h-3.5" />
+                                                    </div>
+                                                    <span className="text-[9px] font-bold uppercase tracking-wider">{language === 'tr' ? 'Özel Poz Seçili' : 'Custom Pose Selected'}</span>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center gap-1.5 text-[var(--accent-primary)]">
+                                                    <div className="w-5 h-5 rounded-full bg-orange-400/10 flex items-center justify-center">
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse" />
+                                                    </div>
+                                                    <span className="text-[9px] font-bold uppercase tracking-wider">{language === 'tr' ? 'Otomatik Seçim' : 'Auto Selection'}</span>
+                                                </div>
+                                            )}
+
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    if (setWizardStep && setActiveGroup && setActiveLibraryAsset) {
+                                                        setWizardStep(2);
+                                                        setActiveGroup('product');
+                                                        setActiveLibraryAsset('pose');
+                                                    }
+                                                }}
+                                                className="text-[9px] font-bold text-white bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] uppercase px-2.5 py-1.5 rounded-md transition-colors"
+                                            >
+                                                {language === 'tr' ? (hasPose ? 'Pozu Değiştir' : 'Poz Seç') : (hasPose ? 'Change Pose' : 'Select Pose')}
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
 

@@ -19,6 +19,7 @@ interface PreviewAreaProps {
     estimatedCost: number;
     isStoppingBatch?: boolean;
     handleStopBatch?: () => void;
+    handleRegenerateShot?: (index: number) => void;
 }
 
 export function PreviewArea({
@@ -34,7 +35,8 @@ export function PreviewArea({
     productCode,
     estimatedCost,
     isStoppingBatch,
-    handleStopBatch
+    handleStopBatch,
+    handleRegenerateShot
 }: PreviewAreaProps) {
     const generateButton = (
         <div className="w-full max-w-md mb-6 space-y-2">
@@ -45,7 +47,7 @@ export function PreviewArea({
                     "bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] shadow-[var(--accent-primary)]/20 text-white"
                 )}
                 onClick={() => batchMode ? handleBatchGenerate() : handleGenerate()}
-                disabled={isProcessing || (batchMode && !productCode)}
+                disabled={isProcessing}
             >
                 {isProcessing ? (
                     <span className="flex items-center gap-2">
@@ -164,14 +166,6 @@ export function PreviewArea({
                                         <Button
                                             size="icon"
                                             className="h-8 w-8 rounded-full bg-white/80 hover:bg-white text-black backdrop-blur-md shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
-                                            onClick={() => router.push(`/resize?image=${encodeURIComponent(url)}`)}
-                                            title="Upscale"
-                                        >
-                                            <Maximize2 className="w-3.5 h-3.5" />
-                                        </Button>
-                                        <Button
-                                            size="icon"
-                                            className="h-8 w-8 rounded-full bg-white/80 hover:bg-white text-black backdrop-blur-md shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
                                             onClick={async (e) => {
                                                 e.stopPropagation();
                                                 try {
@@ -195,11 +189,26 @@ export function PreviewArea({
                                             <Download className="w-3.5 h-3.5" />
                                         </Button>
                                     </div>
-                                    {(typeof img === 'object' && img.filename) && (
-                                        <div className="absolute bottom-0 inset-x-0 p-2 bg-black/40 backdrop-blur-sm text-[8px] text-white font-medium truncate opacity-0 group-hover:opacity-100 transition-opacity">
-                                            {img.filename.replace('.jpg', '').replace('.png', '')}
-                                        </div>
-                                    )}
+                                    {
+                                        (typeof img === 'object' && img.filename) && (
+                                            <div className="absolute bottom-0 inset-x-0 p-2 bg-black/40 backdrop-blur-sm text-[8px] text-white font-medium truncate opacity-0 group-hover:opacity-100 transition-opacity flex justify-between items-center">
+                                                <span>{img.filename.replace('.jpg', '').replace('.png', '')}</span>
+                                            </div>
+                                        )
+                                    }
+                                    {
+                                        img.requestPayload && handleRegenerateShot && !isProcessing && (
+                                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
+                                                <Button
+                                                    onClick={() => handleRegenerateShot(i)}
+                                                    className="bg-white/90 hover:bg-white text-black text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full shadow-xl transform hover:scale-105 transition-all"
+                                                >
+                                                    <Zap className="w-4 h-4 mr-2" />
+                                                    {language === 'tr' ? 'Tekrar Üret' : 'Regenerate'}
+                                                </Button>
+                                            </div>
+                                        )
+                                    }
                                 </div>
                             );
                         })}
@@ -218,20 +227,22 @@ export function PreviewArea({
                     </div>
                 </div>
 
-                {!isProcessing && (
-                    <div className="w-full max-w-2xl pt-6 border-t border-[var(--border-subtle)] flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-3">
-                            <div className="flex flex-col">
-                                <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-wider">{language === "tr" ? "TOPLAM GÖRSEL" : "TOTAL IMAGES"}</span>
-                                <span className="text-sm font-black text-[var(--text-primary)]">{resultImages.length}</span>
+                {
+                    !isProcessing && (
+                        <div className="w-full max-w-2xl pt-6 border-t border-[var(--border-subtle)] flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-wider">{language === "tr" ? "TOPLAM GÖRSEL" : "TOTAL IMAGES"}</span>
+                                    <span className="text-sm font-black text-[var(--text-primary)]">{resultImages.length}</span>
+                                </div>
+                            </div>
+                            <div className="flex gap-3">
+                                {generateButton}
                             </div>
                         </div>
-                        <div className="flex gap-3">
-                            {generateButton}
-                        </div>
-                    </div>
-                )}
-            </div>
+                    )
+                }
+            </div >
         );
     }
 

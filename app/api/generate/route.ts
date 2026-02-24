@@ -714,12 +714,11 @@ export async function POST(req: NextRequest) {
                 framingBlock.push("Shot Type: Head-to-toe full body photography.");
                 framingBlock.push("Visible: Full model from head to feet.");
                 framingBlock.push("Enabled Details: Leg silhouette, hem finish, footwear, and full body stance.");
-                framingBlock.push("Constraint: Exclude close-up facial micro-expressions.");
             } else if (framing === 'cowboy_shot') {
                 framingBlock.push("Shot Type: Cowboy shot (Medium shot).");
                 framingBlock.push("Visible: Head to mid-thigh area.");
                 framingBlock.push("Enabled Details: Garment fall, drape, and hemline over the pants.");
-                framingBlock.push("Constraint: Exclude lower legs and footwear.");
+                framingBlock.push("Constraint: Exclude footwear.");
             } else if (framing === 'chest_and_face') {
                 framingBlock.push("Shot Type: Close-up beauty/fashion portrait.");
                 framingBlock.push("Visible: Head, shoulders, and upper chest.");

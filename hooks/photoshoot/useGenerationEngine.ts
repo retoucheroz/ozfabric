@@ -514,10 +514,7 @@ export const useGenerationEngine = (
     };
 
     const handleBatchGenerate = async () => {
-        if (!productCode.trim()) {
-            toast.error(language === "tr" ? "Ürün kodu gerekli!" : "Product code required!");
-            return;
-        }
+        // Removed product code requirement
         if (!assets.model) {
             toast.error(language === "tr" ? "Model görseli gerekli!" : "Model image required!");
             return;
@@ -794,52 +791,54 @@ export const useGenerationEngine = (
                     if (firstSentenceMatch) finalFitDescription = firstSentenceMatch[0].trim();
                 }
 
+                const requestPayload = {
+                    productName: preview.structured.productName,
+                    workflowType,
+                    uploadedImages,
+                    gender,
+                    resolution,
+                    aspectRatio,
+                    hairBehindShoulders: preview.spec.excludeHairInfo ? undefined : preview.spec.hairBehind,
+                    enableWind: preview.spec.enableWind,
+                    isStylingShot: preview.spec.isStyling,
+                    shotIndex: i + 1,
+                    shotRole: preview.spec.isStyling ? 'styling' : 'technical',
+                    lookAtCamera: preview.spec.excludeHairInfo ? undefined : preview.spec.lookAtCamera,
+                    buttonsOpen,
+                    tucked,
+                    socksType: preview.spec.excludeSocksInfo ? 'none' : socksType,
+                    pantLength,
+                    techAccessories,
+                    closureType,
+                    upperGarmentDescription,
+                    lowerGarmentDescription,
+                    innerWearDescription,
+                    shoesDescription,
+                    sleevesRolled,
+                    excludeBeltAsset: preview.spec.excludeBeltAsset,
+                    excludeHatAsset: preview.spec.excludeHatAsset,
+                    excludeShoesAsset: preview.spec.excludeShoesAsset,
+                    productDescription: preview.structured.productDescription,
+                    fitDescription: finalFitDescription,
+                    poseDescription: preview.structured.pose,
+                    targetView: preview.spec.camera.angle === 'angled' || preview.spec.view.includes('angled') ? 'side' : (preview.spec.camera.angle === 'back' || preview.spec.view.includes('back') ? 'back' : 'front'),
+                    poseFocus: preview.spec.view.includes('detail') ? 'detail' : (preview.spec.camera.shot_type === 'close_up' ? 'closeup' : (preview.spec.camera.shot_type === 'cowboy_shot' ? 'upper' : 'full')),
+                    editedPrompt: editedBatchPrompts[i],
+                    seed: finalSeed,
+                    enableWebSearch,
+                    angleId: preview.spec.view,
+                    selectedMoodId,
+                    collarType,
+                    lightingPositive,
+                    lightingNegative,
+                    poseStickman: preview.spec.useStickman ? poseStickman : undefined,
+                    preview: false
+                };
+
                 const res = await fetch("/api/generate", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        productName: preview.structured.productName,
-                        workflowType,
-                        uploadedImages,
-                        gender,
-                        resolution,
-                        aspectRatio,
-                        hairBehindShoulders: preview.spec.excludeHairInfo ? undefined : preview.spec.hairBehind,
-                        enableWind: preview.spec.enableWind,
-                        isStylingShot: preview.spec.isStyling,
-                        shotIndex: i + 1,
-                        shotRole: preview.spec.isStyling ? 'styling' : 'technical',
-                        lookAtCamera: preview.spec.excludeHairInfo ? undefined : preview.spec.lookAtCamera,
-                        buttonsOpen,
-                        tucked,
-                        socksType: preview.spec.excludeSocksInfo ? 'none' : socksType,
-                        pantLength,
-                        techAccessories,
-                        closureType,
-                        upperGarmentDescription,
-                        lowerGarmentDescription,
-                        innerWearDescription,
-                        shoesDescription,
-                        sleevesRolled,
-                        excludeBeltAsset: preview.spec.excludeBeltAsset,
-                        excludeHatAsset: preview.spec.excludeHatAsset,
-                        excludeShoesAsset: preview.spec.excludeShoesAsset,
-                        productDescription: preview.structured.productDescription,
-                        fitDescription: finalFitDescription,
-                        poseDescription: preview.structured.pose,
-                        targetView: preview.spec.camera.angle === 'angled' || preview.spec.view.includes('angled') ? 'side' : (preview.spec.camera.angle === 'back' || preview.spec.view.includes('back') ? 'back' : 'front'),
-                        poseFocus: preview.spec.view.includes('detail') ? 'detail' : (preview.spec.camera.shot_type === 'close_up' ? 'closeup' : (preview.spec.camera.shot_type === 'cowboy_shot' ? 'upper' : 'full')),
-                        editedPrompt: editedBatchPrompts[i],
-                        seed: finalSeed,
-                        enableWebSearch,
-                        angleId: preview.spec.view,
-                        selectedMoodId,
-                        collarType,
-                        lightingPositive,
-                        lightingNegative,
-                        poseStickman: preview.spec.useStickman ? poseStickman : undefined,
-                        preview: false
-                    })
+                    body: JSON.stringify(requestPayload)
                 });
 
                 if (res.ok) {
@@ -848,7 +847,7 @@ export const useGenerationEngine = (
                     if (imageUrl) {
                         const nameSuffix = preview.title.replace(/\s+/g, '_').toLowerCase();
                         const fullFilename = `${productCode || 'shot'}_${nameSuffix}.jpg`;
-                        const newImg = { filename: fullFilename, url: imageUrl, downloadName: fullFilename };
+                        const newImg = { filename: fullFilename, url: imageUrl, downloadName: fullFilename, requestPayload };
                         generatedImages.push(newImg);
 
                         // Force update with latest array to ensure PreviewArea sees it
@@ -885,6 +884,44 @@ export const useGenerationEngine = (
         }
     };
 
+    const handleRegenerateShot = async (index: number) => {
+        const img = resultImages?.[index];
+        if (!img || !img.requestPayload) return;
+
+        setIsProcessing(true);
+        try {
+            const payload = { ...img.requestPayload, seed: Math.floor(Math.random() * 1000000000) };
+            const res = await fetch("/api/generate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                const data = await res.json();
+                const imageUrl = data.images?.[0] || data.image_url;
+                if (imageUrl) {
+                    const updated = [...(resultImages || [])];
+                    updated[index] = { ...updated[index], url: imageUrl, requestPayload: payload };
+                    setResultImages(updated);
+                    toast.success(language === 'tr' ? 'Görsel yeniden üretildi.' : 'Image regenerated.');
+
+                    addProject({
+                        title: `Regenerated Shot`,
+                        type: "Photoshoot",
+                        imageUrl: imageUrl,
+                        description: `Seed: ${payload.seed} | Prompt: ${payload.editedPrompt || payload.poseDescription}`
+                    });
+                }
+            } else {
+                toast.error(language === 'tr' ? 'Hata oluştu.' : 'Generation failed.');
+            }
+        } catch (e: any) {
+            toast.error(`Error: ${e.message}`);
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
     const handleStopBatch = () => {
         setIsStoppingBatch(true);
         isStoppingBatchRef.current = true;
@@ -911,6 +948,7 @@ export const useGenerationEngine = (
         handleBatchGenerate,
         handleConfirmBatchGeneration,
         handleStopBatch,
+        handleRegenerateShot,
         isStoppingBatch,
         batchPreviewPrompts,
         editedBatchPrompts,
