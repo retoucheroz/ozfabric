@@ -432,148 +432,153 @@ export default function PhotoshootPage() {
                                             {language === 'tr' ? 'Açı ve Kare Seçimleri' : 'Angle & Shot Selection'}
                                         </label>
 
-                                        {/* Styling Row - 50% larger, side by side */}
-                                        <div className="grid grid-cols-2 gap-6 w-full lg:w-2/3 mx-auto">
-                                            {availableBatchShots.filter(s => s.id.includes('styling')).map((shot) => {
-                                                const isSelected = batchShotSelection[shot.id] ?? false;
-                                                const isMaviActive = user?.role === 'admin' && isMaviBatch;
+                                        <div className="flex flex-col xl:flex-row gap-8">
+                                            {/* Sol: Styling Angles (Büyük ve yan yana) */}
+                                            <div className="flex-none lg:w-1/3 w-full">
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    {availableBatchShots.filter(s => s.id.includes('styling')).map((shot) => {
+                                                        const isSelected = batchShotSelection[shot.id] ?? false;
+                                                        const isMaviActive = user?.role === 'admin' && isMaviBatch;
 
-                                                return (
-                                                    <div key={shot.id} className="flex flex-col gap-3">
-                                                        <div
-                                                            className={cn(
-                                                                "relative aspect-[3/4] rounded-xl border transition-all duration-300 overflow-hidden group cursor-pointer w-full",
-                                                                isSelected
-                                                                    ? (isMaviActive ? "border-blue-500 ring-2 ring-blue-500/20 shadow-lg" : "border-[var(--accent-primary)] ring-2 ring-[var(--accent-primary)]/20 shadow-lg")
-                                                                    : "border-[var(--border-subtle)] opacity-40 grayscale bg-[var(--bg-elevated)] hover:opacity-80 transition-opacity"
-                                                            )}
-                                                            onClick={() => setBatchShotSelection(prev => ({ ...prev, [shot.id]: !isSelected }))}
-                                                        >
-                                                            <div className="w-full h-full relative">
-                                                                {shot.image ? (
-                                                                    <img src={shot.image} alt={shot.label} className="w-full h-full object-cover" />
-                                                                ) : (
-                                                                    <div className="w-full h-full flex items-center justify-center bg-muted/20">
-                                                                        <Shirt className="w-8 h-8 opacity-20" />
-                                                                    </div>
-                                                                )}
-
-                                                                <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
-                                                                    <p className="text-sm font-black text-white text-center leading-snug uppercase">
-                                                                        {language === 'tr' ? shot.label : shot.labelEn}
-                                                                    </p>
-                                                                </div>
-
-                                                                <div className="absolute top-3 left-3">
-                                                                    <div className={cn(
-                                                                        "w-6 h-6 rounded-md flex items-center justify-center border transition-all",
+                                                        return (
+                                                            <div key={shot.id} className="flex flex-col gap-3">
+                                                                <div
+                                                                    className={cn(
+                                                                        "relative aspect-[3/4] rounded-xl border transition-all duration-300 overflow-hidden group cursor-pointer w-full",
                                                                         isSelected
-                                                                            ? (isMaviActive ? "bg-blue-600 border-blue-400 text-white" : "bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white")
-                                                                            : "bg-white/20 border-white/40 text-transparent"
-                                                                    )}>
-                                                                        <Check className="w-4 h-4" />
+                                                                            ? (isMaviActive ? "border-blue-500 ring-2 ring-blue-500/20 shadow-lg" : "border-[var(--accent-primary)] ring-2 ring-[var(--accent-primary)]/20 shadow-lg")
+                                                                            : "border-[var(--border-subtle)] opacity-40 grayscale bg-[var(--bg-elevated)] hover:opacity-80 transition-opacity"
+                                                                    )}
+                                                                    onClick={() => setBatchShotSelection(prev => ({ ...prev, [shot.id]: !isSelected }))}
+                                                                >
+                                                                    <div className="w-full h-full relative">
+                                                                        {shot.image ? (
+                                                                            <img src={shot.image} alt={shot.label} className="w-full h-full object-cover" />
+                                                                        ) : (
+                                                                            <div className="w-full h-full flex items-center justify-center bg-muted/20">
+                                                                                <Shirt className="w-8 h-8 opacity-20" />
+                                                                            </div>
+                                                                        )}
+
+                                                                        <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/90 via-black/60 to-transparent flex flex-col items-center justify-end">
+                                                                            <p className="text-[10px] font-black text-white text-center leading-snug uppercase">
+                                                                                {language === 'tr' ? shot.label : shot.labelEn}
+                                                                            </p>
+                                                                            {/* Sadece burada Poz Seç yazısını minik gösterdik ama tıklama butonunu alta ayırdık */}
+                                                                        </div>
+
+                                                                        <div className="absolute top-2 left-2">
+                                                                            <div className={cn(
+                                                                                "w-5 h-5 rounded-md flex items-center justify-center border transition-all",
+                                                                                isSelected
+                                                                                    ? (isMaviActive ? "bg-blue-600 border-blue-400 text-white" : "bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white")
+                                                                                    : "bg-white/20 border-white/40 text-transparent"
+                                                                            )}>
+                                                                                <Check className="w-3.5 h-3.5" />
+                                                                            </div>
+                                                                        </div>
+
+                                                                        {isSelected && (
+                                                                            <div
+                                                                                className="absolute top-2 right-2 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10"
+                                                                                onClick={(e) => e.stopPropagation()}
+                                                                            >
+                                                                                <span className="text-[10px] font-bold text-white tracking-widest leading-none">YNC</span>
+                                                                                <Switch
+                                                                                    className="scale-[0.6] origin-right !m-0"
+                                                                                    checked={stylingSideOnly[shot.id] || false}
+                                                                                    onCheckedChange={(val) => setStylingSideOnly({ ...stylingSideOnly, [shot.id]: val })}
+                                                                                />
+                                                                            </div>
+                                                                        )}
                                                                     </div>
                                                                 </div>
 
+                                                                {/* Poz Seç - right below */}
                                                                 {isSelected && (
-                                                                    <div
-                                                                        className="absolute top-3 right-3 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10"
-                                                                        onClick={(e) => e.stopPropagation()}
+                                                                    <button
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            setActiveGroup('product');
+                                                                            setTargetPoseShot(shot.id);
+                                                                            setActiveLibraryAsset('pose');
+                                                                        }}
+                                                                        className={cn(
+                                                                            "flex items-center justify-center gap-1.5 w-full py-2.5 rounded-lg border shadow-sm transition-colors cursor-pointer group/pose-btn",
+                                                                            assets[`pose_${shot.id}`]
+                                                                                ? "border-green-500/30 bg-green-500/10 text-green-600 dark:text-green-400 hover:bg-green-500 hover:text-white"
+                                                                                : "border-[var(--accent-primary)]/30 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] hover:bg-[var(--accent-primary)] hover:text-white"
+                                                                        )}
                                                                     >
-                                                                        <span className="text-xs font-bold text-white tracking-widest leading-none">YNC</span>
-                                                                        <Switch
-                                                                            className="scale-75 origin-right !m-0"
-                                                                            checked={stylingSideOnly[shot.id] || false}
-                                                                            onCheckedChange={(val) => setStylingSideOnly({ ...stylingSideOnly, [shot.id]: val })}
-                                                                        />
-                                                                    </div>
+                                                                        {assets[`pose_${shot.id}`] ? (
+                                                                            <>
+                                                                                <Check className="w-3.5 h-3.5 group-hover/pose-btn:text-white" />
+                                                                                <span className="text-[9px] font-bold uppercase tracking-wider">{language === 'tr' ? 'Özel Poz Seçili' : 'Custom Pose Selected'}</span>
+                                                                            </>
+                                                                        ) : (
+                                                                            <>
+                                                                                <div className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse group-hover/pose-btn:bg-white" />
+                                                                                <span className="text-[9px] font-bold uppercase tracking-wider">{language === 'tr' ? 'Poz Seç (İsteğe Bağlı)' : 'Select Pose (Optional)'}</span>
+                                                                            </>
+                                                                        )}
+                                                                    </button>
                                                                 )}
                                                             </div>
-                                                        </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
 
-                                                        {/* Poz Seç - right below */}
-                                                        {isSelected && (
-                                                            <button
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    setActiveGroup('product');
-                                                                    setTargetPoseShot(shot.id);
-                                                                    setActiveLibraryAsset('pose');
-                                                                }}
-                                                                className={cn(
-                                                                    "flex items-center justify-center gap-2 w-full py-3 rounded-lg border shadow-sm transition-colors cursor-pointer group/pose-btn",
-                                                                    assets[`pose_${shot.id}`]
-                                                                        ? "border-green-500/30 bg-green-500/10 text-green-600 dark:text-green-400 hover:bg-green-500 hover:text-white"
-                                                                        : "border-[var(--accent-primary)]/30 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] hover:bg-[var(--accent-primary)] hover:text-white"
-                                                                )}
-                                                            >
-                                                                {assets[`pose_${shot.id}`] ? (
-                                                                    <>
-                                                                        <Check className="w-4 h-4 group-hover/pose-btn:text-white" />
-                                                                        <span className="text-xs font-bold uppercase tracking-wider">{language === 'tr' ? 'Özel Poz Seçili' : 'Custom Pose Selected'}</span>
-                                                                    </>
-                                                                ) : (
-                                                                    <>
-                                                                        <div className="w-2 h-2 rounded-full bg-orange-400 animate-pulse group-hover/pose-btn:bg-white" />
-                                                                        <span className="text-xs font-bold uppercase tracking-wider">{language === 'tr' ? 'Poz Seç (İsteğe Bağlı)' : 'Select Pose (Optional)'}</span>
-                                                                    </>
-                                                                )}
-                                                            </button>
-                                                        )}
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
+                                            {/* Sağ: Diğer Teknik Kareler (4 sütunlu grid) */}
+                                            <div className="flex-1">
+                                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                    {availableBatchShots.filter(s => !s.id.includes('styling')).map((shot) => {
+                                                        const isSelected = batchShotSelection[shot.id] ?? false;
+                                                        const isMaviActive = user?.role === 'admin' && isMaviBatch;
 
-                                        <Separator className="my-4 opacity-50" />
-
-                                        {/* Technical Row - 4 items per row, 25% larger equivalent by using 4 cols */}
-                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
-                                            {availableBatchShots.filter(s => !s.id.includes('styling')).map((shot) => {
-                                                const isSelected = batchShotSelection[shot.id] ?? false;
-                                                const isMaviActive = user?.role === 'admin' && isMaviBatch;
-
-                                                return (
-                                                    <div key={shot.id} className="flex flex-col gap-2">
-                                                        <div
-                                                            className={cn(
-                                                                "relative aspect-[3/4] rounded-xl border transition-all duration-300 overflow-hidden group cursor-pointer w-full",
-                                                                isSelected
-                                                                    ? (isMaviActive ? "border-blue-500 ring-2 ring-blue-500/20 shadow-lg" : "border-[var(--accent-primary)] ring-2 ring-[var(--accent-primary)]/20 shadow-lg")
-                                                                    : "border-[var(--border-subtle)] opacity-40 grayscale bg-[var(--bg-elevated)] hover:opacity-80 transition-opacity"
-                                                            )}
-                                                            onClick={() => setBatchShotSelection(prev => ({ ...prev, [shot.id]: !isSelected }))}
-                                                        >
-                                                            <div className="w-full h-full relative">
-                                                                {shot.image ? (
-                                                                    <img src={shot.image} alt={shot.label} className="w-full h-full object-cover" />
-                                                                ) : (
-                                                                    <div className="w-full h-full flex items-center justify-center bg-muted/20">
-                                                                        <Shirt className="w-6 h-6 opacity-20" />
-                                                                    </div>
-                                                                )}
-
-                                                                <div className="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
-                                                                    <p className="text-[10px] font-black text-white text-center leading-snug uppercase">
-                                                                        {language === 'tr' ? shot.label : shot.labelEn}
-                                                                    </p>
-                                                                </div>
-
-                                                                <div className="absolute top-2 left-2">
-                                                                    <div className={cn(
-                                                                        "w-5 h-5 rounded-md flex items-center justify-center border transition-all",
+                                                        return (
+                                                            <div key={shot.id} className="flex flex-col gap-2">
+                                                                <div
+                                                                    className={cn(
+                                                                        "relative aspect-[3/4] rounded-xl border transition-all duration-300 overflow-hidden group cursor-pointer w-full",
                                                                         isSelected
-                                                                            ? (isMaviActive ? "bg-blue-600 border-blue-400 text-white" : "bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white")
-                                                                            : "bg-white/20 border-white/40 text-transparent"
-                                                                    )}>
-                                                                        <Check className="w-3.5 h-3.5" />
+                                                                            ? (isMaviActive ? "border-blue-500 ring-2 ring-blue-500/20 shadow-lg" : "border-[var(--accent-primary)] ring-2 ring-[var(--accent-primary)]/20 shadow-lg")
+                                                                            : "border-[var(--border-subtle)] opacity-40 grayscale bg-[var(--bg-elevated)] hover:opacity-80 transition-opacity"
+                                                                    )}
+                                                                    onClick={() => setBatchShotSelection(prev => ({ ...prev, [shot.id]: !isSelected }))}
+                                                                >
+                                                                    <div className="w-full h-full relative">
+                                                                        {shot.image ? (
+                                                                            <img src={shot.image} alt={shot.label} className="w-full h-full object-cover" />
+                                                                        ) : (
+                                                                            <div className="w-full h-full flex items-center justify-center bg-muted/20">
+                                                                                <Shirt className="w-6 h-6 opacity-20" />
+                                                                            </div>
+                                                                        )}
+
+                                                                        <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
+                                                                            <p className="text-[9px] font-black text-white text-center leading-snug uppercase">
+                                                                                {language === 'tr' ? shot.label : shot.labelEn}
+                                                                            </p>
+                                                                        </div>
+
+                                                                        <div className="absolute top-2 left-2">
+                                                                            <div className={cn(
+                                                                                "w-4 h-4 rounded-md flex items-center justify-center border transition-all",
+                                                                                isSelected
+                                                                                    ? (isMaviActive ? "bg-blue-600 border-blue-400 text-white" : "bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white")
+                                                                                    : "bg-white/20 border-white/40 text-transparent"
+                                                                            )}>
+                                                                                <Check className="w-3 h-3" />
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
