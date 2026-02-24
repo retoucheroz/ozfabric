@@ -27,7 +27,7 @@ export async function requireAdmin() {
 
 // Kredi düşürme (atomik)
 export async function deductCredits(userId: string, amount: number, description: string = 'Image Generation') {
-    return await prisma.$transaction(async (tx) => {
+    return await prisma.$transaction(async (tx: any) => {
         const user = await tx.user.findUnique({
             where: { id: userId },
             select: { credits: true },
@@ -57,7 +57,7 @@ export async function deductCredits(userId: string, amount: number, description:
 
 // Kredi ekleme (webhook'tan çağrılır)
 export async function addCredits(userId: string, amount: number, description: string, type: string = 'deposit') {
-    return await prisma.$transaction(async (tx) => {
+    return await prisma.$transaction(async (tx: any) => {
         const updatedUser = await tx.user.update({
             where: { id: userId },
             data: { credits: { increment: amount } },
