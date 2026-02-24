@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
         });
 
         // Map to legacy format for AdminPanel compatibility
-        const mapped = users.map(u => ({
+        const mapped = users.map((u: any) => ({
             username: u.email || u.name,
             email: u.email,
             name: u.name,
