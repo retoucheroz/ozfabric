@@ -118,6 +118,9 @@ export const usePhotoshootWorkflow = () => {
             return;
         }
 
+        // Always open library tab first when sidebar opens
+        setLibraryTab('library');
+
         // If it's a group selector, don't set internalAsset (handled in Sidebar)
         if (['product_group', 'accessories_group'].includes(activeLibraryAsset)) {
             setInternalAsset(null);

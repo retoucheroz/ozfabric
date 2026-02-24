@@ -862,6 +862,7 @@ export default function PhotoshootPage() {
                 sessionLibrary={sessionLibrary}
                 isAdmin={user?.role === 'admin'}
                 addToGlobalLibrary={addToGlobalLibrary}
+                selectedPoseUrl={targetPoseShot ? (assets[`pose_${targetPoseShot}`] || null) : (assets.pose || null)}
             />
         </div >
     );

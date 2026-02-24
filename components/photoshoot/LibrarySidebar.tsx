@@ -71,6 +71,7 @@ interface LibrarySidebarProps {
     sessionLibrary: string[];
     isAdmin?: boolean;
     addToGlobalLibrary?: (category: string, data: any) => void;
+    selectedPoseUrl?: string | null;
 }
 
 export function LibrarySidebar({
@@ -127,7 +128,8 @@ export function LibrarySidebar({
     handleLibrarySelect,
     sessionLibrary,
     isAdmin,
-    addToGlobalLibrary
+    addToGlobalLibrary,
+    selectedPoseUrl
 }: LibrarySidebarProps) {
 
     const AssetCard = ({ id, label, icon, required = false, variant = 'default', hideLibrary = false }: { id: string, label: string, icon: any, required?: boolean, variant?: 'default' | 'square', hideLibrary?: boolean }) => (
@@ -325,30 +327,44 @@ export function LibrarySidebar({
                                                         return p.tags?.includes('tam_boy') || !p.tags?.includes('ust_beden');
                                                     }
                                                     return true;
-                                                }).map(pose => (
-                                                    <div key={pose.id} className="group relative aspect-[2/3] rounded-lg border bg-card overflow-hidden cursor-pointer hover:ring-2 hover:ring-violet-500 transition-all shrink-0">
-                                                        <img src={pose.thumbUrl || pose.originalThumb} className="w-full h-full object-cover" onClick={() => handleSavedPoseClick(pose)} />
-                                                        <div className="absolute bottom-0 inset-x-0 p-1 bg-black/60 text-[9px] text-white truncate flex items-center gap-1">
-                                                            {pose.isGlobal && <Sparkles size={8} className="text-amber-400" />}
-                                                            {language === "tr" ? "Özel Poz" : "Custom Pose"}
+                                                }).map(pose => {
+                                                    const isPoseSelected = selectedPoseUrl && pose.url === selectedPoseUrl;
+                                                    return (
+                                                        <div key={pose.id} className={cn(
+                                                            "group relative aspect-[2/3] rounded-lg border overflow-hidden cursor-pointer transition-all shrink-0",
+                                                            isPoseSelected
+                                                                ? "ring-2 ring-green-500 border-green-500 shadow-lg shadow-green-500/20"
+                                                                : "bg-card hover:ring-2 hover:ring-violet-500"
+                                                        )}>
+                                                            <img src={pose.thumbUrl || pose.originalThumb} className="w-full h-full object-cover" onClick={() => handleSavedPoseClick(pose)} />
+                                                            <div className={cn(
+                                                                "absolute bottom-0 inset-x-0 p-1 text-[9px] text-white truncate flex items-center gap-1",
+                                                                isPoseSelected ? "bg-green-600/80" : "bg-black/60"
+                                                            )}>
+                                                                {pose.isGlobal && <Sparkles size={8} className="text-amber-400" />}
+                                                                {isPoseSelected
+                                                                    ? (language === "tr" ? "✓ Seçili" : "✓ Selected")
+                                                                    : (language === "tr" ? "Özel Poz" : "Custom Pose")
+                                                                }
+                                                            </div>
+                                                            <div className="absolute top-1 right-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                {(!pose.isGlobal || isAdmin) && <button onClick={(e) => { e.stopPropagation(); deleteSavedPose(pose.id); }} className="p-1 bg-red-500 text-white rounded hover:bg-red-600"><X size={10} /></button>}
+                                                                <button onClick={(e) => { e.stopPropagation(); handleEditItemClick('pose', pose.id); }} className="p-1 bg-[var(--accent-primary)] text-white rounded hover:bg-[var(--accent-hover)]"><Edit2 size={10} /></button>
+                                                                {!pose.isGlobal && isAdmin && addToGlobalLibrary && (
+                                                                    <button
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            addToGlobalLibrary('pose', { ...pose, id: undefined, createdAt: Date.now() });
+                                                                        }}
+                                                                        className="p-1 bg-amber-500 text-white rounded hover:bg-amber-600"
+                                                                    >
+                                                                        <Sparkles size={10} />
+                                                                    </button>
+                                                                )}
+                                                            </div>
                                                         </div>
-                                                        <div className="absolute top-1 right-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            {(!pose.isGlobal || isAdmin) && <button onClick={(e) => { e.stopPropagation(); deleteSavedPose(pose.id); }} className="p-1 bg-red-500 text-white rounded hover:bg-red-600"><X size={10} /></button>}
-                                                            <button onClick={(e) => { e.stopPropagation(); handleEditItemClick('pose', pose.id); }} className="p-1 bg-[var(--accent-primary)] text-white rounded hover:bg-[var(--accent-hover)]"><Edit2 size={10} /></button>
-                                                            {!pose.isGlobal && isAdmin && addToGlobalLibrary && (
-                                                                <button
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        addToGlobalLibrary('pose', { ...pose, id: undefined, createdAt: Date.now() });
-                                                                    }}
-                                                                    className="p-1 bg-amber-500 text-white rounded hover:bg-amber-600"
-                                                                >
-                                                                    <Sparkles size={10} />
-                                                                </button>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                ))}
+                                                    );
+                                                })}
                                             </div>
                                         </div>
                                     ))}
