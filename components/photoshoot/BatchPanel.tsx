@@ -130,7 +130,6 @@ export function BatchPanel({
 
                             const itemsToCheck = [
                                 { key: 'model', labelTr: 'Stüdyo Mankeni', labelEn: 'Studio Model', group: 'product' },
-                                { key: 'pose', labelTr: 'Özel Poz', labelEn: 'Custom Pose', group: 'product' },
                                 { key: 'background', labelTr: 'Arka Plan', labelEn: 'Background', group: 'product' },
                                 { key: 'bag', labelTr: 'Çanta', labelEn: 'Bag', group: 'accessories' },
                                 { key: 'glasses', labelTr: 'Gözlük', labelEn: 'Glasses', group: 'accessories' },

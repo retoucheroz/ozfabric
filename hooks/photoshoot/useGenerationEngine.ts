@@ -594,11 +594,14 @@ export const useGenerationEngine = (
                 }
 
                 const isDetailShot = spec.view.includes('detail');
+                const poseKey = `pose_${spec.view}`;
+                let targetedPosePrompt = assets[`${poseKey}_prompt`] !== undefined ? assets[`${poseKey}_prompt`] : libraryPosePrompt;
+
                 const structured: any = {
                     productName: currentProductName,
                     productDescription: currentProductDesc,
                     fitDescription: previewFitDesc,
-                    pose: spec.pose,
+                    pose: targetedPosePrompt || spec.pose,
                     view: spec.view,
                     camera: spec.camera
                 };
@@ -621,22 +624,30 @@ export const useGenerationEngine = (
                 const payload = {
                     productName: preview.structured.productName,
                     workflowType: workflowType,
-                    uploadedImages: Object.keys(assets).reduce((acc: any, k: string) => {
-                        const isAccessory = ['jacket', 'bag', 'glasses', 'hat', 'belt', 'jewelry'].includes(k);
-                        const isStylingShot = preview.spec.isStyling;
+                    uploadedImages: (() => {
+                        const imgs = Object.keys(assets).reduce((acc: any, k: string) => {
+                            if (k.startsWith('pose_')) return acc; // Custom pose state keys
 
-                        if (isAccessory && !isStylingShot && !techAccessories[k]) return acc;
-                        if (preview.spec.excludeAllAccessories && isAccessory) return acc;
+                            const isAccessory = ['jacket', 'bag', 'glasses', 'hat', 'belt', 'jewelry'].includes(k);
+                            const isStylingShot = preview.spec.isStyling;
 
-                        if (k === 'glasses') {
-                            acc[k] = preview.spec.includeGlasses || (isStylingShot ? true : techAccessories.glasses) ? (assetsHighRes.glasses || assets.glasses) : undefined;
-                        } else if (k === 'lighting' && !lightingSendImage) {
-                            acc[k] = undefined;
-                        } else {
-                            acc[k] = assetsHighRes[k] || assets[k];
-                        }
-                        return acc;
-                    }, {}),
+                            if (isAccessory && !isStylingShot && !techAccessories[k]) return acc;
+                            if (preview.spec.excludeAllAccessories && isAccessory) return acc;
+
+                            if (k === 'glasses') {
+                                acc[k] = preview.spec.includeGlasses || (isStylingShot ? true : techAccessories.glasses) ? (assetsHighRes.glasses || assets.glasses) : undefined;
+                            } else if (k === 'lighting' && !lightingSendImage) {
+                                acc[k] = undefined;
+                            } else {
+                                acc[k] = assetsHighRes[k] || assets[k];
+                            }
+                            return acc;
+                        }, {});
+
+                        const poseKey = `pose_${preview.spec.view}`;
+                        imgs.pose = assets[poseKey] || assetsHighRes.pose || assets.pose;
+                        return imgs;
+                    })(),
                     gender: modelGender,
                     resolution: "1K",
                     aspectRatio: "3:4",
@@ -658,7 +669,7 @@ export const useGenerationEngine = (
                     productDescription: preview.structured.productDescription,
                     fitDescription: preview.structured.fitDescription,
                     poseDescription: preview.structured.pose,
-                    poseStickman: preview.spec.useStickman ? poseStickman : undefined,
+                    poseStickman: assets[`pose_${preview.spec.view}_stickman`] !== undefined ? assets[`pose_${preview.spec.view}_stickman`] : (preview.spec.useStickman ? poseStickman : undefined),
                     targetView: preview.spec.camera.angle === 'angled' || preview.spec.view.includes('angled') ? 'side' : (preview.spec.camera.angle === 'back' || preview.spec.view.includes('back') ? 'back' : 'front'),
                     poseFocus: preview.spec.view.includes('detail') ? 'detail' : (preview.spec.camera.shot_type === 'close_up' ? 'closeup' : (preview.spec.camera.shot_type === 'cowboy_shot' ? 'upper' : 'full')),
                     hairBehindShoulders: (preview.spec.excludeHairInfo && modelGender !== 'male') ? undefined : preview.spec.hairBehind,

@@ -281,61 +281,7 @@ export function BehaviorToggles({
                 </TooltipProvider>
             </div>
 
-            {/* MOOD SELECTOR */}
-            {showMoodSelector && (
-                <div className="mt-4 border border-[var(--border-subtle)] rounded-xl p-4 bg-[var(--bg-elevated)] flex flex-col space-y-3 shadow-sm">
-                    <div className="flex justify-between items-center group relative">
-                        <div className="flex items-center gap-2">
-                            <h4 className="text-[10px] uppercase font-bold text-[var(--text-primary)] tracking-widest bg-gradient-to-r from-[var(--accent-primary)] to-[#ff0080] bg-clip-text text-transparent">{language === "tr" ? "MODEL HAVASI" : "MODEL MOOD"}</h4>
-                            {hasOnlyTechnicalAngles && (
-                                <span className="text-[9px] text-[var(--accent-primary)] font-bold px-2 py-0.5 rounded-full bg-[var(--accent-primary)]/10">{language === "tr" ? "OTOMATİK" : "AUTO"}</span>
-                            )}
-                        </div>
-                        {hasOnlyTechnicalAngles && (
-                            <span className="text-[9px] text-[var(--text-muted)] font-medium max-w-[200px] text-right">{language === "tr" ? "Teknik açılarda doğal ifade otomatik uygulanır" : "Natural expression auto-applied on technical shots"}</span>
-                        )}
-                        {!hasOnlyTechnicalAngles && hasTechnicalAngle && (
-                            <span className="text-[9px] text-[var(--text-muted)] italic max-w-[200px] text-right">{language === "tr" ? "Styling açılara uygulanır, teknik açılarda otomatik" : "Applied to styling shots, auto on technical"}</span>
-                        )}
-                    </div>
 
-                    {!hasOnlyTechnicalAngles && (
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                            {STYLING_MOODS.map(mood => (
-                                <div
-                                    key={mood.id}
-                                    onClick={() => setSelectedMoodId(mood.id)}
-                                    className={cn(
-                                        "flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all cursor-pointer group select-none",
-                                        selectedMoodId === mood.id
-                                            ? "bg-[var(--accent-soft)] border-[var(--accent-primary)] shadow-sm"
-                                            : "bg-[var(--bg-card)] border-[var(--border-subtle)] hover:border-[var(--accent-primary)]/50 hover:bg-[var(--bg-elevated)]"
-                                    )}
-                                >
-                                    <span className={cn(
-                                        "text-lg mb-1.5 transition-transform duration-300",
-                                        selectedMoodId === mood.id ? "text-[var(--accent-primary)] scale-110" : "text-[var(--text-muted)] group-hover:scale-110 group-hover:text-[var(--text-primary)]"
-                                    )}>
-                                        {mood.icon}
-                                    </span>
-                                    <span className={cn(
-                                        "text-[9px] font-black uppercase tracking-wider text-center leading-none mb-1",
-                                        selectedMoodId === mood.id ? "text-[var(--accent-primary)]" : "text-[var(--text-primary)]"
-                                    )}>
-                                        {language === "tr" ? mood.label : mood.labelEn}
-                                    </span>
-                                    <span className={cn(
-                                        "text-[8px] text-center leading-tight transition-colors",
-                                        selectedMoodId === mood.id ? "text-[var(--text-primary)]" : "text-[var(--text-muted)]"
-                                    )}>
-                                        {language === "tr" ? mood.description : mood.descriptionEn}
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-            )}
         </div>
     );
 }

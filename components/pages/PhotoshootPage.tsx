@@ -83,6 +83,8 @@ export default function PhotoshootPage() {
         productDescription, setProductDescription, resetWorkflow, addToGlobalLibrary
     } = usePhotoshootWorkflow();
 
+    const [targetPoseShot, setTargetPoseShot] = useState<string | null>(null);
+
     // Block navigation when generation is in progress
     useEffect(() => {
         if (!isProcessing) return;
@@ -258,7 +260,7 @@ export default function PhotoshootPage() {
                                                     </div>
                                                     <div className="space-y-0.5 pointer-events-none">
                                                         <span className="text-[11px] font-black uppercase tracking-wide text-[var(--text-primary)] block leading-tight">
-                                                            {language === "tr" ? "HAVASI" : "MOOD"}
+                                                            {language === "tr" ? "MODEL TAVRI" : "MODEL MOOD"}
                                                         </span>
                                                         <span className="text-[9px] font-black tracking-tighter text-[var(--accent-primary)] uppercase opacity-90 block transition-colors mt-0.5">
                                                             {language === "tr"
@@ -489,18 +491,18 @@ export default function PhotoshootPage() {
                                                             <button
                                                                 onClick={(e) => {
                                                                     e.stopPropagation();
-                                                                    // Sadece kütüphaneyi aç, 2. adıma dönme!
                                                                     setActiveGroup('product');
+                                                                    setTargetPoseShot(shot.id);
                                                                     setActiveLibraryAsset('pose');
                                                                 }}
                                                                 className={cn(
                                                                     "flex items-center justify-center gap-1.5 w-full py-2 rounded-lg border shadow-sm transition-colors cursor-pointer group/pose-btn",
-                                                                    assets.pose
+                                                                    assets[`pose_${shot.id}`]
                                                                         ? "border-green-500/30 bg-green-500/10 text-green-600 dark:text-green-400 hover:bg-green-500 hover:text-white"
                                                                         : "border-[var(--accent-primary)]/30 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] hover:bg-[var(--accent-primary)] hover:text-white"
                                                                 )}
                                                             >
-                                                                {assets.pose ? (
+                                                                {assets[`pose_${shot.id}`] ? (
                                                                     <>
                                                                         <Check className="w-3.5 h-3.5 group-hover/pose-btn:text-white" />
                                                                         <span className="text-[9px] font-bold uppercase tracking-wider">{language === 'tr' ? 'Özel Poz Seçili' : 'Custom Pose Selected'}</span>
@@ -805,7 +807,21 @@ export default function PhotoshootPage() {
                 setPoseFocus={setPoseFocus}
                 setUpperFraming={setUpperFraming}
                 savedPoses={savedPoses}
-                handleSavedPoseClick={handleSavedPoseClick}
+                handleSavedPoseClick={(pose) => {
+                    if (targetPoseShot) {
+                        setAssets((prev: any) => ({
+                            ...prev,
+                            [`pose_${targetPoseShot}`]: pose.url,
+                            [`pose_${targetPoseShot}_stickman`]: pose.stickmanUrl,
+                            [`pose_${targetPoseShot}_prompt`]: pose.customPrompt || null,
+                        }));
+                        setTargetPoseShot(null);
+                        setActiveLibraryAsset(null);
+                    } else {
+                        handleSavedPoseClick(pose);
+                        setActiveLibraryAsset(null);
+                    }
+                }}
                 deleteSavedPose={deleteSavedPose}
                 handleSavedFitClick={handleSavedFitClick}
                 handleSavedShoeClick={handleSavedShoeClick}

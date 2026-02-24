@@ -500,10 +500,7 @@ export const usePhotoshootWorkflow = () => {
                 toast.error(language === 'tr' ? "Lütfen bir arkaplan seçin." : "Please select a background.");
                 return false;
             }
-            if (!assets.pose) {
-                toast.error(language === 'tr' ? "Lütfen bir poz seçin." : "Please select a pose.");
-                return false;
-            }
+
             if (!assets.lighting) {
                 toast.error(language === 'tr' ? "Lütfen bir ışık ayarı seçin." : "Please select a lighting setup.");
                 return false;
