@@ -286,147 +286,7 @@ export default function PhotoshootPage() {
                         <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
 
-                            <Tabs defaultValue="single" onValueChange={(val) => setBatchMode(val === 'batch')} className="w-full">
-                                <div className="flex justify-center mb-6">
-                                    <TabsList className={cn("grid w-full max-w-[400px]", (user?.role === 'admin' || user?.authorizedPages?.includes('photoshoot:batch')) ? "grid-cols-2" : "grid-cols-1")}>
-                                        <TabsTrigger value="single">{language === "tr" ? "Tekli Üretim" : "Single Production"}</TabsTrigger>
-                                        {(user?.role === 'admin' || user?.authorizedPages?.includes('photoshoot:batch')) && (
-                                            <TabsTrigger value="batch">{language === "tr" ? "Toplu Üretim (Batch)" : "Batch Production"}</TabsTrigger>
-                                        )}
-                                    </TabsList>
-                                </div>
-
-                                <TabsContent value="single">
-                                    <div className="max-w-5xl mx-auto px-1 md:px-0 space-y-6">
-
-                                        {/* TOP: Horizontal Technical Settings Bar */}
-                                        <div className="p-4 rounded-2xl bg-[var(--bg-elevated)] border border-[var(--border-subtle)] shadow-inner">
-                                            <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider mb-3">{language === "tr" ? "TEKNİK AYARLAR" : "TECHNICAL SETTINGS"}</p>
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                {/* Aspect Ratio */}
-                                                <div className="space-y-1.5">
-                                                    <label className="text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wide px-1">{language === "tr" ? "GÖRSEL ORANI" : "ASPECT RATIO"}</label>
-                                                    <div className="relative">
-                                                        <select className="w-full text-xs px-3 py-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] transition-all font-bold appearance-none" value={aspectRatio} onChange={(e) => setAspectRatio(e.target.value)}>
-                                                            {ASPECT_RATIOS.map(opt => (
-                                                                <option key={opt.id} value={opt.id}>{language === 'tr' ? opt.labelTr : opt.label}</option>
-                                                            ))}
-                                                        </select>
-                                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none" />
-                                                    </div>
-                                                </div>
-                                                {/* Resolution */}
-                                                <div className="space-y-1.5">
-                                                    <label className="text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wide px-1">{language === "tr" ? "ÇÖZÜNÜRLÜK" : "RESOLUTION"}</label>
-                                                    <div className="relative">
-                                                        <select className="w-full text-xs px-3 py-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] transition-all font-bold appearance-none" value={resolution} onChange={(e) => setResolution(e.target.value)}>
-                                                            {RESOLUTION_OPTIONS.map(opt => (
-                                                                <option key={opt.id} value={opt.id}>{language === 'tr' ? opt.labelTr : opt.label}</option>
-                                                            ))}
-                                                        </select>
-                                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none" />
-                                                    </div>
-                                                </div>
-                                                {/* Seed */}
-                                                <div className="space-y-1.5">
-                                                    <label className="text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wide px-1">{language === "tr" ? "TEKRAR TUTARLILIĞI" : "CONSISTENCY"}</label>
-                                                    <div className="relative">
-                                                        <input type="number" className="w-full text-xs px-3 py-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] transition-all font-bold placeholder:text-[var(--text-disabled)]" value={seed === "" ? "" : seed} onChange={(e) => setSeed(e.target.value === "" ? "" : Number(e.target.value))} placeholder="RANDOM" />
-                                                        {seed !== "" && <button onClick={() => setSeed("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500"><X size={14} /></button>}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* BOTTOM: Summary + Preview */}
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                            {/* Sol - Detaylı Özet */}
-                                            <div className="col-span-1 space-y-4">
-                                                <div className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-xl overflow-hidden shadow-sm">
-
-                                                    {/* Product Header */}
-                                                    <div className="p-4 border-b border-[var(--border-subtle)] bg-[var(--bg-elevated)]">
-                                                        <div className="flex items-start justify-between">
-                                                            <div>
-                                                                <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider mb-1">{language === "tr" ? "ÜRÜN" : "PRODUCT"}</p>
-                                                                <h3 className="font-bold text-lg text-[var(--text-primary)] leading-tight">{productName || (language === "tr" ? "İsimsiz Ürün" : "Untitled Product")}</h3>
-                                                                <div className="flex items-center gap-2 mt-2">
-                                                                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-500 font-medium border border-purple-500/20 uppercase">
-                                                                        {workflowType}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                            <button
-                                                                onClick={() => setWizardStep(1)}
-                                                                className="p-2 hover:bg-[var(--bg-surface)] rounded-lg text-muted-foreground hover:text-[var(--text-primary)] transition-colors"
-                                                                title={language === "tr" ? "Ürün Düzenle" : "Edit Product"}
-                                                            >
-                                                                <Edit2 size={16} />
-                                                            </button>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Configuration Details */}
-                                                    <div className="p-4 space-y-4">
-
-                                                        {/* Model & Background */}
-                                                        <div className="space-y-3">
-                                                            <div className="flex items-center justify-between">
-                                                                <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">{language === "tr" ? "KOMPOZİSYON" : "COMPOSITION"}</p>
-                                                                <button onClick={() => setWizardStep(2)} className="text-[10px] text-purple-500 hover:text-purple-400 font-medium hover:underline">{language === "tr" ? "Değiştir" : "Change"}</button>
-                                                            </div>
-
-                                                            <div className="flex items-center gap-3 p-3 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
-                                                                <div className={cn("p-2 rounded-full shrink-0", assets.model ? "bg-blue-500/10 text-blue-500" : "bg-muted text-muted-foreground")}>
-                                                                    <User size={16} />
-                                                                </div>
-                                                                <div className="flex-1 min-w-0">
-                                                                    <p className="text-xs font-medium truncate text-[var(--text-primary)]">
-                                                                        {assets.model ? (language === "tr" ? "Stüdyo Seçili" : "Studio Selected") : (language === "tr" ? "Stüdyo Yok" : "No Studio")}
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-
-                                                            <div className="flex items-center gap-3 p-3 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
-                                                                <div className={cn("p-2 rounded-full shrink-0", assets.background ? "bg-green-500/10 text-green-500" : "bg-muted text-muted-foreground")}>
-                                                                    <ImageIcon size={16} />
-                                                                </div>
-                                                                <div className="flex-1 min-w-0">
-                                                                    <p className="text-xs font-medium truncate text-[var(--text-primary)]">
-                                                                        {assets.background ? (language === "tr" ? "Arka Plan Seçili" : "Background Selected") : (language === "tr" ? "Arka Plan Yok" : "No Background")}
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* Sağ - Önizleme */}
-                                            <div className="col-span-1 lg:col-span-2">
-                                                <PreviewArea
-                                                    language={language}
-                                                    isProcessing={isProcessing}
-                                                    isStoppingBatch={isStoppingBatch}
-                                                    handleStopBatch={handleStopBatch}
-                                                    isGenerationSuccess={isGenerationSuccess}
-                                                    resultImages={resultImages}
-                                                    router={router}
-                                                    StudioSteps={StudioSteps}
-                                                    handleGenerate={handleGenerate}
-                                                    handleBatchGenerate={handleBatchGenerate}
-                                                    batchMode={batchMode}
-                                                    productCode={productCode}
-                                                    estimatedCost={estimatedCost}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </TabsContent>
-
-                                {(user?.role === 'admin' || user?.authorizedPages?.includes('photoshoot:batch')) && (
-                                    <TabsContent value="batch">
+<div className="w-full">
                                         <div className="max-w-5xl mx-auto px-1 md:px-0 space-y-6">
 
                                             {/* TOP: Horizontal Technical Settings Bar */}
@@ -539,6 +399,8 @@ export default function PhotoshootPage() {
                                                 <div className="col-span-1 lg:col-span-5 flex flex-col">
                                                     <div className="flex-1 bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-xl overflow-hidden shadow-sm flex flex-col p-6">
                                                         <BatchPanel
+                                                            productName={productName}
+                                                            selectedMoodId={selectedMoodId}
                                                             language={language}
                                                             batchMode={batchMode}
                                                             setBatchMode={setBatchMode}
@@ -585,9 +447,7 @@ export default function PhotoshootPage() {
                                                 </div>
                                             </div>
                                         </div>
-                                    </TabsContent>
-                                )}
-                            </Tabs>
+</div>
                         </div>
                     )}
                 </div>

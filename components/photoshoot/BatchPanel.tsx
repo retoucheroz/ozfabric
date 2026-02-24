@@ -32,6 +32,8 @@ interface BatchPanelProps {
     setProductDescription: (val: string | null) => void;
     techAccessoryDescriptions: Record<string, string>;
     setTechAccessoryDescriptions: (val: Record<string, string>) => void;
+    productName: string;
+    selectedMoodId: string;
 }
 
 export function BatchPanel({
@@ -52,7 +54,9 @@ export function BatchPanel({
     productDescription,
     setProductDescription,
     techAccessoryDescriptions,
-    setTechAccessoryDescriptions
+    setTechAccessoryDescriptions,
+    productName,
+    selectedMoodId
 }: BatchPanelProps) {
     const isMaviActive = isAdmin && isMaviBatch;
 
@@ -78,7 +82,7 @@ export function BatchPanel({
             <div className="space-y-1">
                 <div className="flex items-center justify-between">
                     <h3 className="text-xs font-black uppercase tracking-wider text-[var(--text-primary)]">
-                        {language === 'tr' ? 'Toplu Üretim' : 'Batch Production'}
+                        {language === 'tr' ? 'Üretim' : 'Production'}
                     </h3>
                     {isAdmin && setIsMaviBatch && (
                         <div className="flex items-center gap-2 px-2 py-1 rounded-full bg-blue-500/10 border border-blue-500/20">
@@ -109,24 +113,64 @@ export function BatchPanel({
                     />
                 </div>
 
-                {/* AI Analysis Result (Editable) */}
+                {/* Editor Summary (Read Only display of composition) */}
                 <div className="space-y-2">
                     <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase flex items-center gap-2">
-                        {language === 'tr' ? 'Yapay Zeka Kumaş Analizi (Düzenlenebilir)' : 'AI Fabric Analysis (Editable)'}
+                        {language === 'tr' ? 'Kreatif Direktör Özeti' : 'Creative Director Summary'}
                     </label>
-                    <textarea
-                        className={cn(
-                            "w-full text-xs p-3 rounded-xl border transition-all duration-200 outline-none scrollbar-thin resize-y min-h-[80px]",
-                            productDescription
-                                ? "bg-green-50/50 border-green-200 dark:bg-green-950/20 dark:border-green-800 text-green-800 dark:text-green-300 focus:border-green-500 focus:ring-green-500/20"
-                                : "bg-[var(--bg-elevated)] border-[var(--border-subtle)] focus:border-[var(--accent-primary)] focus:ring-2 focus:ring-[var(--accent-primary)]/10 text-[var(--text-secondary)]"
-                        )}
-                        value={productDescription || ''}
-                        onChange={(e) => setProductDescription(e.target.value)}
-                        placeholder={language === 'tr'
-                            ? "Henüz analiz yapılmadı. Özel isim girdiyseniz (örn: 'siyah ceket'), üretime başlarken o isim üzerinden analiz edilecektir."
-                            : "No analysis yet. If you put a special name (e.g. 'black jacket'), it will be analyzed using that name upon generation."}
-                    />
+                    <div className="w-full text-[13px] p-4 rounded-xl border transition-all duration-200 bg-[var(--bg-elevated)] border-[var(--border-subtle)] text-[var(--accent-primary)] dark:text-purple-300 font-medium leading-relaxed italic relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-1 h-full bg-[var(--accent-primary)] opacity-50"></div>
+                        {(() => {
+                            const activeShotCount = Object.values(batchShotSelection).filter(Boolean).length;
+                            let summary = `${productName || (language === 'tr' ? 'Bu ürün' : 'This product')} ${language === 'tr' ? 'için profesyonel çekim kompozisyonu ayarlandı.' : 'has a professional photoshoot composition ready.'} `;
+
+                            if (assets.model) summary += language === 'tr' ? "Seçili manken ile " : "With the selected model, ";
+                            else summary += language === 'tr' ? "Manken olmadan " : "Without a human model, ";
+
+                            if (assets.background) summary += language === 'tr' ? "özel konsept ortamında " : "in a custom concept environment, ";
+                            else summary += language === 'tr' ? "temiz stüdyo ışığında " : "under clean studio lighting, ";
+
+                            const accessoryListTr = [];
+                            const accessoryListEn = [];
+                            if (assets.jacket) { accessoryListTr.push("dış giyim"); accessoryListEn.push("outerwear"); }
+                            if (assets.bag) { accessoryListTr.push("çanta"); accessoryListEn.push("bag"); }
+                            if (assets.glasses) { accessoryListTr.push("gözlük"); accessoryListEn.push("glasses"); }
+                            if (assets.hat) { accessoryListTr.push("şapka"); accessoryListEn.push("hat"); }
+                            if (assets.jewelry) { accessoryListTr.push("takı"); accessoryListEn.push("jewelry"); }
+                            if (assets.belt) { accessoryListTr.push("kemer"); accessoryListEn.push("belt"); }
+                            if (assets.shoes) { accessoryListTr.push("ayakkabı"); accessoryListEn.push("shoes"); }
+
+                            if (accessoryListTr.length > 0) {
+                                summary += language === 'tr'
+                                    ? `ve ${accessoryListTr.join(', ')} gibi aksesuarlarla kombinlenerek `
+                                    : `combined with accessories like ${accessoryListEn.join(', ')} `;
+                            }
+
+                            summary += language === 'tr' ? "görselleştirilecek. " : "it will be visualized. ";
+
+                            const moodLabelsTr: Record<string, string> = {
+                                'natural': 'doğal', 'warm': 'samimi ve sıcak', 'powerful': 'güçlü',
+                                'relaxed': 'rahat', 'professional': 'profesyonel', 'subtle': 'sakin'
+                            };
+                            const moodLabelsEn: Record<string, string> = {
+                                'natural': 'natural', 'warm': 'warm & inviting', 'powerful': 'powerful',
+                                'relaxed': 'relaxed', 'professional': 'professional', 'subtle': 'subtle'
+                            };
+
+                            if (assets.model) {
+                                const moodName = language === 'tr' ? (moodLabelsTr[selectedMoodId] || 'doğal') : (moodLabelsEn[selectedMoodId] || 'natural');
+                                summary += language === 'tr'
+                                    ? `Karelerde mankenin daha ${moodName} bir yapı sergilemesi hedefleniyor. `
+                                    : `The model will be presented with a ${moodName} look in the final shots. `;
+                            }
+
+                            summary += language === 'tr'
+                                ? `Sistem, ürününüzü ${activeShotCount > 0 ? activeShotCount : 'seçilecek olan'} farklı açıdan render edecek.`
+                                : `The AI assistant will render from ${activeShotCount > 0 ? activeShotCount : 'selected'} different angles.`;
+
+                            return summary;
+                        })()}
+                    </div>
                 </div>
 
                 {/* Technical Accessory Control */}

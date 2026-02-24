@@ -139,7 +139,7 @@ export function PreviewArea({
                             </div>
                             <div>
                                 <h3 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-wide">
-                                    {language === "tr" ? "Toplu Üretim Devam Ediyor" : "Batch Production in Progress"}
+                                    {language === "tr" ? "Üretim Devam Ediyor" : "Production in Progress"}
                                 </h3>
                                 <p className="text-[10px] font-bold text-[var(--accent-primary)] opacity-80 uppercase tracking-tighter">
                                     {language === "tr" ? `${resultImages.length} görsel üretildi, devamı geliyor...` : `${resultImages.length} images generated, more coming...`}

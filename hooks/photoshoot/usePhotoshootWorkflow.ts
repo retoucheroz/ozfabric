@@ -91,7 +91,7 @@ export const usePhotoshootWorkflow = () => {
     const [poseFocus, setPoseFocus] = useState<'upper' | 'full' | 'lower' | 'closeup'>('full');
     const [detailView, setDetailView] = useState<'front' | 'angled' | 'back'>('front');
     const [productCode, setProductCode] = useState("");
-    const [batchMode, setBatchMode] = useState(false);
+    const [batchMode, setBatchMode] = useState(true);
     const [isMaviBatch, setIsMaviBatch] = useState(false);
     const [stylingSideOnly, setStylingSideOnly] = useState<Record<string, boolean>>({});
     const [upperFraming, setUpperFraming] = useState<"full" | "medium_full">("full");
