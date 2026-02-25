@@ -790,6 +790,9 @@ export const useGenerationEngine = (
                     if (firstSentenceMatch) finalFitDescription = firstSentenceMatch[0].trim();
                 }
 
+                const poseKey = `pose_${preview.spec.view}`;
+                uploadedImages.pose = assets[poseKey] || assetsHighRes.pose || assets.pose;
+
                 const requestPayload = {
                     productName: preview.structured.productName,
                     workflowType,
@@ -830,7 +833,7 @@ export const useGenerationEngine = (
                     collarType,
                     lightingPositive,
                     lightingNegative,
-                    poseStickman: preview.spec.useStickman ? poseStickman : undefined,
+                    poseStickman: assets[`${poseKey}_stickman`] || (preview.spec.useStickman ? poseStickman : undefined),
                     preview: false
                 };
 

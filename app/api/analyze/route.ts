@@ -115,34 +115,26 @@ export async function POST(req: NextRequest) {
 
                 if (type === 'pose') {
                     prompt = `${langInstruction}
-You are an expert AI image generation prompt engineer specializing in human pose description.
-Analyze the stickman/pose skeleton image and produce a structured pose prompt using EXACTLY this format with these 5 section headers. Be concise and precise — every word must be useful for an image generation model. NO JSON. NO degrees. NO percentages. NO anatomical jargon. Plain descriptive English only.
+Role: You are a Technical Computer Vision Analyst for Virtual Try-On (VTO) workflows. Your task is to extract a "High-Fidelity Pose Map" from images for use in Nano Banana Pro via fal.ai and kie.ai APIs.
 
-OUTPUT FORMAT (use exactly these headers):
+Objective: Focus exclusively on the 3D skeletal geometry and limb-to-body spatial relationship. Ignore all garment colors, fabrics, and backgrounds.
 
-STRUCTURAL ANATOMY LOCK
-[2-3 sentences about proportions, spine alignment, shoulder/hip balance. Do not mention clothing, hair, or gender.]
+Analysis Priorities:
+1. Shoulder Girdle: Orientation of the clavicle and shoulder blades (retracted, neutral, or protracted).
+2. Limb-Body Separation: Define clear gaps or overlaps between arms/legs and the torso (crucial for clean garment masking).
+3. Joint Anchors: Precision of elbows, wrists, knees, and ankles.
+4. Center of Gravity: Weight distribution and hip-tilt angle (Contrapposto).
 
-FRAME PLACEMENT & SCALE
-[1-2 sentences about where the subject sits in frame, framing type (full body / cowboy shot / etc), camera distance impression.]
+Strict Output Format (No conversational filler, return ONLY the block below):
 
-ANCHOR CONTACTS
-[1-2 sentences about feet placement, ground contact, weight distribution, any hand/prop contacts.]
-
-POSE DESCRIPTION (VISUAL LANGUAGE ONLY)
-[3-6 sentences describing body angle, torso direction, each arm position step by step (upper arm → elbow → wrist → hand/fingers), leg stance, head direction, chin angle, eye direction, emotional tone. Be specific: "left hand rests on hip, fingers curled inward", "right arm hangs straight at side", "hand in pocket", "arm raised", etc.]
-
-GRAVITY & PROPORTION SAFEGUARDS
-[1-2 sentences ensuring no floating limbs, no distortion, natural weight distribution, stable stance.]
-
----RULES---
-- Each section: 1 to 4 sentences max.
-- Total output: under 200 words.
-- No JSON, no brackets, no markdown bullets.
-- No mention of clothing, skin, hair, or gender.
-- Use directional language: left/right, forward/back, up/down.
-- Describe HANDS AND FINGERS explicitly when visible.
-- Mention "hands in pockets", "arms crossed", "hand raised", "holding hair" etc if present.`;
+[POSE_ISOLATION_PROMPT]
+Body Orientation: [e.g., Full-frontal, 3/4 turn, profile], [spine alignment].
+Shoulder & Arms: [e.g., Shoulders retracted, arms hidden behind the lumbar, elbows tucked, hands invisible].
+Pelvis & Legs: [e.g., Pelvis shifted to left, weight on right leg, knees locked, straight-leg stance].
+Footwork: [e.g., Barefoot, shoulder-width apart, feet facing camera].
+Head-Camera Vector: [e.g., Head tilted 5° down, chin tucked, eye-level neutral gaze].
+VTO Topology: Clean silhouette borders, high separation of limbs for fabric draping, sharp anatomical outline.
+[/POSE_ISOLATION_PROMPT]`;
                 } else if (type === 'background') {
                     prompt = `${langInstruction} ${multiImageContext}
                     You are an expert location scout and set designer.

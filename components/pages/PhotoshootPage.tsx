@@ -504,6 +504,8 @@ export default function PhotoshootPage() {
                                                                             setActiveGroup('product');
                                                                             setTargetPoseShot(shot.id);
                                                                             setActiveLibraryAsset('pose');
+                                                                            const isUpperFocus = shot.id.includes('upper') || shot.id.includes('closeup') || shot.image?.includes('ust_vucut') || shot.image?.includes('closeup');
+                                                                            setPoseFocus(isUpperFocus ? 'upper' : 'full');
                                                                         }}
                                                                         className={cn(
                                                                             "flex items-center justify-center gap-1.5 w-full py-2.5 rounded-lg border shadow-sm transition-colors cursor-pointer group/pose-btn",

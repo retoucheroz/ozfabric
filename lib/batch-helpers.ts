@@ -95,6 +95,7 @@ export function buildBatchSpecs(
                 assets: ['front', 'back'],
                 fitDescriptionMode: 'full',
                 isStyling: true,
+                useStickman: true,
                 excludeShoesAsset: false
             },
             // 3. Styling Front (Second Pose from Library)
@@ -113,6 +114,7 @@ export function buildBatchSpecs(
                 fitDescriptionMode: 'full',
                 enableWind: enableWind,
                 isStyling: true,
+                useStickman: true,
                 excludeShoesAsset: false
             },
             // 4. Technical Back (Cowboy Shot - Only technical shot)
@@ -173,7 +175,8 @@ export function buildBatchSpecs(
                 assets: ['front', 'back'],
                 fitDescriptionMode: 'full',
                 enableWind: enableWind,
-                isStyling: true
+                isStyling: true,
+                useStickman: true // Allow stickman
             },
             // 3. Technical Front — NO ACCESSORIES
             {
@@ -306,6 +309,7 @@ export function buildStandardBatchSpecs(
             fitDescriptionMode: 'full',
             enableWind: enableWind,
             isStyling: true,
+            useStickman: true, // Allow stickman
             excludeShoesAsset: true
         },
         {
