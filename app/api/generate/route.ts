@@ -388,7 +388,7 @@ export async function POST(req: NextRequest) {
             const isBackView = view.includes('back') || (targetView === 'back' && view === 'back') || (activeDetailView === 'back' && view === 'back');
 
             // Determine if this specific execution is a styling shot
-            const isActiveStyling = view === 'styling' || isStylingShot;
+            const isActiveStyling = effectiveRole === 'styling';
 
             // === STRUCTURED PROMPT OBJECT ===
             const structuredPrompt: any = {
@@ -397,8 +397,8 @@ export async function POST(req: NextRequest) {
                 subject: {
                     type: gender === 'male' ? 'male_model' : gender === 'female' ? 'female_model' : 'model',
                     identity: uploadedImages.model ? "match_provided_model_image" : "generic_fashion_model",
-                    hair_behind_shoulders: hairBehindShoulders, // Explicit boolean
-                    look_at_camera: lookAtCamera, // NEW: Explicit boolean
+                    hair_behind_shoulders: hairBehindShoulders ?? true, // Explicit boolean
+                    look_at_camera: lookAtCamera ?? true, // NEW: Explicit boolean
                     body_description: modelDescription || null, // NEW: Custom physical traits
                     wind: isActiveStyling && enableWind
                 },
@@ -477,20 +477,16 @@ export async function POST(req: NextRequest) {
                 analysis: {
                     "fabric": {
                         "main": "Primary material name",
-                        "composition": "Percentage breakdown (e.g., 98% Cotton 2% Elastane)",
-                        "weight": "GSM or oz (e.g., 320 GSM / 11.5 oz)",
-                        "finish": "Fabric treatment (e.g., Enzyme Wash, Silicone Finish)"
+                        "composition": "Percentage breakdown",
+                        "weight": "GSM or oz",
+                        "finish": "Fabric treatment"
                     },
-                    "innerBrief": "Detailed visual description of the inner layer (t-shirt, sweater, etc.) if visible. Mention color and fabric texture.",
-                    "upperBrief": "Detailed visual description of the upper garment (coat, jacket, shirt) for styling blocks.",
-                    "lowerBrief": "Detailed visual description of the lower garment (pants, skirt) for styling blocks.",
-                    "shoesBrief": "Detailed visual description of footwear if visible.",
+                    "innerBrief": innerWearDescription || "Detailed visual description of the inner layer",
+                    "upperBrief": upperGarmentDescription || "Detailed visual description of the upper garment",
+                    "lowerBrief": lowerGarmentDescription || "Detailed visual description of the lower garment",
+                    "shoesBrief": shoesDescription || "Detailed visual description of footwear",
                     "measurements": {
-                        "chest": "Model's chest measurement in cm",
-                        "waist": "Model's waist measurement in cm",
-                        "hips": "Model's hips measurement in cm",
-                        "inseam": "Model's inseam measurement in cm",
-                        "height": "Model's height in cm"
+                        "chest": "cm", "waist": "cm", "hips": "cm", "inseam": "cm", "height": "cm"
                     }
                 }
             };
@@ -501,11 +497,33 @@ export async function POST(req: NextRequest) {
             if (editedPrompt && (editedPrompt.trim().startsWith('{') || editedPrompt.trim().startsWith('['))) {
                 try {
                     const parsed = JSON.parse(editedPrompt);
-                    // If it's the structured prompt format, merge it
+                    // 1. Structured Prompt Format (Internal)
                     if (parsed.intent || parsed.subject || parsed.garment) {
                         Object.assign(structuredPrompt, parsed);
                         structuredPrompt._is_user_edited = true;
                         console.log("Using USER-EDITED JSON structured prompt");
+                    }
+                    // 2. Batch Spec Format (Frontend)
+                    else if (parsed.productName || parsed.productDescription || parsed.pose) {
+                        if (parsed.productName) structuredPrompt.garment.name = parsed.productName;
+                        if (parsed.productDescription) structuredPrompt.garment.fabric = parsed.productDescription;
+                        if (parsed.fitDescription) structuredPrompt.garment.fit = parsed.fitDescription;
+                        if (parsed.view) structuredPrompt.camera.angle = parsed.view.includes('front') ? 'front' : parsed.view.includes('side') ? 'side' : parsed.view.includes('back') ? 'back' : parsed.view;
+
+                        // Handle pose with role-based restrictions
+                        if (isActiveStyling) {
+                            if (parsed.pose) structuredPrompt.pose.description = parsed.pose;
+                        } else {
+                            structuredPrompt.pose.description = null;
+                        }
+
+                        if (parsed.camera) {
+                            if (parsed.camera.shot_type) structuredPrompt.camera.shot_type = parsed.camera.shot_type;
+                            if (parsed.camera.framing) structuredPrompt.camera.framing = parsed.camera.framing;
+                        }
+
+                        structuredPrompt._is_user_edited = true;
+                        console.log("Mapped Frontend Batch JSON to Structured Prompt");
                     }
                 } catch (e) {
                     // Not valid JSON or not our format, treat as plain text later
@@ -600,7 +618,6 @@ export async function POST(req: NextRequest) {
 
                 // Framing Logic for Technical Angles
                 if (poseFocus === 'closeup') {
-                    // CLOSEUP: Face to chest framing
                     structuredPrompt.camera.shot_type = 'close_up';
                     structuredPrompt.camera.framing = 'chest_and_face';
                 } else if (poseFocus === 'full') {
