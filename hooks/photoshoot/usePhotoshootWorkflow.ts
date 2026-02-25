@@ -144,50 +144,8 @@ export const usePhotoshootWorkflow = () => {
     useEffect(() => {
         setMounted(true);
 
-        const restoreState = async () => {
-            try {
-                const savedStates = await dbOperations.getAll(STORES.PHOTOSHOOT_STATE);
-                if (savedStates && savedStates.length > 0) {
-                    const state = (savedStates[savedStates.length - 1] as any).data;
-                    if (state.assets) setAssets(state.assets);
-                    if (state.productName) setProductName(state.productName);
-                    if (state.workflowType) setWorkflowType(state.workflowType);
-                    if (state.productDescription) setProductDescription(state.productDescription);
-                    if (state.fitDescription) setFitDescription(state.fitDescription);
-                    if (state.upperGarmentDescription) setUpperGarmentDescription(state.upperGarmentDescription);
-                    if (state.lowerGarmentDescription) setLowerGarmentDescription(state.lowerGarmentDescription);
-                    if (state.innerWearDescription) setInnerWearDescription(state.innerWearDescription);
-                    if (state.shoesDescription) setShoesDescription(state.shoesDescription);
-                    if (state.modelDescription) setModelDescription(state.modelDescription);
-                    if (state.buttonsOpen !== undefined) setButtonsOpen(state.buttonsOpen);
-                    if (state.tucked !== undefined) setTucked(state.tucked);
-                    if (state.socksType) setSocksType(state.socksType);
-                    if (state.closureType) setClosureType(state.closureType);
-                    if (state.gender) setGender(state.gender);
-                    if (state.resolution) setResolution(state.resolution);
-                    if (state.aspectRatio) setAspectRatio(state.aspectRatio);
-                    if (state.enableWind !== undefined) setEnableWind(state.enableWind);
-                    if (state.selectedMoodId !== undefined) setSelectedMoodId(state.selectedMoodId);
-                    if (state.collarType) setCollarType(state.collarType);
-                    if (state.shoulderType) setShoulderType(state.shoulderType);
-                    if (state.waistType) setWaistType(state.waistType);
-                    if (state.riseType) setRiseType(state.riseType);
-                    if (state.legType) setLegType(state.legType);
-                    if (state.hemType) setHemType(state.hemType);
-                    if (state.pantLength) setPantLength(state.pantLength);
-                    if (state.techAccessories) setTechAccessories(state.techAccessories);
-                    if (state.techAccessoryDescriptions) setTechAccessoryDescriptions(state.techAccessoryDescriptions);
-                    if (state.showGarmentDetails !== undefined) setShowGarmentDetails(state.showGarmentDetails);
-                    if (state.wizardStep) setWizardStep(state.wizardStep);
-                }
-            } catch (e) {
-                console.error("Failed to restore state from IndexedDB", e);
-            } finally {
-                isRestoringRef.current = false;
-            }
-        };
-
-        restoreState();
+        // Clear any old session state on mount to ensure fresh start
+        dbOperations.delete(STORES.PHOTOSHOOT_STATE, 'current-session').catch(() => { });
 
         fetch('/api/auth/session')
             .then(res => res.json())
@@ -199,32 +157,6 @@ export const usePhotoshootWorkflow = () => {
             .catch(err => console.error("Session fetch error:", err));
     }, []);
 
-    useEffect(() => {
-        if (isRestoringRef.current) return;
-
-        const saveState = async () => {
-            const stateToSave = {
-                id: 'current-session',
-                timestamp: Date.now(),
-                data: {
-                    assets, productName, workflowType, productDescription, fitDescription,
-                    upperGarmentDescription, lowerGarmentDescription, innerWearDescription,
-                    shoesDescription, modelDescription, buttonsOpen, tucked, socksType,
-                    closureType, gender, resolution, aspectRatio, enableWind,
-                    selectedMoodId, collarType, shoulderType, waistType, riseType,
-                    legType, hemType, pantLength, techAccessories, showGarmentDetails, wizardStep
-                }
-            };
-            try {
-                await dbOperations.add(STORES.PHOTOSHOOT_STATE, stateToSave);
-            } catch (e) {
-                console.error("Failed to save state to IndexedDB", e);
-            }
-        };
-
-        const timeout = setTimeout(saveState, 500);
-        return () => clearTimeout(timeout);
-    }, [assets, productName, workflowType, productDescription, fitDescription, upperGarmentDescription, lowerGarmentDescription, innerWearDescription, shoesDescription, modelDescription, buttonsOpen, tucked, socksType, closureType, gender, resolution, aspectRatio, enableWind, selectedMoodId, collarType, shoulderType, waistType, riseType, legType, hemType, pantLength, techAccessories, showGarmentDetails, wizardStep]);
 
     // Hooks
     const {
@@ -514,64 +446,6 @@ export const usePhotoshootWorkflow = () => {
         return true;
     };
 
-    const resetWorkflow = () => {
-        if (!confirm(language === "tr" ? "Tüm seçimleri sıfırlayarak baştan başlamak istediğinize emin misiniz?" : "Are you sure you want to reset all selections and start over?")) return;
-
-        setProductName("");
-        setIsManualProductName(false);
-        setProductCode("");
-        setWorkflowType("upper");
-        setGender("");
-        setSeed("");
-        setIsSeedManual(false);
-        setUserAddedPrompt("");
-
-        setPoseDescription(null);
-        setPoseStickman(null);
-        setProductDescription(null);
-        setFitDescription(null);
-        setUpperGarmentDescription(null);
-        setLowerGarmentDescription(null);
-        setInnerWearDescription(null);
-        setShoesDescription(null);
-        setModelDescription(null);
-
-        setTucked(false);
-        setSleevesRolled(false);
-        setClosureType("buttons");
-
-        setSocksType("none");
-        setCollarType("none");
-        setShoulderType("none");
-        setWaistType("none");
-        setRiseType("none");
-        setLegType("none");
-        setHemType("none");
-        setPantLength("none");
-
-        const emptyAssets = {
-            model: null, background: null, main_product: null, pose: null,
-            top_front: null, bottom_front: null, shoes: null, top_back: null,
-            bottom_back: null, jacket: null, bag: null, glasses: null,
-            hat: null, jewelry: null, belt: null, inner_wear: null, lighting: null
-        };
-
-        setAssets(emptyAssets);
-        setAssetsHighRes(emptyAssets);
-
-        setBatchMode(false);
-        setIsMaviBatch(false);
-        setStylingSideOnly({});
-        setBatchShotSelection({});
-        setTechAccessories({ jacket: false, bag: false, glasses: false, hat: false, jewelry: false, belt: false });
-        setTechAccessoryDescriptions({});
-
-        dbOperations.delete(STORES.PHOTOSHOOT_STATE, 'current-session').catch(console.error);
-
-        setWizardStep(1);
-
-        toast.success(language === "tr" ? "Stüdyo sıfırlandı." : "Studio resetted.");
-    };
 
     return {
         projects, addProject, deductCredits, models, t, language, router,
@@ -624,7 +498,7 @@ export const usePhotoshootWorkflow = () => {
         handleBatchGenerate, handleConfirmGeneration, handleConfirmBatchGeneration, batchPreviewPrompts,
         editedBatchPrompts, setEditedBatchPrompts, showBatchPreview, setShowBatchPreview,
         selectedBatchImages, setSelectedBatchImages, isStoppingBatch, handleStopBatch, estimatedCost,
-        handleAssetRemove, canMoveToStep, handleLibrarySelect, getLibraryItems, convertToStickman, resetWorkflow,
+        handleAssetRemove, canMoveToStep, handleLibrarySelect, getLibraryItems, convertToStickman,
         addToGlobalLibrary
     };
 };

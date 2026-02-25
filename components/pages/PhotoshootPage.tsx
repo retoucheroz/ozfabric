@@ -81,7 +81,7 @@ export default function PhotoshootPage() {
         editedBatchPrompts, setEditedBatchPrompts, showBatchPreview, setShowBatchPreview,
         selectedBatchImages, setSelectedBatchImages, isStoppingBatch, handleStopBatch, estimatedCost,
         handleAssetRemove, canMoveToStep, handleLibrarySelect, convertToStickman, models, setLightingPositive, setLightingNegative,
-        productDescription, setProductDescription, resetWorkflow, addToGlobalLibrary
+        productDescription, setProductDescription, addToGlobalLibrary
     } = usePhotoshootWorkflow();
 
     const [targetPoseShot, setTargetPoseShot] = useState<string | null>(null);
@@ -147,17 +147,6 @@ export default function PhotoshootPage() {
 
                     {/* Page Title & Reset Button */}
                     <div className="text-center -mt-2 mb-2 relative flex flex-col items-center justify-center">
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 hidden md:block">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="text-xs h-8 gap-1.5 font-bold uppercase tracking-wider text-rose-500 hover:text-rose-600 hover:bg-rose-50/50 border-rose-200"
-                                onClick={resetWorkflow}
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg>
-                                {language === "tr" ? "SIFIRLA" : "RESET"}
-                            </Button>
-                        </div>
                         <h1 className="text-xl font-black uppercase tracking-tight text-[var(--text-primary)]">📸 {t("home.photoshootTitle")}</h1>
                         <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] opacity-60 mt-0.5">{t("home.photoshootDesc")}</p>
                     </div>
