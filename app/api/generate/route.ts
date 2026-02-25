@@ -13,8 +13,8 @@ export const dynamic = 'force-dynamic';
 const NEGATIVE_PROMPTS = {
     shoes: "oversized shoes, chunky shoes, large footwear, clown shoes, big shoes, thick soles, platform shoes, bulky sneakers, exaggerated footwear, disproportionate shoes, cartoon shoes, huge feet, giant shoes, massive sneakers, wide shoes, puffy shoes, oversized feet, unrealistic shoe size, shoes too big for body, exaggerated shoe proportions",
     buttons: "open shirt, unbuttoned, open front, chest visible",
-    tucked: "tucked in shirt, shirt inside pants, waistband visible, belt, belt loops, exposed pants button, high-waisted styling, shirt tucked in, shirt tucked into jeans, shirt inside waistband",
-    untucked: "untucked shirt, loose hem, shirt over pants, hidden waistband, long shirt hanging out", // NEW negative
+    tucked: "untucked shirt, loose hem, shirt over pants, hidden waistband, long shirt hanging out, shirt outside pants, partial tuck, half tuck, french tuck, shirt over waistband, any hem below waistband",
+    untucked: "tucked in shirt, shirt inside pants, waistband visible, partial tuck, half tuck, french tuck, fabric entering waistband, shirt in waistband, any part of shirt inside pants, exposed pants button",
     flatFabric: "flat fabric, smooth texture, plain surface, digital print look, no texture, solid color fabric, printed stripes, screen print, no weave visible, uniform surface, plastic looking fabric",
     cropping: "cropped head, cut off head, missing head, partial face, close up, zoomed in, out of frame, cropped feet, missing shoes",
     wind: "strong wind hair, messy hair, disheveled hair, chaotic strands",
@@ -802,9 +802,9 @@ export async function POST(req: NextRequest) {
                 if (sp.garment.details?.waist) productBlock.push(`Waist: ${sp.garment.details.waist}.`);
                 if (sp.garment.details?.rise) productBlock.push(`Rise: ${sp.garment.details.rise}.`);
                 if (sp.styling.tucked) {
-                    productBlock.push("Style Adjustment: Tucked in, garment is tucked into the waistband, waistband is visible.");
+                    productBlock.push(`[TUCK_CONSTRAINTS]\nSTRICT: The main TOP garment must be fully tucked into the bottom garment.\nAll front, side, and back fabric panels must be inserted inside the waistband.\nNo fabric may hang outside below the waistline.\nNo partial tuck. No loose hem. No outer drape below the waistband.\nThe waistband must be fully visible and clearly defined.\nThe top garment must enter the waistband opening around the full 360° perimeter.\nFabric inside the waistband should show natural compression and slight blouse effect above the waistline.\nNo external hem visibility below the waistband at any point.\n[/TUCK_CONSTRAINTS]`);
                 } else if (wf === 'upper' || wf === 'set') {
-                    productBlock.push("Style Adjustment: MANDATORY - Untucked. The hem of the garment MUST hang loose OVER the pants, completely covering the waistband and belt area. The hem is fully visible and NOT tucked in.");
+                    productBlock.push(`[ANTI_TUCK_CONSTRAINTS]\nSTRICT: The main TOP garment (upper-body garment) must remain 100% OUTSIDE the bottom garment.\nNo partial tuck. No half-tuck. No French tuck.\nNo front-in, side-in, or back-in styling.\nNo fabric from the top garment may enter the bottom garment waistband opening at any point.\nThe bottom waistband must remain fully covered by the top garment around the full 360° perimeter.\nThe top hem must overlap the waistband by at least 4–8 cm everywhere.\n[/ANTI_TUCK_CONSTRAINTS]`);
                 }
             }
             if (canShowLegHem) {

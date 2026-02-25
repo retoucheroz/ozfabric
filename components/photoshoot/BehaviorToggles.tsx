@@ -190,9 +190,9 @@ export function BehaviorToggles({
 
                 {/* 4. Tucked */}
                 <ToggleItem
-                    label={language === "tr" ? "İÇERİDE" : "TUCKED"}
-                    brief={language === "tr" ? "Pantolon içine sokar" : "Tuck into pants"}
-                    detailed={language === "tr" ? "Üst ürünün alt ürünün içine sokulup sokulmayacağının seçeneği." : "Choice of whether to tuck the top into the bottom product."}
+                    label={language === "tr" ? "SOKMA" : "TUCK IN"}
+                    brief={language === "tr" ? "Üstü alta sokar" : "Top into bottom"}
+                    detailed={language === "tr" ? "Üst ürünün alt ürünün (pantolon, etek vb.) içine tamamen sokulup sokulmamasını belirler. Kapalıyken üst, alta tamamen dışarıda kalır. Açıkken tamamen içeri sokulur." : "Determines whether the top garment is fully tucked into the bottom garment. Off = hem hangs freely over the waistband. On = fully tucked in."}
                     icon={TbArrowBarToDown}
                     active={tucked}
                     onClick={() => setTucked(!tucked)}

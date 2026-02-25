@@ -5,23 +5,23 @@ require('dotenv').config({ path: '.env.local' });
 const sql = neon(process.env.DATABASE_URL);
 
 async function main() {
-    console.log('🔄 Dropping existing tables...');
+  console.log('🔄 Dropping existing tables...');
 
-    await sql`DROP TABLE IF EXISTS credit_transactions CASCADE`;
-    await sql`DROP TABLE IF EXISTS lemon_transactions CASCADE`;
-    await sql`DROP TABLE IF EXISTS app_settings CASCADE`;
-    await sql`DROP TABLE IF EXISTS sessions CASCADE`;
-    await sql`DROP TABLE IF EXISTS accounts CASCADE`;
-    await sql`DROP TABLE IF EXISTS verification_tokens CASCADE`;
-    await sql`DROP TABLE IF EXISTS global_library CASCADE`;
-    await sql`DROP TABLE IF EXISTS users CASCADE`;
+  await sql`DROP TABLE IF EXISTS credit_transactions CASCADE`;
+  await sql`DROP TABLE IF EXISTS lemon_transactions CASCADE`;
+  await sql`DROP TABLE IF EXISTS app_settings CASCADE`;
+  await sql`DROP TABLE IF EXISTS sessions CASCADE`;
+  await sql`DROP TABLE IF EXISTS accounts CASCADE`;
+  await sql`DROP TABLE IF EXISTS verification_tokens CASCADE`;
+  await sql`DROP TABLE IF EXISTS global_library CASCADE`;
+  await sql`DROP TABLE IF EXISTS users CASCADE`;
 
-    console.log('✅ Old tables dropped');
+  console.log('✅ Old tables dropped');
 
-    console.log('🔄 Creating new tables...');
+  console.log('🔄 Creating new tables...');
 
-    // Users table
-    await sql`
+  // Users table
+  await sql`
     CREATE TABLE users (
       id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
       name TEXT,
@@ -46,10 +46,10 @@ async function main() {
       updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
     )
   `;
-    console.log('  ✅ users');
+  console.log('  ✅ users');
 
-    // Accounts table (NextAuth)
-    await sql`
+  // Accounts table (NextAuth)
+  await sql`
     CREATE TABLE accounts (
       id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
       user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -66,10 +66,10 @@ async function main() {
       UNIQUE(provider, provider_account_id)
     )
   `;
-    console.log('  ✅ accounts');
+  console.log('  ✅ accounts');
 
-    // Sessions table (NextAuth)
-    await sql`
+  // Sessions table (NextAuth)
+  await sql`
     CREATE TABLE sessions (
       id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
       session_token TEXT NOT NULL UNIQUE,
@@ -77,10 +77,10 @@ async function main() {
       expires TIMESTAMPTZ NOT NULL
     )
   `;
-    console.log('  ✅ sessions');
+  console.log('  ✅ sessions');
 
-    // Verification tokens (NextAuth)
-    await sql`
+  // Verification tokens (NextAuth)
+  await sql`
     CREATE TABLE verification_tokens (
       identifier TEXT NOT NULL,
       token TEXT NOT NULL UNIQUE,
@@ -88,10 +88,10 @@ async function main() {
       UNIQUE(identifier, token)
     )
   `;
-    console.log('  ✅ verification_tokens');
+  console.log('  ✅ verification_tokens');
 
-    // Credit transactions
-    await sql`
+  // Credit transactions
+  await sql`
     CREATE TABLE credit_transactions (
       id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
       user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -101,10 +101,10 @@ async function main() {
       created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     )
   `;
-    console.log('  ✅ credit_transactions');
+  console.log('  ✅ credit_transactions');
 
-    // Lemon Squeezy transactions
-    await sql`
+  // Lemon Squeezy transactions
+  await sql`
     CREATE TABLE lemon_transactions (
       id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
       event_id TEXT NOT NULL UNIQUE,
@@ -118,30 +118,41 @@ async function main() {
       created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     )
   `;
-    console.log('  ✅ lemon_transactions');
+  console.log('  ✅ lemon_transactions');
 
-    // App settings
-    await sql`
+  // App settings
+  await sql`
     CREATE TABLE app_settings (
       key TEXT PRIMARY KEY,
       value TEXT NOT NULL,
       updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
     )
   `;
-    console.log('  ✅ app_settings');
+  console.log('  ✅ app_settings');
 
-    console.log('🎉 All tables created successfully!');
+  // Global Library (shared across all users by admins)
+  await sql`
+    CREATE TABLE global_library (
+      id TEXT PRIMARY KEY,
+      category TEXT NOT NULL,
+      data JSONB NOT NULL DEFAULT '{}',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `;
+  console.log('  ✅ global_library');
 
-    // Verify
-    const tables = await sql`
+  console.log('🎉 All tables created successfully!');
+
+  // Verify
+  const tables = await sql`
     SELECT table_name FROM information_schema.tables 
     WHERE table_schema = 'public' 
     ORDER BY table_name
   `;
-    console.log('\n📋 Current tables:', tables.map(t => t.table_name).join(', '));
+  console.log('\n📋 Current tables:', tables.map(t => t.table_name).join(', '));
 }
 
 main().catch(e => {
-    console.error('❌ Error:', e);
-    process.exit(1);
+  console.error('❌ Error:', e);
+  process.exit(1);
 });

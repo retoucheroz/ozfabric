@@ -5,7 +5,7 @@ import { deductCredits } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 
 const POSE_COST = 10;
-export const maxDuration = 60;
+export const maxDuration = 90;
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
@@ -26,19 +26,58 @@ export async function POST(req: NextRequest) {
         const falKey = process.env.FAL_KEY;
         if (!falKey) return NextResponse.json({ error: "FAL_KEY is not configured" }, { status: 500 });
 
-        const { ensureR2Url, uploadFromUrl } = await import("@/lib/s3");
-        const sanitizedUrl = await ensureR2Url(image_url, "poses/extraction");
+        // If image_url is a base64, upload it to R2 first (fal.ai requires a public URL)
+        let publicUrl = image_url;
+        if (image_url.startsWith("data:")) {
+            const { uploadBase64 } = await import("@/lib/s3");
+            publicUrl = await uploadBase64(image_url, "poses/extraction");
+            // If still base64 (R2 not configured), upload via r2 API
+            if (publicUrl.startsWith("data:")) {
+                const origin = req.headers.get("origin") || process.env.NEXTAUTH_URL || "http://localhost:3000";
+                const uploadRes = await fetch(`${origin}/api/r2/upload`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "Cookie": req.headers.get("cookie") || "" },
+                    body: JSON.stringify({ base64: image_url, fileName: "pose_input.jpg", folder: "poses/extraction" })
+                });
+                if (uploadRes.ok) {
+                    const uploadData = await uploadRes.json();
+                    publicUrl = uploadData.url;
+                }
+            }
+        } else if (!image_url.startsWith("http")) {
+            // Relative URL — make absolute
+            const origin = process.env.NEXTAUTH_URL || "http://localhost:3000";
+            publicUrl = `${origin}${image_url.startsWith("/") ? "" : "/"}${image_url}`;
+        }
 
         const { fal } = await import("@fal-ai/client");
         fal.config({ credentials: falKey });
 
-        const result: any = await fal.run("fal-ai/dwpose", {
-            input: { image_url: sanitizedUrl }
-        });
+        // Try fal-ai/dwpose (better quality)
+        let rawPoseUrl: string | null = null;
 
-        const rawPoseUrl = result.image?.url || result.url;
-        if (!rawPoseUrl) throw new Error("No image in response");
+        try {
+            const result: any = await fal.run("fal-ai/dwpose", {
+                input: { image_url: publicUrl }
+            });
+            rawPoseUrl = result.image?.url || result.url || null;
+        } catch (e: any) {
+            console.warn("dwpose failed, trying imageutils/openpose:", e?.message);
+            // Fallback: imageutils/openpose
+            try {
+                const result2: any = await fal.run("fal-ai/imageutils/openpose", {
+                    input: { image_url: publicUrl }
+                });
+                rawPoseUrl = result2.image?.url || result2.images?.[0]?.url || null;
+            } catch (e2: any) {
+                console.error("Both pose models failed:", e2?.message);
+            }
+        }
 
+        if (!rawPoseUrl) throw new Error("No stickman image returned from any model");
+
+        // Save to R2 for persistence
+        const { uploadFromUrl } = await import("@/lib/s3");
         const savedPoseUrl = await uploadFromUrl(rawPoseUrl, "poses/results");
 
         // Deduct credits
