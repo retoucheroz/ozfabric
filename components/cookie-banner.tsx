@@ -35,57 +35,58 @@ export function CookieBanner() {
     if (!isVisible) return null;
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 z-[100] p-4 sm:p-6 pb-safe sm:pb-6 pointer-events-none">
-            <div className="mx-auto max-w-4xl bg-[var(--bg-surface)] border border-[var(--border-strong)] rounded-2xl shadow-2xl p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 pointer-events-auto transform transition-all duration-500 animate-in slide-in-from-bottom-5">
-                <div className="bg-[var(--accent-soft)] p-3 rounded-xl shrink-0 hidden sm:block">
-                    <Cookie className="w-6 h-6 text-[var(--accent-primary)]" />
-                </div>
+        <div className="fixed bottom-6 left-6 z-[100] max-w-[400px] w-[calc(100%-3rem)] pointer-events-none group">
+            <div className="glass-strong rounded-[2rem] border border-[var(--border-accent)] shadow-2xl p-5 sm:p-6 pointer-events-auto relative overflow-hidden transition-all duration-300 hover:shadow-purple-500/10 hover:border-purple-500/30">
+                {/* Background Glow */}
+                <div className="absolute -top-10 -right-10 w-32 h-32 bg-[var(--accent-primary)]/10 blur-[40px] rounded-full" />
 
-                <div className="flex-1 space-y-2">
-                    <div className="flex items-center justify-between sm:justify-start gap-2">
-                        <h3 className="font-bold text-sm sm:text-base text-[var(--text-primary)]">
-                            {language === 'tr' ? 'Çerez Politikası ve Gizlilik' : 'Cookie Policy & Privacy'}
-                        </h3>
-                        <div className="bg-[var(--accent-soft)] p-2 rounded-lg shrink-0 sm:hidden">
-                            <Cookie className="w-5 h-5 text-[var(--accent-primary)]" />
+                <div className="relative z-10">
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                        <div className="flex items-center gap-2.5">
+                            <div className="bg-[var(--accent-primary)]/10 p-2 rounded-xl">
+                                <Cookie className="w-5 h-5 text-[var(--accent-primary)]" />
+                            </div>
+                            <h3 className="font-bold text-[15px] tracking-tight text-[var(--text-primary)]">
+                                {language === 'tr' ? 'Çerez Politikası' : 'Cookie Policy'}
+                            </h3>
                         </div>
+                        <button
+                            onClick={handleClose}
+                            className="p-1.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] rounded-full transition-all"
+                            aria-label="Close"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
                     </div>
-                    <p className="text-xs sm:text-sm text-[var(--text-muted)] leading-relaxed">
+
+                    <p className="text-[13px] text-[var(--text-secondary)] leading-relaxed mb-5">
                         {language === 'tr'
-                            ? 'Size daha iyi bir deneyim sunabilmek, sitemizi teknik olarak geliştirebilmek ve kullanım analizleri yapabilmek için çerezler (cookies) kullanıyoruz. Sitemizi kullanmaya devam ederek çerez kullanımını kabul etmiş olursunuz.'
-                            : 'We use cookies to provide you with a better experience, improve our site technically, and analyze usage. By continuing to use our site, you accept the use of cookies.'}
+                            ? 'Daha iyi bir kullanıcı deneyimi sunmak ve sitemizi geliştirmek için çerezler kullanıyoruz.'
+                            : 'We use cookies to enhance your experience and improve our services.'}
                         {' '}
-                        <Link href="/cookie-policy" className="text-[var(--accent-primary)] hover:underline font-medium inline-block mt-1 sm:mt-0">
-                            {language === 'tr' ? 'Detaylı Bilgi' : 'Learn More'}
+                        <Link href="/cookie-policy" className="text-[var(--accent-primary)] hover:underline font-semibold inline-flex items-center gap-0.5">
+                            {language === 'tr' ? 'Detaylar' : 'Details'}
                         </Link>
                     </p>
-                </div>
 
-                <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-2 shrink-0 border-t sm:border-t-0 border-[var(--border-subtle)] pt-4 sm:pt-0 mt-2 sm:mt-0">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleAcceptEssential}
-                        className="w-full sm:w-auto h-10 px-4 text-xs font-semibold rounded-xl bg-transparent border-[var(--border-strong)] hover:bg-[var(--bg-elevated)]"
-                    >
-                        {language === 'tr' ? 'Yalnızca Gerekli Çerezler' : 'Essential Only'}
-                    </Button>
-                    <Button
-                        size="sm"
-                        onClick={handleAcceptAll}
-                        className="w-full sm:w-auto h-10 px-4 text-xs font-semibold rounded-xl bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-white shadow-lg shadow-[var(--accent-primary)]/20"
-                    >
-                        {language === 'tr' ? 'Tümünü Kabul Et' : 'Accept All'}
-                    </Button>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleAcceptEssential}
+                            className="flex-1 h-9 text-[11px] font-bold uppercase tracking-wider rounded-xl bg-transparent border-[var(--border-default)] hover:bg-[var(--bg-elevated)] transition-all"
+                        >
+                            {language === 'tr' ? 'Gerekli' : 'Essential'}
+                        </Button>
+                        <Button
+                            size="sm"
+                            onClick={handleAcceptAll}
+                            className="flex-1 h-9 text-[11px] font-bold uppercase tracking-wider rounded-xl bg-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/90 text-white shadow-lg shadow-purple-500/20 active:scale-95 transition-all"
+                        >
+                            {language === 'tr' ? 'Kabul Et' : 'Accept All'}
+                        </Button>
+                    </div>
                 </div>
-
-                <button
-                    onClick={handleClose}
-                    className="absolute top-2 right-2 sm:static p-2 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] rounded-full transition-colors"
-                    aria-label="Close"
-                >
-                    <X className="w-4 h-4" />
-                </button>
             </div>
         </div>
     );
