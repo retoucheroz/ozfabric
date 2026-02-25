@@ -105,7 +105,7 @@ export default function LoginPage() {
 
           <div className="relative z-10">
             <div className="flex items-center">
-              <img src="/logo.png" alt="Logo" className="h-12 w-auto object-contain" />
+              <img src="/logo.png" alt="Logo" className="h-7 w-auto object-contain" />
             </div>
           </div>
           <div className="relative z-10 max-w-lg space-y-4 text-white">
@@ -124,7 +124,7 @@ export default function LoginPage() {
 
           {/* Mobile Logo */}
           <div className="absolute top-8 left-8 lg:hidden z-20">
-            <img src="/logo.png" alt="Logo" className="h-10 w-auto object-contain" />
+            <img src="/logo.png" alt="Logo" className="h-6 w-auto object-contain" />
           </div>
 
           {/* Language Switcher */}
