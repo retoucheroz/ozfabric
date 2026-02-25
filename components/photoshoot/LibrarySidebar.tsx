@@ -320,11 +320,10 @@ export function LibrarySidebar({
                                                     if (!isGenderMatch) return false;
 
                                                     if (poseFocus === 'upper') {
-                                                        return p.tags?.includes('ust_beden');
+                                                        return p.tags?.includes('ust_beden') || !p.tags || p.tags.length === 0;
                                                     } else if (poseFocus === 'full') {
-                                                        // Show everything that isn't explicitly marked as ONLY 'ust_beden',
-                                                        // OR specifically marked as 'tam_boy'
-                                                        return p.tags?.includes('tam_boy') || !p.tags?.includes('ust_beden');
+                                                        // Show untagged items or items explicitly marked as tam_boy
+                                                        return p.tags?.includes('tam_boy') || !p.tags?.includes('ust_beden') || !p.tags || p.tags.length === 0;
                                                     }
                                                     return true;
                                                 }).map(pose => {
@@ -584,12 +583,8 @@ export function LibrarySidebar({
                                     className="absolute inset-0 opacity-0 cursor-pointer"
                                     onChange={(e) => {
                                         const file = e.target.files?.[0];
-                                        if (file) {
-                                            const reader = new FileReader();
-                                            reader.onloadend = () => {
-                                                handleLibrarySelect({ src: reader.result as string }, true);
-                                            };
-                                            reader.readAsDataURL(file);
+                                        if (file && activeLibraryAsset) {
+                                            handleAssetUpload(activeLibraryAsset, file);
                                         }
                                     }}
                                 />
@@ -602,7 +597,7 @@ export function LibrarySidebar({
                                 </div>
                             </div>
 
-                            {(internalAsset === 'model' || internalAsset === 'pose') && (
+                            {internalAsset === 'model' && (
                                 <div className="space-y-2">
                                     <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                         {language === "tr" ? "Eğitilmiş Modellerim" : "My Trained Models"}

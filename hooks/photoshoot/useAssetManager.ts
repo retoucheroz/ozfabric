@@ -121,7 +121,7 @@ export const useAssetManager = (
             setAssets((prev: Record<string, string | null>) => ({ ...prev, [key]: lowRes }));
             setAssetsHighRes((prev: Record<string, string | null>) => ({ ...prev, [key]: highRes }));
 
-            if (key === 'pose') {
+            if (key === 'pose' || key.startsWith('pose_')) {
                 setPoseDescription(null);
                 setTempPoseData({ original: highRes, stickman: "" });
                 setShowSavePoseDialog(true);
@@ -143,7 +143,7 @@ export const useAssetManager = (
                 setShowSaveLightingDialog(true);
             }
 
-            if (['background', 'fit_pattern', 'shoes', 'jacket', 'bag', 'glasses', 'hat', 'jewelry', 'belt'].includes(key)) {
+            if (['background', 'fit_pattern', 'shoes', 'jacket', 'bag', 'glasses', 'hat', 'jewelry', 'belt', 'inner_wear'].includes(key)) {
                 setTempAssetData({ key, url: lowRes, name: "" });
                 setShowSaveAssetDialog(true);
             }

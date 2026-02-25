@@ -128,7 +128,9 @@ export const usePhotoshootWorkflow = () => {
         }
 
         // Map asset types to internal asset categories
-        if (['model', 'pose', 'background', 'lighting', 'shoes', 'jacket', 'bag', 'glasses', 'hat', 'jewelry', 'belt', 'inner_wear', 'fit_pattern'].includes(activeLibraryAsset)) {
+        if (activeLibraryAsset.startsWith('pose')) {
+            setInternalAsset('pose');
+        } else if (['model', 'background', 'lighting', 'shoes', 'jacket', 'bag', 'glasses', 'hat', 'jewelry', 'belt', 'inner_wear', 'fit_pattern'].includes(activeLibraryAsset)) {
             setInternalAsset(activeLibraryAsset);
         } else {
             // For product parts (top_front, etc), we might want to show product library?
@@ -266,7 +268,7 @@ export const usePhotoshootWorkflow = () => {
         setShoesDescription, setInnerWearDescription, assets, assetsHighRes,
         savedPoses, savedModels, savedBackgrounds, savedFits, savedShoes,
         savedLightings, savedJackets, savedBags, savedGlasses, savedHats,
-        savedJewelry, savedBelts, savedInnerWears, lightingPositive, lightingNegative
+        savedJewelry, savedBelts, savedInnerWears, lightingPositive, lightingNegative, poseFocus
     );
 
     const {

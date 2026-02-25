@@ -389,38 +389,40 @@ export default function PhotoshootPage() {
                                 <div className="max-w-5xl mx-auto px-1 md:px-0 space-y-6">
 
                                     {/* TOP: Horizontal Technical Settings Bar */}
-                                    <div className="p-3 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-subtle)] shadow-inner">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <p className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider m-0">{language === "tr" ? "TEKNİK AYARLAR" : "TECHNICAL SETTINGS"}</p>
-                                        </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                            <div className="space-y-1">
-                                                <label className="text-[9px] uppercase font-bold text-[var(--text-muted)] tracking-wide px-1">{language === "tr" ? "GÖRSEL ORANI" : "ASPECT RATIO"}</label>
-                                                <div className="relative">
-                                                    <select className="w-full text-xs px-2 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] transition-all font-bold appearance-none" value={aspectRatio} onChange={(e) => setAspectRatio(e.target.value)}>
-                                                        {ASPECT_RATIOS.map(opt => (
-                                                            <option key={opt.id} value={opt.id}>{language === 'tr' ? opt.labelTr : opt.label}</option>
-                                                        ))}
-                                                    </select>
-                                                    <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none" />
-                                                </div>
+                                    <div className="py-2 px-3 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-subtle)] shadow-inner">
+                                        <div className="flex flex-col md:flex-row md:items-center gap-4">
+                                            <div className="md:border-r border-[var(--border-subtle)] pr-4 flex-none hidden lg:block">
+                                                <p className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider m-0">{language === "tr" ? "AYARLAR" : "SETTINGS"}</p>
                                             </div>
-                                            <div className="space-y-1">
-                                                <label className="text-[9px] uppercase font-bold text-[var(--text-muted)] tracking-wide px-1">{language === "tr" ? "ÇÖZÜNÜRLÜK" : "RESOLUTION"}</label>
-                                                <div className="relative">
-                                                    <select className="w-full text-xs px-2 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] transition-all font-bold appearance-none" value={resolution} onChange={(e) => setResolution(e.target.value)}>
-                                                        {RESOLUTION_OPTIONS.map(opt => (
-                                                            <option key={opt.id} value={opt.id}>{language === 'tr' ? opt.labelTr : opt.label}</option>
-                                                        ))}
-                                                    </select>
-                                                    <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none" />
+                                            <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3">
+                                                <div className="flex items-center gap-2">
+                                                    <label className="text-[9px] uppercase font-bold text-[var(--text-muted)] tracking-wide whitespace-nowrap">{language === "tr" ? "ORAN" : "RATIO"}</label>
+                                                    <div className="relative flex-1 min-w-[80px]">
+                                                        <select className="w-full text-xs px-2 py-1.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] transition-all font-bold appearance-none" value={aspectRatio} onChange={(e) => setAspectRatio(e.target.value)}>
+                                                            {ASPECT_RATIOS.map(opt => (
+                                                                <option key={opt.id} value={opt.id}>{language === 'tr' ? opt.labelTr : opt.label}</option>
+                                                            ))}
+                                                        </select>
+                                                        <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--text-muted)] pointer-events-none" />
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div className="space-y-1">
-                                                <label className="text-[9px] uppercase font-bold text-[var(--text-muted)] tracking-wide px-1">{language === "tr" ? "TEKRAR TUTARLILIĞI" : "CONSISTENCY"}</label>
-                                                <div className="relative">
-                                                    <input type="number" className="w-full text-xs px-2 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] transition-all font-bold placeholder:text-[var(--text-disabled)]" value={seed === "" ? "" : seed} onChange={(e) => setSeed(e.target.value === "" ? "" : Number(e.target.value))} placeholder="RANDOM" />
-                                                    {seed !== "" && <button onClick={() => setSeed("")} className="absolute right-2 top-1/2 -translate-y-1/2 text-red-500"><X size={14} /></button>}
+                                                <div className="flex items-center gap-2">
+                                                    <label className="text-[9px] uppercase font-bold text-[var(--text-muted)] tracking-wide whitespace-nowrap">{language === "tr" ? "KALİTE" : "QUALITY"}</label>
+                                                    <div className="relative flex-1 min-w-[80px]">
+                                                        <select className="w-full text-xs px-2 py-1.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] transition-all font-bold appearance-none" value={resolution} onChange={(e) => setResolution(e.target.value)}>
+                                                            {RESOLUTION_OPTIONS.map(opt => (
+                                                                <option key={opt.id} value={opt.id}>{language === 'tr' ? opt.labelTr : opt.label}</option>
+                                                            ))}
+                                                        </select>
+                                                        <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--text-muted)] pointer-events-none" />
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <label className="text-[9px] uppercase font-bold text-[var(--text-muted)] tracking-wide whitespace-nowrap">{language === "tr" ? "SEED" : "SEED"}</label>
+                                                    <div className="relative flex-1">
+                                                        <input type="number" className="w-full text-xs px-2 py-1.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] transition-all font-bold placeholder:text-[var(--text-disabled)]" value={seed === "" ? "" : seed} onChange={(e) => setSeed(e.target.value === "" ? "" : Number(e.target.value))} placeholder="RANDOM" />
+                                                        {seed !== "" && <button onClick={() => setSeed("")} className="absolute right-2 top-1/2 -translate-y-1/2 text-red-500"><X size={14} /></button>}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

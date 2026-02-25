@@ -54,7 +54,8 @@ export const useDialogState = (
     savedBelts: any[],
     savedInnerWears: any[],
     lightingPositive: string,
-    lightingNegative: string
+    lightingNegative: string,
+    poseFocus: 'full' | 'upper' | 'lower' | 'closeup'
 ) => {
     // Dialog Visibility States
     const [showSavePoseDialog, setShowSavePoseDialog] = useState(false);
@@ -138,6 +139,10 @@ export const useDialogState = (
                     console.error("Pose analysis failed:", e);
                 }
 
+                const tags = [];
+                if (poseFocus === 'upper') tags.push('ust_beden');
+                if (poseFocus === 'full') tags.push('tam_boy');
+
                 const newPose: SavedPose = {
                     id: crypto.randomUUID(),
                     url: finalUrl,
@@ -147,6 +152,7 @@ export const useDialogState = (
                     stickmanUrl: finalStickmanUrl,
                     gender: genderValue,
                     customPrompt: autoPrompt || undefined,
+                    tags,
                     createdAt: Date.now()
                 };
                 const updated = [newPose, ...savedPoses];

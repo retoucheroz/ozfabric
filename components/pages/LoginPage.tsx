@@ -104,11 +104,8 @@ export default function LoginPage() {
         <div className="hidden lg:flex flex-col justify-between p-12">
 
           <div className="relative z-10">
-            <div className="flex items-center gap-2 font-bold text-2xl tracking-tighter text-white">
-              <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full flex items-center justify-center">
-                <div className="w-4 h-4 bg-white rounded-full"></div>
-              </div>
-              <span className="bg-gradient-to-r from-violet-400 to-purple-500 bg-clip-text text-transparent">ModeOn</span>.ai
+            <div className="flex items-center">
+              <img src="/logo.png" alt="Logo" className="h-12 w-auto object-contain" />
             </div>
           </div>
           <div className="relative z-10 max-w-lg space-y-4 text-white">
@@ -126,11 +123,8 @@ export default function LoginPage() {
         <div className="flex items-center justify-center min-h-screen lg:min-h-0 py-12 px-8 relative">
 
           {/* Mobile Logo */}
-          <div className="absolute top-8 left-8 lg:hidden flex items-center gap-2 font-bold text-xl tracking-tighter text-white z-20">
-            <div className="w-6 h-6 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full flex items-center justify-center">
-              <div className="w-3 h-3 bg-white rounded-full"></div>
-            </div>
-            <span className="bg-gradient-to-r from-violet-400 to-purple-500 bg-clip-text text-transparent">ModeOn</span>.ai
+          <div className="absolute top-8 left-8 lg:hidden z-20">
+            <img src="/logo.png" alt="Logo" className="h-10 w-auto object-contain" />
           </div>
 
           {/* Language Switcher */}
