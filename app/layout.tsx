@@ -21,7 +21,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ModeOn.ai - AI Fashion Design",
+  title: "OzFabric - AI Fashion Design",
   description: "AI-Powered Fashion Design & Photoshoot Platform",
 };
 
