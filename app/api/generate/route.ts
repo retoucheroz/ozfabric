@@ -387,6 +387,9 @@ export async function POST(req: NextRequest) {
         const buildStructuredPrompt = (view: 'styling' | 'front' | 'side' | 'back') => {
             const isBackView = view.includes('back') || (targetView === 'back' && view === 'back') || (activeDetailView === 'back' && view === 'back');
 
+            // Determine if this specific execution is a styling shot
+            const isActiveStyling = view === 'styling' || isStylingShot;
+
             // === STRUCTURED PROMPT OBJECT ===
             const structuredPrompt: any = {
                 intent: "Fashion e-commerce photography",
@@ -397,7 +400,7 @@ export async function POST(req: NextRequest) {
                     hair_behind_shoulders: hairBehindShoulders, // Explicit boolean
                     look_at_camera: lookAtCamera, // NEW: Explicit boolean
                     body_description: modelDescription || null, // NEW: Custom physical traits
-                    wind: isStylingShot && enableWind
+                    wind: isActiveStyling && enableWind
                 },
 
                 garment: {
@@ -454,9 +457,9 @@ export async function POST(req: NextRequest) {
                 },
 
                 pose: {
-                    reference: null, // No image ref, only text
-                    description: poseDescription, // Analyzed text description
-                    dynamic: true
+                    reference: null,
+                    description: isActiveStyling ? poseDescription : null, // STYLING ONLY
+                    dynamic: isActiveStyling
                 },
                 camera: {
                     shot_type: "full_body",
@@ -493,7 +496,7 @@ export async function POST(req: NextRequest) {
             };
 
             // === JSON OVERRIDE CHECK ===
-            // If the user provided an edited prompt that is actually valid JSON, 
+            // If the user provided an edited prompt that is actually valid JSON,
             // merge it or replace the structured prompt entirely.
             if (editedPrompt && (editedPrompt.trim().startsWith('{') || editedPrompt.trim().startsWith('['))) {
                 try {
@@ -565,7 +568,7 @@ export async function POST(req: NextRequest) {
 
             // === VIEW-SPECIFIC ADJUSTMENTS ===
 
-            if (view === 'styling' || isStylingShot) {
+            if (isActiveStyling) {
                 // Artistic mode
                 structuredPrompt.pose.dynamic = true;
                 if (poseStickman) {
@@ -586,20 +589,14 @@ export async function POST(req: NextRequest) {
             } else {
                 // Technical angles (front, side, back)
                 structuredPrompt.camera.angle = view as string;
-                // If it's a technical angle or shotRole is technical, disable dynamic behavior
-                const isTechnicalAngle = angleId && angleId.startsWith('std_tech_');
-                structuredPrompt.pose.dynamic = (isStylingShot && !isTechnicalAngle);
+                // Technical shots should NEVER have complex descriptions or stickman influence
+                structuredPrompt.pose.dynamic = false;
+                structuredPrompt.pose.description = null;
 
-                // Only provide technical reference if no specific pose description is provided
-                if (!poseDescription) {
-                    structuredPrompt.pose.reference = (view as string) === 'front' ? "standing straight, arms at sides" :
-                        (view as string) === 'side' ? "profile view, natural stance" :
-                            "back view, straight posture";
-                }
-
-                if (poseStickman) {
-                    structuredPrompt.pose.reference = "use stickman reference";
-                }
+                structuredPrompt.pose.reference = (view as string) === 'front' ? "standing straight, arms at sides, neutral stance" :
+                    (view as string) === 'side' ? "profile view, neutral natural stance, arms at sides" :
+                        (view as string) === 'back' ? "back view, standing straight, arms at sides" :
+                            "neutral professional pose";
 
                 // Framing Logic for Technical Angles
                 if (poseFocus === 'closeup') {
