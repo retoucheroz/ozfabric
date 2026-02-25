@@ -5,7 +5,7 @@ import { deductCredits } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 
 const POSE_COST = 10;
-export const maxDuration = 60;
+export const maxDuration = 300; // Increased to 300 to prevent timeouts
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
