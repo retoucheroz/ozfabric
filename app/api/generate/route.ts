@@ -286,7 +286,7 @@ export async function POST(req: NextRequest) {
             // Added logic to handle view-specific asset visibility while ensuring main_product is present
             const isFront = view === 'front' || view === 'styling' || view.includes('front');
             const isBack = view === 'back' || view.includes('back');
-            const isSide = view === 'side' || view.includes('side') || view.includes('angled');
+            const isSide = view === 'side' || view.includes('side') || view.includes('angled') || view.includes('threequarter');
 
             if (isFront || isSide) {
                 if (imgs.main_product) assets.push(imgs.main_product);
@@ -304,14 +304,9 @@ export async function POST(req: NextRequest) {
             }
 
             if (isBack || isSide) {
-                if (imgs.main_product && !isFront) assets.push(imgs.main_product); // Ensure it's there if back-only
                 if (imgs.top_back) assets.push(imgs.top_back);
-                else if (imgs.top_front && !isFront) assets.push(imgs.top_front);
-
                 if (imgs.bottom_back) assets.push(imgs.bottom_back);
-                else if (imgs.bottom_front && !isFront) assets.push(imgs.bottom_front);
-
-                if (imgs.jacket && !isFront) assets.push(imgs.jacket);
+                if (imgs.jacket) assets.push(imgs.jacket);
                 if (imgs.backRefUpload) assets.push(imgs.backRefUpload);
                 assets.push(...backDetails);
             }
@@ -693,8 +688,9 @@ export async function POST(req: NextRequest) {
             }
 
             // Prevent hallucinated logos on back view if not explicitly requested
-            if (view.includes('back') || structuredPrompt.camera.angle === 'back') {
+            if (isBackView) {
                 negativePrompt += ", " + NEGATIVE_PROMPTS.distorted_logo;
+                negativePrompt += ", face, eyes, gaze, lips, nose, chest, breast, frontal view, looking at camera, making eye contact";
             }
 
             if (structuredPrompt.subject.wind) {
@@ -777,10 +773,10 @@ export async function POST(req: NextRequest) {
                 framingBlock.push("Enabled Details: Collar type, buttons, hair texture, gaze, and facial expression.");
                 framingBlock.push("Constraint: Exclude waist, legs, and footwear.");
             } else if (framing === 'waist_to_above_knees') {
-                framingBlock.push("Shot Type: Detail-oriented proximity shot.");
-                framingBlock.push("Visible: Waist to just above the knees.");
-                framingBlock.push("Enabled Details: Pocket details, waist fit, and fabric texture.");
-                framingBlock.push("Constraint: Exclude face, upper chest, and feet.");
+                framingBlock.push("Shot Type: Detail-oriented proximity shot. Strictly centered on the lower body.");
+                framingBlock.push("Visible: MANDATORY - Strict crop from the natural waistline down to the upper knees ONLY.");
+                framingBlock.push("Enabled Details: Pocket details, waistband construction, waist fit, and fabric texture.");
+                framingBlock.push("Constraint: ABSOLUTELY EXCLUDE face, shoulders, upper chest, and feet from the frame.");
             }
             framingBlock.push(`[/FRAMING_DESCRIPTION]`);
             sections.push(framingBlock.join("\n"));
@@ -919,6 +915,12 @@ export async function POST(req: NextRequest) {
                 let bio = clean(sp.pose.description);
                 // Standardize "figure" to "model"
                 bio = bio.replace(/the figure/gi, "the model").replace(/figure stands/gi, "model stands").replace(/figure is/gi, "model is");
+
+                if (!sp.pose.dynamic && !isBackView) {
+                    bio += ". Model stands perfectly still and symmetrical with feet parallel and shoulder-width apart, facing the camera directly. Arms hang straight down at the sides with fingers relaxed. No weight shift in the hips. Eyes looking directly into the camera lens.";
+                } else if (!sp.pose.dynamic && isBackView) {
+                    bio += ". Model stands perfectly straight with back to camera, head facing away, arms at sides, feet parallel.";
+                }
 
                 if (sp.pose.dynamic) {
                     bio = bio.replace(/arms (hang|stay|placed) (naturally )?at sides/gi, "arms in dynamic fashion placement");
