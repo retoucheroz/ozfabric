@@ -720,18 +720,18 @@ export const useGenerationEngine = (
         const finalSeed = (seed !== null && seed !== "") ? Number(seed) : Math.floor(Math.random() * 1000000000);
         if (seed === "") setSeed(finalSeed);
 
-        // Credit deduction is now handled on the server side in /api/generate
-        const finalSelectionCount = selectedBatchImages.filter(Boolean).length;
+        const selectedIndices = batchPreviewPrompts
+            .map((_, i) => i)
+            .filter(i => selectedBatchImages[i]);
+
+        const finalSelectionCount = selectedIndices.length;
+        let currentFinished = 0;
 
         try {
-            const generatedImages: any[] = [];
-            for (let i = 0; i < batchPreviewPrompts.length; i++) {
-                if (isStoppingBatchRef.current) break;
-                if (!selectedBatchImages[i]) continue;
+            const processItem = async (i: number) => {
+                if (isStoppingBatchRef.current) return;
 
                 const preview = batchPreviewPrompts[i];
-                const currentIndex = selectedBatchImages.slice(0, i + 1).filter(Boolean).length;
-                toast.info(`${language === "tr" ? "Üretiliyor" : "Generating"} ${currentIndex}/${finalSelectionCount}...`);
 
                 const uploadedImages: any = {
                     model: assetsHighRes.model || assets.model,
@@ -838,52 +838,45 @@ export const useGenerationEngine = (
                     preview: false
                 };
 
-                const res = await fetch("/api/generate", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(requestPayload)
-                });
+                try {
+                    const res = await fetch("/api/generate", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(requestPayload)
+                    });
 
-                if (res.ok) {
-                    const data = await res.json();
-                    const imageUrl = data.images?.[0] || data.image_url;
-                    if (imageUrl) {
-                        const nameSuffix = preview.title.replace(/\s+/g, '_').toLowerCase();
-                        const fullFilename = `${productCode || 'shot'}_${nameSuffix}.jpg`;
-                        const newImg = { filename: fullFilename, url: imageUrl, downloadName: fullFilename, requestPayload };
-                        generatedImages.push(newImg);
+                    if (res.ok) {
+                        const data = await res.json();
+                        const imageUrl = data.images?.[0] || data.image_url;
+                        if (imageUrl) {
+                            const nameSuffix = preview.title.replace(/\s+/g, '_').toLowerCase();
+                            const fullFilename = `${productCode || 'shot'}_${nameSuffix}.jpg`;
+                            const newImg = { filename: fullFilename, url: imageUrl, downloadName: fullFilename, requestPayload };
 
-                        // Force update with latest array to ensure PreviewArea sees it
-                        setResultImages([...generatedImages]);
+                            setResultImages(prev => [...prev, newImg]);
+                            currentFinished++;
+                            toast.info(`${language === 'tr' ? 'Üretildi' : 'Generated'} ${currentFinished}/${finalSelectionCount}`);
 
-                        addProject({
-                            title: `Batch: ${productCode} - ${preview.title}`,
-                            type: "Photoshoot",
-                            imageUrl: imageUrl,
-                            description: `Seed: ${finalSeed} | Prompt: ${editedBatchPrompts[i]}`
-                        });
-                    } else {
-                        toast.error(`${preview.title}: ${language === 'tr' ? 'Görsel URL alınamadı' : 'Image URL not found'}`);
+                            addProject({
+                                title: `Batch: ${productCode} - ${preview.title}`,
+                                type: "Photoshoot",
+                                imageUrl: imageUrl,
+                                description: `Seed: ${finalSeed} | Prompt: ${editedBatchPrompts[i]}`
+                            });
+                        }
                     }
-                } else {
-                    const errorData = await res.json().catch(() => ({}));
-                    console.error("Batch item error:", res.status, errorData);
-                    toast.error(`${preview.title}: ${language === 'tr' ? 'Hata' : 'Error'} ${res.status} (${errorData.error || (language === 'tr' ? 'Sunucu Hatası' : 'Server Error')})`);
+                } catch (e) {
+                    console.error("Batch single item error:", e);
                 }
-            }
+            };
 
-            if (generatedImages.length > 0) {
-                setIsGenerationSuccess(true);
-                setGenerationStage('complete');
-                await new Promise(r => setTimeout(r, 800));
-                // Final sync
-                setResultImages([...generatedImages]);
-            }
+            await Promise.all(selectedIndices.map(idx => processItem(idx)));
+            setIsGenerationSuccess(true);
+            setGenerationStage('complete');
         } catch (e: any) {
             toast.error(`Batch Error: ${e.message}`);
         } finally {
             setIsProcessing(false);
-            setIsGenerationSuccess(false);
         }
     };
 
