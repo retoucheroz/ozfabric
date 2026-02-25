@@ -6,12 +6,19 @@ function dataUrlToBlob(dataUrl: string) {
 }
 
 export async function uploadToR2(dataUrlOrUrl: string, fileName: string) {
-  // Zaten URL geliyorsa dokunma
+  // Handle relative paths
+  if (dataUrlOrUrl.startsWith("/")) {
+    dataUrlOrUrl = window.location.origin + dataUrlOrUrl;
+  }
+
+  // If it's already a full URL, we can return it, but for some APIs (like Kie) 
+  // it's safer to ensure it's in a known storage (R2/S3).
+  // However, to save bandwidth/time, if it's already an http URL we return it.
   if (dataUrlOrUrl.startsWith("http://") || dataUrlOrUrl.startsWith("https://")) {
     return dataUrlOrUrl;
   }
 
-  // Base64 değilse dokunma
+  // Base64 check
   if (!dataUrlOrUrl.startsWith("data:")) {
     return dataUrlOrUrl;
   }

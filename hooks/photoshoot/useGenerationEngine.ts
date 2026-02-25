@@ -609,7 +609,8 @@ export const useGenerationEngine = (
                 return {
                     title: productCode ? `${productCode}${idx + 1}` : `image_${idx + 1}`,
                     spec: spec,
-                    structured
+                    structured,
+                    isMavi: isMaviBatch
                 };
             });
 

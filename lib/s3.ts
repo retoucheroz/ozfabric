@@ -43,21 +43,32 @@ export async function uploadBase64(base64: string, prefix: string = "uploads") {
   }
 }
 
+export function getAbsoluteUrl(path: string) {
+  if (!path) return path;
+  if (path.startsWith("http")) return path;
+  if (path.startsWith("data:")) return path;
+
+  const baseUrl = (process.env.NEXTAUTH_URL || "http://localhost:3000").replace(/\/$/, "");
+  return `${baseUrl}${path.startsWith("/") ? "" : "/"}${path}`;
+}
+
 export async function ensureS3Url(dataUrlOrUrl: string, prefix: string = "assets") {
   if (!dataUrlOrUrl) return dataUrlOrUrl;
 
-  if (dataUrlOrUrl.startsWith("http")) {
-    if (dataUrlOrUrl.includes("fal.ai") || dataUrlOrUrl.includes("fal.run") || dataUrlOrUrl.includes("replicate.delivery")) {
-      return await uploadFromUrl(dataUrlOrUrl, prefix);
+  const absoluteUrl = getAbsoluteUrl(dataUrlOrUrl);
+
+  if (absoluteUrl.startsWith("http")) {
+    if (absoluteUrl.includes("fal.ai") || absoluteUrl.includes("fal.run") || absoluteUrl.includes("replicate.delivery")) {
+      return await uploadFromUrl(absoluteUrl, prefix);
     }
-    return dataUrlOrUrl;
+    return absoluteUrl;
   }
 
-  if (dataUrlOrUrl.startsWith("data:image")) {
-    return await uploadBase64(dataUrlOrUrl, prefix);
+  if (absoluteUrl.startsWith("data:image")) {
+    return await uploadBase64(absoluteUrl, prefix);
   }
 
-  return dataUrlOrUrl;
+  return absoluteUrl;
 }
 
 export async function uploadFromUrl(url: string, prefix: string = "generations") {

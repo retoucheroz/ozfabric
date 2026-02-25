@@ -11,21 +11,23 @@ async function checkAdmin() {
 
 export async function GET(req: NextRequest) {
     const category = req.nextUrl.searchParams.get('category');
-    const items = await getGlobalLibraryItems(category || undefined);
+    const session = await getServerSession(authOptions);
+    const isAdmin = session?.user?.role === 'admin';
+    const items = await getGlobalLibraryItems(category || undefined, !isAdmin);
     return NextResponse.json(items);
 }
 
 export async function POST(req: NextRequest) {
     if (!await checkAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    const { category, data } = await req.json();
-    const item = await addGlobalLibraryItem(category, data);
+    const { category, data, isPublic } = await req.json();
+    const item = await addGlobalLibraryItem(category, data, isPublic);
     return NextResponse.json(item);
 }
 
 export async function PATCH(req: NextRequest) {
     if (!await checkAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    const { id, data } = await req.json();
-    const item = await updateGlobalLibraryItem(id, data);
+    const { id, data, isPublic } = await req.json();
+    const item = await updateGlobalLibraryItem(id, data, isPublic);
     return NextResponse.json(item);
 }
 

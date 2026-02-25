@@ -174,7 +174,43 @@ export function LibrarySidebar({
                     <span className="text-base font-black uppercase tracking-tight text-[var(--text-primary)]">
                         {activeLibraryAsset === 'product_group' ? (language === "tr" ? "ÜRÜN YÖNETİMİ" : "PRODUCT MGMT") :
                             activeLibraryAsset === 'accessories_group' ? (language === "tr" ? "AKSESUARLAR" : "ACCESSORIES") :
-                                (language === "tr" ? "SEÇİM YAP" : "SELECT ASSET")}
+                                (() => {
+                                    if (language === "tr") {
+                                        switch (internalAsset) {
+                                            case 'pose': return "Poz Kütüphanesi";
+                                            case 'model': return "Model Kütüphanesi";
+                                            case 'background': return "Arkaplan Kütüphanesi";
+                                            case 'lighting': return "Işık Kütüphanesi";
+                                            case 'shoes': return "Ayakkabı Kütüphanesi";
+                                            case 'jacket': return "Dış Giyim Kütüphanesi";
+                                            case 'bag': return "Çanta Kütüphanesi";
+                                            case 'glasses': return "Gözlük Kütüphanesi";
+                                            case 'hat': return "Şapka Kütüphanesi";
+                                            case 'jewelry': return "Takı Kütüphanesi";
+                                            case 'belt': return "Kemer Kütüphanesi";
+                                            case 'inner_wear': return "İç Giyim Kütüphanesi";
+                                            case 'fit_pattern': return "Kalıp Kütüphanesi";
+                                            default: return "Seçim Yap";
+                                        }
+                                    } else {
+                                        switch (internalAsset) {
+                                            case 'pose': return "Pose Library";
+                                            case 'model': return "Model Library";
+                                            case 'background': return "Background Library";
+                                            case 'lighting': return "Lighting Library";
+                                            case 'shoes': return "Shoes Library";
+                                            case 'jacket': return "Jacket Library";
+                                            case 'bag': return "Bag Library";
+                                            case 'glasses': return "Glasses Library";
+                                            case 'hat': return "Hat Library";
+                                            case 'jewelry': return "Jewelry Library";
+                                            case 'belt': return "Belt Library";
+                                            case 'inner_wear': return "Inner Wear Library";
+                                            case 'fit_pattern': return "Fit Library";
+                                            default: return "Select Asset";
+                                        }
+                                    }
+                                })()}
                     </span>
                 </div>
                 <Button variant="ghost" size="icon" className="h-8 w-8 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]" onClick={() => { setActiveLibraryAsset(null); setActiveGroup(null); }}>
@@ -281,26 +317,11 @@ export function LibrarySidebar({
 
                     <Tabs value={libraryTab} onValueChange={setLibraryTab} className="flex-1 flex flex-col">
                         <div className="px-3 pt-3">
-                            <TabsList className={cn("w-full grid", (['pose', 'model'].includes(internalAsset || "") || !isAdmin) ? "grid-cols-3" : "grid-cols-4")}>
-                                {/* POSE & MODEL Share the same "Library | Upload" structure */}
-                                {['pose', 'model'].includes(internalAsset || "") ? (
-                                    <>
-                                        <TabsTrigger value="library" className="text-xs col-span-2">{language === "tr" ? "Kütüphane" : "Library"}</TabsTrigger>
-                                        <TabsTrigger value="assets" className="text-xs col-span-1">{language === "tr" ? "Yükle" : "Upload"}</TabsTrigger>
-                                    </>
-                                ) : (
-                                    /* Standard or other custom tabs */
-                                    <>
-                                        <TabsTrigger value="library" className="text-xs">{language === "tr" ? "Kütüphane" : "Library"}</TabsTrigger>
-                                        <TabsTrigger value="templates" className="text-xs">{language === "tr" ? "Şablonlar" : "Templates"}</TabsTrigger>
-                                        <TabsTrigger value="assets" className="text-xs">{language === "tr" ? "Yükle" : "Upload"}</TabsTrigger>
-                                        {isAdmin && (
-                                            <TabsTrigger value="prompt" className="text-[10px] uppercase font-bold tracking-tight">
-                                                {language === "tr" ? "İSTEM" : "PROMPT"}
-                                            </TabsTrigger>
-                                        )}
-                                    </>
-                                )}
+                            <TabsList className="w-full grid grid-cols-2">
+                                <TabsTrigger value="library" className="text-xs">{language === "tr" ? "Kütüphane" : "Library"}</TabsTrigger>
+                                <TabsTrigger value="prompt" className="text-[10px] uppercase font-bold tracking-tight">
+                                    {language === "tr" ? "PROMPT" : "PROMPT"}
+                                </TabsTrigger>
                             </TabsList>
                         </div>
 
@@ -506,10 +527,12 @@ export function LibrarySidebar({
                                                                                                     {item.name || item.labelTr || item.label}
                                                                                                 </div>
                                                                                                 <div className="absolute top-1 right-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                                                    {(!isPreset || (item.isGlobal && isAdmin)) && (
-                                                                                                        <button onClick={(e) => { e.stopPropagation(); deleteSavedAsset(internalAsset!, item.id); }} className="p-1 bg-red-500 text-white rounded hover:bg-red-600"><X size={10} /></button>
+                                                                                                    {isAdmin && (
+                                                                                                        <>
+                                                                                                            <button onClick={(e) => { e.stopPropagation(); deleteSavedAsset(internalAsset!, item.id); }} className="p-1 bg-red-500 text-white rounded hover:bg-red-600"><X size={10} /></button>
+                                                                                                            <button onClick={(e) => { e.stopPropagation(); handleEditItemClick(internalAsset!, item.id); }} className="p-1 bg-[var(--accent-primary)] text-white rounded hover:bg-[var(--accent-hover)]"><Edit2 size={10} /></button>
+                                                                                                        </>
                                                                                                     )}
-                                                                                                    <button onClick={(e) => { e.stopPropagation(); handleEditItemClick(internalAsset!, item.id); }} className="p-1 bg-[var(--accent-primary)] text-white rounded hover:bg-[var(--accent-hover)]"><Edit2 size={10} /></button>
                                                                                                     {!item.isGlobal && isAdmin && addToGlobalLibrary && !isPreset && (
                                                                                                         <button
                                                                                                             onClick={(e) => {
@@ -564,12 +587,12 @@ export function LibrarySidebar({
 
                         <TabsContent value="prompt" className="flex-1 p-3">
                             <div className="space-y-2">
-                                <label className="text-xs font-medium">{language === "tr" ? "Özel İstem" : "Custom Prompt"}</label>
+                                <label className="text-xs font-medium">{language === "tr" ? "Özel Prompt" : "Custom Prompt"}</label>
                                 <textarea
                                     className="w-full h-32 p-2 text-xs rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-primary)] resize-none focus:ring-1 focus:ring-[var(--accent-primary)]"
                                     placeholder={language === "tr" ? "Tam olarak ne istediğinizi tarif edin..." : "Describe exactly what you want..."}
                                 ></textarea>
-                                <Button size="sm" className="w-full text-xs">{language === "tr" ? "İstemi Uygula" : "Apply Prompt"}</Button>
+                                <Button size="sm" className="w-full text-xs">{language === "tr" ? "Prompt'u Uygula" : "Apply Prompt"}</Button>
                                 <p className="text-[10px] text-muted-foreground mt-2">
                                     {language === "tr" ? "Bu varlık için özel prompt kullanın." : "Use a custom prompt for this asset slot."}
                                 </p>

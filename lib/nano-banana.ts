@@ -28,7 +28,7 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
             model: "nano-banana-pro",
             input: {
                 prompt: payload.prompt,
-                image_input: imageList,
+                image_input: imageList.slice(0, 14), // Limit to 14 images as requested
                 aspect_ratio: payload.aspect_ratio || "3:4",
                 resolution: payload.resolution || "1K",
                 output_format: "png",
@@ -53,8 +53,13 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
             throw new Error(`Kie API Create Task Error: ${err}`);
         }
         const createTaskData = await createTaskRes.json();
-        const taskId = createTaskData.data?.taskId;
-        if (!taskId) throw new Error("Kie API missing taskId");
+        const taskId = createTaskData?.data?.taskId || createTaskData?.taskId; // Check both common locations
+
+        if (!taskId) {
+            console.error("Kie API Response Error Structure:", JSON.stringify(createTaskData, null, 2));
+            const errorMsg = createTaskData?.message || createTaskData?.msg || createTaskData?.info || JSON.stringify(createTaskData).substring(0, 500);
+            throw new Error(`Kie API error: ${errorMsg}`);
+        }
 
         let maxRetries = 240; // Poll for up to 240 seconds (4 minutes)
         while (maxRetries > 0) {
@@ -81,11 +86,14 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
         if (!finalImageUrl) throw new Error("Kie API timeout for task ID: " + taskId);
 
     } else {
-        // DEFAULT (fal_ai)
+        const imageList = Array.isArray(payload.image_urls)
+            ? payload.image_urls
+            : Object.values(payload.image_urls);
+
         const falPayload = {
             prompt: payload.prompt,
             negative_prompt: payload.negative_prompt,
-            image_urls: payload.image_urls,
+            image_urls: imageList.slice(0, 14),
             aspect_ratio: payload.aspect_ratio || "3:4",
             resolution: payload.resolution || "1K",
             seed: payload.seed,

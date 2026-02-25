@@ -56,23 +56,38 @@ export async function POST(req: NextRequest) {
         const errors: string[] = [];
 
         // Pre-process images
+        const { getAbsoluteUrl } = await import("@/lib/s3");
         const inputImages = images && Array.isArray(images) ? images : [image];
-        const processedImages = inputImages.map((img: string) => {
+        const processedImages = await Promise.all(inputImages.map(async (img: string) => {
             let base64Data = img;
             let mimeType = "image/png";
-            if (img.includes(",")) {
+
+            if (img.startsWith("http") || img.startsWith("/")) {
+                const absoluteUrl = getAbsoluteUrl(img);
+                try {
+                    const response = await fetch(absoluteUrl);
+                    if (response.ok) {
+                        const arrayBuffer = await response.arrayBuffer();
+                        base64Data = Buffer.from(arrayBuffer).toString('base64');
+                        mimeType = response.headers.get("content-type") || "image/png";
+                    }
+                } catch (e) {
+                    console.error("Failed to fetch image for analysis:", absoluteUrl, e);
+                }
+            } else if (img.includes(",")) {
                 const parts = img.split(",");
                 const match = parts[0].match(/:(.*?);/);
                 if (match) mimeType = match[1];
                 base64Data = parts[1];
             }
+
             return {
                 inlineData: {
                     data: base64Data,
                     mimeType: mimeType
                 }
             };
-        });
+        }));
 
         for (const modelName of modelsToTry) {
             try {
