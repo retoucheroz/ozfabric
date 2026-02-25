@@ -1,4 +1,4 @@
-// Batch Generation Helper Functions for Photoshoot
+// Batch Generation Helper Functions for Photoshoot (Trigger Redeploy)
 
 export interface BatchSpec {
     view: string;
