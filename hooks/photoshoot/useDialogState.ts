@@ -80,98 +80,97 @@ export const useDialogState = (
     const handleSavePose = async (genderValue: 'male' | 'female' | 'skip') => {
         if (!tempPoseData) return;
         setShowSavePoseDialog(false);
+
+        if (genderValue === 'skip') {
+            setTempPoseData(null);
+            return;
+        }
+
         try {
-            toast.info(language === "tr" ? "Stickman oluşturuluyor..." : "Converting to Stickman...");
-            const res = await fetch("/api/pose", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ image_url: tempPoseData.original })
-            });
-            if (!res.ok) throw new Error("Stickman conversion failed");
-            const data = await res.json();
-            const stickmanUrl = data.pose_image;
-            setPoseStickman(stickmanUrl);
+            const optimizedThumb = await resizeImageToThumbnail(tempPoseData.original);
 
-            if (genderValue !== 'skip') {
-                const optimizedThumb = await resizeImageToThumbnail(tempPoseData.original);
-                let finalUrl = tempPoseData.original;
-                let finalStickmanUrl = stickmanUrl;
+            const tags = [];
+            if (poseFocus === 'upper') tags.push('ust_beden');
+            if (poseFocus === 'full') tags.push('tam_boy');
 
-                if (process.env.NEXT_PUBLIC_USE_R2_UPLOAD === "true") {
-                    try {
-                        toast.info(language === "tr" ? "Poz buluta kaydediliyor..." : "Saving pose to cloud...");
-                        const serverUpload = async (b64: string, name: string) => {
-                            const res = await fetch("/api/r2/upload", {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ base64: b64, fileName: name, folder: "poses" })
-                            });
-                            if (!res.ok) throw new Error("Server upload failed");
-                            const data = await res.json();
-                            return data.url;
-                        };
+            // 1. Add to library IMMEDIATELY with a processing placeholder
+            const newPoseId = crypto.randomUUID();
+            const newPose: SavedPose = {
+                id: newPoseId,
+                url: tempPoseData.original,
+                name: language === "tr" ? "Yeni Poz" : "New Pose",
+                thumbUrl: optimizedThumb,
+                originalThumb: optimizedThumb,
+                stickmanUrl: "processing", // placeholder — shows loading indicator
+                gender: genderValue,
+                customPrompt: undefined,
+                tags,
+                createdAt: Date.now()
+            };
+            setSavedPoses((prev: SavedPose[]) => [newPose, ...prev]);
+            await dbOperations.add(STORES.POSES, newPose);
+            toast.success(language === "tr" ? "Poz kütüphaneye eklendi" : "Pose added to library");
+            setTempPoseData(null);
 
-                        const [r2Url, r2Stickman] = await Promise.all([
-                            serverUpload(tempPoseData.original, "pose_original.png"),
-                            serverUpload(stickmanUrl, "pose_stickman.png")
-                        ]);
-                        finalUrl = r2Url;
-                        finalStickmanUrl = r2Stickman;
-                    } catch (r2Error) {
-                        console.error("R2 Pose Upload Error:", r2Error);
-                        toast.error(language === "tr" ? "Buluta kaydedilemedi, yerel hafızaya alınıyor." : "Cloud save failed, using local storage.");
-                    }
-                }
-
-                let autoPrompt = "";
+            // 2. Run stickman + analyze in background (non-blocking)
+            (async () => {
                 try {
-                    toast.info(language === "tr" ? "Poz analiz ediliyor..." : "Analyzing pose...");
-                    const resAnalyze = await fetch("/api/analyze", {
+                    toast.info(language === "tr" ? "Stickman oluşturuluyor..." : "Converting to stickman...");
+                    const res = await fetch("/api/pose", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ image: finalStickmanUrl, type: 'pose', language })
+                        body: JSON.stringify({ image_url: tempPoseData.original })
                     });
-                    const analyzeData = await resAnalyze.json();
-                    if (analyzeData?.data?.description) {
-                        autoPrompt = analyzeData.data.description;
+                    if (!res.ok) throw new Error("Stickman conversion failed");
+                    const data = await res.json();
+                    const stickmanUrl = data.pose_image;
+                    setPoseStickman(stickmanUrl);
+
+                    // Analyze the stickman for auto-prompt
+                    let autoPrompt = "";
+                    try {
+                        const resAnalyze = await fetch("/api/analyze", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ image: stickmanUrl, type: 'pose', language })
+                        });
+                        const analyzeData = await resAnalyze.json();
+                        if (analyzeData?.data?.description) {
+                            autoPrompt = analyzeData.data.description;
+                        }
+                    } catch (e) {
+                        console.error("Pose analysis failed:", e);
                     }
-                } catch (e) {
-                    console.error("Pose analysis failed:", e);
+
+                    // 3. Update the pose entry with real stickman + prompt
+                    const updatedPose: SavedPose = {
+                        ...newPose,
+                        stickmanUrl,
+                        customPrompt: autoPrompt || undefined
+                    };
+                    setSavedPoses((prev: SavedPose[]) => prev.map((p: SavedPose) => p.id === newPoseId ? updatedPose : p));
+                    await dbOperations.add(STORES.POSES, updatedPose); // add() uses store.put() = upsert
+
+                    setAssets((prev: any) => ({ ...prev, pose: newPose.url }));
+                    if (autoPrompt) setPoseDescription(autoPrompt);
+                    setPoseStickman(stickmanUrl);
+                    toast.success(language === "tr" ? "Stickman hazır!" : "Stickman ready!");
+                } catch (bgErr) {
+                    console.error("Background stickman failed:", bgErr);
+                    // Update pose to show stickman failed (remove processing state)
+                    const failedPose: SavedPose = { ...newPose, stickmanUrl: "" };
+                    setSavedPoses((prev: SavedPose[]) => prev.map((p: SavedPose) => p.id === newPoseId ? failedPose : p));
+                    await dbOperations.add(STORES.POSES, failedPose); // upsert
+                    toast.error(language === "tr" ? "Stickman oluşturulamadı" : "Stickman conversion failed");
                 }
+            })();
 
-                const tags = [];
-                if (poseFocus === 'upper') tags.push('ust_beden');
-                if (poseFocus === 'full') tags.push('tam_boy');
-
-                const newPose: SavedPose = {
-                    id: crypto.randomUUID(),
-                    url: finalUrl,
-                    name: language === "tr" ? "Yeni Poz" : "New Pose",
-                    thumbUrl: optimizedThumb,
-                    originalThumb: optimizedThumb,
-                    stickmanUrl: finalStickmanUrl,
-                    gender: genderValue,
-                    customPrompt: autoPrompt || undefined,
-                    tags,
-                    createdAt: Date.now()
-                };
-                const updated = [newPose, ...savedPoses];
-                setSavedPoses(updated);
-                await dbOperations.add(STORES.POSES, newPose);
-                toast.success(language === "tr" ? "Poz kütüphaneye kaydedildi" : "Pose saved to library");
-
-                setAssets((prev: any) => ({ ...prev, pose: finalUrl }));
-                if (autoPrompt) {
-                    setPoseDescription(autoPrompt);
-                }
-                setPoseStickman(finalStickmanUrl);
-            }
-            setTempPoseData(null);
         } catch (e) {
             console.error(e);
-            toast.error("Failed to convert/save pose");
+            toast.error("Failed to save pose");
         }
     };
+
 
     // MODEL HANDLER
     const handleSaveModel = async () => {

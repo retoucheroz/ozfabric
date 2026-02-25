@@ -365,14 +365,24 @@ export function LibrarySidebar({
                                                     return true;
                                                 }).map(pose => {
                                                     const isPoseSelected = selectedPoseUrl && pose.url === selectedPoseUrl;
+                                                    const isProcessing = (pose as any).stickmanUrl === 'processing';
                                                     return (
                                                         <div key={pose.id} className={cn(
-                                                            "group relative aspect-[2/3] rounded-lg border overflow-hidden cursor-pointer transition-all shrink-0",
+                                                            "group relative aspect-[2/3] rounded-lg border overflow-hidden transition-all shrink-0",
+                                                            isProcessing ? "cursor-wait" : "cursor-pointer",
                                                             isPoseSelected
                                                                 ? "ring-2 ring-green-500 border-green-500 shadow-lg shadow-green-500/20"
                                                                 : "bg-card hover:ring-2 hover:ring-violet-500"
                                                         )}>
-                                                            <img src={pose.thumbUrl || pose.originalThumb} className="w-full h-full object-cover" onClick={() => handleSavedPoseClick(pose)} />
+                                                            <img src={pose.thumbUrl || pose.originalThumb} className="w-full h-full object-cover" onClick={() => !isProcessing && handleSavedPoseClick(pose)} />
+                                                            {isProcessing && (
+                                                                <div className="absolute inset-0 bg-black/65 flex flex-col items-center justify-center gap-2 pointer-events-none">
+                                                                    <div className="w-5 h-5 border-2 border-violet-400 border-t-transparent rounded-full animate-spin" />
+                                                                    <span className="text-[8px] text-violet-300 font-bold text-center px-1 leading-tight">
+                                                                        {language === "tr" ? "Stickman hazırlanıyor" : "Creating stickman"}
+                                                                    </span>
+                                                                </div>
+                                                            )}
                                                             <div className={cn(
                                                                 "absolute bottom-0 inset-x-0 p-1 text-[9px] text-white truncate flex items-center gap-1",
                                                                 isPoseSelected ? "bg-green-600/80" : "bg-black/60"

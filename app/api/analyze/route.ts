@@ -114,52 +114,35 @@ export async function POST(req: NextRequest) {
 
 
                 if (type === 'pose') {
-                    prompt = `${langInstruction} ${multiImageContext} 
-                    You are an expert fashion photographer, stylist, and prompt engineer. Analyze this stickman/pose image and describe it in a SINGLE PARAGRAPH.
-                    
-                    Follow these rules EXACTLY:
+                    prompt = `${langInstruction}
+You are an expert AI image generation prompt engineer specializing in human pose description.
+Analyze the stickman/pose skeleton image and produce a structured pose prompt using EXACTLY this format with these 5 section headers. Be concise and precise — every word must be useful for an image generation model. NO JSON. NO degrees. NO percentages. NO anatomical jargon. Plain descriptive English only.
 
-                    Pose Behavior (internal understanding only):
-                    Translate pose visually, not mathematically.
-                    No degrees. No percentages. No anatomy jargon.
+OUTPUT FORMAT (use exactly these headers):
 
-                    1) STRUCTURAL ANATOMY LOCK
-                    Preserve bone structure, proportions, natural asymmetry.
-                    No gender, hair, clothing description.
+STRUCTURAL ANATOMY LOCK
+[2-3 sentences about proportions, spine alignment, shoulder/hip balance. Do not mention clothing, hair, or gender.]
 
-                    2) FRAME PLACEMENT & SCALE
-                    - Maintain original subject-to-frame proportion
-                    - Remain secondary if environmental
-                    - Keep camera distance consistent
-                    - Do not allow subject to fill frame
-                    - Preserve negative space
+FRAME PLACEMENT & SCALE
+[1-2 sentences about where the subject sits in frame, framing type (full body / cowboy shot / etc), camera distance impression.]
 
-                    3) ANCHOR CONTACTS
-                    (Note points of contact with ground/props)
+ANCHOR CONTACTS
+[1-2 sentences about feet placement, ground contact, weight distribution, any hand/prop contacts.]
 
-                    4) POSE DESCRIPTION (VISUAL LANGUAGE ONLY)
-                    - Body slightly turned or angled
-                    - Weight resting more on one leg if visible
-                    - Hips shifted if present
-                    - Shoulders relaxed or squared
-                    - Arms relaxed / bent / resting
-                    - Head turned or facing camera
-                    - Chin slightly lowered or lifted
-                    - Eye direction
-                    - Emotional tone
+POSE DESCRIPTION (VISUAL LANGUAGE ONLY)
+[3-6 sentences describing body angle, torso direction, each arm position step by step (upper arm → elbow → wrist → hand/fingers), leg stance, head direction, chin angle, eye direction, emotional tone. Be specific: "left hand rests on hip, fingers curled inward", "right arm hangs straight at side", "hand in pocket", "arm raised", etc.]
 
-                    No degrees. No percentages. No anatomical terminology.
+GRAVITY & PROPORTION SAFEGUARDS
+[1-2 sentences ensuring no floating limbs, no distortion, natural weight distribution, stable stance.]
 
-                    5) GRAVITY & PROPORTION SAFEGUARDS
-                    - No elongation
-                    - No floating feet
-                    - No distortion
-                    - Maintain natural balance
-                    
-                    JSON Response Format:
-                    {
-                        "description": "[SINGLE PARAGRAPH POSE DESCRIPTION FOLLOWNG THE RULES OVERWRITING ANY PREVIOUS STYLE]"
-                    }`;
+---RULES---
+- Each section: 1 to 4 sentences max.
+- Total output: under 200 words.
+- No JSON, no brackets, no markdown bullets.
+- No mention of clothing, skin, hair, or gender.
+- Use directional language: left/right, forward/back, up/down.
+- Describe HANDS AND FINGERS explicitly when visible.
+- Mention "hands in pockets", "arms crossed", "hand raised", "holding hair" etc if present.`;
                 } else if (type === 'background') {
                     prompt = `${langInstruction} ${multiImageContext}
                     You are an expert location scout and set designer.

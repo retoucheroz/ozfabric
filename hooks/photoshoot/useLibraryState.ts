@@ -82,26 +82,28 @@ export const useLibraryState = (
             const innerWears = await dbOperations.getAll<SavedInnerWear>(STORES.INNER_WEAR);
             setSavedInnerWears(innerWears.sort((a, b) => b.createdAt - a.createdAt));
 
-            // Fetch Global Library
             try {
                 const globalRes = await fetch('/api/admin/library');
                 if (globalRes.ok) {
                     const globals = await globalRes.json();
                     globals.forEach((item: any) => {
                         const data = { ...item.data, id: item.id, isGlobal: true };
-                        if (item.category === 'pose') setSavedPoses(prev => [data, ...prev]);
-                        else if (item.category === 'model') setSavedModels(prev => [data, ...prev]);
-                        else if (item.category === 'background') setSavedBackgrounds(prev => [data, ...prev]);
-                        else if (item.category === 'fit_pattern') setSavedFits(prev => [data, ...prev]);
-                        else if (item.category === 'shoes') setSavedShoes(prev => [data, ...prev]);
-                        else if (item.category === 'jacket') setSavedJackets(prev => [data, ...prev]);
-                        else if (item.category === 'bag') setSavedBags(prev => [data, ...prev]);
-                        else if (item.category === 'glasses') setSavedGlasses(prev => [data, ...prev]);
-                        else if (item.category === 'hat') setSavedHats(prev => [data, ...prev]);
-                        else if (item.category === 'jewelry') setSavedJewelry(prev => [data, ...prev]);
-                        else if (item.category === 'belt') setSavedBelts(prev => [data, ...prev]);
-                        else if (item.category === 'inner_wear') setSavedInnerWears(prev => [data, ...prev]);
-                        else if (item.category === 'lighting') setSavedLightings(prev => [data, ...prev]);
+                        const isDup = (existing: any[]) =>
+                            existing.some(e => e.id === item.id || (e.thumbUrl && e.thumbUrl === data.thumbUrl));
+
+                        if (item.category === 'pose') setSavedPoses(prev => isDup(prev) ? prev.map(e => e.id === item.id ? { ...e, isGlobal: true } : e) : [data, ...prev]);
+                        else if (item.category === 'model') setSavedModels(prev => isDup(prev) ? prev : [data, ...prev]);
+                        else if (item.category === 'background') setSavedBackgrounds(prev => isDup(prev) ? prev : [data, ...prev]);
+                        else if (item.category === 'fit_pattern') setSavedFits(prev => isDup(prev) ? prev : [data, ...prev]);
+                        else if (item.category === 'shoes') setSavedShoes(prev => isDup(prev) ? prev : [data, ...prev]);
+                        else if (item.category === 'jacket') setSavedJackets(prev => isDup(prev) ? prev : [data, ...prev]);
+                        else if (item.category === 'bag') setSavedBags(prev => isDup(prev) ? prev : [data, ...prev]);
+                        else if (item.category === 'glasses') setSavedGlasses(prev => isDup(prev) ? prev : [data, ...prev]);
+                        else if (item.category === 'hat') setSavedHats(prev => isDup(prev) ? prev : [data, ...prev]);
+                        else if (item.category === 'jewelry') setSavedJewelry(prev => isDup(prev) ? prev : [data, ...prev]);
+                        else if (item.category === 'belt') setSavedBelts(prev => isDup(prev) ? prev : [data, ...prev]);
+                        else if (item.category === 'inner_wear') setSavedInnerWears(prev => isDup(prev) ? prev : [data, ...prev]);
+                        else if (item.category === 'lighting') setSavedLightings(prev => isDup(prev) ? prev : [data, ...prev]);
                     });
                 }
             } catch (err) {
