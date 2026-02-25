@@ -335,7 +335,23 @@ export function LibrarySidebar({
                                                 <User size={12} className={g === 'female' ? 'text-pink-500' : 'text-blue-500'} />
                                                 {g === 'female' ? "Female Poses" : "Male Poses"}
                                             </h4>
-                                            <div className="grid grid-cols-3 gap-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
+                                            <div className="grid grid-cols-3 gap-2 min-h-[140px] overflow-y-auto custom-scrollbar pr-1">
+                                                <div className="aspect-[2/3] shrink-0">
+                                                    <BaseAssetCard
+                                                        id="pose"
+                                                        label={language === "tr" ? "YENİ" : "NEW"}
+                                                        icon={ScanLine}
+                                                        assets={{}}
+                                                        activeLibraryAsset={null}
+                                                        setActiveLibraryAsset={() => { }}
+                                                        handleAssetUpload={handleAssetUpload}
+                                                        handleAssetRemove={() => { }}
+                                                        language={language}
+                                                        variant="portrait"
+                                                        description={language === "tr" ? "EKLE" : "ADD"}
+                                                        hideLibrary={true}
+                                                    />
+                                                </div>
                                                 {savedPoses.filter(p => {
                                                     const isGenderMatch = p.gender === g;
                                                     if (!isGenderMatch) return false;
@@ -368,8 +384,12 @@ export function LibrarySidebar({
                                                                 }
                                                             </div>
                                                             <div className="absolute top-1 right-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                {(!pose.isGlobal || isAdmin) && <button onClick={(e) => { e.stopPropagation(); deleteSavedPose(pose.id); }} className="p-1 bg-red-500 text-white rounded hover:bg-red-600"><X size={10} /></button>}
-                                                                <button onClick={(e) => { e.stopPropagation(); handleEditItemClick('pose', pose.id); }} className="p-1 bg-[var(--accent-primary)] text-white rounded hover:bg-[var(--accent-hover)]"><Edit2 size={10} /></button>
+                                                                {(!pose.isGlobal || isAdmin) && (
+                                                                    <>
+                                                                        <button onClick={(e) => { e.stopPropagation(); deleteSavedPose(pose.id); }} className="p-1 bg-red-500 text-white rounded hover:bg-red-600"><X size={10} /></button>
+                                                                        <button onClick={(e) => { e.stopPropagation(); handleEditItemClick('pose', pose.id); }} className="p-1 bg-[var(--accent-primary)] text-white rounded hover:bg-[var(--accent-hover)]"><Edit2 size={10} /></button>
+                                                                    </>
+                                                                )}
                                                                 {!pose.isGlobal && isAdmin && addToGlobalLibrary && (
                                                                     <button
                                                                         onClick={(e) => {
@@ -411,6 +431,22 @@ export function LibrarySidebar({
                             ) : (['background', 'fit_pattern', 'inner_wear', 'shoes', 'lighting', 'jacket', 'bag', 'glasses', 'hat', 'jewelry', 'belt'].includes(internalAsset || '')) ? (
                                 <div className="space-y-4 h-[calc(100vh-280px)] flex flex-col">
                                     <div className="grid grid-cols-3 gap-2 overflow-y-auto custom-scrollbar pr-1 pb-10">
+                                        <div className="aspect-square shrink-0">
+                                            <BaseAssetCard
+                                                id={internalAsset!}
+                                                label={language === "tr" ? "YENİ" : "NEW"}
+                                                icon={internalAsset === 'lighting' ? RotateCw : Camera}
+                                                assets={{}}
+                                                activeLibraryAsset={null}
+                                                setActiveLibraryAsset={() => { }}
+                                                handleAssetUpload={handleAssetUpload}
+                                                handleAssetRemove={() => { }}
+                                                language={language}
+                                                variant="square"
+                                                description={language === "tr" ? "EKLE" : "ADD"}
+                                                hideLibrary={true}
+                                            />
+                                        </div>
                                         {(internalAsset === 'background' ? [...savedBackgrounds, ...BACKGROUND_PRESETS.filter(bp => !savedBackgrounds.some(sb => sb.id === bp.id))] :
                                             internalAsset === 'fit_pattern' ? savedFits :
                                                 internalAsset === 'lighting' ? [...savedLightings, ...LIGHTING_PRESETS.filter(lp => !savedLightings.some(sl => sl.id === lp.id))] :
@@ -527,7 +563,7 @@ export function LibrarySidebar({
                                                                                                     {item.name || item.labelTr || item.label}
                                                                                                 </div>
                                                                                                 <div className="absolute top-1 right-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                                                    {isAdmin && (
+                                                                                                    {(!isPreset && (isAdmin || !item.isGlobal)) && (
                                                                                                         <>
                                                                                                             <button onClick={(e) => { e.stopPropagation(); deleteSavedAsset(internalAsset!, item.id); }} className="p-1 bg-red-500 text-white rounded hover:bg-red-600"><X size={10} /></button>
                                                                                                             <button onClick={(e) => { e.stopPropagation(); handleEditItemClick(internalAsset!, item.id); }} className="p-1 bg-[var(--accent-primary)] text-white rounded hover:bg-[var(--accent-hover)]"><Edit2 size={10} /></button>

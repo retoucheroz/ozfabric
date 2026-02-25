@@ -226,7 +226,7 @@ export async function POST(req: NextRequest) {
         }
 
         // 1. Determine Workflow Type
-        const lowerName = productName.toLowerCase();
+        const lowerName = (productName || "").toLowerCase();
         let workflowType = requestedWorkflowType || 'upper';
 
         const lowerKeywords = ['pantolon', 'şort', 'etek', 'tayt', 'jean', 'trousers', 'skirt', 'shorts', 'leggings', 'joggers', 'denim'];
@@ -513,7 +513,7 @@ export async function POST(req: NextRequest) {
             let currentProductDesc = productDescription; // Use local variable
 
             if (!structuredPrompt._is_user_edited) {
-                const nameLower = productName.toLowerCase();
+                const nameLower = (productName || "").toLowerCase();
                 let descLower = currentProductDesc ? currentProductDesc.toLowerCase() : "";
 
                 // 1. DENIM / JEANS Override

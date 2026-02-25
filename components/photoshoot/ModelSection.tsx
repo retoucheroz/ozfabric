@@ -54,7 +54,26 @@ export function ModelSection({
                             <User size={12} className={g === 'female' ? 'text-pink-500' : 'text-blue-500'} />
                             {g === 'female' ? (language === "tr" ? "Kadın Stüdyolar" : "Female Studios") : (language === "tr" ? "Erkek Stüdyolar" : "Male Studios")}
                         </h4>
-                        <div className="grid grid-cols-3 gap-2 max-h-[400px] overflow-y-auto custom-scrollbar pr-1">
+                        <div className="grid grid-cols-3 gap-2 min-h-[140px] overflow-y-auto custom-scrollbar pr-1">
+                            <div className="aspect-[2/3] shrink-0">
+                                <AssetCard
+                                    id="model"
+                                    label={language === "tr" ? "YENİ" : "NEW"}
+                                    icon={TbUserCircle}
+                                    assets={{}}
+                                    activeLibraryAsset={null}
+                                    setActiveLibraryAsset={() => { }}
+                                    handleAssetUpload={(id, file) => {
+                                        setGender(g as any);
+                                        handleAssetUpload(id, file);
+                                    }}
+                                    handleAssetRemove={() => { }}
+                                    language={language}
+                                    variant="portrait"
+                                    description={language === "tr" ? "EKLE" : "ADD"}
+                                    hideLibrary={true}
+                                />
+                            </div>
                             {[...MODEL_PRESETS, ...savedModels].filter(m => m.gender === g).map(model => {
                                 const isPreset = MODEL_PRESETS.some(p => p.id === model.id);
                                 return (
@@ -74,8 +93,12 @@ export function ModelSection({
                                             {model.name}
                                         </div>
                                         <div className="absolute top-1 right-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            {(!isPreset || (model.isGlobal && isAdmin)) && deleteSavedModel && <button onClick={(e) => { e.stopPropagation(); deleteSavedModel(model.id); }} className="p-1 bg-red-500 text-white rounded hover:bg-red-600"><X size={10} /></button>}
-                                            {!isPreset && handleEditItemClick && <button onClick={(e) => { e.stopPropagation(); handleEditItemClick('model', model.id); }} className="p-1 bg-[var(--accent-primary)] text-white rounded hover:bg-[var(--accent-hover)]"><Edit2 size={10} /></button>}
+                                            {(!isPreset && (!model.isGlobal || isAdmin)) && (
+                                                <>
+                                                    {deleteSavedModel && <button onClick={(e) => { e.stopPropagation(); deleteSavedModel(model.id); }} className="p-1 bg-red-500 text-white rounded hover:bg-red-600"><X size={10} /></button>}
+                                                    {handleEditItemClick && <button onClick={(e) => { e.stopPropagation(); handleEditItemClick('model', model.id); }} className="p-1 bg-[var(--accent-primary)] text-white rounded hover:bg-[var(--accent-hover)]"><Edit2 size={10} /></button>}
+                                                </>
+                                            )}
                                             {!model.isGlobal && isAdmin && addToGlobalLibrary && (
                                                 <button
                                                     onClick={(e) => {
