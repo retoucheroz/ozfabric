@@ -292,7 +292,7 @@ export async function POST(req: NextRequest) {
                 if (imgs.main_product) assets.push(imgs.main_product);
                 if (imgs.top_front) assets.push(imgs.top_front);
                 if (imgs.dress_front) assets.push(imgs.dress_front);
-                if (imgs.inner_wear) assets.push(imgs.inner_wear);
+                if (imgs.inner_wear && buttonsOpen) assets.push(imgs.inner_wear);
                 if (imgs.bottom_front && focus !== 'closeup') assets.push(imgs.bottom_front);
                 if (imgs.jacket) assets.push(imgs.jacket);
                 if (imgs.belt && !excludeBeltAsset && focus !== 'closeup') assets.push(imgs.belt);
@@ -419,7 +419,7 @@ export async function POST(req: NextRequest) {
 
                 styling: {
                     buttons: buttonsOpen ? "open" : "closed",
-                    tucked: tucked,
+                    tucked: tucked ? 'tucked' : 'untucked',
                     sleeves_rolled: sleevesRolled, // NEW
                     "inner_wear": uploadedImages.inner_wear ? {
                         visible: true,
@@ -821,19 +821,17 @@ export async function POST(req: NextRequest) {
             if (canShowWaistRiseFitTuck) {
                 if (sp.garment.details?.waist) productBlock.push(`Waist: ${sp.garment.details.waist}.`);
                 // Tucking / Untucked (Highest Priority for fit/silhouette)
-                if (wf === 'upper' || wf === 'dress' || wf === 'set') {
-                    if (sp.styling.tucked === 'tucked') {
-                        productBlock.push(`[TUCK_CONSTRAINTS]\nThe main TOP garment must be tucked into the bottom garment.\nFabric enters the waistband around the full perimeter.\nThe waistband of the bottom garment should be visible.\n[/TUCK_CONSTRAINTS]`);
-                    } else if (sp.styling.tucked === 'untucked') {
-                        productBlock.push(`[ANTI_TUCK_CONSTRAINTS]\nThe main TOP garment must remain outside the bottom garment, covering the waistband.\nThe hem of the top garment should overlap and conceal the belt-line and pocket openings of the bottom garment.\n[/ANTI_TUCK_CONSTRAINTS]`);
-                    }
+                if (sp.styling.tucked === 'tucked') {
+                    productBlock.push(`Style Adjustment: Tucked in, waistband is visible.`);
+                } else if (sp.styling.tucked === 'untucked') {
+                    productBlock.push(`Style Adjustment: MANDATORY - Untucked. The hem of the garment MUST hang loose OVER the pants, completely covering the waistband and belt area. The hem is fully visible and NOT tucked in.`);
                 }
 
                 if (wf === 'lower' && sp.styling.layers.upper_garment?.visible) {
                     if (sp.styling.tucked === 'tucked') {
-                        productBlock.push(`[TUCK_CONSTRAINTS]\nThe visible top garment is tucked into these pants.\nThe waistband is clearly visible.\n[/TUCK_CONSTRAINTS]`);
+                        productBlock.push(`Style Adjustment: Tucked in, waistband is visible.`);
                     } else if (sp.styling.tucked === 'untucked') {
-                        productBlock.push(`[ANTI_TUCK_CONSTRAINTS]\nThe visible top garment is untucked, hanging over the waistband of these pants.\nThe top garment hem covers the waist and pocket area.\n[/ANTI_TUCK_CONSTRAINTS]`);
+                        productBlock.push(`Style Adjustment: MANDATORY - Untucked. The hem of the garment MUST hang loose OVER the pants, completely covering the waistband and belt area. The hem is fully visible and NOT tucked in.`);
                     }
                 }
 
@@ -907,8 +905,10 @@ export async function POST(req: NextRequest) {
             }
 
             // === PRIORITY 3: POSE GEOMETRY (structured [POSE] block) ===
+            const angleLabel = view.includes('back') ? "BACK VIEW" : (view.includes('side') || view.includes('angled') ? "THREE-QUARTER FRONT VIEW" : (view.includes('closeup') ? "CLOSE-UP FRONT VIEW" : (view.includes('detail') ? (view.includes('front') ? "DETAIL FRONT VIEW" : "DETAIL BACK VIEW") : "FRONT VIEW")));
             const poseBlock: string[] = [];
             poseBlock.push(`[POSE]`);
+            poseBlock.push(`View Angle: ${angleLabel}.`);
             poseBlock.push(`Subject: Professional ${sp.subject.type} (Strictly match provided identity).`);
 
             if (sp.pose.description) {
@@ -960,9 +960,9 @@ export async function POST(req: NextRequest) {
                 }
             }
 
-            if (sp.styling.inner_wear?.visible && canShowCollarHairButtons) {
+            if (sp.styling.inner_wear?.visible && canShowCollarHairButtons && sp.styling.buttons === 'open') {
                 const innerDesc = clean(sp.styling.inner_wear.description);
-                stylingItems.push(`base layer${innerDesc ? ` (${innerDesc})` : ""} is visible`);
+                stylingItems.push(`base layer${innerDesc ? ` (${innerDesc})` : ""} is visible under the open front`);
             }
 
             // Sleeves Logic
