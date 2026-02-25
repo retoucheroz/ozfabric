@@ -115,23 +115,27 @@ export async function POST(req: NextRequest) {
 
                 if (type === 'pose') {
                     prompt = `${langInstruction}
-Role: You are a Senior Computer Vision Engineer for Virtual Try-On systems. Your mission is to map human skeletal geometry with surgical precision.
+Role: You are a Technical Computer Vision Specialist for Fashion VTO. Your sole function is to extract a "High-Fidelity Pose Map" from any image and translate it into a technical prompt specifically optimized for the Nano Banana Pro engine.
 
-STRICT ANALYSIS RULES:
-1. No Assumptions: If arms are bent, do not label them as 'extended'. Locate the elbows precisely.
-2. Interaction Mapping: Explicitly define if hands are touching the torso, clothing, or each other. This is critical for fabric displacement.
-3. Negative Space: Identify the gaps between the torso and the arms. If there is no gap (overlap), state it clearly.
-4. Action-State: Describe the pose as an action (e.g., 'buttoning a garment at chest level') to help the AI understand the muscle tension.
+Analysis & Translation Rules:
+1. No Numerical Angles: Never use degrees (e.g., 45°). Use descriptive geometry:
+   - Acute bend: "Sharply bent," "acute-angle flex."
+   - 90-degree bend: "Perpendicular," "L-shaped," "Right-angle bend."
+   - Straight: "Fully extended," "locked joints," "stiff alignment."
+2. Contact & Collision (Critical for VTO):
+   - Identify if hands/arms are touching the torso or other limbs. Use terms like "high-contact overlap" or "direct hand-to-fabric interaction."
+   - If there is a gap between arms and body, use "high-separation silhouette" or "unobstructed torso."
+3. Anatomic Anchors: Focus on the "Clavicle" (Shoulder height), "Lumbar" (Lower back), and "Pelvis" (Hip tilt).
+4. Action Context: Describe the pose through muscle tension (e.g., "shoulders hunched forward," "rigid vertical stance").
 
-Strict Output Format:
+Output Format (Strictly English):
 
-[POSE_ISOLATION_PROMPT]
-Skeletal Framing: [Full-frontal/Slight tilt], [Shoulder alignment - e.g., slightly hunched or squared].
-Arm & Elbow Geometry: [Elbow flex angle], [Upper arm position relative to torso - e.g., arms flared or tucked].
-Hands & Manual Interaction: [EXTREMELY DETAILED: e.g., Both hands brought to center-chest, fingers engaged in buttoning motion, wrists flexed inward].
-Lower Body Alignment: [Hip tilt], [Knee lock status], [Leg spacing].
-Head/Neck Vector: [Chin height], [Neck elongation], [Eye-contact status].
-VTO Topology: [CRITICAL: Describe overlaps between arms and torso to prevent fabric merging glitches].
+[NANO_BANANA_PRO_POSE]
+Baseline Geometry: [e.g., Full-frontal verticality, slight spinal S-curve, squared shoulders].
+Upper Limb Map: [e.g., Arms sharply bent at elbows, forearms angled toward the solar plexus, hands overlapping at the center-line].
+Lower Limb Map: [e.g., Stiff-legged stance, weight shifted to the right hip, knees locked, feet facing forward].
+Head & Neck Axis: [e.g., Head canted slightly to the side, chin tucked, neutral eye-level gaze].
+VTO Topo-Constraints: [e.g., Clean separation of limbs for masking / High overlap on the chest area / Hidden hands behind the lumbar].
 [END_PROMPT]`;
                 } else if (type === 'background') {
                     prompt = `${langInstruction} ${multiImageContext}
