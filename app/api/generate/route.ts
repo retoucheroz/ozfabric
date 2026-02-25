@@ -126,7 +126,7 @@ export async function POST(req: NextRequest) {
         if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
         const body = await req.json();
-        const {
+        let {
             productName,
             workflowType: requestedWorkflowType,
             uploadedImages: rawUploadedImages,
@@ -203,9 +203,15 @@ export async function POST(req: NextRequest) {
         // One-time random seed for consistency across angles
         const requestSeed = (seed !== null && seed !== undefined) ? Number(seed) : Math.floor(Math.random() * 1000000000);
 
+        // Ensure poseStickman is an R2 URL
+        if (poseStickman) {
+            let { ensureR2Url } = await import("@/lib/s3");
+            poseStickman = await ensureR2Url(poseStickman, "poses");
+        }
+
         // === R2 INPUT SANITIZATION ===
         // Ensure all input images are R2 URLs, not base64 strings
-        const { ensureR2Url } = await import("@/lib/s3");
+        let { ensureR2Url } = await import("@/lib/s3");
         const sanitizedData = await Promise.all(
             Object.entries(rawUploadedImages || {}).map(async ([key, value]) => {
                 if (typeof value === 'string' && value) {
@@ -217,7 +223,9 @@ export async function POST(req: NextRequest) {
         const uploadedImages = Object.fromEntries(sanitizedData);
 
         // Determine derived shot role if not explicitly provided
-        const effectiveRole = shotRole || (isStylingShot && !isAngles && poseFocus !== 'detail' && poseFocus !== 'closeup' ? 'styling' : 'technical');
+        // Check if angleId is a technical angle (starts with std_tech_)
+        const isTechnicalAngle = angleId && angleId.startsWith('std_tech_');
+        const effectiveRole = shotRole || ((isStylingShot && !isAngles && poseFocus !== 'detail' && poseFocus !== 'closeup' && !isTechnicalAngle) ? 'styling' : 'technical');
 
         // === SAFETY: Ensure raw 'pose' image is NEVER included in input_images ===
         // We only use 'poseStickman' for pose control later.
@@ -578,7 +586,9 @@ export async function POST(req: NextRequest) {
             } else {
                 // Technical angles (front, side, back)
                 structuredPrompt.camera.angle = view as string;
-                structuredPrompt.pose.dynamic = false;
+                // If it's a technical angle or shotRole is technical, disable dynamic behavior
+                const isTechnicalAngle = angleId && angleId.startsWith('std_tech_');
+                structuredPrompt.pose.dynamic = (isStylingShot && !isTechnicalAngle);
 
                 // Only provide technical reference if no specific pose description is provided
                 if (!poseDescription) {
@@ -800,12 +810,34 @@ export async function POST(req: NextRequest) {
             }
             if (canShowWaistRiseFitTuck) {
                 if (sp.garment.details?.waist) productBlock.push(`Waist: ${sp.garment.details.waist}.`);
-                if (sp.garment.details?.rise) productBlock.push(`Rise: ${sp.garment.details.rise}.`);
-                if (sp.styling.tucked) {
-                    productBlock.push(`[TUCK_CONSTRAINTS]\nSTRICT: The main TOP garment must be fully tucked into the bottom garment.\nAll front, side, and back fabric panels must be inserted inside the waistband.\nNo fabric may hang outside below the waistline.\nNo partial tuck. No loose hem. No outer drape below the waistband.\nThe waistband must be fully visible and clearly defined.\nThe top garment must enter the waistband opening around the full 360° perimeter.\nFabric inside the waistband should show natural compression and slight blouse effect above the waistline.\nNo external hem visibility below the waistband at any point.\n[/TUCK_CONSTRAINTS]`);
-                } else if (wf === 'upper' || wf === 'set') {
-                    productBlock.push(`[ANTI_TUCK_CONSTRAINTS]\nSTRICT: The main TOP garment (upper-body garment) must remain 100% OUTSIDE the bottom garment.\nNo partial tuck. No half-tuck. No French tuck.\nNo front-in, side-in, or back-in styling.\nNo fabric from the top garment may enter the bottom garment waistband opening at any point.\nThe bottom waistband must remain fully covered by the top garment around the full 360° perimeter.\nThe top hem must overlap the waistband by at least 4–8 cm everywhere.\n[/ANTI_TUCK_CONSTRAINTS]`);
+                // Tucking / Untucked (Highest Priority for fit/silhouette)
+                if (wf === 'upper' || wf === 'dress' || wf === 'set') {
+                    if (sp.styling.tucked === 'tucked') {
+                        productBlock.push(`[TUCK_CONSTRAINTS]\nThe main TOP garment must be tucked into the bottom garment.\nFabric enters the waistband around the full perimeter.\nThe waistband of the bottom garment should be visible.\n[/TUCK_CONSTRAINTS]`);
+                    } else if (sp.styling.tucked === 'untucked') {
+                        productBlock.push(`[ANTI_TUCK_CONSTRAINTS]\nThe main TOP garment must remain outside the bottom garment, covering the waistband.\nThe hem of the top garment should overlap and conceal the belt-line and pocket openings of the bottom garment.\n[/ANTI_TUCK_CONSTRAINTS]`);
+                    }
                 }
+
+                if (wf === 'lower' && sp.styling.layers.upper_garment?.visible) {
+                    if (sp.styling.tucked === 'tucked') {
+                        productBlock.push(`[TUCK_CONSTRAINTS]\nThe visible top garment is tucked into these pants.\nThe waistband is clearly visible.\n[/TUCK_CONSTRAINTS]`);
+                    } else if (sp.styling.tucked === 'untucked') {
+                        productBlock.push(`[ANTI_TUCK_CONSTRAINTS]\nThe visible top garment is untucked, hanging over the waistband of these pants.\nThe top garment hem covers the waist and pocket area.\n[/ANTI_TUCK_CONSTRAINTS]`);
+                    }
+                }
+
+                // Length constraints (if any)
+                if (wf === 'lower' || wf === 'set') {
+                    if (pantLength === 'full') {
+                        productBlock.push(`LENGTH CONSTRAINT: Pant legs extend to the floor/heel level, slightly breaking over the shoes. This 'Full Length' style means the hem sits exactly where the shoe meets the floor at the back, with a single minimal fold at the front. MUST conceal any socks.`);
+                    } else if (pantLength === 'cropped' || pantLength === 'ankle') {
+                        productBlock.push(`LENGTH CONSTRAINT: The pant hem must clear the ankle bone, showing a gap between the hem and the footwear. No stacking or break in the fabric at the ankle.`);
+                    }
+                }
+
+
+                if (sp.garment.details?.rise) productBlock.push(`Rise: ${sp.garment.details.rise}.`);
             }
             if (canShowLegHem) {
                 if (sp.garment.details?.leg_style) productBlock.push(`Leg Style: ${sp.garment.details.leg_style}.`);
@@ -816,20 +848,6 @@ export async function POST(req: NextRequest) {
                 productBlock.push("Style Adjustment: Front is open and unbuttoned.");
             }
 
-            if (canShowLegHem && pantLength && pantLength !== 'none') {
-                const lengthPrompts: Record<string, string> = {
-                    cropped: "LENGTH CONSTRAINT: Pant legs end clearly above the ankle bone, exposing visible ankle space. Hem floats above the shoe upper with a visible gap. No break, no shoe contact, no stacking, no pooling. Strict cropped length. Maintain exact proportional scaling relative to model height.",
-                    ankle: "LENGTH CONSTRAINT: Pant legs end exactly at the ankle bone level. Hem sits just at the top line of the ankle without touching the shoe. No break, no fabric resting on the shoe, no stacking, no pooling. Clean ankle-length finish. Maintain exact proportional scaling relative to model height.",
-                    below_ankle: "LENGTH CONSTRAINT: Pant legs end slightly below the ankle bone with minimal contact at the top edge of the shoe. No visible break at the front. No stacking, no pooling, no extended length. Controlled ankle-below finish. Maintain exact proportional scaling relative to model height.",
-                    full_length: "LENGTH CONSTRAINT: Pant legs extend to the floor/heel level, slightly breaking over the shoes. This 'Full Length' style means the hem sits exactly where the shoe meets the floor at the back, with a single minimal fold at the front. MUST conceal any socks.",
-                    deep_break: "LENGTH CONSTRAINT: Pant legs are extra long, fully covering the upper part of the shoe and the heel. This 'Over-the-shoe' style ensures the hem puddles slightly over the footwear, hiding most of the shoe and completely concealing socks. The pant leg is the dominant feature at the foot level."
-                };
-                if (lengthPrompts[pantLength]) {
-                    productBlock.push(lengthPrompts[pantLength]);
-                }
-            }
-
-            productBlock.push(`Garment type, fabric, construction, fit and details are FINAL. The model's pose must complement these features while maintaining natural fashion movement.`);
             productBlock.push(`[/LOCKED_PRODUCT_CONSTRAINTS]`);
             sections.push(productBlock.join("\n"));
 
@@ -885,13 +903,16 @@ export async function POST(req: NextRequest) {
 
             if (sp.pose.description) {
                 let bio = clean(sp.pose.description);
+                // Standardize "figure" to "model"
+                bio = bio.replace(/the figure/gi, "the model").replace(/figure stands/gi, "model stands").replace(/figure is/gi, "model is");
+
                 if (sp.pose.dynamic) {
                     bio = bio.replace(/arms (hang|stay|placed) (naturally )?at sides/gi, "arms in dynamic fashion placement");
                 }
                 poseBlock.push(bio);
             }
             if (sp.pose.reference && sp.pose.reference.includes("stickman")) {
-                poseBlock.push("ControlNet: Strictly follow the provided stickman geometry.");
+                poseBlock.push("POSE REFERENCE: Use the provided reference stickman image to match pose.");
             }
             poseBlock.push(`[/POSE]`);
             sections.push(poseBlock.join("\n"));
@@ -1030,7 +1051,7 @@ export async function POST(req: NextRequest) {
                 if (resolution.includes('4K')) finalRes = '4K';
             }
 
-            const { generateWithNanoBanana } = await import('@/lib/nano-banana');
+            let { generateWithNanoBanana } = await import('@/lib/nano-banana');
             return await generateWithNanoBanana({
                 prompt: reqData.prompt,
                 image_urls: reqData.input_images,
