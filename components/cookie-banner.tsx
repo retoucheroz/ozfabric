@@ -35,58 +35,61 @@ export function CookieBanner() {
     if (!isVisible) return null;
 
     return (
-        <div className="fixed bottom-6 left-6 z-[100] max-w-[400px] w-[calc(100%-3rem)] pointer-events-none group">
-            <div className="glass-strong rounded-[2rem] border border-[var(--border-accent)] shadow-2xl p-5 sm:p-6 pointer-events-auto relative overflow-hidden transition-all duration-300 hover:shadow-purple-500/10 hover:border-purple-500/30">
+        <div className="fixed bottom-6 right-6 z-[100] max-w-[600px] w-[calc(100%-3rem)] pointer-events-none group animate-in fade-in slide-in-from-right-5 duration-500">
+            <div className="glass-strong rounded-3xl border border-[var(--border-accent)] shadow-2xl p-4 sm:p-5 pointer-events-auto relative overflow-hidden transition-all duration-300 hover:shadow-purple-500/10 hover:border-purple-500/30">
                 {/* Background Glow */}
                 <div className="absolute -top-10 -right-10 w-32 h-32 bg-[var(--accent-primary)]/10 blur-[40px] rounded-full" />
 
-                <div className="relative z-10">
-                    <div className="flex items-start justify-between gap-3 mb-3">
-                        <div className="flex items-center gap-2.5">
-                            <div className="bg-[var(--accent-primary)]/10 p-2 rounded-xl">
-                                <Cookie className="w-5 h-5 text-[var(--accent-primary)]" />
-                            </div>
-                            <h3 className="font-bold text-[15px] tracking-tight text-[var(--text-primary)]">
-                                {language === 'tr' ? 'Çerez Politikası' : 'Cookie Policy'}
-                            </h3>
+                <div className="relative z-10 flex flex-col md:flex-row items-center gap-4">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className="bg-[var(--accent-primary)]/10 p-2 rounded-xl shrink-0 hidden sm:block">
+                            <Cookie className="w-5 h-5 text-[var(--accent-primary)]" />
                         </div>
-                        <button
-                            onClick={handleClose}
-                            className="p-1.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] rounded-full transition-all"
-                            aria-label="Close"
-                        >
-                            <X className="w-4 h-4" />
-                        </button>
+                        <p className="text-[13px] text-[var(--text-secondary)] leading-tight">
+                            {language === 'tr'
+                                ? 'Daha iyi bir kullanıcı deneyimi için çerezler kullanıyoruz.'
+                                : 'We use cookies to enhance your experience.'}
+                            {' '}
+                            <Link href="/cookie-policy" className="text-[var(--accent-primary)] hover:underline font-semibold whitespace-nowrap">
+                                {language === 'tr' ? 'Detaylar' : 'Details'}
+                            </Link>
+                        </p>
                     </div>
 
-                    <p className="text-[13px] text-[var(--text-secondary)] leading-relaxed mb-5">
-                        {language === 'tr'
-                            ? 'Daha iyi bir kullanıcı deneyimi sunmak ve sitemizi geliştirmek için çerezler kullanıyoruz.'
-                            : 'We use cookies to enhance your experience and improve our services.'}
-                        {' '}
-                        <Link href="/cookie-policy" className="text-[var(--accent-primary)] hover:underline font-semibold inline-flex items-center gap-0.5">
-                            {language === 'tr' ? 'Detaylar' : 'Details'}
-                        </Link>
-                    </p>
-
-                    <div className="flex flex-col sm:flex-row gap-2">
+                    <div className="flex items-center gap-2 shrink-0 w-full md:w-auto">
                         <Button
                             variant="outline"
                             size="sm"
                             onClick={handleAcceptEssential}
-                            className="flex-1 h-9 text-[11px] font-bold uppercase tracking-wider rounded-xl bg-transparent border-[var(--border-default)] hover:bg-[var(--bg-elevated)] transition-all"
+                            className="flex-1 md:flex-none h-8 px-3 text-[10px] font-bold uppercase tracking-wider rounded-xl bg-transparent border-[var(--border-default)] hover:bg-[var(--bg-elevated)] transition-all"
                         >
                             {language === 'tr' ? 'Gerekli' : 'Essential'}
                         </Button>
                         <Button
                             size="sm"
                             onClick={handleAcceptAll}
-                            className="flex-1 h-9 text-[11px] font-bold uppercase tracking-wider rounded-xl bg-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/90 text-white shadow-lg shadow-purple-500/20 active:scale-95 transition-all"
+                            className="flex-1 md:flex-none h-8 px-3 text-[10px] font-bold uppercase tracking-wider rounded-xl bg-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/90 text-white shadow-lg shadow-purple-500/10 active:scale-95 transition-all text-nowrap"
                         >
                             {language === 'tr' ? 'Kabul Et' : 'Accept All'}
                         </Button>
+                        <button
+                            onClick={handleClose}
+                            className="p-1 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-all ml-1 hidden md:block"
+                            aria-label="Close"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
                     </div>
                 </div>
+
+                {/* Mobile Close Button */}
+                <button
+                    onClick={handleClose}
+                    className="absolute top-2 right-2 p-1 text-[var(--text-muted)] hover:text-[var(--text-primary)] md:hidden"
+                    aria-label="Close"
+                >
+                    <X className="w-4 h-4" />
+                </button>
             </div>
         </div>
     );
