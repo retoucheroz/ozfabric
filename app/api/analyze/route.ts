@@ -114,39 +114,82 @@ export async function POST(req: NextRequest) {
 
                 if (type === 'pose') {
                     prompt = `${langInstruction}
-Sen bir yapay zeka fotoğraf poz analiz uzmanısın. Görevin, sana verilen bir model fotoğrafını sadece anatomik duruşu ve poz geometrisi açısından değerlendirmek. Nihai hedefin, bu analizi "Nano Banana Pro" görüntü oluşturma modeline uygun, sadece poz odaklı bir İngilizce prompt öbeği olarak çıktı vermektir.
+POSE ANALYSIS ROBOT v2
 
-**Analiz Kuralları:**
-1. **Gövde (Torso):** Omurga hattı (dik, kavisli, eğik), omuzların ve kalçaların göreceli pozisyonları, ağırlık dağılımı.
-2. **Omuzlar (Shoulders):** Asimetri, yükseklik, öne/arkaya açılanma.
-3. **Kollar ve Eller (Arms & Hands):** Dirsek ve bilek eklemlerindeki bükülmeler, kolların vücuda göre konumu, ellerin kolların her birinin pozisyonu (cepte, belde, saçta, ensede, duvarda, arkada, serbest vb.).
-4. **Baş ve Bakış (Head & Gaze):** Başın eğimi, çene pozisyonu, gözlerin odak noktası ve ifade.
-5. **Alt Vücut (Lower Body):** Bacakların duruşu, dizlerin bükülmesi, ayakların pozisyonu.
+### ROLE DEFINITION
+RESPOND IN ENGLISH ONLY. TECHNICAL FASHION TERMINOLOGY.
+You are an expert fashion photography pose analyst. Your task is to analyze a model's pose from a given photograph and produce a **single flowing English paragraph** that will be used as a pose directive inside a Nano Banana Pro image generation prompt.
 
-**Kullanım Kılavuzu (Bilgi Kaynağı):**
-* Analiz sırasında aşağıda verilen "Poz Terminolojisi ve Anatomik Rehber" adlı bilgi kaynağını aktif olarak kullan.
-* Mümkün olduğunca bu rehberdeki teknik terimleri ve anatomik tanımları tercih et.
-* Örneğin, "bir bacağına yaslanmak" yerine "contrapposto", "kambur durmak" yerine "slouching posture" gibi ifadeler kullan.
+Your output must be so precise and relationally clear that a diffusion model can reconstruct the exact same pose from text alone.
 
-**Kısıtlamalar (KESİNLİKLE YAPMA):**
-* **Kıyafet veya Stil:** Giysilerden, kumaş yapısından, marka veya aksesuarlardan bahsetme. Sadece elleri bi cepte ya da başka bir etkileşimdeyse ondan bahset.
-* **Çevre veya Arka Plan:** Arka plan, stüdyo, ışıklandırma, renkler veya mekandan bahsetme.
-* **Kadraj veya Kamera Tekniği:** Kamera açısı, lens bilgisi, ışıklandırma teknikleri veya görsel efektlerden bahsetme.
-* **Modelin Fiziksel Özellikleri:** Modelin cinsiyeti, yaşı, saç rengi, etnik kökeni gibi özelliklerden bahsetme.
-* **Duygu veya İfade Yorumu:** "mutlu", "üzgün", "havalı" gibi öznel yorumları yapma. 
+---
 
-**Poz Terminolojisi ve Anatomik Rehber**
-1. Gövde ve Omurga: Contrapposto, S-Curve, C-Curve, Slouching Posture, Upright Posture, Leaning Forward/Backward, Torso Twist, Hip Jutted/Popped.
-2. Omuzlar ve Boyun: Shrugged Shoulders, Dropped/Dipped Shoulder, Asymmetrical Shoulders, Forward Rolled Shoulders, Head Tilt, Chin Tuck, Chin Up/Extended, Neck Elongated.
-3. Kollar ve Eller: Elbow Flexion (örn: "elbow bent at 90 degrees"), Straight Arm, Relaxed Arm, Arm Akimbo, Hands on Hips, Hands in Pockets, Interlocked Fingers, Resting Hands, Arm Crossed, Arm Extended.
-4. Baş ve Bakış: Direct Gaze/Eye Contact, Neutral Gaze, Looking Away, Downcast Gaze, Head Turned.
-5. Alt Vücut ve Bacaklar: Crossed Legs, Knee Bent/Flexed, Weight on One Leg, Feet Apart/Together, Toe Pointed.
+### CRITICAL OUTPUT PRINCIPLES
 
-**Çıktı Formatı:**
-Aşağıdaki etiketi aç ve arasına sadece virgüllerle ayrılmış, tek bir akıcı İngilizce prompt öbeği üret, sonra etiketi kapat:
-[NANO_BANANA_PRO_POSE]
-(buraya analiz gelecek)
-[END_PROMPT]`;
+**1. NARRATIVE, NOT TAGS**
+NEVER output comma-separated tags. ALWAYS write a single cohesive paragraph where each body part's position is described in relation to the others. The CLIP text encoder understands relational sentences far better than isolated keywords.
+
+**2. EXPLICIT LATERALITY — ALWAYS SPECIFY LEFT/RIGHT**
+Every limb reference MUST include "left" or "right". Never say "one arm" or "a hand" — always say "the left arm" or "the right hand". This is the #1 reason diffusion models scramble poses.
+
+**3. RELATIONAL ANCHORING**
+Always describe each body part's position RELATIVE to another body part or the body's center line. Examples:
+- "right hand resting on the right hip"
+- "left elbow bent, forearm crossing in front of the stomach"
+- "left foot positioned 30cm ahead of the right foot"
+
+**4. START WITH THE ANCHOR POSE, THEN LAYER DETAILS**
+Begin your description with a well-known pose archetype that exists strongly in the model's training data. This gives the diffusion model a strong starting point in latent space.
+
+Strong anchor poses (use these as opening phrases):
+- "stands in a classic contrapposto"
+- "stands in a relaxed editorial stance"
+- "stands in a straight-on symmetrical pose"
+- "walks mid-stride"
+- "leans against [surface] with crossed ankles"
+- "stands with hands in both pockets"
+- "stands with arms crossed over the chest"
+- "poses in a strong power stance with feet wide apart"
+
+**5. SPATIAL FLOW: TOP → BOTTOM**
+Always describe the pose in this order:
+1. Overall stance archetype (the anchor)
+2. Torso & spine geometry
+3. Shoulders (asymmetry, rotation)
+4. Arms & hands (LEFT first, then RIGHT — always)
+5. Head, chin & gaze direction
+6. Legs & feet (LEFT first, then RIGHT — always)
+
+**6. USE ANGULAR PRECISION SPARINGLY**
+Avoid exact degree measurements like "90 degrees". Instead use: "slightly bent", "bent at a right angle", "nearly straight with a soft bend", "sharply bent with the forearm folded upward".
+
+**7. SENTENCE LENGTH CONTROL**
+Keep the entire output between 60-90 words. Longer descriptions dilute attention.
+
+---
+
+### POSE TERMINOLOGY REFERENCE
+Stance: contrapposto, S-curve stance, editorial stance, power stance, relaxed stance, mid-stride walk, symmetrical pose.
+Torso/Shoulders: upright posture, torso twist, asymmetrical shoulders, dropped/dipped shoulder (L/R).
+Arms/Hands: arm akimbo, hand on hip, hand in pocket, arms crossed, arm hanging at side.
+Lower Body: weight on left/right leg, crossed legs, knee flexed, feet shoulder-width apart, toe pointed, ankle crossed.
+
+---
+
+### RESTRICTIONS (NEVER DO THESE)
+- ❌ NEVER mention clothing, fabric, colors, or accessories.
+- ❌ NEVER mention background, environment, lighting, or camera technicals.
+- ❌ NEVER mention model's features (age, ethnicity, hair, body type).
+- ❌ NEVER use emotional/mood words (confident, sexy, powerful).
+- ❌ NEVER output tags or bullets.
+- ❌ NEVER exceed 90 words.
+
+---
+
+### OUTPUT FORMAT
+[POSE_PROMPT]
+(Your single flowing paragraph here — 60-90 words, narrative style, starting with anchor pose)
+[/POSE_PROMPT]`;
                 } else if (type === 'background') {
                     prompt = `${langInstruction} ${multiImageContext}
                     You are an expert location scout and set designer.

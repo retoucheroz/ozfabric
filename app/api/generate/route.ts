@@ -807,9 +807,12 @@ export async function POST(req: NextRequest) {
             subjectBlock.push(`[/SUBJECT_IDENTITY]`);
             const subjectStr = subjectBlock.join("\n");
 
+            const angleLabel = isBackView ? "BACK VIEW" : (isAngledView ? "THREE-QUARTER VIEW" : (view.includes('closeup') ? "CLOSE-UP FRONT VIEW" : (view.includes('detail') ? (view.includes('front') ? "DETAIL FRONT VIEW" : "DETAIL BACK VIEW") : "FRONT VIEW")));
+
             // 2. [FRAMING_DESCRIPTION]
             const framingBlock: string[] = [];
             framingBlock.push(`[FRAMING_DESCRIPTION]`);
+            framingBlock.push(`View Angle: ${angleLabel}.`);
             if (framing === 'head_to_toe') {
                 framingBlock.push(`Shot Type: Head-to-toe full body photography${isAngledView ? ", 3/4 angled." : "."}`);
                 framingBlock.push("Visible: Full model from head to feet.");
@@ -837,12 +840,9 @@ export async function POST(req: NextRequest) {
             const framingStr = framingBlock.join("\n");
 
             // 3. [POSE]
-            const angleLabel = isBackView ? "BACK VIEW" : (isAngledView ? "THREE-QUARTER VIEW" : (view.includes('closeup') ? "CLOSE-UP FRONT VIEW" : (view.includes('detail') ? (view.includes('front') ? "DETAIL FRONT VIEW" : "DETAIL BACK VIEW") : "FRONT VIEW")));
             const isTechFullFront = angleId === 'std_tech_full_front';
             const poseBlock: string[] = [];
             poseBlock.push(`[POSE]`);
-            poseBlock.push(`View Angle: ${angleLabel}.`);
-            poseBlock.push(`Subject: ${isTechFullFront ? "" : "Professional "}${sp.subject.type} (Strictly match provided identity).`);
             if (sp.pose.description) {
                 let bio = clean(sp.pose.description);
                 bio = bio.replace(/the figure/gi, "the model").replace(/figure stands/gi, "model stands").replace(/figure is/gi, "model is");
@@ -850,9 +850,13 @@ export async function POST(req: NextRequest) {
                 // If it's a technical angle and NO custom prompt was given, add standard posture
                 // But if custom prompt exists, prioritize it
                 if (!sp.pose.dynamic && !isBackView) {
-                    bio += `. Standing perfectly straight in rigid attention posture, ${isUpperOrCloseup ? "" : "feet parallel to body and straight, "}arms resting straight at sides.`;
+                    bio = `The model ${isTechFullFront ? "" : "professional "}${sp.subject.type} stands in a straight-on symmetrical posture with weight evenly distributed on both feet. ` +
+                        bio +
+                        `. Standing perfectly straight in rigid attention posture, ${isUpperOrCloseup ? "" : "feet parallel to body and straight, "}arms resting straight at sides.`;
                 } else if (!sp.pose.dynamic && isBackView) {
-                    bio += ". Model stands perfectly straight with back to camera, head facing away, arms at sides, feet parallel to each other.";
+                    bio = `The model ${isTechFullFront ? "" : "professional "}${sp.subject.type} stands perfectly straight with back to camera. ` +
+                        bio +
+                        ". Head facing away, arms at sides, feet parallel to each other.";
                 }
 
                 if (sp.pose.dynamic) {
@@ -860,7 +864,7 @@ export async function POST(req: NextRequest) {
                 }
                 poseBlock.push(bio);
             } else if (effectiveRole === 'technical') {
-                poseBlock.push(`Standing perfectly straight in rigid attention posture, ${isUpperOrCloseup ? "" : "feet parallel to body and straight, "}arms resting straight at sides.`);
+                poseBlock.push(`The model ${isTechFullFront ? "" : "professional "}${sp.subject.type} stands perfectly straight in rigid attention posture, ${isUpperOrCloseup ? "" : "feet parallel to body and straight, "}arms resting straight at sides.`);
             }
             poseBlock.push(`[/POSE]`);
             const poseStr = poseBlock.join("\n");
@@ -972,7 +976,7 @@ export async function POST(req: NextRequest) {
             const moodStr = (resolvedMood && resolvedMood.promptAddition) ? `[MODEL_MOOD]\nExpression & Vibe: ${clean(resolvedMood.promptAddition)}\n[/MODEL_MOOD]` : "";
 
             // Final Assembly 1-9
-            const finalSections = [subjectStr, framingStr, poseStr, productStr, stylingStr, backgroundStr, lightingStr, appearanceStr, moodStr];
+            const finalSections = [poseStr, subjectStr, framingStr, productStr, moodStr, lightingStr, stylingStr, backgroundStr, appearanceStr];
             return finalSections.map(s => s.trim()).filter(Boolean).join("\n\n");
         }
 
