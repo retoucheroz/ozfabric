@@ -32,8 +32,8 @@ interface BehaviorTogglesProps {
     batchShotSelection?: Record<string, boolean>;
     availableBatchShots?: any[];
     poseFocus?: string;
-    socksType: 'none' | 'white' | 'black' | 'grey' | 'navy';
-    setSocksType: (val: 'none' | 'white' | 'black' | 'grey' | 'navy') => void;
+    socksType: 'none' | 'white' | 'black' | 'grey' | 'navy' | 'beige' | 'brown' | 'red' | 'green' | 'blue' | 'anthracite';
+    setSocksType: (val: 'none' | 'white' | 'black' | 'grey' | 'navy' | 'beige' | 'brown' | 'red' | 'green' | 'blue' | 'anthracite') => void;
     pantLength?: string;
 }
 
@@ -67,7 +67,7 @@ export function BehaviorToggles({
     setSocksType,
     pantLength
 }: BehaviorTogglesProps) {
-    const isSocksDisabled = pantLength === 'full_length' || pantLength === 'deep_break';
+    const isSocksDisabled = pantLength === 'covering' || pantLength === 'flare';
 
     // If socks are disabled by pant length but they have a value, reset to none on render
     React.useEffect(() => {
@@ -234,11 +234,10 @@ export function BehaviorToggles({
                                 )}
                                 onClick={() => {
                                     if (isSocksDisabled) return;
-                                    if (socksType === 'none') setSocksType('white');
-                                    else if (socksType === 'white') setSocksType('black');
-                                    else if (socksType === 'black') setSocksType('grey');
-                                    else if (socksType === 'grey') setSocksType('navy');
-                                    else setSocksType('none');
+                                    const colors: ('none' | 'white' | 'black' | 'grey' | 'navy' | 'beige' | 'brown' | 'red' | 'green' | 'blue' | 'anthracite')[] = ['none', 'white', 'black', 'grey', 'navy', 'beige', 'brown', 'red', 'green', 'blue', 'anthracite'];
+                                    const currentIndex = colors.indexOf(socksType);
+                                    const nextIndex = (currentIndex + 1) % colors.length;
+                                    setSocksType(colors[nextIndex]);
                                 }}
                             >
                                 <div className="flex flex-col items-center gap-1.5 pt-1">
@@ -257,15 +256,21 @@ export function BehaviorToggles({
                                         socksType !== 'none' ? "text-[var(--accent-primary)]" : "text-[var(--text-muted)]"
                                     )}>
                                         {language === "tr"
-                                            ? (socksType === 'black' ? "SİYAH" : socksType === 'white' ? "BEYAZ" : socksType === 'grey' ? "GRİ" : socksType === 'navy' ? "LACİVERT" : "YOK")
-                                            : (socksType === 'black' ? "BLACK" : socksType === 'white' ? "WHITE" : socksType === 'grey' ? "GREY" : socksType === 'navy' ? "NAVY" : "NONE")}
+                                            ? (socksType === 'black' ? "SİYAH" : socksType === 'white' ? "BEYAZ" : socksType === 'grey' ? "GRİ" : socksType === 'navy' ? "LACİVERT" : socksType === 'beige' ? "BEJ" : socksType === 'brown' ? "KAHVERENGİ" : socksType === 'red' ? "KIRMIZI" : socksType === 'green' ? "YEŞİL" : socksType === 'blue' ? "MAVİ" : socksType === 'anthracite' ? "ANTRASİT" : "YOK")
+                                            : (socksType === 'black' ? "BLACK" : socksType === 'white' ? "WHITE" : socksType === 'grey' ? "GREY" : socksType === 'navy' ? "NAVY" : socksType === 'beige' ? "BEIGE" : socksType === 'brown' ? "BROWN" : socksType === 'red' ? "RED" : socksType === 'green' ? "GREEN" : socksType === 'blue' ? "BLUE" : socksType === 'anthracite' ? "ANTHRACITE" : "NONE")}
                                     </span>
-                                    <div className="flex gap-1 mt-0.5">
+                                    <div className="flex flex-wrap justify-center gap-1 mt-0.5 max-w-[60px]">
                                         <div className={cn("w-1 h-1 rounded-full transition-all", socksType === 'none' ? "bg-[var(--accent-primary)] scale-125" : "bg-[var(--bg-muted)]")} />
                                         <div className={cn("w-1 h-1 rounded-full transition-all", socksType === 'white' ? "bg-[var(--accent-primary)] scale-125" : "bg-[var(--bg-muted)]")} />
                                         <div className={cn("w-1 h-1 rounded-full transition-all", socksType === 'black' ? "bg-[var(--accent-primary)] scale-125" : "bg-[var(--bg-muted)]")} />
                                         <div className={cn("w-1 h-1 rounded-full transition-all", socksType === 'grey' ? "bg-[var(--accent-primary)] scale-125" : "bg-[var(--bg-muted)]")} />
                                         <div className={cn("w-1 h-1 rounded-full transition-all", socksType === 'navy' ? "bg-[var(--accent-primary)] scale-125" : "bg-[var(--bg-muted)]")} />
+                                        <div className={cn("w-1 h-1 rounded-full transition-all", socksType === 'beige' ? "bg-[var(--accent-primary)] scale-125" : "bg-[var(--bg-muted)]")} />
+                                        <div className={cn("w-1 h-1 rounded-full transition-all", socksType === 'brown' ? "bg-[var(--accent-primary)] scale-125" : "bg-[var(--bg-muted)]")} />
+                                        <div className={cn("w-1 h-1 rounded-full transition-all", socksType === 'red' ? "bg-[var(--accent-primary)] scale-125" : "bg-[var(--bg-muted)]")} />
+                                        <div className={cn("w-1 h-1 rounded-full transition-all", socksType === 'green' ? "bg-[var(--accent-primary)] scale-125" : "bg-[var(--bg-muted)]")} />
+                                        <div className={cn("w-1 h-1 rounded-full transition-all", socksType === 'blue' ? "bg-[var(--accent-primary)] scale-125" : "bg-[var(--bg-muted)]")} />
+                                        <div className={cn("w-1 h-1 rounded-full transition-all", socksType === 'anthracite' ? "bg-[var(--accent-primary)] scale-125" : "bg-[var(--bg-muted)]")} />
                                     </div>
                                 </div>
                             </div>
@@ -282,6 +287,6 @@ export function BehaviorToggles({
             </div>
 
 
-        </div>
+        </div >
     );
 }
