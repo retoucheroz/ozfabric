@@ -644,17 +644,21 @@ export const useGenerationEngine = (
                                 const isStylingShot = preview.spec.isStyling;
                                 if (isAccessory && !isStylingShot && !techAccessories[k]) return acc;
                                 if (preview.spec.excludeAllAccessories && isAccessory) return acc;
+
+                                const assetVal = assetsHighRes[k] || assets[k];
                                 if (k === 'glasses') {
-                                    acc[k] = preview.spec.includeGlasses || (isStylingShot ? true : techAccessories.glasses) ? (assetsHighRes.glasses || assets.glasses) : undefined;
+                                    const hasGlasses = preview.spec.includeGlasses || (isStylingShot ? true : techAccessories.glasses);
+                                    acc[k] = (hasGlasses && assetVal) ? "PRESENT" : undefined;
                                 } else if (k === 'lighting' && !lightingSendImage) {
                                     acc[k] = undefined;
                                 } else {
-                                    acc[k] = assetsHighRes[k] || assets[k];
+                                    acc[k] = assetVal ? "PRESENT" : undefined;
                                 }
                                 return acc;
                             }, {});
                             const poseKey = `pose_${preview.spec.view}`;
-                            imgs.pose = assets[poseKey] || assetsHighRes.pose || assets.pose;
+                            const hasPose = assets[poseKey] || assetsHighRes.pose || assets.pose;
+                            imgs.pose = hasPose ? "PRESENT" : undefined;
                             return imgs;
                         })(),
                         gender: modelGender,
@@ -678,7 +682,7 @@ export const useGenerationEngine = (
                         productDescription: preview.structured.productDescription,
                         fitDescription: preview.structured.fitDescription,
                         poseDescription: preview.structured.pose,
-                        poseStickman: assets[`pose_${preview.spec.view}_stickman`] !== undefined ? assets[`pose_${preview.spec.view}_stickman`] : (preview.spec.useStickman ? poseStickman : undefined),
+                        poseStickman: (assets[`pose_${preview.spec.view}_stickman`] !== undefined || (preview.spec.useStickman && poseStickman)) ? "PRESENT" : undefined,
                         targetView: preview.spec.camera.angle === 'angled' || preview.spec.view.includes('angled') ? 'side' : (preview.spec.camera.angle === 'back' || preview.spec.view.includes('back') ? 'back' : 'front'),
                         poseFocus: preview.spec.view.includes('detail') ? 'detail' : (preview.spec.camera.shot_type === 'close_up' ? 'closeup' : (preview.spec.camera.shot_type === 'cowboy_shot' ? 'upper' : 'full')),
                         hairBehindShoulders: (preview.spec.excludeHairInfo && modelGender !== 'male') ? undefined : preview.spec.hairBehind,
@@ -703,15 +707,24 @@ export const useGenerationEngine = (
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify(payload)
                         });
+
+                        // Check if the response is actually JSON before parsing
+                        const contentType = res.headers.get("content-type");
+                        if (!contentType || !contentType.includes("application/json")) {
+                            const text = await res.text();
+                            const errorMsg = text.length > 50 ? text.substring(0, 50) + "..." : text;
+                            return `[SERVER_ERROR] ${res.status}: ${errorMsg}`;
+                        }
+
                         const data = await res.json();
                         if (!res.ok) {
                             console.error("Preview API error:", data.error || data);
-                            return `[ERROR: ${data.error || "API Failure"}] Manual check required for this shot. Check assets and descriptions.`;
+                            return `[ERROR: ${data.error || "API Failure"}] Manual check required.`;
                         }
-                        return data.previews?.[0]?.prompt || "[WARNING] Prompt generation returned empty. Using default tags.";
+                        return data.previews?.[0]?.prompt || "[WARNING] Prompt generation returned empty.";
                     } catch (e: any) {
                         console.error("Failed to fetch preview:", e);
-                        return `[FETCH FAILED] Network or Server error: ${e.message}`;
+                        return `[FETCH FAILED] ${e.message}`;
                     }
                 }));
                 textPrompts.push(...results);
