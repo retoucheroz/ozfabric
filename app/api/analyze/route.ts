@@ -115,27 +115,38 @@ export async function POST(req: NextRequest) {
 
                 if (type === 'pose') {
                     prompt = `${langInstruction}
-Role: You are a Technical Computer Vision Specialist for Fashion VTO. Your sole function is to extract a "High-Fidelity Pose Map" from any image and translate it into a technical prompt specifically optimized for the Nano Banana Pro engine.
+Sen bir yapay zeka fotoğraf poz analiz uzmanısın. Görevin, sana verilen bir model fotoğrafını sadece anatomik duruşu ve poz geometrisi açısından değerlendirmek. Nihai hedefin, bu analizi "Nano Banana Pro" görüntü oluşturma modeline uygun, sadece poz odaklı bir İngilizce prompt öbeği olarak çıktı vermektir.
 
-Analysis & Translation Rules:
-1. No Numerical Angles: Never use degrees (e.g., 45°). Use descriptive geometry:
-   - Acute bend: "Sharply bent," "acute-angle flex."
-   - 90-degree bend: "Perpendicular," "L-shaped," "Right-angle bend."
-   - Straight: "Fully extended," "locked joints," "stiff alignment."
-2. Contact & Collision (Critical for VTO):
-   - Identify if hands/arms are touching the torso or other limbs. Use terms like "high-contact overlap" or "direct hand-to-fabric interaction."
-   - If there is a gap between arms and body, use "high-separation silhouette" or "unobstructed torso."
-3. Anatomic Anchors: Focus on the "Clavicle" (Shoulder height), "Lumbar" (Lower back), and "Pelvis" (Hip tilt).
-4. Action Context: Describe the pose through muscle tension (e.g., "shoulders hunched forward," "rigid vertical stance").
+**Analiz Kuralları:**
+1. **Gövde (Torso):** Omurga hattı (dik, kavisli, eğik), omuzların ve kalçaların göreceli pozisyonları, ağırlık dağılımı.
+2. **Omuzlar (Shoulders):** Asimetri, yükseklik, öne/arkaya açılanma.
+3. **Kollar ve Eller (Arms & Hands):** Dirsek ve bilek eklemlerindeki bükülmeler, kolların vücuda göre konumu, ellerin kolların her birinin pozisyonu (cepte, belde, saçta, ensede, duvarda, arkada, serbest vb.).
+4. **Baş ve Bakış (Head & Gaze):** Başın eğimi, çene pozisyonu, gözlerin odak noktası ve ifade.
+5. **Alt Vücut (Lower Body):** Bacakların duruşu, dizlerin bükülmesi, ayakların pozisyonu.
 
-Output Format (Strictly English):
+**Kullanım Kılavuzu (Bilgi Kaynağı):**
+* Analiz sırasında aşağıda verilen "Poz Terminolojisi ve Anatomik Rehber" adlı bilgi kaynağını aktif olarak kullan.
+* Mümkün olduğunca bu rehberdeki teknik terimleri ve anatomik tanımları tercih et.
+* Örneğin, "bir bacağına yaslanmak" yerine "contrapposto", "kambur durmak" yerine "slouching posture" gibi ifadeler kullan.
 
+**Kısıtlamalar (KESİNLİKLE YAPMA):**
+* **Kıyafet veya Stil:** Giysilerden, kumaş yapısından, marka veya aksesuarlardan bahsetme. Sadece elleri bi cepte ya da başka bir etkileşimdeyse ondan bahset.
+* **Çevre veya Arka Plan:** Arka plan, stüdyo, ışıklandırma, renkler veya mekandan bahsetme.
+* **Kadraj veya Kamera Tekniği:** Kamera açısı, lens bilgisi, ışıklandırma teknikleri veya görsel efektlerden bahsetme.
+* **Modelin Fiziksel Özellikleri:** Modelin cinsiyeti, yaşı, saç rengi, etnik kökeni gibi özelliklerden bahsetme.
+* **Duygu veya İfade Yorumu:** "mutlu", "üzgün", "havalı" gibi öznel yorumları yapma. 
+
+**Poz Terminolojisi ve Anatomik Rehber**
+1. Gövde ve Omurga: Contrapposto, S-Curve, C-Curve, Slouching Posture, Upright Posture, Leaning Forward/Backward, Torso Twist, Hip Jutted/Popped.
+2. Omuzlar ve Boyun: Shrugged Shoulders, Dropped/Dipped Shoulder, Asymmetrical Shoulders, Forward Rolled Shoulders, Head Tilt, Chin Tuck, Chin Up/Extended, Neck Elongated.
+3. Kollar ve Eller: Elbow Flexion (örn: "elbow bent at 90 degrees"), Straight Arm, Relaxed Arm, Arm Akimbo, Hands on Hips, Hands in Pockets, Interlocked Fingers, Resting Hands, Arm Crossed, Arm Extended.
+4. Baş ve Bakış: Direct Gaze/Eye Contact, Neutral Gaze, Looking Away, Downcast Gaze, Head Turned.
+5. Alt Vücut ve Bacaklar: Crossed Legs, Knee Bent/Flexed, Weight on One Leg, Feet Apart/Together, Toe Pointed.
+
+**Çıktı Formatı:**
+Aşağıdaki etiketi aç ve arasına sadece virgüllerle ayrılmış, tek bir akıcı İngilizce prompt öbeği üret, sonra etiketi kapat:
 [NANO_BANANA_PRO_POSE]
-Baseline Geometry: [e.g., Full-frontal verticality, slight spinal S-curve, squared shoulders].
-Upper Limb Map: [e.g., Arms sharply bent at elbows, forearms angled toward the solar plexus, hands overlapping at the center-line].
-Lower Limb Map: [e.g., Stiff-legged stance, weight shifted to the right hip, knees locked, feet facing forward].
-Head & Neck Axis: [e.g., Head canted slightly to the side, chin tucked, neutral eye-level gaze].
-VTO Topo-Constraints: [e.g., Clean separation of limbs for masking / High overlap on the chest area / Hidden hands behind the lumbar].
+(buraya analiz gelecek)
 [END_PROMPT]`;
                 } else if (type === 'background') {
                     prompt = `${langInstruction} ${multiImageContext}
