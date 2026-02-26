@@ -353,7 +353,7 @@ export function buildStandardBatchSpecs(
         },
         {
             view: "std_tech_upper_front",
-            pose: "Standing perfectly straight in rigid attention posture, feet touching and strictly parallel, arms resting straight at sides, neutral gaze. Cowboy shot.",
+            pose: "Standing perfectly straight in rigid attention posture, arms resting straight at sides, neutral gaze. Cowboy shot.",
             dynamic: false,
             lookAtCamera: true,
             hairBehind: true,
@@ -365,7 +365,7 @@ export function buildStandardBatchSpecs(
         },
         {
             view: "std_tech_upper_back",
-            pose: "Standing perfectly straight, back to camera, feet touching and strictly parallel, arms at sides. Cowboy shot.",
+            pose: "Standing perfectly straight, back to camera, arms at sides. Cowboy shot.",
             dynamic: false,
             lookAtCamera: false,
             hairBehind: true,
