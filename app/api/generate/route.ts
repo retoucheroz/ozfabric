@@ -1054,12 +1054,7 @@ export async function POST(req: NextRequest) {
 
             const finalPrompt = sections.map(s => s.trim()).filter(Boolean).join(" ");
 
-            return {
-                prompt: finalPrompt,
-                structured: sp,
-                input_images: uploadedImages,
-                negative_prompt: "" // You can add negative prompt logic here if needed
-            };
+            return finalPrompt;
         }
 
         // NOTE: detail_1, detail_2, fit_pattern are NOT sent - only used for analysis
