@@ -119,8 +119,8 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
 
         const validBase64 = base64Images.filter((img): img is { data: string, mimeType: string } => img !== null);
 
-        // Use the specialized Image Generation model which supports multiple image inputs via generateContent
-        const modelId = "gemini-2.0-flash-exp-image-generation";
+        // CORRECT MODEL: gemini-3-pro-image-preview for Studio Image Generation
+        const modelId = "gemini-3-pro-image-preview";
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${geminiKey}`;
 
         const parts: any[] = [{ text: payload.prompt }];
@@ -171,10 +171,11 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
 
         if (!b64) {
             console.error("Gemini Unexpected Response (No Image Data):", JSON.stringify(data, null, 2));
-            throw new Error("Gemini API did not return generated image data. Check if safety filters blocked it.");
+            throw new Error("Gemini API (gemini-3-pro-image-preview) did not return generated image data. Check if safety filters blocked it.");
         }
 
         finalImageUrl = `data:image/png;base64,${b64}`;
+
 
 
     } else {
