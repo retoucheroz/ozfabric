@@ -28,7 +28,7 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
             model: "nano-banana-pro",
             input: {
                 prompt: payload.prompt,
-                image_input: imageList.slice(0, 14), // Limit to 14 images as requested
+                image_input: imageList.slice(0, 8), // Kie Limit: 8 images max
                 aspect_ratio: payload.aspect_ratio || "3:4",
                 resolution: payload.resolution || "1K",
                 output_format: "png",

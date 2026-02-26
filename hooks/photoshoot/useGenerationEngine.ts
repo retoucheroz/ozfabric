@@ -598,7 +598,14 @@ export const useGenerationEngine = (
                     fitDescription: previewFitDesc,
                     pose: targetedPosePrompt || spec.pose,
                     view: spec.view,
-                    camera: spec.camera
+                    camera: spec.camera,
+                    // Technical angles need a rigid attention posture
+                    _pose_reference: spec.isStyling ? undefined : (
+                        spec.view.includes('front') ? "standing perfectly straight in attention posture, feet touching and strictly parallel facing forward, arms resting straight at sides, neutral gaze" :
+                            spec.view.includes('side') ? "strict profile view, standing straight, feet positioned close together and parallel, arms at sides" :
+                                spec.view.includes('back') ? "back view, standing perfectly straight, feet touching and parallel, arms at sides" :
+                                    "standing straight, rigid attention posture, feet together and parallel"
+                    )
                 };
 
                 if (!isDetailShot) {
@@ -616,87 +623,94 @@ export const useGenerationEngine = (
 
             toast.info(language === "tr" ? "Promptlar hazırlanıyor..." : "Preparing prompts...");
 
-            const textPrompts = await Promise.all(previews.map(async (preview, idx) => {
-                const payload = {
-                    productName: preview.structured.productName,
-                    workflowType: workflowType,
-                    uploadedImages: (() => {
-                        const imgs = Object.keys(assets).reduce((acc: any, k: string) => {
-                            if (k.startsWith('pose_')) return acc; // Custom pose state keys
+            // Process preview prompts in small chunks to avoid overloading
+            const textPrompts: string[] = [];
+            const previewChunks = [];
+            const previewSize = 3;
+            for (let i = 0; i < previews.length; i += previewSize) {
+                previewChunks.push(previews.slice(i, i + previewSize));
+            }
 
-                            const isAccessory = ['jacket', 'bag', 'glasses', 'hat', 'belt', 'jewelry'].includes(k);
-                            const isStylingShot = preview.spec.isStyling;
+            for (const chunk of previewChunks) {
+                const results = await Promise.all(chunk.map(async (preview) => {
+                    const payload = {
+                        productName: preview.structured.productName,
+                        workflowType: workflowType,
+                        uploadedImages: (() => {
+                            const imgs = Object.keys(assets).reduce((acc: any, k: string) => {
+                                if (k.startsWith('pose_')) return acc;
+                                const isAccessory = ['jacket', 'bag', 'glasses', 'hat', 'belt', 'jewelry'].includes(k);
+                                const isStylingShot = preview.spec.isStyling;
+                                if (isAccessory && !isStylingShot && !techAccessories[k]) return acc;
+                                if (preview.spec.excludeAllAccessories && isAccessory) return acc;
+                                if (k === 'glasses') {
+                                    acc[k] = preview.spec.includeGlasses || (isStylingShot ? true : techAccessories.glasses) ? (assetsHighRes.glasses || assets.glasses) : undefined;
+                                } else if (k === 'lighting' && !lightingSendImage) {
+                                    acc[k] = undefined;
+                                } else {
+                                    acc[k] = assetsHighRes[k] || assets[k];
+                                }
+                                return acc;
+                            }, {});
+                            const poseKey = `pose_${preview.spec.view}`;
+                            imgs.pose = assets[poseKey] || assetsHighRes.pose || assets.pose;
+                            return imgs;
+                        })(),
+                        gender: modelGender,
+                        resolution: "1K",
+                        aspectRatio: "3:4",
+                        buttonsOpen,
+                        tucked,
+                        socksType: preview.spec.excludeSocksInfo ? 'none' : socksType,
+                        pantLength,
+                        techAccessories,
+                        closureType,
+                        upperGarmentDescription,
+                        lowerGarmentDescription,
+                        innerWearDescription,
+                        modelDescription,
+                        shoesDescription,
+                        sleevesRolled,
+                        excludeBeltAsset: preview.spec.excludeAllAccessories ? true : preview.spec.excludeBeltAsset,
+                        excludeHatAsset: preview.spec.excludeAllAccessories ? true : preview.spec.excludeHatAsset,
+                        excludeShoesAsset: preview.spec.excludeShoesAsset,
+                        productDescription: preview.structured.productDescription,
+                        fitDescription: preview.structured.fitDescription,
+                        poseDescription: preview.structured.pose,
+                        poseStickman: assets[`pose_${preview.spec.view}_stickman`] !== undefined ? assets[`pose_${preview.spec.view}_stickman`] : (preview.spec.useStickman ? poseStickman : undefined),
+                        targetView: preview.spec.camera.angle === 'angled' || preview.spec.view.includes('angled') ? 'side' : (preview.spec.camera.angle === 'back' || preview.spec.view.includes('back') ? 'back' : 'front'),
+                        poseFocus: preview.spec.view.includes('detail') ? 'detail' : (preview.spec.camera.shot_type === 'close_up' ? 'closeup' : (preview.spec.camera.shot_type === 'cowboy_shot' ? 'upper' : 'full')),
+                        hairBehindShoulders: (preview.spec.excludeHairInfo && modelGender !== 'male') ? undefined : preview.spec.hairBehind,
+                        lookAtCamera: (preview.spec.excludeHairInfo && modelGender !== 'male') ? undefined : preview.spec.lookAtCamera,
+                        enableWind: preview.spec.enableWind,
+                        isStylingShot: preview.spec.isStyling,
+                        shotIndex: previews.indexOf(preview) + 1,
+                        shotRole: preview.spec.isStyling ? 'styling' : 'technical',
+                        lightingPositive,
+                        lightingNegative,
+                        seed: seed === "" ? null : Number(seed),
+                        enableWebSearch,
+                        selectedMoodId,
+                        collarType,
+                        preview: true,
+                        isAngles: false,
+                        editedPrompt: JSON.stringify(preview.structured)
+                    };
 
-                            if (isAccessory && !isStylingShot && !techAccessories[k]) return acc;
-                            if (preview.spec.excludeAllAccessories && isAccessory) return acc;
-
-                            if (k === 'glasses') {
-                                acc[k] = preview.spec.includeGlasses || (isStylingShot ? true : techAccessories.glasses) ? (assetsHighRes.glasses || assets.glasses) : undefined;
-                            } else if (k === 'lighting' && !lightingSendImage) {
-                                acc[k] = undefined;
-                            } else {
-                                acc[k] = assetsHighRes[k] || assets[k];
-                            }
-                            return acc;
-                        }, {});
-
-                        const poseKey = `pose_${preview.spec.view}`;
-                        imgs.pose = assets[poseKey] || assetsHighRes.pose || assets.pose;
-                        return imgs;
-                    })(),
-                    gender: modelGender,
-                    resolution: "1K",
-                    aspectRatio: "3:4",
-                    buttonsOpen,
-                    tucked,
-                    socksType: preview.spec.excludeSocksInfo ? 'none' : socksType,
-                    pantLength,
-                    techAccessories,
-                    closureType,
-                    upperGarmentDescription,
-                    lowerGarmentDescription,
-                    innerWearDescription,
-                    modelDescription,
-                    shoesDescription,
-                    sleevesRolled,
-                    excludeBeltAsset: preview.spec.excludeAllAccessories ? true : preview.spec.excludeBeltAsset,
-                    excludeHatAsset: preview.spec.excludeAllAccessories ? true : preview.spec.excludeHatAsset,
-                    excludeShoesAsset: preview.spec.excludeShoesAsset,
-                    productDescription: preview.structured.productDescription,
-                    fitDescription: preview.structured.fitDescription,
-                    poseDescription: preview.structured.pose,
-                    poseStickman: assets[`pose_${preview.spec.view}_stickman`] !== undefined ? assets[`pose_${preview.spec.view}_stickman`] : (preview.spec.useStickman ? poseStickman : undefined),
-                    targetView: preview.spec.camera.angle === 'angled' || preview.spec.view.includes('angled') ? 'side' : (preview.spec.camera.angle === 'back' || preview.spec.view.includes('back') ? 'back' : 'front'),
-                    poseFocus: preview.spec.view.includes('detail') ? 'detail' : (preview.spec.camera.shot_type === 'close_up' ? 'closeup' : (preview.spec.camera.shot_type === 'cowboy_shot' ? 'upper' : 'full')),
-                    hairBehindShoulders: (preview.spec.excludeHairInfo && modelGender !== 'male') ? undefined : preview.spec.hairBehind,
-                    lookAtCamera: (preview.spec.excludeHairInfo && modelGender !== 'male') ? undefined : preview.spec.lookAtCamera,
-                    enableWind: preview.spec.enableWind,
-                    isStylingShot: preview.spec.isStyling,
-                    shotIndex: idx + 1,
-                    shotRole: preview.spec.isStyling ? 'styling' : 'technical',
-                    lightingPositive,
-                    lightingNegative,
-                    seed: seed === "" ? null : Number(seed),
-                    enableWebSearch,
-                    selectedMoodId,
-                    collarType,
-                    preview: true,
-                    isAngles: false,
-                    editedPrompt: JSON.stringify(preview.structured)
-                };
-
-                try {
-                    const res = await fetch("/api/generate", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(payload)
-                    });
-                    const data = await res.json();
-                    return data.previews?.[0]?.prompt || JSON.stringify(preview.structured, null, 2);
-                } catch (e) {
-                    return JSON.stringify(preview.structured, null, 2);
-                }
-            }));
+                    try {
+                        const res = await fetch("/api/generate", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(payload)
+                        });
+                        const data = await res.json();
+                        return data.previews?.[0]?.prompt || JSON.stringify(preview.structured, null, 2);
+                    } catch (e) {
+                        return JSON.stringify(preview.structured, null, 2);
+                    }
+                }));
+                textPrompts.push(...results);
+            }
 
             setBatchPreviewPrompts(previews);
             setEditedBatchPrompts(textPrompts);
@@ -724,147 +738,179 @@ export const useGenerationEngine = (
             const finalSelectionCount = selectedBatchImages.filter(Boolean).length;
             const generatedImages: any[] = [];
 
-            for (let i = 0; i < batchPreviewPrompts.length; i++) {
+            // Get selected indices
+            const selectedIndices = batchPreviewPrompts
+                .map((_, i) => i)
+                .filter(i => selectedBatchImages[i]);
+
+            // Split into chunks of 3 for parallel-but-controlled execution
+            const chunkSize = 3;
+            const chunks: number[][] = [];
+            for (let i = 0; i < selectedIndices.length; i += chunkSize) {
+                chunks.push(selectedIndices.slice(i, i + chunkSize));
+            }
+
+            for (const chunk of chunks) {
                 if (isStoppingBatchRef.current) break;
-                if (!selectedBatchImages[i]) continue;
 
-                const preview = batchPreviewPrompts[i];
-                const currentIndex = selectedBatchImages.slice(0, i + 1).filter(Boolean).length;
-                toast.info(`${language === "tr" ? "Üretiliyor" : "Generating"} ${currentIndex}/${finalSelectionCount}...`);
+                const chunkResults = await Promise.all(chunk.map(async (i) => {
+                    if (isStoppingBatchRef.current) return null;
 
-                const uploadedImages: any = {
-                    model: assetsHighRes.model || assets.model,
-                    background: assetsHighRes.background || assets.background
-                };
+                    const preview = batchPreviewPrompts[i];
+                    const currentIndex = selectedIndices.indexOf(i) + 1;
 
-                if (preview.spec.includeGlasses && (assetsHighRes.glasses || assets.glasses)) {
-                    uploadedImages.glasses = assetsHighRes.glasses || assets.glasses;
-                }
-                if (!preview.spec.excludeShoesAsset) {
-                    uploadedImages.shoes = assetsHighRes.shoes || assets.shoes;
-                }
-                if (assetsHighRes.inner_wear || assets.inner_wear) uploadedImages.inner_wear = assetsHighRes.inner_wear || assets.inner_wear;
-                if (assetsHighRes.jacket || assets.jacket) uploadedImages.jacket = assetsHighRes.jacket || assets.jacket;
-                if (assetsHighRes.hat || assets.hat) uploadedImages.hat = assetsHighRes.hat || assets.hat;
-                if (assetsHighRes.bag || assets.bag) uploadedImages.bag = assetsHighRes.bag || assets.bag;
-                if (assetsHighRes.belt || assets.belt) uploadedImages.belt = assetsHighRes.belt || assets.belt;
-                if (assetsHighRes.jewelry || assets.jewelry) uploadedImages.jewelry = assetsHighRes.jewelry || assets.jewelry;
-                if (lightingSendImage && (assetsHighRes.lighting || assets.lighting)) uploadedImages.lighting = assetsHighRes.lighting || assets.lighting;
+                    const uploadedImages: any = {
+                        model: assetsHighRes.model || assets.model,
+                        background: assetsHighRes.background || assets.background
+                    };
 
-                if (!preview.spec.isStyling) {
-                    if (!techAccessories.jacket) delete uploadedImages.jacket;
-                    if (!techAccessories.bag) delete uploadedImages.bag;
-                    if (!techAccessories.glasses) delete uploadedImages.glasses;
-                    if (!techAccessories.hat) delete uploadedImages.hat;
-                    if (!techAccessories.jewelry) delete uploadedImages.jewelry;
-                    if (!techAccessories.belt) delete uploadedImages.belt;
-                }
-
-                if (preview.spec.excludeBeltAsset) delete uploadedImages.belt;
-                if (preview.spec.excludeHatAsset) delete uploadedImages.hat;
-                if (preview.spec.excludeShoesAsset) delete uploadedImages.shoes;
-                if (preview.spec.excludeBagAsset) delete uploadedImages.bag;
-                if (preview.spec.excludeAllAccessories) {
-                    delete uploadedImages.jacket;
-                    delete uploadedImages.belt;
-                    delete uploadedImages.bag;
-                    delete uploadedImages.hat;
-                    delete uploadedImages.glasses;
-                    delete uploadedImages.jewelry;
-                }
-
-                if (preview.spec.assets.includes('front')) {
-                    uploadedImages.top_front = assetsHighRes.top_front || assets.top_front;
-                    uploadedImages.bottom_front = assetsHighRes.bottom_front || assets.bottom_front;
-                    for (let j = 1; j <= 4; j++) uploadedImages[`detail_front_${j}`] = assetsHighRes[`detail_front_${j}`] || assets[`detail_front_${j}`];
-                }
-                if (preview.spec.assets.includes('back')) {
-                    uploadedImages.top_back = assetsHighRes.top_back || assets.top_back;
-                    uploadedImages.bottom_back = assetsHighRes.bottom_back || assets.bottom_back;
-                    for (let j = 1; j <= 4; j++) uploadedImages[`detail_back_${j}`] = assetsHighRes[`detail_back_${j}`] || assets[`detail_back_${j}`];
-                }
-
-                let finalFitDescription = preview.structured.fitDescription;
-                if (preview.spec.fitDescriptionMode === 'first_sentence_only' && finalFitDescription) {
-                    const firstSentenceMatch = finalFitDescription.match(/^[^.!?]+[.!?]/);
-                    if (firstSentenceMatch) finalFitDescription = firstSentenceMatch[0].trim();
-                }
-
-                const poseKey = `pose_${preview.spec.view}`;
-                uploadedImages.pose = assets[poseKey] || assetsHighRes.pose || assets.pose;
-
-                const requestPayload = {
-                    productName: preview.structured.productName,
-                    workflowType,
-                    uploadedImages,
-                    gender,
-                    resolution,
-                    aspectRatio,
-                    hairBehindShoulders: preview.spec.excludeHairInfo ? undefined : preview.spec.hairBehind,
-                    enableWind: preview.spec.enableWind,
-                    isStylingShot: preview.spec.isStyling,
-                    shotIndex: i + 1,
-                    shotRole: preview.spec.isStyling ? 'styling' : 'technical',
-                    lookAtCamera: preview.spec.excludeHairInfo ? undefined : preview.spec.lookAtCamera,
-                    buttonsOpen,
-                    tucked,
-                    socksType: preview.spec.excludeSocksInfo ? 'none' : socksType,
-                    pantLength,
-                    techAccessories,
-                    closureType,
-                    upperGarmentDescription,
-                    lowerGarmentDescription,
-                    innerWearDescription,
-                    shoesDescription,
-                    sleevesRolled,
-                    excludeBeltAsset: preview.spec.excludeBeltAsset,
-                    excludeHatAsset: preview.spec.excludeHatAsset,
-                    excludeShoesAsset: preview.spec.excludeShoesAsset,
-                    productDescription: preview.structured.productDescription,
-                    fitDescription: finalFitDescription,
-                    poseDescription: preview.structured.pose,
-                    targetView: preview.spec.camera.angle === 'angled' || preview.spec.view.includes('angled') ? 'side' : (preview.spec.camera.angle === 'back' || preview.spec.view.includes('back') ? 'back' : 'front'),
-                    poseFocus: preview.spec.view.includes('detail') ? 'detail' : (preview.spec.camera.shot_type === 'close_up' ? 'closeup' : (preview.spec.camera.shot_type === 'cowboy_shot' ? 'upper' : 'full')),
-                    editedPrompt: editedBatchPrompts[i],
-                    seed: finalSeed,
-                    enableWebSearch,
-                    angleId: preview.spec.view,
-                    selectedMoodId,
-                    collarType,
-                    lightingPositive,
-                    lightingNegative,
-                    poseStickman: assets[`${poseKey}_stickman`] || (preview.spec.useStickman ? poseStickman : undefined),
-                    preview: false
-                };
-
-                try {
-                    const res = await fetch("/api/generate", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(requestPayload)
-                    });
-
-                    if (res.ok) {
-                        const data = await res.json();
-                        const imageUrl = data.images?.[0] || data.image_url;
-                        if (imageUrl) {
-                            const nameSuffix = preview.title.replace(/\s+/g, '_').toLowerCase();
-                            const fullFilename = `${productCode || 'shot'}_${nameSuffix}.jpg`;
-                            const newImg = { filename: fullFilename, url: imageUrl, downloadName: fullFilename, requestPayload };
-                            generatedImages.push(newImg);
-                            setResultImages([...generatedImages]);
-
-                            addProject({
-                                title: `Batch: ${productCode} - ${preview.title}`,
-                                type: "Photoshoot",
-                                imageUrl: imageUrl,
-                                description: `Seed: ${finalSeed} | Prompt: ${editedBatchPrompts[i]}`
-                            });
-                        }
+                    if (preview.spec.includeGlasses && (assetsHighRes.glasses || assets.glasses)) {
+                        uploadedImages.glasses = assetsHighRes.glasses || assets.glasses;
                     }
-                } catch (e) {
-                    console.error("Batch individual item error:", e);
+                    if (!preview.spec.excludeShoesAsset) {
+                        uploadedImages.shoes = assetsHighRes.shoes || assets.shoes;
+                    }
+                    if (assetsHighRes.inner_wear || assets.inner_wear) uploadedImages.inner_wear = assetsHighRes.inner_wear || assets.inner_wear;
+                    if (assetsHighRes.jacket || assets.jacket) uploadedImages.jacket = assetsHighRes.jacket || assets.jacket;
+                    if (assetsHighRes.hat || assets.hat) uploadedImages.hat = assetsHighRes.hat || assets.hat;
+                    if (assetsHighRes.bag || assets.bag) uploadedImages.bag = assetsHighRes.bag || assets.bag;
+                    if (assetsHighRes.belt || assets.belt) uploadedImages.belt = assetsHighRes.belt || assets.belt;
+                    if (assetsHighRes.jewelry || assets.jewelry) uploadedImages.jewelry = assetsHighRes.jewelry || assets.jewelry;
+                    if (lightingSendImage && (assetsHighRes.lighting || assets.lighting)) uploadedImages.lighting = assetsHighRes.lighting || assets.lighting;
+
+                    if (!preview.spec.isStyling) {
+                        if (!techAccessories.jacket) delete uploadedImages.jacket;
+                        if (!techAccessories.bag) delete uploadedImages.bag;
+                        if (!techAccessories.glasses) delete uploadedImages.glasses;
+                        if (!techAccessories.hat) delete uploadedImages.hat;
+                        if (!techAccessories.jewelry) delete uploadedImages.jewelry;
+                        if (!techAccessories.belt) delete uploadedImages.belt;
+                    }
+
+                    if (preview.spec.excludeBeltAsset) delete uploadedImages.belt;
+                    if (preview.spec.excludeHatAsset) delete uploadedImages.hat;
+                    if (preview.spec.excludeShoesAsset) delete uploadedImages.shoes;
+                    if (preview.spec.excludeBagAsset) delete uploadedImages.bag;
+                    if (preview.spec.excludeAllAccessories) {
+                        delete uploadedImages.jacket;
+                        delete uploadedImages.belt;
+                        delete uploadedImages.bag;
+                        delete uploadedImages.hat;
+                        delete uploadedImages.glasses;
+                        delete uploadedImages.jewelry;
+                    }
+
+                    if (preview.spec.assets.includes('front')) {
+                        uploadedImages.top_front = assetsHighRes.top_front || assets.top_front;
+                        uploadedImages.bottom_front = assetsHighRes.bottom_front || assets.bottom_front;
+                        for (let j = 1; j <= 4; j++) uploadedImages[`detail_front_${j}`] = assetsHighRes[`detail_front_${j}`] || assets[`detail_front_${j}`];
+                    }
+                    if (preview.spec.assets.includes('back')) {
+                        uploadedImages.top_back = assetsHighRes.top_back || assets.top_back;
+                        uploadedImages.bottom_back = assetsHighRes.bottom_back || assets.bottom_back;
+                        for (let j = 1; j <= 4; j++) uploadedImages[`detail_back_${j}`] = assetsHighRes[`detail_back_${j}`] || assets[`detail_back_${j}`];
+                    }
+
+                    let finalFitDescription = preview.structured.fitDescription;
+                    if (preview.spec.fitDescriptionMode === 'first_sentence_only' && finalFitDescription) {
+                        const firstSentenceMatch = finalFitDescription.match(/^[^.!?]+[.!?]/);
+                        if (firstSentenceMatch) finalFitDescription = firstSentenceMatch[0].trim();
+                    }
+
+                    const poseKey = `pose_${preview.spec.view}`;
+                    uploadedImages.pose = assets[poseKey] || assetsHighRes.pose || assets.pose;
+
+                    const requestPayload = {
+                        productName: preview.structured.productName,
+                        workflowType,
+                        uploadedImages,
+                        gender,
+                        resolution,
+                        aspectRatio,
+                        hairBehindShoulders: preview.spec.excludeHairInfo ? undefined : preview.spec.hairBehind,
+                        enableWind: preview.spec.enableWind,
+                        isStylingShot: preview.spec.isStyling,
+                        shotIndex: i + 1,
+                        shotRole: preview.spec.isStyling ? 'styling' : 'technical',
+                        lookAtCamera: preview.spec.excludeHairInfo ? undefined : preview.spec.lookAtCamera,
+                        buttonsOpen,
+                        tucked,
+                        socksType: preview.spec.excludeSocksInfo ? 'none' : socksType,
+                        pantLength,
+                        techAccessories,
+                        closureType,
+                        upperGarmentDescription,
+                        lowerGarmentDescription,
+                        innerWearDescription,
+                        modelDescription,
+                        shoesDescription,
+                        sleevesRolled,
+                        excludeBeltAsset: preview.spec.excludeBeltAsset,
+                        excludeHatAsset: preview.spec.excludeHatAsset,
+                        excludeShoesAsset: preview.spec.excludeShoesAsset,
+                        productDescription: preview.structured.productDescription,
+                        fitDescription: finalFitDescription,
+                        poseDescription: preview.structured.pose,
+                        targetView: preview.spec.camera.angle === 'angled' || preview.spec.view.includes('angled') ? 'side' : (preview.spec.camera.angle === 'back' || preview.spec.view.includes('back') ? 'back' : 'front'),
+                        poseFocus: preview.spec.view.includes('detail') ? 'detail' : (preview.spec.camera.shot_type === 'close_up' ? 'closeup' : (preview.spec.camera.shot_type === 'cowboy_shot' ? 'upper' : 'full')),
+                        editedPrompt: editedBatchPrompts[i],
+                        seed: finalSeed,
+                        enableWebSearch,
+                        angleId: preview.spec.view,
+                        selectedMoodId,
+                        collarType,
+                        lightingPositive,
+                        lightingNegative,
+                        poseStickman: assets[`${poseKey}_stickman`] || (preview.spec.useStickman ? poseStickman : undefined),
+                        preview: false
+                    };
+
+                    try {
+                        const res = await fetch("/api/generate", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(requestPayload)
+                        });
+
+                        if (res.ok) {
+                            const data = await res.json();
+                            const imageUrl = data.images?.[0] || data.image_url;
+                            if (imageUrl) {
+                                return { imageUrl, idx: i, requestPayload };
+                            }
+                        } else {
+                            const err = await res.text();
+                            console.error(`Generation error for index ${i}:`, err);
+                            toast.error(language === "tr" ? `${i + 1}. Görsel Hatası: ${err}` : `Error for image ${i + 1}: ${err}`);
+                        }
+                    } catch (e) {
+                        console.error(`Fetch error for index ${i}:`, e);
+                    }
+                    return null;
+                }));
+
+                // Update UI and results for the completed chunk
+                for (const res of chunkResults) {
+                    if (res) {
+                        const { imageUrl, idx, requestPayload } = res;
+                        const preview = batchPreviewPrompts[idx];
+                        const nameSuffix = preview.title.replace(/\s+/g, '_').toLowerCase();
+                        const fullFilename = `${productCode || 'shot'}_${nameSuffix}.jpg`;
+                        const newImg = { filename: fullFilename, url: imageUrl, downloadName: fullFilename, requestPayload };
+                        generatedImages.push(newImg);
+                        setResultImages([...generatedImages]); // Update resultImages incrementally
+
+                        addProject({
+                            title: `Batch: ${productCode} - ${preview.title}`,
+                            type: "Photoshoot",
+                            imageUrl: imageUrl,
+                            description: `Seed: ${finalSeed} | Prompt: ${editedBatchPrompts[idx]}`
+                        });
+                    }
                 }
+
+                const progress = Math.min(100, Math.round((generatedImages.length / finalSelectionCount) * 100));
+                // setBatchProgress(progress); // Assuming setBatchProgress is defined elsewhere if needed
             }
 
             setIsGenerationSuccess(true);

@@ -181,7 +181,7 @@ export function buildBatchSpecs(
             // 3. Technical Front — NO ACCESSORIES
             {
                 view: "technical_front",
-                pose: "Standing straight, arms at sides, neutral stance. Professional studio photography.",
+                pose: "Standing perfectly straight in rigid attention posture, feet touching and strictly parallel, arms resting straight at sides, neutral gaze. No styling pose, professional technical studio photography.",
                 dynamic: false,
                 lookAtCamera: true,
                 hairBehind: true,
@@ -194,7 +194,7 @@ export function buildBatchSpecs(
             // 4. Technical Back — NO ACCESSORIES
             {
                 view: "technical_back",
-                pose: "Standing straight, back to camera, arms at sides. Professional studio photography.",
+                pose: "Standing perfectly straight, back to camera, feet touching and strictly parallel, arms at sides. No styling pose, professional technical studio photography.",
                 dynamic: false,
                 lookAtCamera: false,
                 hairBehind: true,
@@ -208,7 +208,7 @@ export function buildBatchSpecs(
             // 4.5. Technical 3/4 Front — NO ACCESSORIES
             {
                 view: "technical_threequarter_front",
-                pose: "upright posture, three-quarter profile view facing right, shoulders level and relaxed, natural shoulder alignment, arms resting straight along the sides, hands relaxed with fingers slightly curved, no hand-to-body interaction, weight subtly distributed with slight emphasis on rear leg, neutral balanced stance, feet parallel and slightly apart, knees softly extended, neutral gaze directed forward in profile direction, head aligned with spine, chin neutral, elongated neck line",
+                pose: "upright posture, three-quarter profile view facing right, feet touching and strictly parallel, arms resting straight along the sides, no hand-to-body interaction, weight centered, neutral balanced stance, professional technical shot.",
                 dynamic: false,
                 lookAtCamera: false,
                 hairBehind: true,
@@ -314,7 +314,7 @@ export function buildStandardBatchSpecs(
         },
         {
             view: "std_tech_full_front",
-            pose: "Standing straight, arms at sides, neutral stance. Professional studio photography.",
+            pose: "Standing perfectly straight in rigid attention posture, feet touching and strictly parallel, arms resting straight at sides, neutral gaze. No styling pose, professional technical studio photography.",
             dynamic: false,
             lookAtCamera: true,
             hairBehind: true,
@@ -325,7 +325,7 @@ export function buildStandardBatchSpecs(
         },
         {
             view: "std_tech_full_back",
-            pose: "Standing straight, back to camera, arms at sides. Professional studio photography.",
+            pose: "Standing perfectly straight, back to camera, feet touching and strictly parallel, arms at sides. No styling pose, professional technical studio photography.",
             dynamic: false,
             lookAtCamera: false,
             hairBehind: true,
@@ -337,7 +337,7 @@ export function buildStandardBatchSpecs(
         },
         {
             view: "std_tech_threequarter_front",
-            pose: "upright posture, three-quarter profile view facing right, shoulders level and relaxed, natural shoulder alignment, arms resting straight along the sides, hands relaxed with fingers slightly curved, no hand-to-body interaction, weight subtly distributed with slight emphasis on rear leg, neutral balanced stance, feet parallel and slightly apart, knees softly extended, neutral gaze directed forward in profile direction, head aligned with spine, chin neutral, elongated neck line",
+            pose: "upright posture, three-quarter profile view facing right, feet touching and strictly parallel, arms resting straight along the sides, no hand-to-body interaction, weight centered, neutral balanced stance, professional technical shot.",
             dynamic: false,
             lookAtCamera: false,
             hairBehind: true,
@@ -349,7 +349,7 @@ export function buildStandardBatchSpecs(
         },
         {
             view: "std_tech_upper_front",
-            pose: "Standing straight, arms at sides, neutral stance. Cowboy shot.",
+            pose: "Standing perfectly straight in rigid attention posture, feet touching and strictly parallel, arms resting straight at sides, neutral gaze. Cowboy shot.",
             dynamic: false,
             lookAtCamera: true,
             hairBehind: true,
@@ -361,7 +361,7 @@ export function buildStandardBatchSpecs(
         },
         {
             view: "std_tech_upper_back",
-            pose: "Standing straight, back to camera, arms at sides. Cowboy shot.",
+            pose: "Standing perfectly straight, back to camera, feet touching and strictly parallel, arms at sides. Cowboy shot.",
             dynamic: false,
             lookAtCamera: false,
             hairBehind: true,

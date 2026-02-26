@@ -606,10 +606,10 @@ export async function POST(req: NextRequest) {
                 structuredPrompt.pose.dynamic = false;
                 structuredPrompt.pose.description = null;
 
-                structuredPrompt.pose.reference = (view as string) === 'front' ? "standing straight, arms at sides, neutral stance" :
-                    (view as string) === 'side' ? "profile view, neutral natural stance, arms at sides" :
-                        (view as string) === 'back' ? "back view, standing straight, arms at sides" :
-                            "neutral professional pose";
+                structuredPrompt.pose.reference = (view as string) === 'front' ? "standing perfectly straight in attention posture, feet touching and strictly parallel facing forward, arms resting straight at sides, neutral gaze" :
+                    (view as string) === 'side' ? "strict profile view, standing straight, feet positioned close together and parallel, arms at sides" :
+                        (view as string) === 'back' ? "back view, standing perfectly straight, feet touching and parallel, arms at sides" :
+                            "standing straight, rigid attention posture, feet together and parallel";
 
                 // Framing Logic for Technical Angles
                 if (poseFocus === 'closeup') {
