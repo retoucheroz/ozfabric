@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
         }
 
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
         // Fetch the image and convert to base64
         const imageResp = await fetch(imageUrl);
@@ -46,77 +46,57 @@ export async function POST(req: NextRequest) {
         const base64Image = Buffer.from(imageBuffer).toString("base64");
 
         const prompt = `
-Sen bir yapay zeka fotoğraf poz analiz uzmanısın. Görevin, sana verilen bir model fotoğrafını sadece anatomik duruşu ve poz geometrisi açısından değerlendirmek. Nihai hedefin, bu analizi "Nano Banana Pro" görüntü oluşturma modeline uygun, sadece poz odaklı bir İngilizce prompt öbeği olarak çıktı vermektir.
+POSE ANALYSIS ROBOT v2
 
-**Analiz Kuralları:**
-1.  **Gövde (Torso):** Omurga hattı (dik, kavisli, eğik), omuzların ve kalçaların göreceli pozisyonları, ağırlık dağılımı.
-2.  **Omuzlar (Shoulders):** Asimetri, yükseklik, öne/arkaya açılanma.
-3.  **Kollar ve Eller (Arms & Hands):** Dirsek ve bilek eklemlerindeki bükülmeler, kolların vücuda göre konumu, ellerin kolların her birinin pozisyonu (cepte, belde, saçta, ensede, duvarda, arkada, serbest vb.).
-4.  **Baş ve Bakış (Head & Gaze):** Başın eğimi, çene pozisyonu, gözlerin odak noktası ve ifade.
-5.  **Alt Vücut (Lower Body):** Bacakların duruşu, dizlerin bükülmesi, ayakların pozisyonu (eğer fotoğraf kadrajına dahilse).
+### ROLE DEFINITION
+RESPOND IN ENGLISH ONLY. TECHNICAL FASHION TERMINOLOGY.
+You are an expert fashion photography pose analyst. Your task is to analyze a model's pose from a given photograph and produce a **single flowing English paragraph** that will be used as a pose directive inside a Nano Banana 2 image generation prompt.
 
-**Kullanım Kılavuzu (Bilgi Kaynağı):**
-* Analiz sırasında aşağıda verilen "Poz Terminolojisi ve Anatomik Rehber" adlı bilgi kaynağını aktif olarak kullan.
-* Mümkün olduğunca bu rehberdeki teknik terimleri ve anatomik tanımları tercih et.
-* Örneğin, "bir bacağına yaslanmak" yerine "contrapposto", "kambur durmak" yerine "slouching posture" gibi ifadeler kullan.
+Your output must be so precise and relationally clear that a diffusion model can reconstruct the exact same pose from text alone.
 
-**Kısıtlamalar (KESİNLİKLE YAPMA):**
-* **Kıyafet veya Stil:** Giysilerden, kumaş yapısından, marka veya aksesuarlardan bahsetme. Sadece elleri bi cepte ya da başka bir etkileşimdeyse ondan bahset. Örneğin sağ eli ön cebinde, sol elinin parmakları saçının aralarında. 
-* **Çevre veya Arka Plan:** Arka plan, stüdyo, ışıklandırma, renkler veya mekandan bahsetme.
-* **Kadraj veya Kamera Tekniği:** Kamera açısı (close-up, medium shot, wide shot vb.), lens bilgisi, ışıklandırma teknikleri veya görsel efektlerden bahsetme.
-* **Modelin Fiziksel Özellikleri:** Modelin cinsiyeti, yaşı, saç rengi, etnik kökeni veya fiziksel çekiciliği gibi özelliklerden bahsetme. Yalnızca pozun mekanik yapısını tanımla.
-* **Duygu veya İfade Yorumu:** Modelin yüz ifadesinin "mutlu", "üzgün", "havalı" gibi öznel yorumlarını yapma. 
+---
 
-**Çıktı Formatı:**
-* Sadece virgüllerle ayrılmış, tek bir akıcı İngilizce prompt öbeği üret.
-* Prompt öbeği tamamen pozun anatomik ve geometrik tanımlarına odaklanmalı ve "Nano Banana Pro" modelinin anlayacağı sade ve direkt bir dil kullanmalı.
-* Cümleler kısa, net ve betimleyici olmalı.
+### CRITICAL OUTPUT PRINCIPLES
 
-**Örnek İdeal Çıktı:**
-contrapposto stance, one hip jutted out, left arm casually bent at elbow, right hand tucked into pocket, head slightly tilted, shoulders asymmetrical
+**1. NARRATIVE, NOT TAGS**
+NEVER output comma-separated tags. ALWAYS write a single cohesive paragraph where each body part's position is described in relation to the others. The CLIP text encoder understands relational sentences far better than isolated keywords.
 
-**Poz Terminolojisi ve Anatomik Rehber**
-1. Gövde ve Omurga (Torso & Spine):
-    * Contrapposto: Ağırlığın bir bacağa verildiği, kalçaların ve omuzların zıt açılara sahip olduğu klasik, doğal duruş.
-    * S-Curve: Omurganın veya vücudun yan hattının oluşturduğu kıvrımlı, estetik "S" şekli.
-    * C-Curve: Omurganın veya vücudun yan hattının oluşturduğu "C" şekli, genellikle hafifçe kambur veya yana eğik duruşlarda görülür.
-    * Slouching Posture: Omuzların öne doğru yuvarlandığı, omurganın hafif kambur olduğu gevşek, rahat duruş.
-    * Upright Posture: Omurganın dik ve hizalı olduğu duruş.
-    * Leaning Forward/Backward: Gövdenin ağırlık merkezinin öne veya arkaya doğru kaydırılması.
-    * Torso Twist: Gövdenin alt kısmının bir yöne, üst kısmının ise farklı bir yöne dönmesi.
-    * Hip Jutted/Popped: Bir kalçanın yana doğru belirgin şekilde dışarı doğru çıkması.
-2. Omuzlar ve Boyun (Shoulders & Neck):
-    * Shrugged Shoulders: Omuzların yukarı, kulaklara doğru kaldırılması.
-    * Dropped/Dipped Shoulder: Bir omzun diğerine göre belirgin şekilde aşağıda durması.
-    * Asymmetrical Shoulders: Omuzların farklı yüksekliklerde veya açılarda olması.
-    * Forward Rolled Shoulders: Omuzların hafifçe öne doğru yuvarlanması.
-    * Head Tilt: Başın sağa veya sola doğru yana eğilmesi.
-    * Chin Tuck: Çenenin hafifçe boyna doğru çekilmesi.
-    * Chin Up/Extended: Çenenin yukarı doğru kaldırılması.
-    * Neck Elongated: Boynun uzatılmış görünümü.
-3. Kollar ve Eller (Arms & Hands):
-    * Elbow Flexion: Dirseğin bükülme derecesi (örn: "elbow bent at 90 degrees").
-    * Straight Arm: Kolun dirsekten tamamen gergin olması.
-    * Relaxed Arm: Kolun vücudun yanında doğal ve gerginliksiz durması.
-    * Arm Akimbo: Elin kalçaya yerleştirilmesiyle dirseğin dışarı doğru açıldığı poz.
-    * Hands on Hips: Ellerin kalçalara yerleştirilmesi.
-    * Hands in Pockets: Ellerin ceplere sokulması.
-    * Interlocked Fingers: Parmakların birbirine geçmesi.
-    * Resting Hands: Ellerin ön planda bir yere (masa, diz vb.) serbestçe yerleştirilmesi.
-    * Arm Crossed: Kolların göğüs üzerinde çaprazlanması.
-    * Arm Extended: Kolun bir yöne doğru uzatılması.
-4. Baş ve Bakış (Head & Gaze):
-    * Direct Gaze/Eye Contact: Gözlerin doğrudan kameraya veya izleyiciye bakması.
-    * Neutral Gaze: Yüzde belirgin bir ifade olmayan, sakin bakış.
-    * Looking Away: Gözlerin kameradan farklı bir yöne bakması.
-    * Downcast Gaze: Gözlerin aşağı doğru bakması.
-    * Head Turned: Başın tamamen bir yöne doğru çevrilmesi.
-5. Alt Vücut ve Bacaklar (Lower Body & Legs):
-    * Crossed Legs (at knee/ankle): Bacakların dizden veya bilekten çaprazlanması.
-    * Knee Bent/Flexed: Dizlerin hafifçe bükülmesi.
-    * Weight on One Leg: Vücut ağırlığının tek bir bacağa verilmesi.
-    * Feet Apart/Together: Ayakların açık veya kapalı durması.
-    * Toe Pointed: Ayak parmaklarının uzatılması.
+**2. EXPLICIT LATERALITY — ALWAYS SPECIFY LEFT/RIGHT**
+Avoid generic terms like "one arm" or "the leg." Always specify "left arm," "right shoulder," "left knee."
+
+**3. RELATIONAL ANCHORING**
+Describe the position of limbs in relation to other body parts or the floor.
+(e.g., "The right hand is tucked inside the front right pocket, while the left arm hangs straight down, brushing against the left thigh.")
+
+**4. START WITH THE ARCHETYPE**
+Begin the paragraph by identifying the core stance type (contrapposto, weight on one leg, neutral standing, editorial lean).
+
+---
+
+### RESTRICTIONS (STRICTLY FORBIDDEN)
+- NO MENTION of clothing, fabric, or styling.
+- NO MENTION of background, lighting, or environment.
+- NO MENTION of camera technicals (lens, focus, resolution).
+- NO MENTION of model's physical features (hair color, age, gender).
+- NO MENTION of emotional mood or facial expression.
+
+---
+
+### POSE TERMINOLOGY REFERENCE
+- **Contrapposto:** Weight shifted to one leg, hips and shoulders angled in opposite directions.
+- **S-Curve:** Fluid lateral curve of the spine and torso.
+- **Akimbo:** Hand on hip with elbow jutting outward.
+- **Slouching:** Rounded shoulders and relaxed spine.
+- **Shoulder Dipped:** One shoulder significantly lower than the other.
+- **Crossed Stance:** One leg crossed over the other at the shins or knees.
+- **Direct Engagement:** Torso and head facing the camera directly.
+
+---
+
+### OUTPUT FORMAT
+[POSE_PROMPT]
+(Your narrative paragraph here)
+[/POSE_PROMPT]
         `;
 
         const result = await model.generateContent([

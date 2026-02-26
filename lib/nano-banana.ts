@@ -119,8 +119,8 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
 
         const validBase64 = base64Images.filter((img): img is { data: string, mimeType: string } => img !== null);
 
-        // CORRECT MODEL: gemini-3-pro-image-preview for Studio Image Generation
-        const modelId = "gemini-3-pro-image-preview";
+        // CORRECT MODEL: gemini-3.1-flash-image-preview for Studio Image Generation (Nano Banana 2)
+        const modelId = "gemini-3.1-flash-image-preview";
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${geminiKey}`;
 
         const parts: any[] = [{ text: payload.prompt }];
@@ -135,14 +135,24 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
             });
         });
 
+        // Map resolution to Gemini supported values (2K, 4K)
+        let geminiResolution = payload.resolution || "1K";
+        if (geminiResolution === "4K") geminiResolution = "4K";
+        else if (geminiResolution === "2K") geminiResolution = "2K";
+        else geminiResolution = "2K"; // Default to 2K for better quality if not specified
+
         const googlePayload = {
             contents: [{
                 role: "user",
-                parts: [
-                    ...parts,
-                    { text: `\nOutput Constraints:\n- Resolution: ${payload.resolution || "1K"}\n- Aspect Ratio: ${payload.aspect_ratio || "3:4"}\n- Format: PNG` }
-                ]
-            }]
+                parts: parts
+            }],
+            generationConfig: {
+                responseModalities: ["TEXT", "IMAGE"],
+                imageConfig: {
+                    aspectRatio: payload.aspect_ratio || "3:4",
+                    imageSize: geminiResolution
+                }
+            }
         };
 
         const response = await fetch(endpoint, {
