@@ -153,7 +153,7 @@ export async function POST(req: NextRequest) {
             targetView = null,
             hairBehindShoulders = false,
             lookAtCamera = true, // Default to true
-            socksType = 'none', // 'none' | 'white' | 'black' | 'grey' | 'navy'
+            socksType = 'none', // 'none' | 'white' | 'black' | 'grey' | 'navy' | 'beige' | 'brown' | 'red' | 'green' | 'blue' | 'anthracite'
             enableWind = false, // NEW: Subtle airflow toggle
             isStylingShot = true, // NEW: Flag to identify styling
             lightingPositive = null, // NEW
@@ -419,7 +419,8 @@ export async function POST(req: NextRequest) {
                         waist: (workflowType === 'lower' || workflowType === 'dress' || workflowType === 'set') && waistType !== 'none' ? waistType : null,
                         rise: (workflowType === 'lower' || workflowType === 'dress' || workflowType === 'set') && riseType !== 'none' ? riseType : null,
                         leg_style: (workflowType === 'lower' || workflowType === 'dress' || workflowType === 'set') && legType !== 'none' ? legType : null,
-                        hem_finish: (workflowType === 'lower' || workflowType === 'dress' || workflowType === 'set') && hemType !== 'none' ? hemType : null
+                        hem_finish: (workflowType === 'lower' || workflowType === 'dress' || workflowType === 'set') && hemType !== 'none' ? hemType : null,
+                        pant_length: (workflowType === 'lower' || workflowType === 'dress' || workflowType === 'set') && pantLength !== 'none' ? pantLength : null
                     }
                 },
 
@@ -886,6 +887,14 @@ export async function POST(req: NextRequest) {
             if (canShowLegHem) {
                 if (sp.garment.details?.leg_style) productBlock.push(`Leg Style: ${sp.garment.details.leg_style}.`);
                 if (sp.garment.details?.hem_finish) productBlock.push(`Hem Finish: ${sp.garment.details.hem_finish}.`);
+                if (sp.garment.details?.pant_length) {
+                    const length = sp.garment.details.pant_length;
+                    if (length === 'cropped') productBlock.push("Pant Length: cropped tapered pants ending above the ankle, bare ankles fully exposed, clear visible gap between hem and shoes, no fabric touching footwear.");
+                    else if (length === 'standard') productBlock.push("Pant Length: straight-leg pants ending just below the ankle, hem hovering above the shoe without touching, clean single line at the bottom, no break no stacking no bunching.");
+                    else if (length === 'classic') productBlock.push("Pant Length: pants with hem just touching the top of the shoe, fabric resting on the shoe with barely any fold, no sock visible, clean tailored look with minimal contact at the front crease.");
+                    else if (length === 'covering') productBlock.push("Pant Length: long straight-leg pants with hem draping over the top of the shoes, fabric covering the shoe opening, visible soft break and slight stacking at the front, only the toe area of the shoe peeking out.");
+                    else if (length === 'flare') productBlock.push("Pant Length: wide flared bell-bottom pants flaring out dramatically from the knee down, wide hem sweeping the floor and covering the shoes almost entirely, only the very toe tip of the shoe barely visible beneath the wide flared hem, vintage 70s flare silhouette.");
+                }
             }
             if (sp.styling.buttons === 'open' && canShowCollarHairButtons) {
                 productBlock.push("Style Adjustment: Front is open and unbuttoned.");
@@ -918,6 +927,12 @@ export async function POST(req: NextRequest) {
             if (wf === 'upper' || wf === 'set' || wf === 'dress' || uploadedImages.top_front || uploadedImages.jacket) {
                 if (sp.styling.sleeves_rolled) stylingBlock.push("sleeves are rolled up to the elbows");
                 else stylingBlock.push("sleeves are straight down to the wrists");
+            }
+            if (canShowLegHem && sp.styling.socks && sp.styling.socks !== 'none') {
+                const len = sp.garment.details?.pant_length;
+                if (len !== 'covering' && len !== 'flare') {
+                    stylingBlock.push(`style accessory: wearing ${sp.styling.socks} colored socks.`);
+                }
             }
             const accessoryItems = Object.entries(techAccessories || {}).filter(([_, v]) => !!v).map(([k]) => {
                 const desc = techAccessoryDescriptions[k] || k;

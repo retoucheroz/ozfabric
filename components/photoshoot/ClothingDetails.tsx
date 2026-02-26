@@ -46,11 +46,38 @@ export function ClothingDetails({
                             <label className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-wider">{language === "tr" ? "Paça Uzunluğu" : "Pant Length"}</label>
                             <select className="w-full text-xs p-2.5 rounded-xl border bg-[var(--bg-surface)] border-[var(--border-subtle)] text-[var(--text-primary)] font-bold appearance-none cursor-pointer" value={pantLength} onChange={(e) => setPantLength(e.target.value as any)}>
                                 <option value="none">-</option>
-                                <option value="cropped">{language === "tr" ? "Bileğin Üstünde" : "Cropped"}</option>
-                                <option value="ankle">{language === "tr" ? "Bilekte" : "Exact Ankle"}</option>
-                                <option value="below_ankle">{language === "tr" ? "Bileğin Hemen Altında" : "Below Ankle"}</option>
-                                <option value="full_length">{language === "tr" ? "Topuğa Kadar" : "Full Length"}</option>
-                                <option value="deep_break">{language === "tr" ? "Ayakkabının Üstünü Kapatacak" : "Deep Break"}</option>
+                                <option value="cropped">{language === "tr" ? "Kısa Paça" : "Cropped"}</option>
+                                <option value="standard">{language === "tr" ? "Standart Paça" : "Standard"}</option>
+                                <option value="classic">{language === "tr" ? "Klasik Paça" : "Classic"}</option>
+                                <option value="covering">{language === "tr" ? "Uzun Paça" : "Covering"}</option>
+                                <option value="flare">{language === "tr" ? "İspanyol Paça" : "Flare"}</option>
+                            </select>
+                        </div>
+                    )}
+
+                    {hasFeet && (
+                        <div className={cn("space-y-1.5 transition-opacity duration-300", (pantLength === 'covering' || pantLength === 'flare') && "opacity-40 cursor-not-allowed pointer-events-none")}>
+                            <label className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-wider">
+                                {language === "tr" ? "Çorap Seçeneği" : "Sock Style"}
+                                {(pantLength === 'covering' || pantLength === 'flare') && <span className="ml-2 lowercase font-normal italic">({language === "tr" ? "paçalar kapatıyor" : "covered by hem"})</span>}
+                            </label>
+                            <select
+                                className="w-full text-xs p-2.5 rounded-xl border bg-[var(--bg-surface)] border-[var(--border-subtle)] text-[var(--text-primary)] font-bold appearance-none cursor-pointer"
+                                value={(pantLength === 'covering' || pantLength === 'flare') ? 'none' : socksType}
+                                onChange={(e) => setSocksType(e.target.value as any)}
+                                disabled={pantLength === 'covering' || pantLength === 'flare'}
+                            >
+                                <option value="none">{language === "tr" ? "Görünmesin / Yok" : "No Socks / Invisible"}</option>
+                                <option value="white">{language === "tr" ? "Beyaz" : "White"}</option>
+                                <option value="black">{language === "tr" ? "Siyah" : "Black"}</option>
+                                <option value="grey">{language === "tr" ? "Gri" : "Grey"}</option>
+                                <option value="navy">{language === "tr" ? "Lacivert" : "Navy"}</option>
+                                <option value="beige">{language === "tr" ? "Bej" : "Beige"}</option>
+                                <option value="brown">{language === "tr" ? "Kahverengi" : "Brown"}</option>
+                                <option value="red">{language === "tr" ? "Kırmızı" : "Red"}</option>
+                                <option value="green">{language === "tr" ? "Yeşil" : "Green"}</option>
+                                <option value="blue">{language === "tr" ? "Mavi" : "Blue"}</option>
+                                <option value="anthracite">{language === "tr" ? "Antrasit" : "Anthracite"}</option>
                             </select>
                         </div>
                     )}

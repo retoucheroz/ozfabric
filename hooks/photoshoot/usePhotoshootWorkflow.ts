@@ -60,7 +60,7 @@ export const usePhotoshootWorkflow = () => {
     const [enableWind, setEnableWind] = useState(false);
     const [selectedMoodId, setSelectedMoodId] = useState<string>('natural');
     const [hairBehindShoulders, setHairBehindShoulders] = useState(false);
-    const [socksType, setSocksType] = useState<'none' | 'white' | 'black' | 'grey' | 'navy'>('none');
+    const [socksType, setSocksType] = useState<'none' | 'white' | 'black' | 'grey' | 'navy' | 'beige' | 'brown' | 'red' | 'green' | 'blue' | 'anthracite'>('none');
 
     const [collarType, setCollarType] = useState<'none' | 'standard' | 'v-neck' | 'polo'>('none');
     const [shoulderType, setShoulderType] = useState<'none' | 'standard' | 'dropped' | 'padded'>('none');
@@ -68,7 +68,7 @@ export const usePhotoshootWorkflow = () => {
     const [riseType, setRiseType] = useState<'none' | 'low' | 'mid' | 'high'>('none');
     const [legType, setLegType] = useState<'none' | 'skinny' | 'straight' | 'wide'>('none');
     const [hemType, setHemType] = useState<'none' | 'standard' | 'cuffed' | 'raw'>('none');
-    const [pantLength, setPantLength] = useState<'none' | 'cropped' | 'ankle' | 'below_ankle' | 'full_length' | 'deep_break'>('none');
+    const [pantLength, setPantLength] = useState<'none' | 'cropped' | 'standard' | 'classic' | 'covering' | 'flare'>('none');
 
     const [lightingPositive, setLightingPositive] = useState<string>("");
     const [lightingNegative, setLightingNegative] = useState<string>("");
