@@ -693,8 +693,7 @@ export const useGenerationEngine = (
                         selectedMoodId,
                         collarType,
                         preview: true,
-                        isAngles: false,
-                        editedPrompt: JSON.stringify(preview.structured)
+                        isAngles: false
                     };
 
                     try {

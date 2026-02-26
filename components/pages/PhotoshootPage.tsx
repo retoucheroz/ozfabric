@@ -4,7 +4,7 @@ import { useLanguage } from "@/context/language-context"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch"
 import { Separator } from "@/components/ui/separator"
 import {
@@ -654,112 +654,154 @@ export default function PhotoshootPage() {
 
                 {/* Preview Dialog */}
                 <Dialog open={showPreview} onOpenChange={setShowPreview}>
-                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                        <DialogHeader>
-                            <DialogTitle>
-                                {language === "tr" ? "Oluşturma Önizlemesi" : "Generation Preview"}
-                                {pendingOptions?.isThreeAngles && (
-                                    <span className="text-sm font-normal text-muted-foreground ml-2 block sm:inline mt-1 sm:mt-0">
-                                        {language === "tr" ? "(3 Açılı Çekim - Ön Referans)" : "(3-Angle Shot - Front Reference)"}
-                                    </span>
-                                )}
-                            </DialogTitle>
-                        </DialogHeader>
+                    <DialogContent className="max-w-[1000px] w-[90vw] max-h-[90vh] p-0 overflow-hidden flex flex-col bg-[var(--bg-surface)] border-[var(--border-subtle)] shadow-2xl rounded-[2.5rem]">
+                        {/* Premium Header */}
+                        <div className="flex-none px-10 py-8 border-b border-[var(--border-subtle)] bg-[var(--bg-elevated)]/50 backdrop-blur-xl flex items-center justify-between">
+                            <div className="flex items-center gap-6">
+                                <div className="w-16 h-16 rounded-[1.5rem] bg-blue-600/10 flex items-center justify-center border border-blue-600/20 shadow-inner">
+                                    <FileText className="w-8 h-8 text-blue-500" />
+                                </div>
+                                <div>
+                                    <DialogTitle className="text-3xl font-black text-[var(--text-primary)] tracking-tight">
+                                        {language === "tr" ? "Oluşturma Önizlemesi" : "Generation Preview"}
+                                    </DialogTitle>
+                                    <DialogDescription className="text-sm font-semibold text-[var(--text-muted)] mt-1">
+                                        {pendingOptions?.isThreeAngles
+                                            ? (language === "tr" ? "3 Açılı Çekim - Teknik Analiz" : "3-Angle Shot - Technical Analysis")
+                                            : (language === "tr" ? "Çekim senaryosu ve detaylar hazırlandı." : "Shot scenario and details have been prepared.")
+                                        }
+                                    </DialogDescription>
+                                </div>
+                            </div>
 
-                        {previewData && (
-                            <div className="space-y-6">
-                                {previewData.map((item: any, idx: number) => (
-                                    <div key={idx} className="border rounded-lg p-4 bg-muted/50">
-                                        {user?.role === 'admin' && (
-                                            <div className="flex items-center justify-between mb-3">
-                                                <h4 className="font-semibold flex items-center gap-2">
-                                                    <FileText className="w-4 h-4 text-primary" />
-                                                    {item.title || (language === "tr" ? "Oluşturma İstemi" : "Generation Prompt")}
-                                                </h4>
-                                                <div className="flex items-center gap-2">
-                                                    <Button
-                                                        variant={previewMode === 'text' ? 'default' : 'ghost'}
-                                                        size="sm"
-                                                        className="h-7 text-[10px]"
-                                                        onClick={() => setPreviewMode('text')}
-                                                    >
-                                                        Text
-                                                    </Button>
-                                                    <Button
-                                                        variant={previewMode === 'json' ? 'default' : 'ghost'}
-                                                        size="sm"
-                                                        className="h-7 text-[10px]"
-                                                        onClick={() => {
-                                                            setPreviewMode('json');
-                                                            if (previewData && previewData[0]) {
-                                                                setUserAddedPrompt(JSON.stringify(previewData[0].structured, null, 2));
-                                                            }
-                                                        }}
-                                                    >
-                                                        JSON
-                                                    </Button>
+                            {user?.role === 'admin' && (
+                                <div className="flex p-1.5 rounded-2xl bg-[var(--bg-surface)] border-2 border-[var(--border-subtle)] shadow-md">
+                                    <button
+                                        onClick={() => {
+                                            setPreviewMode('text');
+                                            if (previewData && previewData[0]) setUserAddedPrompt(previewData[0].prompt);
+                                        }}
+                                        className={cn(
+                                            "px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                            previewMode === 'text' ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30" : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                                        )}
+                                    >
+                                        PROMPT
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setPreviewMode('json');
+                                            if (previewData && previewData[0]) setUserAddedPrompt(JSON.stringify(previewData[0].structured, null, 2));
+                                        }}
+                                        className={cn(
+                                            "px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                            previewMode === 'json' ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30" : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                                        )}
+                                    >
+                                        JSON (ADV)
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Content Scroll Area */}
+                        <div className="flex-1 overflow-y-auto custom-scrollbar p-10 bg-[var(--bg-surface)]">
+                            {previewData && (
+                                <div className="space-y-10">
+                                    {previewData.map((item: any, idx: number) => (
+                                        <div key={idx} className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150">
+                                            {/* Shot Info & Metadata Card */}
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                                                <div className="col-span-1 p-6 rounded-[2rem] bg-[var(--bg-elevated)] border border-[var(--border-subtle)] flex flex-col justify-center">
+                                                    <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-1">{language === "tr" ? "ÇEKİM TÜRÜ" : "SHOT TYPE"}</span>
+                                                    <p className="text-xl font-black text-[var(--text-primary)]">{item.title || (language === "tr" ? "Ön Çekim" : "Main Shot")}</p>
+                                                </div>
+                                                <div className="col-span-1 p-6 rounded-[2rem] bg-[var(--bg-elevated)] border border-[var(--border-subtle)] flex flex-col justify-center">
+                                                    <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">{language === "tr" ? "ÇÖZÜNÜRLÜK" : "RESOLUTION"}</span>
+                                                    <p className="text-xl font-black text-[var(--text-primary)]">{item.settings.resolution}</p>
+                                                </div>
+                                                <div className="col-span-1 p-6 rounded-[2rem] bg-[var(--bg-elevated)] border border-[var(--border-subtle)] flex flex-col justify-center">
+                                                    <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">{language === "tr" ? "ORAN" : "ASPECT RATIO"}</span>
+                                                    <p className="text-xl font-black text-[var(--text-primary)]">{item.settings.aspect_ratio}</p>
                                                 </div>
                                             </div>
-                                        )}
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <Button
-                                                variant={previewMode === 'text' ? 'secondary' : 'ghost'}
-                                                size="sm"
-                                                className="h-6 text-[9px]"
-                                                onClick={() => {
-                                                    setPreviewMode('text');
-                                                    if (previewData && previewData[0]) {
-                                                        setUserAddedPrompt(previewData[0].prompt);
-                                                    }
-                                                }}
-                                            >
-                                                {language === "tr" ? "Metne Dön" : "Switch to Text"}
-                                            </Button>
-                                        </div>
 
-                                        {user?.role === 'admin' ? (
-                                            <div className="space-y-2">
-                                                <div className="space-y-4">
-                                                    <textarea
-                                                        className="w-full p-4 text-[12px] border rounded-lg bg-[#0a0a0a] text-green-400 min-h-[350px] font-mono leading-relaxed focus:ring-1 focus:ring-green-500/50 outline-none scrollbar-thin scrollbar-thumb-card"
-                                                        value={userAddedPrompt}
-                                                        onChange={(e) => setUserAddedPrompt(e.target.value)}
-                                                        spellCheck={false}
-                                                    />
-                                                    {previewMode === 'json' && (
-                                                        <p className="text-[10px] text-muted-foreground italic px-1">
-                                                            {language === "tr" ? "JSON'u düzenleyerek çekim detaylarını değiştirebilirsiniz." : "You can modify shot details by editing the JSON above."}
-                                                        </p>
+                                            {/* Editor Frame */}
+                                            <div className="relative group">
+                                                <div className="absolute -inset-0.5 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-[2.5rem] blur opacity-75 transition duration-1000 group-hover:duration-200"></div>
+                                                <div className="relative p-1 rounded-[2.5rem] bg-[var(--bg-elevated)] border border-[var(--border-subtle)] shadow-2xl overflow-hidden">
+                                                    <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]/50">
+                                                        <div className="flex gap-1.5">
+                                                            <div className="w-2.5 h-2.5 rounded-full bg-red-500/40" />
+                                                            <div className="w-2.5 h-2.5 rounded-full bg-amber-500/40" />
+                                                            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/40" />
+                                                        </div>
+                                                        <span className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-[0.3em]">
+                                                            {previewMode === 'text' ? (language === "tr" ? "METİNSEL ANALİZ" : "TEXTUAL ANALYSIS") : "STRUCTURED DATA"}
+                                                        </span>
+                                                        <div className="w-10 h-10 rounded-full bg-blue-500/5 flex items-center justify-center">
+                                                            <FileText className="w-4 h-4 text-blue-500" />
+                                                        </div>
+                                                    </div>
+
+                                                    {user?.role === 'admin' ? (
+                                                        <textarea
+                                                            className={cn(
+                                                                "w-full p-8 text-[13px] font-medium leading-[1.8] bg-[var(--bg-elevated)] text-[var(--text-primary)] min-h-[450px] resize-none outline-none custom-scrollbar transition-all selection:bg-blue-500/30",
+                                                                previewMode === 'json' ? "font-mono text-green-400" : "font-sans italic text-[var(--text-secondary)]"
+                                                            )}
+                                                            value={userAddedPrompt}
+                                                            onChange={(e) => setUserAddedPrompt(e.target.value)}
+                                                            spellCheck={false}
+                                                            placeholder={language === "tr" ? "İçerik buraya gelecek..." : "Content will appear here..."}
+                                                        />
+                                                    ) : (
+                                                        <div className="p-16 text-center space-y-4">
+                                                            <div className="w-20 h-20 rounded-full bg-blue-600/5 flex items-center justify-center mx-auto border border-blue-600/10">
+                                                                <FileText className="w-8 h-8 text-blue-500/50" />
+                                                            </div>
+                                                            <div className="max-w-xs mx-auto">
+                                                                <p className="text-sm font-bold text-[var(--text-primary)] mb-1">
+                                                                    {language === "tr" ? "Üretim Senaryosu Analiz Edildi" : "Production Scenario Analyzed"}
+                                                                </p>
+                                                                <p className="text-xs text-[var(--text-muted)] font-medium leading-relaxed">
+                                                                    {language === "tr" ? "Sistem görsellerinizi analiz etti ve en uygun üretim parametrelerini belirledi." : "The system analyzed your images and determined the optimal production parameters."}
+                                                                </p>
+                                                            </div>
+                                                        </div>
                                                     )}
                                                 </div>
                                             </div>
-                                        ) : (
-                                            <div className="py-10 text-center text-xs text-muted-foreground bg-[var(--bg-surface)] rounded-lg border border-dashed border-[var(--border-subtle)]">
-                                                {language === "tr" ? "Üretim detayları analiz edildi. Onaylayıp devam edebilirsiniz." : "Generation details analyzed. You can confirm and proceed."}
-                                            </div>
-                                        )}
-
-                                        <div className="mt-3 flex items-center gap-2 text-[10px] text-muted-foreground">
-                                            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
-                                                <span>Resolution: {item.settings.resolution}</span>
-                                            </div>
-                                            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--bg-elevated)] text-[var(--accent-primary)] border border-[var(--border-subtle)]">
-                                                <span>Ratio: {item.settings.aspect_ratio}</span>
-                                            </div>
                                         </div>
-                                    </div>
-                                ))}
-                                <div className="flex justify-end gap-3 pt-4">
-                                    <Button variant="outline" onClick={() => setShowPreview(false)}>
-                                        {language === "tr" ? "İptal" : "Cancel"}
-                                    </Button>
-                                    <Button onClick={handleConfirmGeneration} className="bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)]">
-                                        <Sparkles className="w-4 h-4 mr-2" />
-                                        {language === "tr" ? "Onayla ve Oluştur" : "Confirm & Generate"}
-                                    </Button>
+                                    ))}
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
+
+                        {/* Action Footer */}
+                        <div className="flex-none p-10 border-t border-[var(--border-subtle)] bg-[var(--bg-elevated)]/80 backdrop-blur-3xl flex gap-6">
+                            <Button
+                                variant="outline"
+                                onClick={() => setShowPreview(false)}
+                                className="h-20 px-12 rounded-[2rem] border-2 border-[var(--border-strong)] text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[var(--bg-surface)] transition-all flex-none"
+                            >
+                                {language === "tr" ? "DÜZENLEMEYE DÖN" : "RETURN TO EDIT"}
+                            </Button>
+                            <Button
+                                onClick={handleConfirmGeneration}
+                                className="h-20 flex-1 rounded-[2rem] bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-500 hover:to-indigo-600 text-white shadow-2xl shadow-blue-600/30 transition-all hover:scale-[1.01] active:scale-[0.98] flex items-center justify-between px-10 group"
+                            >
+                                <div className="flex flex-col items-start translate-y-[-1px]">
+                                    <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-80 mb-0.5">READY FOR PRODUCTION</span>
+                                    <span className="text-sm font-black uppercase tracking-[0.1em]">
+                                        {language === "tr" ? "ONAYLA VE ÇEKİMİ BAŞLAT" : "CONFIRM & START SHOOT"}
+                                    </span>
+                                </div>
+                                <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-all border border-white/10 shadow-xl group-hover:rotate-6">
+                                    <Sparkles className="w-6 h-6 text-white" />
+                                </div>
+                            </Button>
+                        </div>
                     </DialogContent>
                 </Dialog>
 
