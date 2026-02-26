@@ -706,12 +706,12 @@ export const useGenerationEngine = (
                         const data = await res.json();
                         if (!res.ok) {
                             console.error("Preview API error:", data.error || data);
-                            return JSON.stringify(preview.structured, null, 2);
+                            return `[ERROR: ${data.error || "API Failure"}] Manual check required for this shot. Check assets and descriptions.`;
                         }
-                        return data.previews?.[0]?.prompt || JSON.stringify(preview.structured, null, 2);
-                    } catch (e) {
+                        return data.previews?.[0]?.prompt || "[WARNING] Prompt generation returned empty. Using default tags.";
+                    } catch (e: any) {
                         console.error("Failed to fetch preview:", e);
-                        return JSON.stringify(preview.structured, null, 2);
+                        return `[FETCH FAILED] Network or Server error: ${e.message}`;
                     }
                 }));
                 textPrompts.push(...results);

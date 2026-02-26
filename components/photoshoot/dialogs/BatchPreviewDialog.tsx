@@ -35,7 +35,7 @@ export function BatchPreviewDialog({
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent
-                className="max-w-[95vw] w-[1600px] h-[65vh] p-0 overflow-hidden flex flex-col bg-[#0A0A0B] border-[#222] shadow-[0_0_50px_rgba(0,0,0,0.8)] rounded-3xl"
+                className="!max-w-none !w-[1600px] h-[65vh] p-0 overflow-hidden flex flex-col bg-[#0A0A0B] border-[#222] shadow-[0_0_50px_rgba(0,0,0,0.8)] rounded-3xl"
                 onPointerDownOutside={(e) => e.preventDefault()}
             >
                 {/* Header: Production Control Panel Style */}
@@ -80,7 +80,7 @@ export function BatchPreviewDialog({
                             <div
                                 key={idx}
                                 className={cn(
-                                    "relative h-full w-[800px] shrink-0 rounded-3xl border-2 transition-all flex flex-col overflow-hidden bg-[#141416]/50 shadow-2xl",
+                                    "relative h-full min-w-[850px] shrink-0 rounded-3xl border-2 transition-all flex flex-col overflow-hidden bg-[#141416]/50 shadow-2xl",
                                     isSelected
                                         ? "border-blue-600/40 ring-1 ring-blue-600/10"
                                         : "border-zinc-800 opacity-40 grayscale pointer-events-none"

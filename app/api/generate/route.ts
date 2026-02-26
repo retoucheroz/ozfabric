@@ -1138,11 +1138,17 @@ export async function POST(req: NextRequest) {
                 } else {
                     // Normal Styling Mode
                     const reqData = buildStructuredPrompt(targetView || 'styling');
+                    const finalPromptStr = typeof reqData.prompt === 'string' && reqData.prompt.trim() !== ''
+                        ? reqData.prompt
+                        : `[PROMPT_ENGINE_FALLBACK] ${targetView ? targetView.toUpperCase() : 'STYLING'} SHOT.
+[SUBJECT] ${body.gender || 'model'} identity from reference [/SUBJECT]
+[PRODUCT] ${body.productName || 'garment'} as shown [/PRODUCT]`;
+
                     return NextResponse.json({
                         status: "preview",
                         previews: [{
                             title: targetView ? `${targetView.charAt(0).toUpperCase() + targetView.slice(1)} View` : "Styling Shot",
-                            prompt: reqData.prompt || "Could not generate prompt text.",
+                            prompt: finalPromptStr,
                             structured: reqData.structured,
                             assets: reqData.input_images,
                             settings: { resolution, aspect_ratio: aspectRatio }
