@@ -222,9 +222,9 @@ export const useLibraryState = (
     };
 
     const handleSavedPoseClick = (pose: SavedPose) => {
-        setAssets((prev: any) => ({ ...prev, pose: pose.stickmanUrl || pose.url }));
+        setAssets((prev: any) => ({ ...prev, pose: pose.url }));
         setAssetsHighRes((prev: any) => ({ ...prev, pose: null }));
-        setPoseStickman(pose.stickmanUrl);
+        setPoseStickman(null); // Stickman is removed
 
         if (pose.customPrompt) {
             setPoseDescription(pose.customPrompt);

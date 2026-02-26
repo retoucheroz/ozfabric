@@ -365,7 +365,7 @@ export function LibrarySidebar({
                                                     return true;
                                                 }).map(pose => {
                                                     const isPoseSelected = selectedPoseUrl && pose.url === selectedPoseUrl;
-                                                    const isProcessing = (pose as any).stickmanUrl === 'processing';
+                                                    const isProcessing = (pose as any).customPrompt === undefined && (pose as any).stickmanUrl === 'processing';
                                                     return (
                                                         <div key={pose.id} className={cn(
                                                             "group relative aspect-[2/3] rounded-lg border overflow-hidden transition-all shrink-0",
@@ -377,9 +377,9 @@ export function LibrarySidebar({
                                                             <img src={pose.thumbUrl || pose.originalThumb} className="w-full h-full object-cover" onClick={() => !isProcessing && handleSavedPoseClick(pose)} />
                                                             {isProcessing && (
                                                                 <div className="absolute inset-0 bg-black/65 flex flex-col items-center justify-center gap-2 pointer-events-none">
-                                                                    <div className="w-5 h-5 border-2 border-violet-400 border-t-transparent rounded-full animate-spin" />
-                                                                    <span className="text-[8px] text-violet-300 font-bold text-center px-1 leading-tight">
-                                                                        {language === "tr" ? "Stickman hazırlanıyor" : "Creating stickman"}
+                                                                    <div className="w-5 h-5 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+                                                                    <span className="text-[8px] text-blue-300 font-bold text-center px-1 leading-tight uppercase tracking-tighter">
+                                                                        {language === "tr" ? "Analiz ediliyor" : "Analyzing"}
                                                                     </span>
                                                                 </div>
                                                             )}

@@ -319,7 +319,9 @@ export const useGenerationEngine = (
             ].filter(Boolean);
 
             let currentFocus = poseFocus;
-            if (!isThreeAngles && generationStage === 'complete' && workflowType === 'upper') {
+            if (targetView && targetView.startsWith('std_tech_upper_')) {
+                currentFocus = 'upper';
+            } else if (!isThreeAngles && generationStage === 'complete' && workflowType === 'upper') {
                 const base = 'full';
                 const alternate = 'upper';
                 currentFocus = (stylingIteration % 2 === 0) ? base : alternate;

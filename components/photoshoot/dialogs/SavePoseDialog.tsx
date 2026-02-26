@@ -35,7 +35,7 @@ export function SavePoseDialog({
                             </div>
                         )}
                     </div>
-                    <p className="text-center text-sm text-muted-foreground">{language === "tr" ? "Stickman oluşturmadan önce pozu kaydetmek ister misiniz?" : "Do you want to save this to library before converting?"}</p>
+                    <p className="text-center text-sm text-muted-foreground">{language === "tr" ? "Bu pozu kütüphaneye kaydetmek ister misiniz?" : "Do you want to save this pose to the library?"}</p>
                     <div className="flex gap-2 justify-center mt-2">
                         <Button variant="outline" onClick={() => handleSavePose('female')} className="gap-2">
                             <User className="w-4 h-4 text-pink-500" />
@@ -47,7 +47,7 @@ export function SavePoseDialog({
                         </Button>
                     </div>
                     <Button variant="ghost" onClick={() => handleSavePose('skip')} className="w-full mt-2 text-xs text-muted-foreground">
-                        {language === "tr" ? "Kaydetme, Sadece Dönüştür" : "Don't Save, Just Convert"}
+                        {language === "tr" ? "Kaydetme, Devam Et" : "Don't Save, Just Continue"}
                     </Button>
                 </div>
             </DialogContent>

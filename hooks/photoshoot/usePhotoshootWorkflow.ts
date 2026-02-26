@@ -301,26 +301,7 @@ export const usePhotoshootWorkflow = () => {
         return [];
     };
 
-    const convertToStickman = async () => {
-        if (!assets.pose) return;
-        toast.info(language === "tr" ? "Stickman oluşturuluyor..." : "Converting to Stickman...");
-        try {
-            const res = await fetch("/api/pose", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ image_url: assets.pose })
-            });
-            if (!res.ok) throw new Error("Conversion failed");
-            const data = await res.json();
-            const stickmanUrl = data.pose_image;
-            setAssets(prev => ({ ...prev, pose: stickmanUrl }));
-            setPoseStickman(stickmanUrl);
-            toast.success(language === "tr" ? "Dönüştürüldü" : "Converted");
-        } catch (e) {
-            console.error(e);
-            toast.error("Stickman conversion failed");
-        }
-    };
+
 
     const handleLibrarySelect = (item: any, isUpload: boolean = false) => {
         if (!activeLibraryAsset) return;
@@ -499,7 +480,7 @@ export const usePhotoshootWorkflow = () => {
         handleBatchGenerate, handleConfirmGeneration, handleConfirmBatchGeneration, batchPreviewPrompts,
         editedBatchPrompts, setEditedBatchPrompts, showBatchPreview, setShowBatchPreview,
         selectedBatchImages, setSelectedBatchImages, isStoppingBatch, handleStopBatch, estimatedCost,
-        handleAssetRemove, canMoveToStep, handleLibrarySelect, getLibraryItems, convertToStickman,
+        handleAssetRemove, canMoveToStep, handleLibrarySelect, getLibraryItems,
         addToGlobalLibrary
     };
 };

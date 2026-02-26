@@ -203,16 +203,10 @@ export async function POST(req: NextRequest) {
         // One-time random seed for consistency across angles
         const requestSeed = (seed !== null && seed !== undefined) ? Number(seed) : Math.floor(Math.random() * 1000000000);
 
-        // Ensure poseStickman is an R2 URL
-        // Ensure poseStickman is an R2 URL
+        // Ensure pose image is an R2 URL if provided (but we typically delete it below)
         let uploadedImages = rawUploadedImages || {};
 
         if (!preview) {
-            if (poseStickman) {
-                let { ensureR2Url } = await import("@/lib/s3");
-                poseStickman = await ensureR2Url(poseStickman, "poses");
-            }
-
             // === R2 INPUT SANITIZATION ===
             let { ensureR2Url: ensureS3R2 } = await import("@/lib/s3");
             const sanitizedData = await Promise.all(
@@ -332,12 +326,7 @@ export async function POST(req: NextRequest) {
             if (imgs.jewelry) assets.push(imgs.jewelry);
             if (imgs.lighting) assets.push(imgs.lighting);
 
-            // 5. POSE REFERENCE (Stickman)
-            // If stickman exists, we include it as an asset because it's clean and won't leak texture.
-            if (poseStickman) {
-                assets.push(poseStickman);
-            }
-            // Note: We still exclude original 'imgs.pose' to avoid leakage.
+            // Note: We exclude original 'imgs.pose' to avoid leakage. Skip stickman entirely.
 
             // 6. DETAIL SHOT - SPECIAL ASSET FILTERING
             if (focus === 'detail') {
@@ -457,8 +446,8 @@ export async function POST(req: NextRequest) {
 
                 pose: {
                     reference: null,
-                    description: isActiveStyling ? poseDescription : null, // STYLING ONLY
-                    dynamic: isActiveStyling
+                    description: poseDescription || null, // Always use provided description if available
+                    dynamic: isActiveStyling || !!poseDescription
                 },
                 camera: {
                     shot_type: "full_body",
@@ -588,9 +577,6 @@ export async function POST(req: NextRequest) {
             if (isActiveStyling) {
                 // Artistic mode
                 structuredPrompt.pose.dynamic = true;
-                if (poseStickman) {
-                    structuredPrompt.pose.reference = "use stickman reference";
-                }
 
                 // Framing for Styling
                 if (poseFocus === 'upper') {
@@ -605,10 +591,11 @@ export async function POST(req: NextRequest) {
                 }
             } else {
                 // Technical angles (front, side, back)
+                // Technical shots should only be static if NO custom description is provided
                 structuredPrompt.camera.angle = view as string;
-                // Technical shots should NEVER have complex descriptions or stickman influence
-                structuredPrompt.pose.dynamic = false;
-                structuredPrompt.pose.description = null;
+                structuredPrompt.pose.dynamic = !!structuredPrompt.pose.description;
+                // If structuredPrompt.pose.description is already set (from above), keep it. 
+                // Otherwise it remains null or whatever it was.
 
                 structuredPrompt.pose.reference = (view as string) === 'front' ? "standing perfectly straight in attention posture, feet touching and strictly parallel facing forward, arms resting straight at sides, neutral gaze" :
                     (view as string) === 'side' ? "strict profile view, standing straight, feet positioned close together and parallel, arms at sides" :
@@ -824,20 +811,21 @@ export async function POST(req: NextRequest) {
             if (sp.pose.description) {
                 let bio = clean(sp.pose.description);
                 bio = bio.replace(/the figure/gi, "the model").replace(/figure stands/gi, "model stands").replace(/figure is/gi, "model is");
+
+                // If it's a technical angle and NO custom prompt was given, add standard posture
+                // But if custom prompt exists, prioritize it
                 if (!sp.pose.dynamic && !isBackView) {
                     bio += `. Standing perfectly straight in rigid attention posture, ${isUpperOrCloseup ? "" : "feet parallel to body and straight, "}arms resting straight at sides.`;
                 } else if (!sp.pose.dynamic && isBackView) {
                     bio += ". Model stands perfectly straight with back to camera, head facing away, arms at sides, feet parallel to each other.";
                 }
+
                 if (sp.pose.dynamic) {
                     bio = bio.replace(/arms (hang|stay|placed) (naturally )?at sides/gi, "arms in dynamic fashion placement");
                 }
                 poseBlock.push(bio);
             } else if (effectiveRole === 'technical') {
                 poseBlock.push(`Standing perfectly straight in rigid attention posture, ${isUpperOrCloseup ? "" : "feet parallel to body and straight, "}arms resting straight at sides.`);
-            }
-            if (sp.pose.reference && sp.pose.reference.includes("stickman")) {
-                poseBlock.push("POSE REFERENCE: Use the provided reference stickman image to match pose.");
             }
             poseBlock.push(`[/POSE]`);
             const poseStr = poseBlock.join("\n");

@@ -112,27 +112,18 @@ export const useDialogState = (
             toast.success(language === "tr" ? "Poz kütüphaneye eklendi" : "Pose added to library");
             setTempPoseData(null);
 
-            // 2. Run stickman + analyze in background (non-blocking)
+            // 2. Run analyze in background (non-blocking) using original image
             (async () => {
                 try {
-                    toast.info(language === "tr" ? "Stickman oluşturuluyor..." : "Converting to stickman...");
-                    const res = await fetch("/api/pose", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ image_url: tempPoseData.original })
-                    });
-                    if (!res.ok) throw new Error("Stickman conversion failed");
-                    const data = await res.json();
-                    const stickmanUrl = data.pose_image;
-                    setPoseStickman(stickmanUrl);
+                    toast.info(language === "tr" ? "Poz analiz ediliyor..." : "Analyzing pose...");
 
-                    // Analyze the stickman for auto-prompt
+                    // Analyze the ORIGINAL image for auto-prompt
                     let autoPrompt = "";
                     try {
                         const resAnalyze = await fetch("/api/analyze", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ image: stickmanUrl, type: 'pose', language })
+                            body: JSON.stringify({ image: tempPoseData.original, type: 'pose', language })
                         });
                         const analyzeData = await resAnalyze.json();
                         if (analyzeData?.data?.description) {
@@ -142,26 +133,23 @@ export const useDialogState = (
                         console.error("Pose analysis failed:", e);
                     }
 
-                    // 3. Update the pose entry with real stickman + prompt
+                    // 3. Update the pose entry with prompt
                     const updatedPose: SavedPose = {
                         ...newPose,
-                        stickmanUrl,
+                        stickmanUrl: "", // No stickman anymore
                         customPrompt: autoPrompt || undefined
                     };
                     setSavedPoses((prev: SavedPose[]) => prev.map((p: SavedPose) => p.id === newPoseId ? updatedPose : p));
-                    await dbOperations.add(STORES.POSES, updatedPose); // add() uses store.put() = upsert
+                    await dbOperations.add(STORES.POSES, updatedPose);
 
-                    setAssets((prev: any) => ({ ...prev, pose: stickmanUrl }));
+                    setAssets((prev: any) => ({ ...prev, pose: tempPoseData.original }));
                     if (autoPrompt) setPoseDescription(autoPrompt);
-                    setPoseStickman(stickmanUrl);
-                    toast.success(language === "tr" ? "Stickman hazır!" : "Stickman ready!");
+                    toast.success(language === "tr" ? "Analiz tamamlandı!" : "Analysis complete!");
                 } catch (bgErr) {
-                    console.error("Background stickman failed:", bgErr);
-                    // Update pose to show stickman failed (remove processing state)
+                    console.error("Background analysis failed:", bgErr);
                     const failedPose: SavedPose = { ...newPose, stickmanUrl: "" };
                     setSavedPoses((prev: SavedPose[]) => prev.map((p: SavedPose) => p.id === newPoseId ? failedPose : p));
-                    await dbOperations.add(STORES.POSES, failedPose); // upsert
-                    toast.error(language === "tr" ? "Stickman oluşturulamadı" : "Stickman conversion failed");
+                    await dbOperations.add(STORES.POSES, failedPose);
                 }
             })();
 
