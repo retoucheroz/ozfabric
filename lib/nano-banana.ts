@@ -138,7 +138,10 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
         const googlePayload = {
             contents: [{
                 role: "user",
-                parts: parts
+                parts: [
+                    ...parts,
+                    { text: `\nOutput Constraints:\n- Resolution: ${payload.resolution || "1K"}\n- Aspect Ratio: ${payload.aspect_ratio || "3:4"}\n- Format: PNG` }
+                ]
             }]
         };
 

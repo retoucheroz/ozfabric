@@ -634,7 +634,7 @@ export const useGenerationEngine = (
                 }
 
                 return {
-                    title: productCode ? `${productCode}${idx + 1}` : `image_${idx + 1}`,
+                    title: language === 'tr' ? spec.labelTr : spec.label,
                     spec: spec,
                     structured,
                     isMavi: isMaviBatch

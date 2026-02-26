@@ -277,15 +277,24 @@ export async function POST(req: NextRequest) {
             // 1. Model always included
             if (imgs.model) assets.push(imgs.model);
 
-            // Detail Assets Grouping
-            const frontDetails = [imgs.detail_front_1, imgs.detail_front_2, imgs.detail_front_3, imgs.detail_front_4].filter(Boolean);
-            const backDetails = [imgs.detail_back_1, imgs.detail_back_2, imgs.detail_back_3, imgs.detail_back_4].filter(Boolean);
+            // Detail Assets Grouping (New logic based on user request)
+            // 1,2: Upper Front, 3,4: Lower Front (from front details)
+            // 1,2: Upper Back, 3,4: Lower Back (from back details)
+            const upperFrontDetails = [imgs.detail_front_1, imgs.detail_front_2].filter(Boolean);
+            const upperBackDetails = [imgs.detail_back_1, imgs.detail_back_2].filter(Boolean);
+            const lowerFrontDetails = [imgs.detail_front_3, imgs.detail_front_4].filter(Boolean);
+            const lowerBackDetails = [imgs.detail_back_3, imgs.detail_back_4].filter(Boolean);
+
+            const frontDetails = [...upperFrontDetails, ...lowerFrontDetails];
+            const backDetails = [...upperBackDetails, ...lowerBackDetails];
 
             // 2. Garment Assets (Comprehensive Coverage for all views)
-            // Added logic to handle view-specific asset visibility while ensuring main_product is present
             const isFront = view === 'front' || view === 'styling' || view.includes('front');
             const isBack = view === 'back' || view.includes('back');
             const isSide = view === 'side' || view.includes('side') || view.includes('angled') || view.includes('threequarter');
+
+            const hasUpper = wfType === 'upper' || wfType === 'set' || wfType === 'dress' || !!imgs.top_front;
+            const hasLower = wfType === 'lower' || wfType === 'set' || wfType === 'dress' || !!imgs.bottom_front;
 
             if (isFront || isSide) {
                 if (imgs.main_product) assets.push(imgs.main_product);
@@ -299,7 +308,10 @@ export async function POST(req: NextRequest) {
                 if (imgs.jewelry) assets.push(imgs.jewelry);
                 if (imgs.glasses) assets.push(imgs.glasses);
                 if (imgs.hat && !excludeHatAsset) assets.push(imgs.hat);
-                assets.push(...frontDetails);
+
+                // Selective Detail Inclusion
+                if (hasUpper) assets.push(...upperFrontDetails);
+                if (hasLower) assets.push(...lowerFrontDetails);
             }
 
             if (isBack || isSide) {
@@ -307,7 +319,10 @@ export async function POST(req: NextRequest) {
                 if (imgs.bottom_back) assets.push(imgs.bottom_back);
                 if (imgs.jacket) assets.push(imgs.jacket);
                 if (imgs.backRefUpload) assets.push(imgs.backRefUpload);
-                assets.push(...backDetails);
+
+                // Selective Detail Inclusion
+                if (hasUpper) assets.push(...upperBackDetails);
+                if (hasLower) assets.push(...lowerBackDetails);
             }
 
             // 3. Shoes (Include if not explicitly excluded)
@@ -822,10 +837,11 @@ export async function POST(req: NextRequest) {
 
             // 3. [POSE]
             const angleLabel = isBackView ? "BACK VIEW" : (isAngledView ? "THREE-QUARTER VIEW" : (view.includes('closeup') ? "CLOSE-UP FRONT VIEW" : (view.includes('detail') ? (view.includes('front') ? "DETAIL FRONT VIEW" : "DETAIL BACK VIEW") : "FRONT VIEW")));
+            const isTechFullFront = angleId === 'std_tech_full_front';
             const poseBlock: string[] = [];
             poseBlock.push(`[POSE]`);
             poseBlock.push(`View Angle: ${angleLabel}.`);
-            poseBlock.push(`Subject: Professional ${sp.subject.type} (Strictly match provided identity).`);
+            poseBlock.push(`Subject: ${isTechFullFront ? "" : "Professional "}${sp.subject.type} (Strictly match provided identity).`);
             if (sp.pose.description) {
                 let bio = clean(sp.pose.description);
                 bio = bio.replace(/the figure/gi, "the model").replace(/figure stands/gi, "model stands").replace(/figure is/gi, "model is");
@@ -861,9 +877,9 @@ export async function POST(req: NextRequest) {
             if (canShowWaistRiseFitTuck) {
                 if (sp.garment.details?.waist) productBlock.push(`Waist: ${sp.garment.details.waist}.`);
                 if (sp.styling.tucked === 'tucked') {
-                    productBlock.push(`Style Adjustment: Tucked in, waistband is visible.`);
+                    productBlock.push(`Style Adjustment:\n[TOP_GARMENT_TUCKED_RENDER_LOCK]\n\nThe top garment is inserted into the bottom garment at the waist.\n\nLayer order:\nBottom garment waistband is clearly visible.\nTop garment fabric enters the waistband opening.\n\nFabric behavior:\nFabric folds inward at the waist.\nUpper section remains smooth above the waist.\nLower section is secured inside the bottom garment.\n\nSilhouette:\nA visible separation line occurs at the waistband.\nThe top garment does not extend below the waistband.\n\n[/TOP_GARMENT_TUCKED_RENDER_LOCK]`);
                 } else if (sp.styling.tucked === 'untucked') {
-                    productBlock.push(`Style Adjustment: MANDATORY - Untucked. The hem of the garment MUST hang loose OVER the pants, completely covering the waistband and belt area.`);
+                    productBlock.push(`Style Adjustment:\n[TOP_GARMENT_OUTSIDE_RENDER_LOCK]\n\nThe top garment is worn fully outside the bottom garment.\n\nLayer order:\nTop garment is the outermost layer at the waist and hip region.\nBottom garment remains visually behind the top garment.\n\nFabric behavior:\nFabric falls vertically from shoulders to hem.\nGravity pulls the garment straight downward.\nNo upward pull, no inward folding at the waist.\nNo fabric insertion into waistband area.\n\nSilhouette:\nHemline remains continuous and clearly visible across the entire front.\nThe transition from top garment to bottom garment occurs below the waist level.\n\n[/TOP_GARMENT_OUTSIDE_RENDER_LOCK]`);
                 }
                 if (sp.garment.details?.rise) productBlock.push(`Rise: ${sp.garment.details.rise}.`);
             }

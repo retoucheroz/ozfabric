@@ -2,6 +2,8 @@
 
 export interface BatchSpec {
     view: string;
+    label: string;
+    labelTr: string;
     pose: string;
     dynamic: boolean;
     lookAtCamera: boolean;
@@ -61,6 +63,8 @@ export function buildBatchSpecs(
             // 1. Styling Front
             {
                 view: "styling_front",
+                label: "Front Shot (Styling)",
+                labelTr: "Ön Tam Boy (Styling)",
                 pose: poseLibraryPrompt || getRandomPose('random'),
                 dynamic: true,
                 lookAtCamera: true,
@@ -83,6 +87,8 @@ export function buildBatchSpecs(
             // 2. Styling Angled
             {
                 view: "styling_angled",
+                label: "Three-Quarter Shot (Styling)",
+                labelTr: "Üç Çeyrek Açı (Styling)",
                 pose: angledPosePrompt || getRandomPose('angled'),
                 dynamic: true,
                 lookAtCamera: false,
@@ -101,6 +107,8 @@ export function buildBatchSpecs(
             // 3. Styling Front (Second Pose from Library)
             {
                 view: "styling_front_2",
+                label: "Front Shot (Alt Pose)",
+                labelTr: "Ön Tam Boy (Alternatif Poz)",
                 pose: poseLibraryPrompt || getRandomPose('random'),
                 dynamic: true,
                 lookAtCamera: true,
@@ -120,6 +128,8 @@ export function buildBatchSpecs(
             // 4. Technical Back (Cowboy Shot - Only technical shot)
             {
                 view: "technical_back",
+                label: "Upper Body (Back)",
+                labelTr: "Üst Vücut (Arka)",
                 pose: "Standing perfectly straight, back directly to camera, arms at sides. The upper garment hangs straight and smooth over the pants without any wrinkles, folds, or curling at the hemline. Hem is completely flat and horizontal.",
                 dynamic: false,
                 lookAtCamera: false,
@@ -136,6 +146,8 @@ export function buildBatchSpecs(
             // 5. Close-Up Front (Face to Chest)
             {
                 view: "closeup_front",
+                label: "Product Detail (Front)",
+                labelTr: "Üst Ürün Ön Yakın Çekim",
                 pose: "Close-up fashion photography shot, focusing on the collar and face area. Model is standing perfectly straight, facing the camera directly, arms at sides. Neutral expression, direct eye contact.",
                 dynamic: false,
                 lookAtCamera: true,
@@ -152,6 +164,8 @@ export function buildBatchSpecs(
             // 1. Styling Front
             {
                 view: "styling_front",
+                label: "Front Shot (Styling)",
+                labelTr: "Ön Tam Boy (Styling)",
                 pose: poseLibraryPrompt || getRandomPose('random'),
                 dynamic: true,
                 lookAtCamera: true,
@@ -167,6 +181,8 @@ export function buildBatchSpecs(
             // 2. Styling Angled
             {
                 view: "styling_angled",
+                label: "Three-Quarter Shot (Styling)",
+                labelTr: "Üç Çeyrek Açı (Styling)",
                 pose: angledPosePrompt || getRandomPose('angled'),
                 dynamic: true,
                 lookAtCamera: false,
@@ -181,7 +197,9 @@ export function buildBatchSpecs(
             // 3. Technical Front — NO ACCESSORIES
             {
                 view: "technical_front",
-                pose: "Standing perfectly straight in rigid attention posture, feet touching and strictly parallel, arms resting straight at sides, neutral gaze. No styling pose, professional technical studio photography.",
+                label: "Front Full Body (Technical)",
+                labelTr: "Ön Tam Boy (Teknik)",
+                pose: "Standing perfectly straight in rigid attention posture, feet touching and strictly parallel, arms resting straight at sides, neutral gaze. No styling xpose, professional technical studio photography.",
                 dynamic: false,
                 lookAtCamera: true,
                 hairBehind: true,
@@ -194,6 +212,8 @@ export function buildBatchSpecs(
             // 4. Technical Back — NO ACCESSORIES
             {
                 view: "technical_back",
+                label: "Back Full Body (Technical)",
+                labelTr: "Arka Tam Boy (Teknik)",
                 pose: "Standing perfectly straight, back to camera, feet touching and strictly parallel, arms at sides. No styling pose, professional technical studio photography.",
                 dynamic: false,
                 lookAtCamera: false,
@@ -208,6 +228,8 @@ export function buildBatchSpecs(
             // 4.5. Technical 3/4 Front — NO ACCESSORIES
             {
                 view: "technical_threequarter_front",
+                label: "Three-Quarter Front (Technical)",
+                labelTr: "Üç Çeyrek Açı Ön (Teknik)",
                 pose: "upright posture, three-quarter profile view facing right, feet touching and strictly parallel, arms resting straight along the sides, no hand-to-body interaction, weight centered, neutral balanced stance, professional technical shot.",
                 dynamic: false,
                 lookAtCamera: false,
@@ -223,6 +245,8 @@ export function buildBatchSpecs(
             // 5. Detail Front
             {
                 view: "detail_front",
+                label: "Lower Detailed View (Front)",
+                labelTr: "Alt Ürün Ön Detay",
                 pose: "Close-Up fashion photography detail shot. Camera framing is waist-to-knees. Standing straight.",
                 dynamic: false,
                 lookAtCamera: true,
@@ -239,6 +263,8 @@ export function buildBatchSpecs(
             // 6. Detail Back
             {
                 view: "detail_back",
+                label: "Lower Detailed View (Back)",
+                labelTr: "Alt Ürün Arka Detay",
                 pose: "Close-Up fashion photography back detail shot. Camera framing is waist-to-knees. Standing straight, back to camera.",
                 dynamic: false,
                 lookAtCamera: false,
@@ -288,6 +314,8 @@ export function buildStandardBatchSpecs(
     return [
         {
             view: "std_styling_full",
+            label: "Full Body (Styling)",
+            labelTr: "Tam Boy (Styling)",
             pose: poseLibraryPrompt ? poseLibraryPrompt : (stylingSideOnly["std_styling_full"] ? getRandomPose('angled') : getRandomPose('random')),
             dynamic: true,
             lookAtCamera: !stylingSideOnly["std_styling_full"],
@@ -302,6 +330,8 @@ export function buildStandardBatchSpecs(
         },
         {
             view: "std_styling_upper",
+            label: "Upper Body (Styling)",
+            labelTr: "Üst Vücut (Styling)",
             pose: poseLibraryPrompt ? poseLibraryPrompt : (stylingSideOnly["std_styling_upper"] ? getRandomPose('angled') : getRandomPose('random')),
             dynamic: true,
             lookAtCamera: !stylingSideOnly["std_styling_upper"],
@@ -316,6 +346,8 @@ export function buildStandardBatchSpecs(
         },
         {
             view: "std_tech_full_front",
+            label: "Full Body Front (Technical)",
+            labelTr: "Ön Tam Boy (Teknik)",
             pose: "Standing perfectly straight in rigid attention posture, feet touching and strictly parallel, arms resting straight at sides, neutral gaze. No styling pose, professional technical studio photography.",
             dynamic: false,
             lookAtCamera: true,
@@ -327,6 +359,8 @@ export function buildStandardBatchSpecs(
         },
         {
             view: "std_tech_full_back",
+            label: "Full Body Back (Technical)",
+            labelTr: "Arka Tam Boy (Teknik)",
             pose: "Standing perfectly straight, back to camera, feet touching and strictly parallel, arms at sides. No styling pose, professional technical studio photography.",
             dynamic: false,
             lookAtCamera: false,
@@ -339,6 +373,8 @@ export function buildStandardBatchSpecs(
         },
         {
             view: "std_tech_threequarter_front",
+            label: "Three-Quarter Front (Technical)",
+            labelTr: "Üç Çeyrek Açı Ön (Teknik)",
             pose: "upright posture, three-quarter profile view facing right, feet touching and strictly parallel, arms resting straight along the sides, no hand-to-body interaction, weight centered, neutral balanced stance, professional technical shot.",
             dynamic: false,
             lookAtCamera: false,
@@ -353,6 +389,8 @@ export function buildStandardBatchSpecs(
         },
         {
             view: "std_tech_upper_front",
+            label: "Upper Body Front (Technical)",
+            labelTr: "Üst Vücut Ön (Teknik)",
             pose: "Standing perfectly straight in rigid attention posture, arms resting straight at sides, neutral gaze. Cowboy shot.",
             dynamic: false,
             lookAtCamera: true,
@@ -365,6 +403,8 @@ export function buildStandardBatchSpecs(
         },
         {
             view: "std_tech_upper_back",
+            label: "Upper Body Back (Technical)",
+            labelTr: "Üst Vücut Arka (Teknik)",
             pose: "Standing perfectly straight, back to camera, arms at sides. Cowboy shot.",
             dynamic: false,
             lookAtCamera: false,
@@ -378,6 +418,8 @@ export function buildStandardBatchSpecs(
         },
         {
             view: "std_detail_front",
+            label: "Detail Front",
+            labelTr: "Alt Ürün Ön Detay",
             pose: "Close-Up fashion photography detail shot. Camera framing is waist-to-knees. Standing straight.",
             dynamic: false,
             lookAtCamera: true,
@@ -392,6 +434,8 @@ export function buildStandardBatchSpecs(
         },
         {
             view: "std_detail_back",
+            label: "Detail Back",
+            labelTr: "Alt Ürün Arka Detay",
             pose: "Close-Up fashion photography back detail shot. Camera framing is waist-to-knees. Standing straight, back to camera.",
             dynamic: false,
             lookAtCamera: false,
@@ -406,6 +450,8 @@ export function buildStandardBatchSpecs(
         },
         {
             view: "std_closeup_front",
+            label: "Close-up Front",
+            labelTr: "Üst Ürün Ön Yakın Çekim",
             pose: "Close-up fashion photography shot, focusing on the collar and face area. Model is standing perfectly straight.",
             dynamic: false,
             lookAtCamera: true,

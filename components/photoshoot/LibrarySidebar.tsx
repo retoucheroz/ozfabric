@@ -243,26 +243,46 @@ export function LibrarySidebar({
                                 <div className="space-y-3">
                                     <h4 className="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] flex items-center gap-2 px-1">
                                         <ScanLine size={12} />
-                                        {language === "tr" ? "ÖN DETAYLAR" : "FRONT DETAILS"}
+                                        {language === "tr" ? "ÜST DETAYLAR" : "UPPER DETAILS"}
                                     </h4>
-                                    <div className="grid grid-cols-4 gap-1.5">
-                                        <AssetCard id="detail_front_1" label={language === "tr" ? "Det 1" : "Det 1"} icon={ScanLine} variant="square" hideLibrary={true} />
-                                        <AssetCard id="detail_front_2" label={language === "tr" ? "Det 2" : "Det 2"} icon={ScanLine} variant="square" hideLibrary={true} />
-                                        <AssetCard id="detail_front_3" label={language === "tr" ? "Det 3" : "Det 3"} icon={ScanLine} variant="square" hideLibrary={true} />
-                                        <AssetCard id="detail_front_4" label={language === "tr" ? "Det 4" : "Det 4"} icon={ScanLine} variant="square" hideLibrary={true} />
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="space-y-2">
+                                            <span className="text-[8px] font-bold text-[var(--text-muted)] uppercase tracking-tighter block px-1">{language === "tr" ? "Üst Ürün Ön" : "Upper Front"}</span>
+                                            <div className="grid grid-cols-2 gap-1.5">
+                                                <AssetCard id="detail_front_1" label={language === "tr" ? "Det 1" : "Det 1"} icon={ScanLine} variant="square" hideLibrary={true} />
+                                                <AssetCard id="detail_front_2" label={language === "tr" ? "Det 2" : "Det 2"} icon={ScanLine} variant="square" hideLibrary={true} />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <span className="text-[8px] font-bold text-[var(--text-muted)] uppercase tracking-tighter block px-1">{language === "tr" ? "Üst Ürün Arka" : "Upper Back"}</span>
+                                            <div className="grid grid-cols-2 gap-1.5">
+                                                <AssetCard id="detail_back_1" label={language === "tr" ? "Det 1" : "Det 1"} icon={ScanLine} variant="square" hideLibrary={true} />
+                                                <AssetCard id="detail_back_2" label={language === "tr" ? "Det 2" : "Det 2"} icon={ScanLine} variant="square" hideLibrary={true} />
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div className="space-y-3">
                                     <h4 className="text-[10px] font-black text-amber-500 uppercase tracking-[0.2em] flex items-center gap-2 px-1">
                                         <ScanLine size={12} />
-                                        {language === "tr" ? "ARKA DETAYLAR" : "BACK DETAILS"}
+                                        {language === "tr" ? "ALT DETAYLAR" : "LOWER DETAILS"}
                                     </h4>
-                                    <div className="grid grid-cols-4 gap-1.5">
-                                        <AssetCard id="detail_back_1" label={language === "tr" ? "Det 1" : "Det 1"} icon={ScanLine} variant="square" hideLibrary={true} />
-                                        <AssetCard id="detail_back_2" label={language === "tr" ? "Det 2" : "Det 2"} icon={ScanLine} variant="square" hideLibrary={true} />
-                                        <AssetCard id="detail_back_3" label={language === "tr" ? "Det 3" : "Det 3"} icon={ScanLine} variant="square" hideLibrary={true} />
-                                        <AssetCard id="detail_back_4" label={language === "tr" ? "Det 4" : "Det 4"} icon={ScanLine} variant="square" hideLibrary={true} />
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="space-y-2">
+                                            <span className="text-[8px] font-bold text-[var(--text-muted)] uppercase tracking-tighter block px-1">{language === "tr" ? "Alt Ürün Ön" : "Lower Front"}</span>
+                                            <div className="grid grid-cols-2 gap-1.5">
+                                                <AssetCard id="detail_front_3" label={language === "tr" ? "Det 3" : "Det 3"} icon={ScanLine} variant="square" hideLibrary={true} />
+                                                <AssetCard id="detail_front_4" label={language === "tr" ? "Det 4" : "Det 4"} icon={ScanLine} variant="square" hideLibrary={true} />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <span className="text-[8px] font-bold text-[var(--text-muted)] uppercase tracking-tighter block px-1">{language === "tr" ? "Alt Ürün Arka" : "Lower Back"}</span>
+                                            <div className="grid grid-cols-2 gap-1.5">
+                                                <AssetCard id="detail_back_3" label={language === "tr" ? "Det 3" : "Det 3"} icon={ScanLine} variant="square" hideLibrary={true} />
+                                                <AssetCard id="detail_back_4" label={language === "tr" ? "Det 4" : "Det 4"} icon={ScanLine} variant="square" hideLibrary={true} />
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
