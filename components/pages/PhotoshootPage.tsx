@@ -82,7 +82,7 @@ export default function PhotoshootPage() {
         handleBatchGenerate, handleConfirmGeneration, handleConfirmBatchGeneration, batchPreviewPrompts,
         editedBatchPrompts, setEditedBatchPrompts, showBatchPreview, setShowBatchPreview,
         selectedBatchImages, setSelectedBatchImages, isStoppingBatch, handleStopBatch, estimatedCost,
-        handleAssetRemove, canMoveToStep, handleLibrarySelect, convertToStickman, models, setLightingPositive, setLightingNegative,
+        handleAssetRemove, canMoveToStep, handleLibrarySelect, models, setLightingPositive, setLightingNegative,
         productDescription, setProductDescription, addToGlobalLibrary
     } = usePhotoshootWorkflow();
 

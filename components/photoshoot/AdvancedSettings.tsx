@@ -13,7 +13,6 @@ interface AdvancedSettingsProps {
     setActiveLibraryAsset: (val: any) => void;
     handleAssetUpload: (id: string, file: File) => void;
     handleAssetRemove: (id: string, e: React.MouseEvent) => void;
-    convertToStickman?: () => void;
     lightingSendImage?: boolean;
     setLightingSendImage?: (val: boolean) => void;
 }
@@ -26,7 +25,6 @@ export function AdvancedSettings({
     setActiveLibraryAsset,
     handleAssetUpload,
     handleAssetRemove,
-    convertToStickman,
     lightingSendImage,
     setLightingSendImage,
 }: AdvancedSettingsProps) {
@@ -46,7 +44,6 @@ export function AdvancedSettings({
                     handleAssetUpload={handleAssetUpload}
                     handleAssetRemove={handleAssetRemove}
                     language={language}
-                    convertToStickman={convertToStickman}
                     variant="square"
                 />
                 <AssetCard

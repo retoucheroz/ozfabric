@@ -17,7 +17,6 @@ interface AssetCardProps {
     handleAssetUpload: (id: string, file: File) => void;
     handleAssetRemove: (id: string, e: React.MouseEvent) => void;
     language: string;
-    convertToStickman?: () => void;
     lightingSendImage?: boolean;
     setLightingSendImage?: (val: boolean) => void;
     variant?: 'default' | 'square' | 'portrait';
@@ -37,7 +36,6 @@ export function AssetCard({
     handleAssetUpload,
     handleAssetRemove,
     language,
-    convertToStickman,
     lightingSendImage,
     setLightingSendImage,
     variant = 'default',
@@ -415,15 +413,6 @@ export function AssetCard({
                                 <span className="text-[9px] text-[var(--accent-primary)] font-black uppercase tracking-widest opacity-70">
                                     {assets[id] ? (language === "tr" ? "DEĞİŞTİR" : "CHANGE") : (language === "tr" ? "SEÇİM YAP" : "SELECT")}
                                 </span>
-                                {id === 'pose' && !assets[id]?.includes('fal.media') && convertToStickman && (
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); convertToStickman(); }}
-                                        className="p-1 rounded bg-[var(--accent-primary)] text-white hover:scale-110 transition-transform shadow-sm"
-                                        title="Stickman"
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="5" r="1" /><path d="m9 20 3-6 3 6" /><path d="m6 8 6 2 6-2" /><path d="M12 10v4" /></svg>
-                                    </button>
-                                )}
                             </div>
                         )}
                     </div>
