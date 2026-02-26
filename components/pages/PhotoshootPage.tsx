@@ -640,6 +640,7 @@ export default function PhotoshootPage() {
                                                     batchMode={true}
                                                     productCode={productCode}
                                                     estimatedCost={estimatedCost}
+                                                    isAdmin={user?.role === 'admin'}
                                                 />
                                             </div>
                                         </div>

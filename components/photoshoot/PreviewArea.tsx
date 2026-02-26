@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Camera, Loader2, Maximize2, Download, Eraser, Plus, FileText, Share2, Sparkles, Layers, Info, Zap } from "lucide-react";
+import { Camera, Loader2, Maximize2, Download, Eraser, Plus, FileText, Share2, Sparkles, Layers, Info, Zap, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +20,7 @@ interface PreviewAreaProps {
     isStoppingBatch?: boolean;
     handleStopBatch?: () => void;
     handleRegenerateShot?: (index: number) => void;
+    isAdmin?: boolean;
 }
 
 export function PreviewArea({
@@ -36,8 +37,11 @@ export function PreviewArea({
     estimatedCost,
     isStoppingBatch,
     handleStopBatch,
-    handleRegenerateShot
+    handleRegenerateShot,
+    isAdmin
 }: PreviewAreaProps) {
+    const [debugImage, setDebugImage] = React.useState<any>(null);
+
     const generateButton = (
         <div className="w-full max-w-md mb-6 space-y-2">
             <Button
@@ -162,6 +166,16 @@ export function PreviewArea({
                             return (
                                 <div key={i} className="relative aspect-[2/3] rounded-xl overflow-hidden shadow-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] group animate-in zoom-in-95 duration-500">
                                     <img src={url} className="w-full h-full object-cover" />
+
+                                    {/* View Title Overlay */}
+                                    {img.viewName && (
+                                        <div className="absolute top-0 inset-x-0 p-3 bg-gradient-to-b from-black/80 to-transparent pointer-events-none">
+                                            <span className="text-[10px] font-black text-white uppercase tracking-widest drop-shadow-md">
+                                                {img.viewName}
+                                            </span>
+                                        </div>
+                                    )}
+
                                     <div className="absolute top-2 right-2 flex flex-col gap-2">
                                         <Button
                                             size="icon"
@@ -188,6 +202,20 @@ export function PreviewArea({
                                         >
                                             <Download className="w-3.5 h-3.5" />
                                         </Button>
+
+                                        {isAdmin && (
+                                            <Button
+                                                size="icon"
+                                                className="h-8 w-8 rounded-full bg-blue-600/80 hover:bg-blue-600 text-white backdrop-blur-md shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setDebugImage(img);
+                                                }}
+                                                title="Debug Info"
+                                            >
+                                                <Info className="w-3.5 h-3.5" />
+                                            </Button>
+                                        )}
                                     </div>
                                     {
                                         (typeof img === 'object' && img.filename) && (
@@ -242,6 +270,48 @@ export function PreviewArea({
                         </div>
                     )
                 }
+                {/* Debug Info Dialog */}
+                {isAdmin && debugImage && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+                        <div className="bg-[var(--bg-surface)] w-full max-w-2xl rounded-2xl shadow-2xl border border-[var(--border-subtle)] overflow-hidden flex flex-col max-h-[80vh]">
+                            <div className="p-4 border-b border-[var(--border-subtle)] bg-[var(--bg-elevated)] flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Info className="w-4 h-4 text-blue-500" />
+                                    <h3 className="font-black text-sm uppercase tracking-widest">{debugImage.viewName || "DEBUG INFO"}</h3>
+                                </div>
+                                <button onClick={() => setDebugImage(null)} className="p-2 hover:bg-black/5 rounded-full transition-colors">
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
+
+                            <div className="p-6 overflow-y-auto custom-scrollbar space-y-6">
+                                <div>
+                                    <label className="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] block mb-2">Final Prompt</label>
+                                    <div className="p-4 bg-[var(--bg-elevated)] rounded-xl border border-[var(--border-subtle)] text-xs font-medium leading-relaxed font-mono whitespace-pre-wrap">
+                                        {debugImage.prompt || "No prompt stored"}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="text-[10px] font-black text-[var(--accent-primary)] uppercase tracking-[0.2em] block mb-2">Input Assets</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {debugImage.inputAssets?.length > 0 ? debugImage.inputAssets.map((asset: string) => (
+                                            <span key={asset} className="px-3 py-1 bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-full text-[10px] font-bold uppercase tracking-tighter">
+                                                {asset}
+                                            </span>
+                                        )) : (
+                                            <span className="text-xs text-[var(--text-muted)] italic">No specific asset list stored</span>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="p-4 border-t border-[var(--border-subtle)] bg-[var(--bg-elevated)] flex justify-end">
+                                <Button size="sm" onClick={() => setDebugImage(null)} className="font-bold uppercase tracking-widest text-[10px]">Close</Button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div >
         );
     }

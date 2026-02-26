@@ -192,11 +192,28 @@ export const useGenerationEngine = (
 
             data.images.forEach((img: string, idx: number) => {
                 const finalPrompt = (data.prompts && data.prompts[idx]) ? data.prompts[idx] : `Generated for ${productName}`;
+
+                // Construct a enriched image object for the UI
+                const newImg = {
+                    url: img,
+                    filename: `shot_${idx + 1}.png`,
+                    viewName: isThreeAngles ? (idx === 0 ? "FRONT" : idx === 1 ? "SIDE" : "BACK") : (targetView || "STYLING"),
+                    prompt: finalPrompt,
+                    inputAssets: Object.keys(assets).filter(k => assets[k] !== null && k !== 'prompt')
+                };
+
+                // Update result list with objects instead of just URLs
+                setResultImages(prev => {
+                    const updated = [...prev];
+                    updated[idx] = newImg;
+                    return updated;
+                });
+
                 addProject({
-                    title: `Photoshoot - ${productName} - ${new Date().toLocaleTimeString()}`,
+                    title: `Photoshoot - ${productName} - ${newImg.viewName}`,
                     type: "Photoshoot",
                     imageUrl: img,
-                    description: `Seed: ${finalSeed} | Prompt: ${finalPrompt}`
+                    description: `Seed: ${finalSeed} | Assets: ${newImg.inputAssets.join(', ')} | Prompt: ${finalPrompt}`
                 });
             });
 
@@ -958,7 +975,12 @@ export const useGenerationEngine = (
                             const data = await res.json();
                             const imageUrl = data.images?.[0] || data.image_url;
                             if (imageUrl) {
-                                return { imageUrl, idx: i, requestPayload };
+                                return {
+                                    imageUrl,
+                                    idx: i,
+                                    requestPayload,
+                                    inputAssets: Object.keys(uploadedImages).filter(k => uploadedImages[k] !== undefined)
+                                };
                             }
                         } else {
                             const err = await res.text();
@@ -974,11 +996,19 @@ export const useGenerationEngine = (
                 // Update UI and results for the completed chunk
                 for (const res of chunkResults) {
                     if (res) {
-                        const { imageUrl, idx, requestPayload } = res;
+                        const { imageUrl, idx, requestPayload, inputAssets } = res;
                         const preview = batchPreviewPrompts[idx];
                         const nameSuffix = preview.title.replace(/\s+/g, '_').toLowerCase();
                         const fullFilename = `${productCode || 'shot'}_${nameSuffix}.jpg`;
-                        const newImg = { filename: fullFilename, url: imageUrl, downloadName: fullFilename, requestPayload };
+                        const newImg = {
+                            filename: fullFilename,
+                            url: imageUrl,
+                            downloadName: fullFilename,
+                            requestPayload,
+                            viewName: preview.title, // Use the human readable title from spec
+                            prompt: editedBatchPrompts[idx],
+                            inputAssets: inputAssets
+                        };
                         generatedImages.push(newImg);
                         setResultImages([...generatedImages]); // Update resultImages incrementally
 
@@ -986,7 +1016,7 @@ export const useGenerationEngine = (
                             title: `Batch: ${productCode} - ${preview.title}`,
                             type: "Photoshoot",
                             imageUrl: imageUrl,
-                            description: `Seed: ${finalSeed} | Prompt: ${editedBatchPrompts[idx]}`
+                            description: `Seed: ${finalSeed} | Assets: ${newImg.inputAssets.join(', ')} | Prompt: ${newImg.prompt}`
                         });
                     }
                 }
@@ -1029,7 +1059,7 @@ export const useGenerationEngine = (
                         title: `Regenerated Shot`,
                         type: "Photoshoot",
                         imageUrl: imageUrl,
-                        description: `Seed: ${payload.seed} | Prompt: ${payload.editedPrompt || payload.poseDescription}`
+                        description: `Seed: ${payload.seed} | Assets: ${Object.keys(payload.uploadedImages || {}).join(', ')} | Prompt: ${payload.editedPrompt || payload.poseDescription}`
                     });
                 }
             } else {
