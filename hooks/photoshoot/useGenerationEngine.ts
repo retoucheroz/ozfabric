@@ -765,12 +765,58 @@ export const useGenerationEngine = (
         setIsStoppingBatch(false);
         isStoppingBatchRef.current = false;
 
-        const finalSeed = (seed !== null && seed !== "") ? Number(seed) : Math.floor(Math.random() * 1000000000);
-        if (seed === "") setSeed(finalSeed);
+        const syncAsset = async (base64: string, path: string) => {
+            if (!base64 || !base64.startsWith('data:image')) return base64;
+            try {
+                const res = await fetch('/api/upload', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image: base64, path })
+                });
+                if (!res.ok) return base64;
+                const data = await res.json();
+                return data.url || base64;
+            } catch (e) {
+                return base64;
+            }
+        };
+
+        // Sync assets before starting the loop to keep payloads small
+        const syncedHighRes = { ...assetsHighRes };
+        const syncedLowRes = { ...assets };
 
         try {
+            // First, sync model and background as they are used in every shot
+            syncedHighRes.model = await syncAsset(assetsHighRes.model || assets.model, "batch/model");
+            syncedHighRes.background = await syncAsset(assetsHighRes.background || assets.background, "batch/bg");
+
+            // Sync product assets (front/back)
+            syncedHighRes.top_front = await syncAsset(assetsHighRes.top_front || assets.top_front, "batch/product");
+            syncedHighRes.bottom_front = await syncAsset(assetsHighRes.bottom_front || assets.bottom_front, "batch/product");
+            syncedHighRes.top_back = await syncAsset(assetsHighRes.top_back || assets.top_back, "batch/product");
+            syncedHighRes.bottom_back = await syncAsset(assetsHighRes.bottom_back || assets.bottom_back, "batch/product");
+
+            // Sync accessories if any
+            const techKeys = ['shoes', 'jacket', 'bag', 'glasses', 'hat', 'jewelry', 'belt', 'inner_wear'];
+            for (const k of techKeys) {
+                if (assetsHighRes[k] || assets[k]) {
+                    syncedHighRes[k] = await syncAsset(assetsHighRes[k] || assets[k], `batch/${k}`);
+                }
+            }
+
+            // Sync details (often a source of bloat)
+            for (let j = 1; j <= 4; j++) {
+                const kf = `detail_front_${j}`;
+                const kb = `detail_back_${j}`;
+                if (assetsHighRes[kf] || assets[kf]) syncedHighRes[kf] = await syncAsset(assetsHighRes[kf] || assets[kf], "batch/detail");
+                if (assetsHighRes[kb] || assets[kb]) syncedHighRes[kb] = await syncAsset(assetsHighRes[kb] || assets[kb], "batch/detail");
+            }
+
             const finalSelectionCount = finalSelected.filter(Boolean).length;
             const generatedImages: any[] = [];
+
+            const finalSeed = (seed !== null && seed !== "") ? Number(seed) : Math.floor(Math.random() * 1000000000);
+            if (seed === "") setSeed(finalSeed);
 
             // Get selected indices
             const selectedIndices = finalPreviews
@@ -794,23 +840,23 @@ export const useGenerationEngine = (
                     const currentIndex = selectedIndices.indexOf(i) + 1;
 
                     const uploadedImages: any = {
-                        model: assetsHighRes.model || assets.model,
-                        background: assetsHighRes.background || assets.background
+                        model: syncedHighRes.model || syncedLowRes.model,
+                        background: syncedHighRes.background || syncedLowRes.background
                     };
 
-                    if (preview.spec.includeGlasses && (assetsHighRes.glasses || assets.glasses)) {
-                        uploadedImages.glasses = assetsHighRes.glasses || assets.glasses;
+                    if (preview.spec.includeGlasses && (syncedHighRes.glasses || syncedLowRes.glasses)) {
+                        uploadedImages.glasses = syncedHighRes.glasses || syncedLowRes.glasses;
                     }
                     if (!preview.spec.excludeShoesAsset) {
-                        uploadedImages.shoes = assetsHighRes.shoes || assets.shoes;
+                        uploadedImages.shoes = syncedHighRes.shoes || syncedLowRes.shoes;
                     }
-                    if (assetsHighRes.inner_wear || assets.inner_wear) uploadedImages.inner_wear = assetsHighRes.inner_wear || assets.inner_wear;
-                    if (assetsHighRes.jacket || assets.jacket) uploadedImages.jacket = assetsHighRes.jacket || assets.jacket;
-                    if (assetsHighRes.hat || assets.hat) uploadedImages.hat = assetsHighRes.hat || assets.hat;
-                    if (assetsHighRes.bag || assets.bag) uploadedImages.bag = assetsHighRes.bag || assets.bag;
-                    if (assetsHighRes.belt || assets.belt) uploadedImages.belt = assetsHighRes.belt || assets.belt;
-                    if (assetsHighRes.jewelry || assets.jewelry) uploadedImages.jewelry = assetsHighRes.jewelry || assets.jewelry;
-                    if (lightingSendImage && (assetsHighRes.lighting || assets.lighting)) uploadedImages.lighting = assetsHighRes.lighting || assets.lighting;
+                    if (syncedHighRes.inner_wear || syncedLowRes.inner_wear) uploadedImages.inner_wear = syncedHighRes.inner_wear || syncedLowRes.inner_wear;
+                    if (syncedHighRes.jacket || syncedLowRes.jacket) uploadedImages.jacket = syncedHighRes.jacket || syncedLowRes.jacket;
+                    if (syncedHighRes.hat || syncedLowRes.hat) uploadedImages.hat = syncedHighRes.hat || syncedLowRes.hat;
+                    if (syncedHighRes.bag || syncedLowRes.bag) uploadedImages.bag = syncedHighRes.bag || syncedLowRes.bag;
+                    if (syncedHighRes.belt || syncedLowRes.belt) uploadedImages.belt = syncedHighRes.belt || syncedLowRes.belt;
+                    if (syncedHighRes.jewelry || syncedLowRes.jewelry) uploadedImages.jewelry = syncedHighRes.jewelry || syncedLowRes.jewelry;
+                    if (lightingSendImage && (syncedHighRes.lighting || syncedLowRes.lighting)) uploadedImages.lighting = syncedHighRes.lighting || syncedLowRes.lighting;
 
                     if (!preview.spec.isStyling) {
                         if (!techAccessories.jacket) delete uploadedImages.jacket;
@@ -835,14 +881,14 @@ export const useGenerationEngine = (
                     }
 
                     if (preview.spec.assets.includes('front')) {
-                        uploadedImages.top_front = assetsHighRes.top_front || assets.top_front;
-                        uploadedImages.bottom_front = assetsHighRes.bottom_front || assets.bottom_front;
-                        for (let j = 1; j <= 4; j++) uploadedImages[`detail_front_${j}`] = assetsHighRes[`detail_front_${j}`] || assets[`detail_front_${j}`];
+                        uploadedImages.top_front = syncedHighRes.top_front || syncedLowRes.top_front;
+                        uploadedImages.bottom_front = syncedHighRes.bottom_front || syncedLowRes.bottom_front;
+                        for (let j = 1; j <= 4; j++) uploadedImages[`detail_front_${j}`] = syncedHighRes[`detail_front_${j}`] || syncedLowRes[`detail_front_${j}`];
                     }
                     if (preview.spec.assets.includes('back')) {
-                        uploadedImages.top_back = assetsHighRes.top_back || assets.top_back;
-                        uploadedImages.bottom_back = assetsHighRes.bottom_back || assets.bottom_back;
-                        for (let j = 1; j <= 4; j++) uploadedImages[`detail_back_${j}`] = assetsHighRes[`detail_back_${j}`] || assets[`detail_back_${j}`];
+                        uploadedImages.top_back = syncedHighRes.top_back || syncedLowRes.top_back;
+                        uploadedImages.bottom_back = syncedHighRes.bottom_back || syncedLowRes.bottom_back;
+                        for (let j = 1; j <= 4; j++) uploadedImages[`detail_back_${j}`] = syncedHighRes[`detail_back_${j}`] || syncedLowRes[`detail_back_${j}`];
                     }
 
                     let finalFitDescription = preview.structured.fitDescription;
@@ -852,7 +898,7 @@ export const useGenerationEngine = (
                     }
 
                     const poseKey = `pose_${preview.spec.view}`;
-                    uploadedImages.pose = assets[poseKey] || assetsHighRes.pose || assets.pose;
+                    uploadedImages.pose = syncedLowRes[poseKey] || syncedHighRes.pose || syncedLowRes.pose;
 
                     const requestPayload = {
                         productName: preview.structured.productName,
