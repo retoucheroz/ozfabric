@@ -93,43 +93,63 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
             ? payload.image_urls
             : Object.values(payload.image_urls);
 
-        // Google Imagen 3 Multi-Image Conditioning (Reference Images)
-        // For Google AI SDK, developers often use the Vertex AI endpoint or if using Google AI Studio:
-        // Note: As of now, prompt-based generation is the primary path. 
-        // We'll use the first 4 images as context if the model supports it, otherwise fallback to high-fidelity prompt.
+        // Google Imagen (AI Studio) REST API
+        const modelId = "imagen-4.0-generate-001";
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:predict?key=${geminiKey}`;
+
+        // Fetch first image as reference if it's a URL
+        let base64Image = null;
+        if (imageList.length > 0) {
+            const imgUrl = imageList[0];
+            try {
+                const resp = await fetch(imgUrl);
+                const buffer = await resp.arrayBuffer();
+                base64Image = Buffer.from(buffer).toString('base64');
+            } catch (e) {
+                console.error("Failed to fetch reference image for Gemini:", e);
+            }
+        }
 
         const googlePayload = {
             instances: [
                 {
                     prompt: payload.prompt,
-                    negative_prompt: payload.negative_prompt || "distorted, low quality, unnatural",
-                    aspect_ratio: payload.aspect_ratio || "3:4",
-                    // Note: Google's multi-image conditioning is specific, 
-                    // we'll pass the first image as the primary reference if available
-                    ...(imageList.length > 0 && {
-                        image: imageList[0] // Primary reference
+                    ...(base64Image && {
+                        image: {
+                            bytesBase64Encoded: base64Image,
+                            mimeType: "image/png"
+                        }
                     })
                 }
             ],
             parameters: {
                 sampleCount: 1,
-                seed: payload.seed,
+                aspectRatio: payload.aspect_ratio === "3:4" ? "3:4" : (payload.aspect_ratio === "16:9" ? "16:9" : "1:1"),
+                outputMimeType: "image/png",
+                ...(payload.seed && { seed: payload.seed })
             }
         };
 
-        // Standard Google Vertex/AI Studio endpoint for Imagen
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${geminiKey}`, {
+        const response = await fetch(endpoint, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(googlePayload),
         });
 
-        if (!response.ok) {
-            const err = await response.text();
-            throw new Error(`Gemini API Error: ${err}`);
-        }
         const data = await response.json();
-        finalImageUrl = data.predictions?.[0]?.url || data.images?.[0]?.url;
+
+        if (!response.ok) {
+            throw new Error(`Gemini API Error (${response.status}): ${data.error?.message || JSON.stringify(data)}`);
+        }
+
+        // Response for :predict is in predictions[0].bytesBase64Encoded 
+        const b64 = data.predictions?.[0]?.bytesBase64Encoded;
+        if (!b64) {
+            console.error("Gemini Unexpected Response:", JSON.stringify(data, null, 2));
+            throw new Error("Gemini API did not return image data in the expected format.");
+        }
+
+        finalImageUrl = `data:image/png;base64,${b64}`;
 
     } else {
         const imageList = Array.isArray(payload.image_urls)
