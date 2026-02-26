@@ -755,9 +755,9 @@ export const useGenerationEngine = (
         overridePrompts?: string[],
         overrideSelected?: boolean[]
     ) => {
-        const finalPreviews = overridePreviews || batchPreviewPrompts;
-        const finalPrompts = overridePrompts || editedBatchPrompts;
-        const finalSelected = overrideSelected || selectedBatchImages;
+        const finalPreviews = Array.isArray(overridePreviews) ? overridePreviews : batchPreviewPrompts;
+        const finalPrompts = Array.isArray(overridePrompts) ? overridePrompts : editedBatchPrompts;
+        const finalSelected = Array.isArray(overrideSelected) ? overrideSelected : selectedBatchImages;
 
         setShowBatchPreview(false);
         setIsProcessing(true);
