@@ -1087,63 +1087,77 @@ export async function POST(req: NextRequest) {
 
         // === PREVIEW MODE ===
         if (preview) {
-            if (isAngles) {
-                // Check if targetView is specified (Single Angle Mode)
-                if (targetView) {
-                    const reqData = buildStructuredPrompt(targetView);
+            try {
+                if (isAngles) {
+                    // Check if targetView is specified (Single Angle Mode)
+                    if (targetView) {
+                        const reqData = buildStructuredPrompt(targetView);
+                        return NextResponse.json({
+                            status: "preview",
+                            previews: [{
+                                title: `${targetView.charAt(0).toUpperCase() + targetView.slice(1)} View`,
+                                prompt: reqData.prompt || "Could not generate prompt text.",
+                                structured: reqData.structured,
+                                assets: reqData.input_images,
+                                settings: { resolution, aspect_ratio: aspectRatio }
+                            }]
+                        });
+                    }
+
+                    // Return ALL 3 PROMPTS for 3-Angle Mode
+                    const frontData = buildStructuredPrompt('front');
+                    const sideData = buildStructuredPrompt('side');
+                    const backData = buildStructuredPrompt('back');
+
+                    return NextResponse.json({
+                        status: "preview",
+                        previews: [
+                            {
+                                title: "Front View",
+                                prompt: frontData.prompt || "Could not generate prompt text.",
+                                structured: frontData.structured,
+                                assets: frontData.input_images,
+                                settings: { resolution, aspect_ratio: aspectRatio }
+                            },
+                            {
+                                title: "Side View",
+                                prompt: sideData.prompt || "Could not generate prompt text.",
+                                structured: sideData.structured,
+                                assets: sideData.input_images,
+                                settings: { resolution, aspect_ratio: aspectRatio }
+                            },
+                            {
+                                title: "Back View",
+                                prompt: backData.prompt || "Could not generate prompt text.",
+                                structured: backData.structured,
+                                assets: backData.input_images,
+                                settings: { resolution, aspect_ratio: aspectRatio }
+                            }
+                        ]
+                    });
+                } else {
+                    // Normal Styling Mode
+                    const reqData = buildStructuredPrompt(targetView || 'styling');
                     return NextResponse.json({
                         status: "preview",
                         previews: [{
-                            title: `${targetView.charAt(0).toUpperCase() + targetView.slice(1)} View`,
-                            prompt: reqData.prompt,
+                            title: targetView ? `${targetView.charAt(0).toUpperCase() + targetView.slice(1)} View` : "Styling Shot",
+                            prompt: reqData.prompt || "Could not generate prompt text.",
                             structured: reqData.structured,
                             assets: reqData.input_images,
                             settings: { resolution, aspect_ratio: aspectRatio }
                         }]
                     });
                 }
-
-                // Return ALL 3 PROMPTS for 3-Angle Mode
-                const frontData = buildStructuredPrompt('front');
-                const sideData = buildStructuredPrompt('side');
-                const backData = buildStructuredPrompt('back');
-
-                return NextResponse.json({
-                    status: "preview",
-                    previews: [
-                        {
-                            title: "Front View",
-                            prompt: frontData.prompt,
-                            structured: frontData.structured,
-                            assets: frontData.input_images,
-                            settings: { resolution, aspect_ratio: aspectRatio }
-                        },
-                        {
-                            title: "Side View",
-                            prompt: sideData.prompt,
-                            structured: sideData.structured,
-                            assets: sideData.input_images,
-                            settings: { resolution, aspect_ratio: aspectRatio }
-                        },
-                        {
-                            title: "Back View",
-                            prompt: backData.prompt,
-                            structured: backData.structured,
-                            assets: backData.input_images,
-                            settings: { resolution, aspect_ratio: aspectRatio }
-                        }
-                    ]
-                });
-            } else {
-                // Normal Styling Mode
-                const reqData = buildStructuredPrompt(targetView || 'styling');
+            } catch (err: any) {
+                console.error("Preview generation fatal error:", err);
                 return NextResponse.json({
                     status: "preview",
                     previews: [{
-                        title: targetView ? `${targetView.charAt(0).toUpperCase() + targetView.slice(1)} View` : "Styling Shot",
-                        prompt: reqData.prompt,
-                        structured: reqData.structured,
-                        assets: reqData.input_images,
+                        title: "Error in Preview",
+                        prompt: `[ERROR] Failed to generate tags: ${err.message}. Please check your product description and assets.`,
+                        structured: {},
+                        assets: {},
                         settings: { resolution, aspect_ratio: aspectRatio }
                     }]
                 });
