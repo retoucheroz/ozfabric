@@ -744,49 +744,18 @@ export async function POST(req: NextRequest) {
 
         // === TEXT PROMPT CONVERTER ===
         function convertStructuredToText(sp: any, view: string, wf: string): string {
-            const clean = (str: string) => str?.trim().replace(/\n{2,}/g, "\n").replace(/\s{3,}/g, " ").replace(/\.+$/, "") || "";
+            const clean = (str: string) => str?.trim().replace(/\n{2,}/g, "\n").replace(/\s{3,}/g, " ").replace(/"/g, "").replace(/\.+$/, "") || "";
             const isBackView = view.includes('back') || sp.camera.angle === 'back' || sp.pose.description?.toLowerCase().includes('back to camera');
             const framing = sp.camera.framing;
 
-            // === PROMPT CONSTRUCTION BASES ===
-            const sections: string[] = [];
-
-            // Visibility Flags based strictly on Mapping
+            // Visibility Flags
             const canShowFootwear = framing === 'head_to_toe';
             const canShowLegHem = framing === 'head_to_toe';
-            const canShowStance = framing === 'head_to_toe';
             const canShowWaistRiseFitTuck = ['cowboy_shot', 'head_to_toe', 'waist_to_above_knees'].includes(framing);
             const canShowCollarHairButtons = ['chest_and_face', 'cowboy_shot', 'head_to_toe'].includes(framing);
             const canShowFaceDetails = framing === 'chest_and_face';
 
-            // === BLOCK: FRAMING DESCRIPTION ===
-            const framingBlock: string[] = [];
-            framingBlock.push(`[FRAMING_DESCRIPTION]`);
-            if (framing === 'head_to_toe') {
-                framingBlock.push("Shot Type: Head-to-toe full body photography.");
-                framingBlock.push("Visible: Full model from head to feet.");
-                framingBlock.push("Enabled Details: Leg silhouette, hem finish, footwear, and full body stance.");
-            } else if (framing === 'cowboy_shot') {
-                framingBlock.push("Shot Type: Cowboy shot (Medium shot).");
-                framingBlock.push("Visible: Head to mid-thigh area.");
-                framingBlock.push("Enabled Details: Garment fall, drape, and hemline over the pants.");
-                framingBlock.push("Constraint: Exclude footwear.");
-            } else if (framing === 'chest_and_face') {
-                framingBlock.push("Shot Type: Close-up beauty/fashion portrait.");
-                framingBlock.push("Visible: Head, shoulders, and upper chest.");
-                framingBlock.push("Enabled Details: Collar type, buttons, hair texture, gaze, and facial expression.");
-                framingBlock.push("Constraint: Exclude waist, legs, and footwear.");
-            } else if (framing === 'waist_to_above_knees') {
-                framingBlock.push("Shot Type: Detail-oriented proximity shot. Strictly centered on the lower body.");
-                framingBlock.push("Visible: MANDATORY - Strict crop from the natural waistline down to the upper knees ONLY.");
-                framingBlock.push("Enabled Details: Pocket details, waistband construction, waist fit, and fabric texture.");
-                framingBlock.push("Constraint: ABSOLUTELY EXCLUDE face, shoulders, upper chest, and feet from the frame.");
-            }
-            framingBlock.push(`[/FRAMING_DESCRIPTION]`);
-            sections.push(framingBlock.join("\n"));
-
-            // === PRIORITY 1: SUBJECT IDENTITY & PROPORTIONS ===
-            // Moved to absolute top to ensure the AI locks onto the provided model identity immediately
+            // 1. [SUBJECT_IDENTITY]
             const subjectBlock: string[] = [];
             subjectBlock.push(`[SUBJECT_IDENTITY]`);
             if (sp.subject.identity === "match_provided_model_image") {
@@ -794,12 +763,10 @@ export async function POST(req: NextRequest) {
             } else {
                 subjectBlock.push(`Identity: ${sp.subject.identity}.`);
             }
-
             if (framing !== 'chest_and_face' && framing !== 'close_up') {
                 if (sp.subject.body_description) {
                     subjectBlock.push(`Physical Proportions & Body Description: ${clean(sp.subject.body_description)}`);
                 } else {
-                    // Professional Default Measurements for E-Com consistency
                     if (sp.subject.type === 'male_model') {
                         subjectBlock.push(`Physical Proportions & Body Description: Height 187 cm, Waist 79 cm (W32), Chest 97 cm (Size L / 50), Hips 97 cm, Inseam L34-L36. Lean and athletic build with long leg proportions.`);
                     } else if (sp.subject.type === 'female_model') {
@@ -808,257 +775,151 @@ export async function POST(req: NextRequest) {
                 }
             }
             subjectBlock.push(`[/SUBJECT_IDENTITY]`);
-            sections.push(subjectBlock.join("\n"));
+            const subjectStr = subjectBlock.join("\n");
 
-            // === PRIORITY 2: PRODUCT & UI TOGGLES ===
+            // 2. [FRAMING_DESCRIPTION]
+            const framingBlock: string[] = [];
+            framingBlock.push(`[FRAMING_DESCRIPTION]`);
+            if (framing === 'head_to_toe') {
+                framingBlock.push("Shot Type: Head-to-toe full body photography.");
+                framingBlock.push("Visible: Full model from head to feet.");
+            } else if (framing === 'cowboy_shot') {
+                framingBlock.push("Shot Type: Cowboy shot (Medium shot).");
+                framingBlock.push("Visible: Head to mid-thigh area.");
+            } else if (framing === 'chest_and_face') {
+                framingBlock.push("Shot Type: Close-up beauty/fashion portrait.");
+                framingBlock.push("Visible: Head, shoulders, and upper chest.");
+                framingBlock.push("Constraint: Exclude waist, legs, and footwear.");
+            } else if (framing === 'waist_to_above_knees') {
+                framingBlock.push("Shot Type: Detail-oriented proximity shot. Strictly centered on the lower body.");
+                framingBlock.push("Visible: MANDATORY - Strict crop from the natural waistline down to the upper knees ONLY.");
+                framingBlock.push("Constraint: ABSOLUTELY EXCLUDE face, shoulders, upper chest, and feet from the frame.");
+            }
+            framingBlock.push(`[/FRAMING_DESCRIPTION]`);
+            const framingStr = framingBlock.join("\n");
+
+            // 3. [POSE]
+            const angleLabel = view.includes('back') ? "BACK VIEW" : (view.includes('side') || view.includes('angled') ? "THREE-QUARTER FRONT VIEW" : (view.includes('closeup') ? "CLOSE-UP FRONT VIEW" : (view.includes('detail') ? (view.includes('front') ? "DETAIL FRONT VIEW" : "DETAIL BACK VIEW") : "FRONT VIEW")));
+            const poseBlock: string[] = [];
+            poseBlock.push(`[POSE]`);
+            poseBlock.push(`View Angle: ${angleLabel}.`);
+            poseBlock.push(`Subject: Professional ${sp.subject.type} (Strictly match provided identity).`);
+            if (sp.pose.description) {
+                let bio = clean(sp.pose.description);
+                bio = bio.replace(/the figure/gi, "the model").replace(/figure stands/gi, "model stands").replace(/figure is/gi, "model is");
+                if (!sp.pose.dynamic && !isBackView) {
+                    bio += ". Standing perfectly straight in rigid attention posture, feet parallel to body and straight, arms resting straight at sides.";
+                } else if (!sp.pose.dynamic && isBackView) {
+                    bio += ". Model stands perfectly straight with back to camera, head facing away, arms at sides, feet parallel.";
+                }
+                if (sp.pose.dynamic) {
+                    bio = bio.replace(/arms (hang|stay|placed) (naturally )?at sides/gi, "arms in dynamic fashion placement");
+                }
+                poseBlock.push(bio);
+            } else if (effectiveRole === 'technical') {
+                poseBlock.push("Standing perfectly straight in rigid attention posture, feet parallel to body and straight, arms resting straight at sides.");
+            }
+            if (sp.pose.reference && sp.pose.reference.includes("stickman")) {
+                poseBlock.push("POSE REFERENCE: Use the provided reference stickman image to match pose.");
+            }
+            poseBlock.push(`[/POSE]`);
+            const poseStr = poseBlock.join("\n");
+
+            // 4. [LOCKED_PRODUCT_CONSTRAINTS]
             const productBlock: string[] = [];
             productBlock.push(`[LOCKED_PRODUCT_CONSTRAINTS]`);
             productBlock.push(`Main Garment: ${clean(sp.garment.name)}.`);
             if (sp.garment.fabric) productBlock.push(`Fabric & Texture: ${clean(sp.garment.fabric)}.`);
             if (sp.garment.fit) productBlock.push(`Construction & Fit: ${clean(sp.garment.fit)}.`);
-
-            // Detail checks using Visibility Rules
             if (canShowCollarHairButtons) {
                 if (sp.garment.details?.collar) productBlock.push(`Collar: ${sp.garment.details.collar}.`);
                 if (sp.garment.details?.shoulder) productBlock.push(`Shoulder: ${sp.garment.details.shoulder}.`);
             }
             if (canShowWaistRiseFitTuck) {
                 if (sp.garment.details?.waist) productBlock.push(`Waist: ${sp.garment.details.waist}.`);
-                // Tucking / Untucked (Highest Priority for fit/silhouette)
                 if (sp.styling.tucked === 'tucked') {
                     productBlock.push(`Style Adjustment: Tucked in, waistband is visible.`);
                 } else if (sp.styling.tucked === 'untucked') {
-                    productBlock.push(`Style Adjustment: MANDATORY - Untucked. The hem of the garment MUST hang loose OVER the pants, completely covering the waistband and belt area. The hem is fully visible and NOT tucked in.`);
+                    productBlock.push(`Style Adjustment: MANDATORY - Untucked. The hem of the garment MUST hang loose OVER the pants, completely covering the waistband and belt area.`);
                 }
-
-                if (wf === 'lower' && sp.styling.layers.upper_garment?.visible) {
-                    if (sp.styling.tucked === 'tucked') {
-                        productBlock.push(`Style Adjustment: Tucked in, waistband is visible.`);
-                    } else if (sp.styling.tucked === 'untucked') {
-                        productBlock.push(`Style Adjustment: MANDATORY - Untucked. The hem of the garment MUST hang loose OVER the pants, completely covering the waistband and belt area. The hem is fully visible and NOT tucked in.`);
-                    }
-                }
-
-                // Length constraints (if any)
-                if (wf === 'lower' || wf === 'set') {
-                    if (pantLength === 'full') {
-                        productBlock.push(`LENGTH CONSTRAINT: Pant legs extend to the floor/heel level, slightly breaking over the shoes. This 'Full Length' style means the hem sits exactly where the shoe meets the floor at the back, with a single minimal fold at the front. MUST conceal any socks.`);
-                    } else if (pantLength === 'cropped' || pantLength === 'ankle') {
-                        productBlock.push(`LENGTH CONSTRAINT: The pant hem must clear the ankle bone, showing a gap between the hem and the footwear. No stacking or break in the fabric at the ankle.`);
-                    }
-                }
-
-
                 if (sp.garment.details?.rise) productBlock.push(`Rise: ${sp.garment.details.rise}.`);
             }
             if (canShowLegHem) {
                 if (sp.garment.details?.leg_style) productBlock.push(`Leg Style: ${sp.garment.details.leg_style}.`);
                 if (sp.garment.details?.hem_finish) productBlock.push(`Hem Finish: ${sp.garment.details.hem_finish}.`);
             }
-
             if (sp.styling.buttons === 'open' && canShowCollarHairButtons) {
                 productBlock.push("Style Adjustment: Front is open and unbuttoned.");
             }
-
+            if (canShowFootwear && sp.accessories.shoes) {
+                let shoeStyle = clean(sp.accessories.shoes.style).replace(/sneakers?/gi, "shoes");
+                if (uploadedImages.shoes) {
+                    productBlock.push(`Footwear: STRICTLY MATCH PROVIDED SHOE IMAGE. ${shoeStyle}`);
+                } else {
+                    productBlock.push(`Footwear: ${shoeStyle}`);
+                }
+            }
             productBlock.push(`[/LOCKED_PRODUCT_CONSTRAINTS]`);
-            sections.push(productBlock.join("\n"));
+            const productStr = productBlock.join("\n");
 
-            // === ACCESSORIES ===
-            const accEntries = Object.entries(techAccessories || {}).filter(([_, v]) => !!v);
-
-            // Helper to translate common Turkish accessory terms to English
-            const translateAcc = (text: string, defaultType: string) => {
-                if (!text) return `Model is wearing ${defaultType} from the reference image.`;
-                const lower = text.toLowerCase();
-                let enType = defaultType;
-                if (lower.includes('küpe')) enType = 'earrings';
-                else if (lower.includes('bileklik')) enType = 'bracelet';
-                else if (lower.includes('kolye')) enType = 'necklace';
-                else if (lower.includes('yüzük')) enType = 'ring';
-                else if (lower.includes('gözlük')) enType = 'glasses';
-                else if (lower.includes('şapka')) enType = 'hat';
-                else if (lower.includes('çanta')) enType = 'bag';
-                else if (lower.includes('kemer')) enType = 'belt';
-                else if (lower.includes('ceket')) enType = 'jacket';
-
-                // If it's already in English or custom, use it
-                return `Model is wearing ${enType} (${text}) strictly as shown in the reference accessory image.`;
-            };
-
-            const accMapping: Record<string, string> = {
-                jacket: translateAcc(techAccessoryDescriptions.jacket, 'a jacket'),
-                bag: translateAcc(techAccessoryDescriptions.bag, 'a bag'),
-                glasses: translateAcc(techAccessoryDescriptions.glasses, 'glasses'),
-                hat: translateAcc(techAccessoryDescriptions.hat, 'a hat'),
-                jewelry: translateAcc(techAccessoryDescriptions.jewelry, 'jewelry (earrings/bracelet)'),
-                belt: translateAcc(techAccessoryDescriptions.belt, 'a belt'),
-                watch: "Model is wearing a premium minimalist smartwatch on the wrist.",
-                phone: "Model is naturally holding a modern slim smartphone.",
-                laptop: "A sleek modern laptop is visible in the scene, held or placed naturally.",
-                headphones: "Model is wearing modern minimalist over-ear headphones."
-            };
-            const matchedAccs = accEntries.map(([k]) => accMapping[k]).filter(Boolean);
-
-            if (matchedAccs.length > 0) {
-                const accBlock: string[] = [];
-                accBlock.push(`[ACCESSORIES_DESCRIPTION]`);
-                accBlock.push(`CRITICAL: For any accessories listed below, strictly follow the provided reference images for their specific design, shape, and placement. Do not hallucinate generic versions.`);
-                matchedAccs.forEach(text => accBlock.push(text));
-                accBlock.push(`[/ACCESSORIES_DESCRIPTION]`);
-                sections.push(accBlock.join("\n"));
-            }
-
-            // === PRIORITY 3: POSE GEOMETRY (structured [POSE] block) ===
-            const angleLabel = view.includes('back') ? "BACK VIEW" : (view.includes('side') || view.includes('angled') ? "THREE-QUARTER FRONT VIEW" : (view.includes('closeup') ? "CLOSE-UP FRONT VIEW" : (view.includes('detail') ? (view.includes('front') ? "DETAIL FRONT VIEW" : "DETAIL BACK VIEW") : "FRONT VIEW")));
-            const poseBlock: string[] = [];
-            poseBlock.push(`[POSE]`);
-            poseBlock.push(`View Angle: ${angleLabel}.`);
-            poseBlock.push(`Subject: Professional ${sp.subject.type} (Strictly match provided identity).`);
-
-            if (sp.pose.description) {
-                let bio = clean(sp.pose.description);
-                // Standardize "figure" to "model"
-                bio = bio.replace(/the figure/gi, "the model").replace(/figure stands/gi, "model stands").replace(/figure is/gi, "model is");
-
-                if (!sp.pose.dynamic && !isBackView) {
-                    bio += ". Model stands perfectly still and symmetrical with feet parallel and shoulder-width apart, facing the camera directly. Arms hang straight down at the sides with fingers relaxed. No weight shift in the hips. Eyes looking directly into the camera lens.";
-                } else if (!sp.pose.dynamic && isBackView) {
-                    bio += ". Model stands perfectly straight with back to camera, head facing away, arms at sides, feet parallel.";
-                }
-
-                if (sp.pose.dynamic) {
-                    bio = bio.replace(/arms (hang|stay|placed) (naturally )?at sides/gi, "arms in dynamic fashion placement");
-                }
-                poseBlock.push(bio);
-            }
-            if (sp.pose.reference && sp.pose.reference.includes("stickman")) {
-                poseBlock.push("POSE REFERENCE: Use the provided reference stickman image to match pose.");
-            }
-            poseBlock.push(`[/POSE]`);
-            sections.push(poseBlock.join("\n"));
-
-            // === PRIORITY 4: STYLING & ENVIRONMENT (structured blocks) ===
-            const stylingItems: string[] = [];
-
-            // Layering (Secondary Priority)
+            // 5. [STYLING]
+            const stylingBlock: string[] = [];
+            stylingBlock.push(`[STYLING]`);
             if (sp.styling.layers.jacket?.visible && canShowCollarHairButtons) {
                 const jacketDesc = clean(sp.styling.layers.jacket.description);
-                stylingItems.push(`wearing a jacket over the main garment${jacketDesc ? ` (${jacketDesc})` : ""}`);
+                stylingBlock.push(`wearing a jacket over the main garment${jacketDesc ? ` (${jacketDesc})` : ""}`);
             }
-
             if (sp.styling.layers.upper_garment?.visible && wf === 'lower' && (canShowCollarHairButtons || canShowWaistRiseFitTuck)) {
-                if (uploadedImages.top_front) {
-                    stylingItems.push("wearing the provided top garment reference image");
-                } else {
-                    const upperDesc = clean(sp.styling.layers.upper_garment.description);
-                    stylingItems.push(`wearing a ${upperDesc || 'top garment'} tucked in or as a layer`);
-                }
+                if (uploadedImages.top_front) stylingBlock.push("wearing the provided top garment reference image");
+                else stylingBlock.push(`wearing a ${clean(sp.styling.layers.upper_garment.description) || 'top garment'} tucked in or as a layer`);
             }
-
-            if (sp.styling.layers.bottom_garment?.visible && wf === 'upper' && canShowWaistRiseFitTuck) {
-                if (uploadedImages.bottom_front) {
-                    stylingItems.push("wearing the provided bottom garment reference image");
-                } else {
-                    const bottomDesc = clean(sp.styling.layers.bottom_garment.description);
-                    stylingItems.push(`paired with ${bottomDesc || 'bottom garment'}`);
-                }
-            }
-
             if (sp.styling.inner_wear?.visible && canShowCollarHairButtons && sp.styling.buttons === 'open') {
-                const innerDesc = clean(sp.styling.inner_wear.description);
-                stylingItems.push(`base layer${innerDesc ? ` (${innerDesc})` : ""} is visible under the open front`);
+                stylingBlock.push(`base layer (${clean(sp.styling.inner_wear.description) || 'minimalist layer'}) is visible under the open front`);
             }
-
-            // Sleeves Logic
             if (wf === 'upper' || wf === 'set' || wf === 'dress' || uploadedImages.top_front || uploadedImages.jacket) {
-                if (sp.styling.sleeves_rolled) {
-                    stylingItems.push("sleeves are rolled up to the elbows");
-                } else {
-                    stylingItems.push("sleeves are straight down to the wrists");
-                }
+                if (sp.styling.sleeves_rolled) stylingBlock.push("sleeves are rolled up to the elbows");
+                else stylingBlock.push("sleeves are straight down to the wrists");
             }
+            const accessoryItems = Object.entries(techAccessories || {}).filter(([_, v]) => !!v).map(([k]) => {
+                const desc = techAccessoryDescriptions[k] || k;
+                return `wearing ${clean(desc)} from reference image`;
+            });
+            if (accessoryItems.length > 0) stylingBlock.push(...accessoryItems);
+            stylingBlock.push(`[/STYLING]`);
+            const stylingStr = stylingBlock.length > 2 ? stylingBlock.join("\n") : "";
 
-            if (stylingItems.length > 0) {
-                sections.push(`[STYLING]\n${stylingItems.join(". ")}.\n[/STYLING]`);
-            }
+            // 6. [BACKGROUND]
+            const backgroundStr = `[BACKGROUND]\nUse the provided reference background images to match environment perfectly.\n[/BACKGROUND]`;
 
-            // 5. Footwear & Accessories (structured)
-            const extras: string[] = [];
-            if (canShowFootwear && sp.accessories.shoes) {
-                let style = clean(sp.accessories.shoes.style);
-                style = style.replace(/sneakers?/gi, "shoes");
-                const size = clean(sp.accessories.shoes.size);
+            // 7. [LIGHTING]
+            let lightingContent = "soft_fashion_lighting";
+            if (lightingPositive) lightingContent = clean(lightingPositive);
+            else if (sp.scene.lighting) lightingContent = clean(sp.scene.lighting);
+            const lightingStr = `[LIGHTING]\n${lightingContent}\n[/LIGHTING]`;
 
-                if (uploadedImages.shoes) {
-                    extras.push(`[FOOTWEAR]\n**MANDATORY - MUST MATCH PROVIDED SHOE IMAGE EXACTLY** in color, texture, and silhouette. ${style}${size ? ` (${size})` : ""}\n[/FOOTWEAR]`);
-                } else {
-                    extras.push(`[FOOTWEAR]\n${style}${size ? ` (${size})` : ""}\n[/FOOTWEAR]`);
-                }
-            }
-
-            if (canShowLegHem && !['full_length', 'deep_break'].includes(pantLength)) {
-                if (sp.styling.socks && sp.styling.socks !== 'none') extras.push(`wearing ${sp.styling.socks} socks`);
-            }
-
-            if (canShowCollarHairButtons) {
-                if (sp.accessories?.glasses) extras.push("Wearing the provided sunglasses");
-                if (sp.accessories?.hat) extras.push("Wearing the provided hat");
-                if (sp.accessories?.bag) extras.push("Wearing the provided bag");
-            }
-
-            if (canShowWaistRiseFitTuck) {
-                if (sp.accessories?.belt) extras.push("Wearing the provided belt");
-            }
-
-            if (extras.length > 0) sections.push(extras.join(" "));
-
-            // 6. Background (structured)
-            sections.push(`[BACKGROUND]\nUse the provided reference background images to match environment perfectly.\n[/BACKGROUND]`);
-
-            // 7. Hair & Face (structured)
-            const hairFaceItems: string[] = [];
-
+            // 8. [MODEL_APPEARANCE]
+            const appearanceBlock: string[] = [];
+            appearanceBlock.push(`[MODEL_APPEARANCE]`);
             if (canShowCollarHairButtons || canShowFaceDetails) {
-                if (isBackView) {
-                    hairFaceItems.push("Model is looking away from the camera.");
-                } else if (sp.subject.look_at_camera === true) {
-                    hairFaceItems.push("Model is making direct eye contact with the camera.");
-                } else if (sp.subject.look_at_camera === false) {
-                    hairFaceItems.push("Model is looking slightly away from the camera, avoiding direct eye contact.");
-                }
-
+                if (isBackView) appearanceBlock.push("Model is looking away from the camera.");
+                else if (sp.subject.look_at_camera === true) appearanceBlock.push("Model is making direct eye contact with the camera.");
+                else if (sp.subject.look_at_camera === false) appearanceBlock.push("Model is looking slightly away from the camera.");
                 if (sp.subject.type !== 'male_model') {
-                    if (sp.subject.hair_behind_shoulders === true) {
-                        hairFaceItems.push("Hair is neatly placed BEHIND the shoulders.");
-                    } else {
-                        hairFaceItems.push("Hair: Natural and well-groomed.");
-                    }
+                    if (sp.subject.hair_behind_shoulders === true) appearanceBlock.push("Hair is neatly placed BEHIND the shoulders.");
+                    else appearanceBlock.push("Hair: Natural and well-groomed.");
                 }
-                if (sp.subject.wind) hairFaceItems.push("Dynamic studio airflow/wind effect is visible, hair and fabric suggest movement.");
+                if (sp.subject.wind) appearanceBlock.push("Visible studio airflow movement.");
             }
+            appearanceBlock.push(`[/MODEL_APPEARANCE]`);
+            const appearanceStr = appearanceBlock.length > 2 ? appearanceBlock.join("\n") : "";
 
-            if (hairFaceItems.length > 0) {
-                sections.push(`[MODEL_APPEARANCE]\n${hairFaceItems.join(" ")}\n[/MODEL_APPEARANCE]`);
-            }
-
-            // 8. Expressions & Gaze -> Modern Mood System
+            // 9. [MODEL_MOOD]
             const resolvedMood = resolveMood(angleId, selectedMoodId, effectiveRole);
-            if (resolvedMood && resolvedMood.promptAddition) {
-                sections.push(`[MODEL_MOOD]\nExpression & Vibe: ${resolvedMood.promptAddition}\n[/MODEL_MOOD]`);
-            }
+            const moodStr = (resolvedMood && resolvedMood.promptAddition) ? `[MODEL_MOOD]\nExpression & Vibe: ${clean(resolvedMood.promptAddition)}\n[/MODEL_MOOD]` : "";
 
-            // 9. Lighting (structured - ALWAYS included when available)
-            if (lightingPositive) {
-                sections.push(`[LIGHTING]\n${clean(lightingPositive)}\n[/LIGHTING]`);
-            } else if (sp.scene.lighting) {
-                sections.push(`[LIGHTING]\n${clean(sp.scene.lighting)}\n[/LIGHTING]`);
-            } else {
-                sections.push(`[LIGHTING]\nsoft_fashion_lighting\n[/LIGHTING]`);
-            }
-
-            const finalPrompt = sections.map(s => s.trim()).filter(Boolean).join(" ");
-
-            return finalPrompt;
+            // Final Assembly 1-9
+            const finalSections = [subjectStr, framingStr, poseStr, productStr, stylingStr, backgroundStr, lightingStr, appearanceStr, moodStr];
+            return finalSections.map(s => s.trim()).filter(Boolean).join("\n\n");
         }
 
         // NOTE: detail_1, detail_2, fit_pattern are NOT sent - only used for analysis

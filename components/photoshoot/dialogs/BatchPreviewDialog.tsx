@@ -139,15 +139,17 @@ export function BatchPreviewDialog({
                                                 <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">{language === "tr" ? "API GÖNDERİM DURUMU" : "API SEND STATUS"}</p>
                                                 <div className="grid grid-cols-1 gap-2">
                                                     {[
-                                                        { label: "Shoes", excluded: spec.excludeShoesAsset || spec.excludeAllAccessories },
-                                                        { label: "Belt", excluded: spec.excludeBeltAsset || spec.excludeAllAccessories },
-                                                        { label: "Hat", excluded: spec.excludeHatAsset || spec.excludeAllAccessories },
-                                                        { label: "Bag", excluded: spec.excludeBagAsset || spec.excludeAllAccessories },
-                                                        { label: "Jewelry", excluded: spec.excludeAllAccessories },
-                                                        { label: "Hair Context", excluded: spec.excludeHairInfo }
+                                                        { label_en: "Shoes", label_tr: "Ayakkabı", excluded: spec.excludeShoesAsset || spec.excludeAllAccessories },
+                                                        { label_en: "Belt", label_tr: "Kemer", excluded: spec.excludeBeltAsset || spec.excludeAllAccessories },
+                                                        { label_en: "Hat", label_tr: "Şapka", excluded: spec.excludeHatAsset || spec.excludeAllAccessories },
+                                                        { label_en: "Bag", label_tr: "Çanta", excluded: spec.excludeBagAsset || spec.excludeAllAccessories },
+                                                        { label_en: "Jewelry", label_tr: "Takı", excluded: spec.excludeAllAccessories },
+                                                        { label_en: "Hair Detail", label_tr: "Saç Detayı", excluded: spec.excludeHairInfo }
                                                     ].map((item) => (
-                                                        <div key={item.label} className="flex items-center justify-between px-3 py-1.5 rounded-lg bg-zinc-900/50 border border-zinc-800/50">
-                                                            <span className="text-[10px] font-bold text-zinc-500">{item.label}</span>
+                                                        <div key={item.label_en} className="flex items-center justify-between px-3 py-1.5 rounded-lg bg-zinc-900/50 border border-zinc-800/50">
+                                                            <span className="text-[10px] font-bold text-zinc-500">
+                                                                {language === "tr" ? item.label_tr : item.label_en}
+                                                            </span>
                                                             {item.excluded ? (
                                                                 <X className="w-3 h-3 text-red-500/50" />
                                                             ) : (
