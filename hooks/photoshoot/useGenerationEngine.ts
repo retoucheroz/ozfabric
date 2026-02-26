@@ -85,7 +85,7 @@ export const useGenerationEngine = (
     const [previewData, setPreviewData] = useState<any>(null);
     const [showPreview, setShowPreview] = useState(false);
     const [pendingOptions, setPendingOptions] = useState<any>(null);
-    const [previewMode, setPreviewMode] = useState<'text' | 'json'>('json');
+    const [previewMode, setPreviewMode] = useState<'text' | 'json'>('text');
     const [isGenerationSuccess, setIsGenerationSuccess] = useState(false);
 
     const [isStoppingBatch, setIsStoppingBatch] = useState(false);

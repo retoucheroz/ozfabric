@@ -14,6 +14,8 @@ import {
 import { TbSettings2, TbShirtFilled, TbJacket, TbShirt, TbHanger } from "react-icons/tb"
 import { PiHandbag, PiBaseballCap, PiDiamond, PiBelt } from "react-icons/pi"
 
+import { toast } from "sonner"
+
 // Modular Components
 import { ProductSection } from "@/components/photoshoot/ProductSection";
 import { BatchPanel } from "@/components/photoshoot/BatchPanel"
@@ -528,17 +530,28 @@ export default function PhotoshootPage() {
                                                     {availableBatchShots.filter(s => !s.id.includes('styling')).map((shot) => {
                                                         const isSelected = batchShotSelection[shot.id] ?? false;
                                                         const isMaviActive = user?.role === 'admin' && isMaviBatch;
+                                                        const isLowerDetailShot = shot.id === 'std_detail_front' || shot.id === 'std_detail_back';
+                                                        const isDisabled = workflowType === 'upper' && isLowerDetailShot;
 
                                                         return (
                                                             <div key={shot.id} className="flex flex-col gap-2">
                                                                 <div
                                                                     className={cn(
-                                                                        "relative aspect-[3/4] rounded-xl border transition-all duration-300 overflow-hidden group cursor-pointer w-full",
+                                                                        "relative aspect-[3/4] rounded-xl border transition-all duration-300 overflow-hidden group w-full",
+                                                                        isDisabled ? "cursor-not-allowed opacity-20 grayscale" : "cursor-pointer",
                                                                         isSelected
                                                                             ? (isMaviActive ? "border-blue-500 ring-2 ring-blue-500/20 shadow-lg" : "border-[var(--accent-primary)] ring-2 ring-[var(--accent-primary)]/20 shadow-lg")
-                                                                            : "border-[var(--border-subtle)] opacity-40 grayscale bg-[var(--bg-elevated)] hover:opacity-80 transition-opacity"
+                                                                            : (!isDisabled && "border-[var(--border-subtle)] opacity-40 grayscale bg-[var(--bg-elevated)] hover:opacity-80 transition-opacity")
                                                                     )}
-                                                                    onClick={() => setBatchShotSelection(prev => ({ ...prev, [shot.id]: !isSelected }))}
+                                                                    onClick={() => {
+                                                                        if (isDisabled) {
+                                                                            toast.error(language === 'tr'
+                                                                                ? "Bu açı bir üst ürün için seçilemez. Lütfen 'Detaylı Ürün' adımında 'Alt Ürün' veya 'Set' seçtiğinizden emin olun."
+                                                                                : "This angle cannot be selected for an upper garment. Please ensure you selected 'Lower' or 'Set' in the 'Product Details' step.");
+                                                                            return;
+                                                                        }
+                                                                        setBatchShotSelection(prev => ({ ...prev, [shot.id]: !isSelected }));
+                                                                    }}
                                                                 >
                                                                     <div className="w-full h-full relative">
                                                                         {shot.image ? (
