@@ -35,19 +35,18 @@ export async function POST(req: NextRequest) {
 
         const genAI = new GoogleGenerativeAI(apiKey);
 
-        // Prioritize Gemini 2.0 Flash Lite for all analysis tasks as requested
+        // Prioritize Gemini 2.5/2.0 for all analysis tasks
         let modelsToTry = [
-            "gemini-2.0-flash-lite",
+            "gemini-2.5-flash",
             "gemini-2.0-flash",
-            "gemini-1.5-flash"
+            "gemini-flash-latest"
         ];
 
         if (type === 'techPack' || type === 'fabric' || type === 'fit' || type === 'pose') {
-            // User Request: Use 2.0 Flash Lite/Flash for all technical tasks
             modelsToTry = [
-                "gemini-2.0-flash-lite",
+                "gemini-2.5-flash",
                 "gemini-2.0-flash",
-                "gemini-1.5-flash"
+                "gemini-flash-latest"
             ];
         }
 
