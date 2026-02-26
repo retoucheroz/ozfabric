@@ -255,6 +255,7 @@ export default function AdminPanel() {
                             >
                                 <option value="fal_ai">Fal.ai API</option>
                                 <option value="kie_ai">Kie.ai API</option>
+                                <option value="gemini_ai">Gemini API</option>
                             </select>
                         </div>
                     </CardContent>

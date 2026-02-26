@@ -85,6 +85,52 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
         }
         if (!finalImageUrl) throw new Error("Kie API timeout for task ID: " + taskId);
 
+    } else if (apiProvider === 'gemini_ai') {
+        const geminiKey = process.env.GEMINI_API_KEY;
+        if (!geminiKey) throw new Error("GEMINI_API_KEY is missing");
+
+        const imageList = Array.isArray(payload.image_urls)
+            ? payload.image_urls
+            : Object.values(payload.image_urls);
+
+        // Google Imagen 3 Multi-Image Conditioning (Reference Images)
+        // For Google AI SDK, developers often use the Vertex AI endpoint or if using Google AI Studio:
+        // Note: As of now, prompt-based generation is the primary path. 
+        // We'll use the first 4 images as context if the model supports it, otherwise fallback to high-fidelity prompt.
+
+        const googlePayload = {
+            instances: [
+                {
+                    prompt: payload.prompt,
+                    negative_prompt: payload.negative_prompt || "distorted, low quality, unnatural",
+                    aspect_ratio: payload.aspect_ratio || "3:4",
+                    // Note: Google's multi-image conditioning is specific, 
+                    // we'll pass the first image as the primary reference if available
+                    ...(imageList.length > 0 && {
+                        image: imageList[0] // Primary reference
+                    })
+                }
+            ],
+            parameters: {
+                sampleCount: 1,
+                seed: payload.seed,
+            }
+        };
+
+        // Standard Google Vertex/AI Studio endpoint for Imagen
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${geminiKey}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(googlePayload),
+        });
+
+        if (!response.ok) {
+            const err = await response.text();
+            throw new Error(`Gemini API Error: ${err}`);
+        }
+        const data = await response.json();
+        finalImageUrl = data.predictions?.[0]?.url || data.images?.[0]?.url;
+
     } else {
         const imageList = Array.isArray(payload.image_urls)
             ? payload.image_urls

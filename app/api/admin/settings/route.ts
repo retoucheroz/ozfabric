@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     try {
         const { nano_banana_provider } = await req.json();
 
-        if (nano_banana_provider && ['fal_ai', 'kie_ai'].includes(nano_banana_provider)) {
+        if (nano_banana_provider && ['fal_ai', 'kie_ai', 'gemini_ai'].includes(nano_banana_provider)) {
             await setGlobalSetting('nano_banana_provider', nano_banana_provider);
             return NextResponse.json({ success: true, nano_banana_provider });
         }
