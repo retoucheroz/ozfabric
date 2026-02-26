@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
             try {
                 const model = genAI.getGenerativeModel({
                     model: modelName,
-                    generationConfig: { responseMimeType: "application/json" },
+                    generationConfig: { responseMimeType: type === 'pose' ? "text/plain" : "application/json" },
                     // Critical: Disable safety filters to prevent blocking fashion images
                     safetySettings: [
                         { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
@@ -284,7 +284,15 @@ VTO Topo-Constraints: [e.g., Clean separation of limbs for masking / High overla
                 responseText = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
 
                 if (type === 'pose') {
-                    analysis = { description: responseText }; // Wrap plain text in object
+                    // Extract text between [NANO_BANANA_PRO_POSE] and [END_PROMPT]
+                    let cleaned = responseText;
+                    if (cleaned.includes('[NANO_BANANA_PRO_POSE]')) {
+                        cleaned = cleaned.split('[NANO_BANANA_PRO_POSE]')[1];
+                    }
+                    if (cleaned.includes('[END_PROMPT]')) {
+                        cleaned = cleaned.split('[END_PROMPT]')[0];
+                    }
+                    analysis = { description: cleaned.trim() };
                 } else {
                     analysis = JSON.parse(responseText);
                 }

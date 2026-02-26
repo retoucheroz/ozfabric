@@ -151,7 +151,7 @@ export const useDialogState = (
                     setSavedPoses((prev: SavedPose[]) => prev.map((p: SavedPose) => p.id === newPoseId ? updatedPose : p));
                     await dbOperations.add(STORES.POSES, updatedPose); // add() uses store.put() = upsert
 
-                    setAssets((prev: any) => ({ ...prev, pose: newPose.url }));
+                    setAssets((prev: any) => ({ ...prev, pose: stickmanUrl }));
                     if (autoPrompt) setPoseDescription(autoPrompt);
                     setPoseStickman(stickmanUrl);
                     toast.success(language === "tr" ? "Stickman hazır!" : "Stickman ready!");
