@@ -703,8 +703,13 @@ export const useGenerationEngine = (
                             body: JSON.stringify(payload)
                         });
                         const data = await res.json();
+                        if (!res.ok) {
+                            console.error("Preview API error:", data.error || data);
+                            return JSON.stringify(preview.structured, null, 2);
+                        }
                         return data.previews?.[0]?.prompt || JSON.stringify(preview.structured, null, 2);
                     } catch (e) {
+                        console.error("Failed to fetch preview:", e);
                         return JSON.stringify(preview.structured, null, 2);
                     }
                 }));

@@ -204,23 +204,27 @@ export async function POST(req: NextRequest) {
         const requestSeed = (seed !== null && seed !== undefined) ? Number(seed) : Math.floor(Math.random() * 1000000000);
 
         // Ensure poseStickman is an R2 URL
-        if (poseStickman) {
-            let { ensureR2Url } = await import("@/lib/s3");
-            poseStickman = await ensureR2Url(poseStickman, "poses");
-        }
+        // Ensure poseStickman is an R2 URL
+        let uploadedImages = rawUploadedImages || {};
 
-        // === R2 INPUT SANITIZATION ===
-        // Ensure all input images are R2 URLs, not base64 strings
-        let { ensureR2Url } = await import("@/lib/s3");
-        const sanitizedData = await Promise.all(
-            Object.entries(rawUploadedImages || {}).map(async ([key, value]) => {
-                if (typeof value === 'string' && value) {
-                    return [key, await ensureR2Url(value, "inputs")];
-                }
-                return [key, value];
-            })
-        );
-        const uploadedImages = Object.fromEntries(sanitizedData);
+        if (!preview) {
+            if (poseStickman) {
+                let { ensureR2Url } = await import("@/lib/s3");
+                poseStickman = await ensureR2Url(poseStickman, "poses");
+            }
+
+            // === R2 INPUT SANITIZATION ===
+            let { ensureR2Url: ensureS3R2 } = await import("@/lib/s3");
+            const sanitizedData = await Promise.all(
+                Object.entries(rawUploadedImages || {}).map(async ([key, value]) => {
+                    if (typeof value === 'string' && value) {
+                        return [key, await ensureS3R2(value, "inputs")];
+                    }
+                    return [key, value];
+                })
+            );
+            uploadedImages = Object.fromEntries(sanitizedData);
+        }
 
         // Determine derived shot role if not explicitly provided
         // Check if angleId is a technical angle (starts with std_tech_)
