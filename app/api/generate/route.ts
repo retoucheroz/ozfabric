@@ -272,6 +272,7 @@ export async function POST(req: NextRequest) {
         // === HELPER: Build Asset List ===
         const buildAssetList = (view: string, imgs: any, focus: string, wfType: string): string[] => {
             const assets: string[] = [];
+            const isCloseupView = focus === 'closeup' || view.includes('closeup');
 
             // 1. Model always included
             if (imgs.model) assets.push(imgs.model);
@@ -291,10 +292,10 @@ export async function POST(req: NextRequest) {
                 if (imgs.top_front) assets.push(imgs.top_front);
                 if (imgs.dress_front) assets.push(imgs.dress_front);
                 if (imgs.inner_wear && buttonsOpen) assets.push(imgs.inner_wear);
-                if (imgs.bottom_front && focus !== 'closeup') assets.push(imgs.bottom_front);
+                if (imgs.bottom_front && !isCloseupView) assets.push(imgs.bottom_front);
                 if (imgs.jacket) assets.push(imgs.jacket);
-                if (imgs.belt && !excludeBeltAsset && focus !== 'closeup') assets.push(imgs.belt);
-                if (imgs.bag && focus !== 'closeup') assets.push(imgs.bag);
+                if (imgs.belt && !excludeBeltAsset && !isCloseupView) assets.push(imgs.belt);
+                if (imgs.bag && !isCloseupView) assets.push(imgs.bag);
                 if (imgs.jewelry) assets.push(imgs.jewelry);
                 if (imgs.glasses) assets.push(imgs.glasses);
                 if (imgs.hat && !excludeHatAsset) assets.push(imgs.hat);
@@ -319,9 +320,9 @@ export async function POST(req: NextRequest) {
 
             // 4. Common Assets
             if (imgs.background) assets.push(imgs.background);
-            if (imgs.belt && !excludeBeltAsset && focus !== 'closeup') assets.push(imgs.belt);
-            if (imgs.hat && !excludeHatAsset && focus !== 'closeup') assets.push(imgs.hat);
-            if (imgs.bag && focus !== 'closeup') assets.push(imgs.bag);
+            if (imgs.belt && !excludeBeltAsset && !isCloseupView) assets.push(imgs.belt);
+            if (imgs.hat && !excludeHatAsset && !isCloseupView) assets.push(imgs.hat);
+            if (imgs.bag && !isCloseupView) assets.push(imgs.bag);
             if (imgs.glasses) assets.push(imgs.glasses);
             if (imgs.jewelry) assets.push(imgs.jewelry);
             if (imgs.lighting) assets.push(imgs.lighting);
