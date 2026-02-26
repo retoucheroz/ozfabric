@@ -32,7 +32,7 @@ interface MoodPreset {
 const MOOD_PRESETS: Record<string, MoodPreset> = {
     natural: {
         id: 'natural',
-        promptAddition: 'captured in a candid moment between takes, natural resting expression with quiet confidence, eyes alive and present, as if the photographer caught a real unguarded moment, shot on 35mm film',
+        promptAddition: 'candid moment between takes, natural resting expression with quiet confidence, eyes alive and present, as if the photographer caught a real unguarded moment',
         negativePromptAddition: 'stiff expression, dead eyes, blank stare, mannequin-like, forced smile, robotic gaze, vacant look, overly posed, plastic skin, doll-like, uncanny valley, wax figure',
     },
     warm: {
@@ -94,7 +94,7 @@ function resolveMood(angleId: string | null | undefined, userMoodId?: string, sh
     if (angleId) {
         const angleMeta = ANGLE_METADATA[angleId];
         if (angleMeta) {
-            if (angleMeta.faceProminence === 'none') return null;
+            if (angleMeta.faceProminence === 'none' || angleId.toLowerCase().includes('back')) return null;
 
             if (angleMeta.shotType === 'technical') {
                 return angleMeta.faceProminence === 'partial' ? MOOD_PRESETS['subtle'] : MOOD_PRESETS['professional'];
@@ -732,6 +732,23 @@ export async function POST(req: NextRequest) {
         // === TEXT PROMPT CONVERTER ===
         function convertStructuredToText(sp: any, view: string, wf: string): string {
             const clean = (str: string) => str?.trim().replace(/\n{2,}/g, "\n").replace(/\s{3,}/g, " ").replace(/"/g, "").replace(/\.+$/, "") || "";
+
+            // Simple English Translation Map for Product Names
+            const trEnMap: Record<string, string> = {
+                'gömlek': 'shirt', 'tişört': 't-shirt', 'pantolon': 'pants', 'etek': 'skirt', 'elbise': 'dress',
+                'kaban': 'coat', 'ceket': 'jacket', 'kazak': 'sweater', 'hırka': 'cardigan', 'yelek': 'vest',
+                'şort': 'shorts', 'tayt': 'leggings', 'tulum': 'jumpsuit', 'pijama': 'pajamas', 'takım': 'suit',
+                'mont': 'jacket', 'palto': 'coat', 'trençkot': 'trench coat', 'bluz': 'blouse', 'atlet': 'tank top'
+            };
+
+            let productNameEn = sp.garment.name || "";
+            if (productNameEn) {
+                Object.entries(trEnMap).forEach(([tr, en]) => {
+                    const regex = new RegExp(`\\b${tr}\\b`, 'gi');
+                    productNameEn = productNameEn.replace(regex, en);
+                });
+            }
+
             const isBackView = view.includes('back') || sp.camera.angle === 'back' || sp.pose.description?.toLowerCase().includes('back to camera');
             const isAngledView = view.includes('side') || view.includes('angled') || view.includes('threequarter') || sp.camera.angle === 'angled';
             const framing = sp.camera.framing;
@@ -833,7 +850,7 @@ export async function POST(req: NextRequest) {
             // 4. [LOCKED_PRODUCT_CONSTRAINTS]
             const productBlock: string[] = [];
             productBlock.push(`[LOCKED_PRODUCT_CONSTRAINTS]`);
-            productBlock.push(`Main Garment: ${clean(sp.garment.name)}.`);
+            productBlock.push(`Main Garment: ${clean(productNameEn)}.`);
             if (sp.garment.fabric) productBlock.push(`Fabric & Texture: ${clean(sp.garment.fabric)}.`);
             if (sp.garment.fit) productBlock.push(`Construction & Fit: ${clean(sp.garment.fit)}.`);
             if (canShowCollarHairButtons) {
