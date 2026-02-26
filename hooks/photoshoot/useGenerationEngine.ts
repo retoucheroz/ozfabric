@@ -58,6 +58,7 @@ export const useGenerationEngine = (
     singleCost: number,
     poseFocus: string,
     detailView: string,
+    userRole: string | null,
 
     // Setters
     setSeed: (seed: number | "") => void,
@@ -719,7 +720,15 @@ export const useGenerationEngine = (
             setBatchPreviewPrompts(previews);
             setEditedBatchPrompts(textPrompts);
             setSelectedBatchImages(previews.map(() => true));
-            setShowBatchPreview(true);
+
+            if (userRole === 'admin') {
+                setShowBatchPreview(true);
+            } else {
+                // For non-admins, bypass the preview and start immediately
+                // We need to use a slightly different flow or just call the confirm handler
+                // But handleConfirmBatchGeneration expects the states to be set.
+                handleConfirmBatchGeneration(previews, textPrompts, previews.map(() => true));
+            }
 
         } catch (e: any) {
             toast.error(`Error: ${e.message}`);
@@ -728,7 +737,15 @@ export const useGenerationEngine = (
         }
     };
 
-    const handleConfirmBatchGeneration = async () => {
+    const handleConfirmBatchGeneration = async (
+        overridePreviews?: any[],
+        overridePrompts?: string[],
+        overrideSelected?: boolean[]
+    ) => {
+        const finalPreviews = overridePreviews || batchPreviewPrompts;
+        const finalPrompts = overridePrompts || editedBatchPrompts;
+        const finalSelected = overrideSelected || selectedBatchImages;
+
         setShowBatchPreview(false);
         setIsProcessing(true);
         setResultImages([]);
@@ -739,13 +756,13 @@ export const useGenerationEngine = (
         if (seed === "") setSeed(finalSeed);
 
         try {
-            const finalSelectionCount = selectedBatchImages.filter(Boolean).length;
+            const finalSelectionCount = finalSelected.filter(Boolean).length;
             const generatedImages: any[] = [];
 
             // Get selected indices
-            const selectedIndices = batchPreviewPrompts
+            const selectedIndices = finalPreviews
                 .map((_, i) => i)
-                .filter(i => selectedBatchImages[i]);
+                .filter(i => finalSelected[i]);
 
             // Split into chunks of 3 for parallel-but-controlled execution
             const chunkSize = 3;
@@ -760,7 +777,7 @@ export const useGenerationEngine = (
                 const chunkResults = await Promise.all(chunk.map(async (i) => {
                     if (isStoppingBatchRef.current) return null;
 
-                    const preview = batchPreviewPrompts[i];
+                    const preview = finalPreviews[i];
                     const currentIndex = selectedIndices.indexOf(i) + 1;
 
                     const uploadedImages: any = {
@@ -857,7 +874,7 @@ export const useGenerationEngine = (
                         poseDescription: preview.structured.pose,
                         targetView: preview.spec.camera.angle === 'angled' || preview.spec.view.includes('angled') ? 'side' : (preview.spec.camera.angle === 'back' || preview.spec.view.includes('back') ? 'back' : 'front'),
                         poseFocus: preview.spec.view.includes('detail') ? 'detail' : (preview.spec.camera.shot_type === 'close_up' ? 'closeup' : (preview.spec.camera.shot_type === 'cowboy_shot' ? 'upper' : 'full')),
-                        editedPrompt: editedBatchPrompts[i],
+                        editedPrompt: finalPrompts[i],
                         seed: finalSeed,
                         enableWebSearch,
                         angleId: preview.spec.view,

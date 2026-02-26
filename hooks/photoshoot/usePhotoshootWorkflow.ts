@@ -243,6 +243,7 @@ export const usePhotoshootWorkflow = () => {
         innerWearDescription, shoesDescription, modelDescription, isMaviBatch,
         productCode, upperFraming, batchShotSelection, stylingSideOnly,
         techAccessories, techAccessoryDescriptions, singleCost, poseFocus, detailView,
+        user?.role || null,
         // Setters
         setSeed, setProductDescription, setFitDescription, setProductName,
         setUpperGarmentDescription, setLowerGarmentDescription, setInnerWearDescription,
