@@ -215,7 +215,9 @@ export function buildBatchSpecs(
                 camera: { shot_type: 'full_body', framing: 'head_to_toe', angle: "angled" },
                 assets: ['front', 'back'],
                 fitDescriptionMode: 'full',
-                excludeAllAccessories: true,
+                excludeBeltAsset: true,
+                excludeHatAsset: true,
+                excludeBagAsset: true,
                 isStyling: false
             },
             // 5. Detail Front
@@ -344,7 +346,9 @@ export function buildStandardBatchSpecs(
             camera: { shot_type: 'full_body', framing: 'head_to_toe', angle: "angled" },
             assets: ['front', 'back'],
             fitDescriptionMode: 'full',
-            excludeAllAccessories: true,
+            excludeBeltAsset: true,
+            excludeHatAsset: true,
+            excludeBagAsset: true,
             isStyling: false
         },
         {

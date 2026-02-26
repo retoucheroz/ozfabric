@@ -746,7 +746,9 @@ export async function POST(req: NextRequest) {
         function convertStructuredToText(sp: any, view: string, wf: string): string {
             const clean = (str: string) => str?.trim().replace(/\n{2,}/g, "\n").replace(/\s{3,}/g, " ").replace(/"/g, "").replace(/\.+$/, "") || "";
             const isBackView = view.includes('back') || sp.camera.angle === 'back' || sp.pose.description?.toLowerCase().includes('back to camera');
+            const isAngledView = view.includes('side') || view.includes('angled') || view.includes('threequarter') || sp.camera.angle === 'angled';
             const framing = sp.camera.framing;
+            const isUpperOrCloseup = view.includes('upper') || view.includes('closeup') || framing === 'cowboy_shot' || framing === 'chest_and_face' || view.includes('closeup') || view.includes('detail');
 
             // Visibility Flags
             const canShowFootwear = framing === 'head_to_toe';
@@ -781,7 +783,7 @@ export async function POST(req: NextRequest) {
             const framingBlock: string[] = [];
             framingBlock.push(`[FRAMING_DESCRIPTION]`);
             if (framing === 'head_to_toe') {
-                framingBlock.push("Shot Type: Head-to-toe full body photography.");
+                framingBlock.push(`Shot Type: Head-to-toe full body photography${isAngledView ? ", 3/4 angled." : "."}`);
                 framingBlock.push("Visible: Full model from head to feet.");
             } else if (framing === 'cowboy_shot') {
                 framingBlock.push("Shot Type: Cowboy shot (Medium shot).");
@@ -799,7 +801,7 @@ export async function POST(req: NextRequest) {
             const framingStr = framingBlock.join("\n");
 
             // 3. [POSE]
-            const angleLabel = view.includes('back') ? "BACK VIEW" : (view.includes('side') || view.includes('angled') ? "THREE-QUARTER FRONT VIEW" : (view.includes('closeup') ? "CLOSE-UP FRONT VIEW" : (view.includes('detail') ? (view.includes('front') ? "DETAIL FRONT VIEW" : "DETAIL BACK VIEW") : "FRONT VIEW")));
+            const angleLabel = isBackView ? "BACK VIEW" : (isAngledView ? "THREE-QUARTER VIEW" : (view.includes('closeup') ? "CLOSE-UP FRONT VIEW" : (view.includes('detail') ? (view.includes('front') ? "DETAIL FRONT VIEW" : "DETAIL BACK VIEW") : "FRONT VIEW")));
             const poseBlock: string[] = [];
             poseBlock.push(`[POSE]`);
             poseBlock.push(`View Angle: ${angleLabel}.`);
@@ -808,16 +810,16 @@ export async function POST(req: NextRequest) {
                 let bio = clean(sp.pose.description);
                 bio = bio.replace(/the figure/gi, "the model").replace(/figure stands/gi, "model stands").replace(/figure is/gi, "model is");
                 if (!sp.pose.dynamic && !isBackView) {
-                    bio += ". Standing perfectly straight in rigid attention posture, feet parallel to body and straight, arms resting straight at sides.";
+                    bio += `. Standing perfectly straight in rigid attention posture, ${isUpperOrCloseup ? "" : "feet parallel to body and straight, "}arms resting straight at sides.`;
                 } else if (!sp.pose.dynamic && isBackView) {
-                    bio += ". Model stands perfectly straight with back to camera, head facing away, arms at sides, feet parallel.";
+                    bio += ". Model stands perfectly straight with back to camera, head facing away, arms at sides, feet parallel to each other.";
                 }
                 if (sp.pose.dynamic) {
                     bio = bio.replace(/arms (hang|stay|placed) (naturally )?at sides/gi, "arms in dynamic fashion placement");
                 }
                 poseBlock.push(bio);
             } else if (effectiveRole === 'technical') {
-                poseBlock.push("Standing perfectly straight in rigid attention posture, feet parallel to body and straight, arms resting straight at sides.");
+                poseBlock.push(`Standing perfectly straight in rigid attention posture, ${isUpperOrCloseup ? "" : "feet parallel to body and straight, "}arms resting straight at sides.`);
             }
             if (sp.pose.reference && sp.pose.reference.includes("stickman")) {
                 poseBlock.push("POSE REFERENCE: Use the provided reference stickman image to match pose.");
