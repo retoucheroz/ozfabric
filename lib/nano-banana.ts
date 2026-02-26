@@ -93,41 +93,53 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
             ? payload.image_urls
             : Object.values(payload.image_urls);
 
-        // Google Imagen (AI Studio) REST API
-        const modelId = "imagen-4.0-generate-001";
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:predict?key=${geminiKey}`;
-
-        // Fetch first image as reference if it's a URL
-        let base64Image = null;
-        if (imageList.length > 0) {
-            const imgUrl = imageList[0];
+        // Fetch all images and convert to base64
+        const base64Images = await Promise.all(imageList.map(async (url: string) => {
             try {
-                const resp = await fetch(imgUrl);
+                // Handle already base64 data
+                if (url.startsWith('data:')) {
+                    const parts = url.split(',');
+                    const mimeType = parts[0].match(/:(.*?);/)?.[1] || "image/png";
+                    const data = parts[1];
+                    return { data, mimeType };
+                }
+
+                const resp = await fetch(url);
+                if (!resp.ok) return null;
                 const buffer = await resp.arrayBuffer();
-                base64Image = Buffer.from(buffer).toString('base64');
+                return {
+                    data: Buffer.from(buffer).toString('base64'),
+                    mimeType: resp.headers.get("content-type") || "image/png"
+                };
             } catch (e) {
-                console.error("Failed to fetch reference image for Gemini:", e);
+                console.error(`Failed to fetch image ${url} for Gemini Base64 conversion:`, e);
+                return null;
             }
-        }
+        }));
+
+        const validBase64 = base64Images.filter((img): img is { data: string, mimeType: string } => img !== null);
+
+        // Use the specialized Image Generation model which supports multiple image inputs via generateContent
+        const modelId = "gemini-2.0-flash-exp-image-generation";
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${geminiKey}`;
+
+        const parts: any[] = [{ text: payload.prompt }];
+
+        // Add all reference images as parts
+        validBase64.forEach(img => {
+            parts.push({
+                inlineData: {
+                    data: img.data,
+                    mimeType: img.mimeType
+                }
+            });
+        });
 
         const googlePayload = {
-            instances: [
-                {
-                    prompt: payload.prompt,
-                    ...(base64Image && {
-                        image: {
-                            bytesBase64Encoded: base64Image,
-                            mimeType: "image/png"
-                        }
-                    })
-                }
-            ],
-            parameters: {
-                sampleCount: 1,
-                aspectRatio: payload.aspect_ratio === "3:4" ? "3:4" : (payload.aspect_ratio === "16:9" ? "16:9" : "1:1"),
-                outputMimeType: "image/png",
-                ...(payload.seed && { seed: payload.seed })
-            }
+            contents: [{
+                role: "user",
+                parts: parts
+            }]
         };
 
         const response = await fetch(endpoint, {
@@ -142,14 +154,28 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
             throw new Error(`Gemini API Error (${response.status}): ${data.error?.message || JSON.stringify(data)}`);
         }
 
-        // Response for :predict is in predictions[0].bytesBase64Encoded 
-        const b64 = data.predictions?.[0]?.bytesBase64Encoded;
+        // The image content in generateContent is returned as a part in the candidate
+        const candidates = data.candidates || [];
+        let b64 = null;
+
+        for (const candidate of candidates) {
+            const resultParts = candidate.content?.parts || [];
+            for (const part of resultParts) {
+                if (part.inlineData?.data) {
+                    b64 = part.inlineData.data;
+                    break;
+                }
+            }
+            if (b64) break;
+        }
+
         if (!b64) {
-            console.error("Gemini Unexpected Response:", JSON.stringify(data, null, 2));
-            throw new Error("Gemini API did not return image data in the expected format.");
+            console.error("Gemini Unexpected Response (No Image Data):", JSON.stringify(data, null, 2));
+            throw new Error("Gemini API did not return generated image data. Check if safety filters blocked it.");
         }
 
         finalImageUrl = `data:image/png;base64,${b64}`;
+
 
     } else {
         const imageList = Array.isArray(payload.image_urls)
