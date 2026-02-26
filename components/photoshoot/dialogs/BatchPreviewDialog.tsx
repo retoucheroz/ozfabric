@@ -73,8 +73,8 @@ export function BatchPreviewDialog({
                 </div>
 
                 {/* Content Area */}
-                <div className="flex-1 overflow-x-auto overflow-y-hidden custom-scrollbar bg-[var(--bg-surface)] p-8">
-                    <div className="flex gap-8 h-full min-w-max">
+                <div className="flex-1 overflow-y-auto custom-scrollbar bg-[var(--bg-surface)] p-6">
+                    <div className="max-w-5xl mx-auto space-y-6">
                         {batchPreviewPrompts.map((p, idx) => {
                             const isSelected = selectedBatchImages[idx];
 
@@ -82,19 +82,19 @@ export function BatchPreviewDialog({
                                 <div
                                     key={idx}
                                     className={cn(
-                                        "w-[400px] h-full flex flex-col rounded-[2.5rem] border-2 transition-all duration-500 relative group",
+                                        "rounded-2xl border-2 transition-all p-6 flex flex-col md:flex-row gap-6",
                                         isSelected
-                                            ? "bg-[var(--bg-elevated)] border-blue-500/30 shadow-2xl shadow-blue-500/5 ring-4 ring-blue-500/5"
-                                            : "bg-[var(--bg-surface)] border-[var(--border-subtle)] opacity-40 grayscale-70 grayscale hover:opacity-70 hover:grayscale-0"
+                                            ? "bg-[var(--bg-elevated)] border-blue-500/30 shadow-sm"
+                                            : "opacity-40 grayscale border-[var(--border-subtle)]"
                                     )}
                                 >
-                                    {/* Selection Header */}
-                                    <div className="p-6 flex items-center justify-between border-b border-[var(--border-subtle)]">
-                                        <div className="flex items-center gap-4">
+                                    {/* Selection & Sidebar Info */}
+                                    <div className="w-full md:w-64 space-y-4 shrink-0">
+                                        <div className="flex items-center gap-3">
                                             <div
                                                 className={cn(
-                                                    "w-6 h-6 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all",
-                                                    isSelected ? "bg-blue-600 border-blue-600 shadow-lg shadow-blue-500/30" : "border-[var(--border-strong)] bg-transparent"
+                                                    "w-6 h-6 rounded border-2 flex items-center justify-center cursor-pointer transition-all",
+                                                    isSelected ? "bg-blue-600 border-blue-600" : "border-[var(--border-strong)]"
                                                 )}
                                                 onClick={() => {
                                                     const updated = [...selectedBatchImages];
@@ -102,94 +102,54 @@ export function BatchPreviewDialog({
                                                     setSelectedBatchImages(updated);
                                                 }}
                                             >
-                                                {isSelected && <div className="w-2.5 h-2.5 bg-white rounded-full animate-in zoom-in duration-300" />}
+                                                {isSelected && <div className="w-3 h-3 bg-white rounded-sm" />}
                                             </div>
-                                            <span className="text-lg font-black tracking-tight text-[var(--text-primary)]">
+                                            <span className="text-base font-bold text-[var(--text-primary)] truncate">
                                                 {p.title}
                                             </span>
                                         </div>
-                                        <div className={cn(
-                                            "px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest",
-                                            isSelected ? "bg-blue-500/10 text-blue-500" : "bg-muted text-muted-foreground"
-                                        )}>
-                                            {isSelected ? (language === "tr" ? "Üretilecek" : "Active") : (language === "tr" ? "Atlanacak" : "Disabled")}
-                                        </div>
-                                    </div>
 
-                                    {/* Scrollable Section */}
-                                    <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
-                                        {/* Metadata */}
-                                        <div className="grid grid-cols-1 gap-2 p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
-                                            <div className="flex justify-between items-center text-[10px]">
-                                                <span className="font-bold text-[var(--text-muted)] uppercase tracking-wider">{language === "tr" ? "ÇEKİM AÇISI" : "SHOT ANGLE"}</span>
-                                                <span className="font-black text-blue-500">{p.spec?.view}</span>
+                                        <div className="space-y-3 p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-wider">{language === "tr" ? "ÇEKİM AÇISI" : "SHOT ANGLE"}</span>
+                                                <span className="text-xs font-bold text-blue-500 uppercase">{p.spec?.view}</span>
                                             </div>
-                                            <div className="flex flex-col gap-1.5 mt-2">
-                                                <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider">{language === "tr" ? "KIYAFET GÖRSELLERİ" : "GARMENTS"}</span>
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-wider">{language === "tr" ? "KIYAFETLER" : "GARMENTS"}</span>
                                                 <div className="flex flex-wrap gap-1">
                                                     {(p.spec?.assets || ['Default']).map((a: string) => (
-                                                        <span key={a} className="px-2 py-0.5 rounded-md bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[9px] font-bold text-[var(--text-primary)]">
+                                                        <span key={a} className="px-1.5 py-0.5 rounded bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[9px] font-bold uppercase">
                                                             {a}
                                                         </span>
                                                     ))}
                                                 </div>
                                             </div>
-                                            {p.spec && (
-                                                <div className="flex flex-col gap-1.5 mt-2">
-                                                    <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider">{language === "tr" ? "HARİÇ TUTULANLAR" : "EXCLUDED"}</span>
-                                                    <div className="flex flex-wrap gap-1">
-                                                        {[
-                                                            p.spec?.excludeBagAsset && (language === "tr" ? 'Çanta' : 'Bag'),
-                                                            p.spec?.excludeShoesAsset && (language === "tr" ? 'Ayakkabı' : 'Shoes'),
-                                                            p.spec?.excludeHatAsset && (language === "tr" ? 'Şapka' : 'Hat'),
-                                                            p.spec?.excludeBeltAsset && (language === "tr" ? 'Kemer' : 'Belt'),
-                                                            p.spec?.excludeAllAccessories && (language === "tr" ? 'Tüm Aksesuarlar' : 'All Accessories')
-                                                        ].filter(Boolean).length > 0 ? (
-                                                            [
-                                                                p.spec?.excludeBagAsset && (language === "tr" ? 'Çanta' : 'Bag'),
-                                                                p.spec?.excludeShoesAsset && (language === "tr" ? 'Ayakkabı' : 'Shoes'),
-                                                                p.spec?.excludeHatAsset && (language === "tr" ? 'Şapka' : 'Hat'),
-                                                                p.spec?.excludeBeltAsset && (language === "tr" ? 'Kemer' : 'Belt'),
-                                                                p.spec?.excludeAllAccessories && (language === "tr" ? 'Tüm Aksesuarlar' : 'All Accessories')
-                                                            ].filter(Boolean).map((a: any) => (
-                                                                <span key={a} className="px-2 py-0.5 rounded-md bg-red-500/10 border border-red-500/20 text-[9px] font-bold text-red-500">
-                                                                    {a}
-                                                                </span>
-                                                            ))
-                                                        ) : (
-                                                            <span className="text-[9px] font-bold text-[var(--text-muted)] italic">-</span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            )}
                                         </div>
+                                    </div>
 
-                                        {/* Editor */}
-                                        <div className="flex flex-col flex-1 min-h-[400px]">
-                                            <div className="flex items-center justify-between mb-2">
-                                                <span className="text-[10px] font-black text-[var(--text-primary)] uppercase tracking-widest">
-                                                    {language === "tr" ? "ÜRETİM PROMPT'U" : "GENERATION PROMPT"}
-                                                </span>
-                                                <div className="flex gap-1">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500/50" />
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500/20" />
-                                                </div>
-                                            </div>
-                                            <Textarea
-                                                value={editedBatchPrompts[idx]}
-                                                onChange={(e) => {
-                                                    const updated = [...editedBatchPrompts];
-                                                    updated[idx] = e.target.value;
-                                                    setEditedBatchPrompts(updated);
-                                                }}
-                                                placeholder={language === "tr" ? "Prompt buraya gelecek..." : "Prompt will appear here..."}
-                                                className={cn(
-                                                    "flex-1 font-medium text-[11px] leading-relaxed bg-[var(--bg-surface)] border-2 border-[var(--border-subtle)] text-[var(--text-primary)] rounded-3xl p-5 resize-none transition-all focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/5 custom-scrollbar",
-                                                    !isSelected && "pointer-events-none opacity-50"
-                                                )}
-                                            />
+                                    {/* Prompt Editor - WIDE */}
+                                    <div className="flex-1 flex flex-col min-h-[200px]">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-[10px] font-bold text-[var(--text-primary)] uppercase tracking-widest">
+                                                {language === "tr" ? "ÜRETİM TALİMATI" : "GENERATION PROMPT"}
+                                            </span>
+                                            <span className="text-[9px] text-[var(--text-muted)] font-medium">
+                                                {editedBatchPrompts[idx]?.length || 0} characters
+                                            </span>
                                         </div>
+                                        <Textarea
+                                            value={editedBatchPrompts[idx]}
+                                            onChange={(e) => {
+                                                const updated = [...editedBatchPrompts];
+                                                updated[idx] = e.target.value;
+                                                setEditedBatchPrompts(updated);
+                                            }}
+                                            placeholder={language === "tr" ? "Prompt..." : "Prompt..."}
+                                            className={cn(
+                                                "flex-1 font-medium text-[13px] leading-relaxed bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] rounded-xl p-4 resize-none transition-all focus:border-blue-500/50 outline-none custom-scrollbar",
+                                                !isSelected && "pointer-events-none"
+                                            )}
+                                        />
                                     </div>
                                 </div>
                             );
@@ -197,26 +157,22 @@ export function BatchPreviewDialog({
                     </div>
                 </div>
 
-                {/* Footer Section */}
-                <div className="flex-none p-8 border-t border-[var(--border-subtle)] bg-[var(--bg-elevated)]/80 backdrop-blur-xl flex gap-6">
+                {/* Simplified Footer */}
+                <div className="flex-none p-6 border-t border-[var(--border-subtle)] bg-[var(--bg-elevated)] flex justify-end gap-4">
                     <Button
-                        variant="outline"
+                        variant="ghost"
                         onClick={() => onOpenChange(false)}
-                        className="h-16 px-12 rounded-[2rem] border-2 border-[var(--border-strong)] text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[var(--bg-surface)] transition-all flex-none"
+                        className="h-12 px-8 font-bold text-xs uppercase"
                     >
                         {language === "tr" ? "İPTAL" : "CANCEL"}
                     </Button>
                     <Button
                         onClick={onConfirm}
                         disabled={!selectedBatchImages.some(Boolean)}
-                        className="h-16 flex-1 rounded-[2rem] bg-blue-600 hover:bg-blue-700 text-white shadow-2xl shadow-blue-600/20 transition-all hover:scale-[1.01] active:scale-[0.98] flex items-center justify-center gap-4 group disabled:opacity-50 disabled:grayscale disabled:scale-100"
+                        className="h-12 px-10 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase shadow-lg shadow-blue-600/20 transition-all flex items-center gap-3 disabled:opacity-50"
                     >
-                        <span className="text-xs font-black uppercase tracking-[0.2em]">
-                            {language === "tr" ? "ONAYLA VE ÜRETİMİ BAŞLAT" : "CONFIRM & START PRODUCTION"}
-                        </span>
-                        <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-all">
-                            <Package className="w-5 h-5" />
-                        </div>
+                        {language === "tr" ? "ONAYLA VE BAŞLAT" : "CONFIRM & START"}
+                        <Package className="w-4 h-4" />
                     </Button>
                 </div>
             </DialogContent>

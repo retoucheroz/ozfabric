@@ -379,7 +379,7 @@ export async function POST(req: NextRequest) {
         };
 
         // 2. Build Structured Prompt JSON for each view
-        const buildStructuredPrompt = (view: 'styling' | 'front' | 'side' | 'back') => {
+        const buildStructuredPrompt = (view: 'styling' | 'front' | 'side' | 'back'): { prompt: string, structured: any, input_images: any, negative_prompt: string } => {
             const isBackView = view.includes('back') || (targetView === 'back' && view === 'back') || (activeDetailView === 'back' && view === 'back');
 
             // Determine if this specific execution is a styling shot
@@ -1052,7 +1052,14 @@ export async function POST(req: NextRequest) {
                 sections.push(`[LIGHTING]\nsoft_fashion_lighting\n[/LIGHTING]`);
             }
 
-            return sections.map(s => s.trim()).filter(Boolean).join(" ");
+            const finalPrompt = sections.map(s => s.trim()).filter(Boolean).join(" ");
+
+            return {
+                prompt: finalPrompt,
+                structured: sp,
+                input_images: uploadedImages,
+                negative_prompt: "" // You can add negative prompt logic here if needed
+            };
         }
 
         // NOTE: detail_1, detail_2, fit_pattern are NOT sent - only used for analysis
@@ -1084,14 +1091,14 @@ export async function POST(req: NextRequest) {
             if (isAngles) {
                 // Check if targetView is specified (Single Angle Mode)
                 if (targetView) {
-                    const promptData = buildStructuredPrompt(targetView);
+                    const reqData = buildStructuredPrompt(targetView);
                     return NextResponse.json({
                         status: "preview",
                         previews: [{
                             title: `${targetView.charAt(0).toUpperCase() + targetView.slice(1)} View`,
-                            prompt: promptData.prompt,
-                            structured: promptData.structured,
-                            assets: promptData.input_images,
+                            prompt: reqData.prompt,
+                            structured: reqData.structured,
+                            assets: reqData.input_images,
                             settings: { resolution, aspect_ratio: aspectRatio }
                         }]
                     });
