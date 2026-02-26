@@ -769,10 +769,17 @@ export async function POST(req: NextRequest) {
                 if (sp.subject.body_description) {
                     subjectBlock.push(`Physical Proportions & Body Description: ${clean(sp.subject.body_description)}`);
                 } else {
+                    const isCowboyOrUpper = framing === 'cowboy_shot' || view.includes('upper');
                     if (sp.subject.type === 'male_model') {
-                        subjectBlock.push(`Physical Proportions & Body Description: Height 187 cm, Waist 79 cm (W32), Chest 97 cm (Size L / 50), Hips 97 cm, Inseam L34-L36. Lean and athletic build with long leg proportions.`);
+                        const desc = isCowboyOrUpper
+                            ? "Waist 79 cm (W32), Chest 97 cm (Size L / 50). Lean and athletic build."
+                            : "Height 187 cm, Waist 79 cm (W32), Chest 97 cm (Size L / 50), Hips 97 cm, Inseam L34-L36. Lean and athletic build with long leg proportions.";
+                        subjectBlock.push(`Physical Proportions & Body Description: ${desc}`);
                     } else if (sp.subject.type === 'female_model') {
-                        subjectBlock.push(`Physical Proportions & Body Description: Height 178 cm, Waist 62 cm (Size S / 36), Chest 86 cm, Hips 90 cm. Long legs with a slender, high-fashion slim build.`);
+                        const desc = isCowboyOrUpper
+                            ? "Waist 62 cm (Size S / 36), Chest 86 cm. Slender, high-fashion slim build."
+                            : "Height 178 cm, Waist 62 cm (Size S / 36), Chest 86 cm, Hips 90 cm. Long legs with a slender, high-fashion slim build.";
+                        subjectBlock.push(`Physical Proportions & Body Description: ${desc}`);
                     }
                 }
             }
@@ -788,6 +795,14 @@ export async function POST(req: NextRequest) {
             } else if (framing === 'cowboy_shot') {
                 framingBlock.push("Shot Type: Cowboy shot (Medium shot).");
                 framingBlock.push("Visible: Head to mid-thigh area.");
+                framingBlock.push("FRAME LOCK: Strict medium cowboy crop.");
+                framingBlock.push("Image MUST crop between upper-thigh and mid-thigh.");
+                framingBlock.push("No knees visible.");
+                framingBlock.push("No lower legs visible.");
+                framingBlock.push("No full body.");
+                framingBlock.push("The frame must terminate above the knee line.");
+                framingBlock.push("Hem behavior must be visible within frame.");
+                framingBlock.push("Do not extend framing to show full body for hem clarification.");
             } else if (framing === 'chest_and_face') {
                 framingBlock.push("Shot Type: Close-up beauty/fashion portrait.");
                 framingBlock.push("Visible: Head, shoulders, and upper chest.");
