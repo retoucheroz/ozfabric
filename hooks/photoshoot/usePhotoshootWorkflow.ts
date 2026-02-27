@@ -177,7 +177,8 @@ export const usePhotoshootWorkflow = () => {
         setAssets, setAssetsHighRes, setPoseStickman, setPoseDescription,
         setModelDescription, setFitDescription, setShoesDescription,
         setInnerWearDescription, setGender, setLightingPositive,
-        setLightingNegative, setLightingSendImage
+        setLightingNegative, setLightingSendImage, setTechAccessories,
+        setTechAccessoryDescriptions
     );
 
     const {

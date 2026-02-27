@@ -19,7 +19,9 @@ export const useLibraryState = (
     setGender: any,
     setLightingPositive: any,
     setLightingNegative: any,
-    setLightingSendImage: any
+    setLightingSendImage: any,
+    setTechAccessories: any,
+    setTechAccessoryDescriptions: any
 ) => {
     const { language } = useLanguage();
 
@@ -253,31 +255,43 @@ export const useLibraryState = (
     const handleSavedJacketClick = (jack: SavedJacket) => {
         setAssets((prev: any) => ({ ...prev, jacket: jack.url }));
         setAssetsHighRes((prev: any) => ({ ...prev, jacket: null }));
+        setTechAccessories((prev: any) => ({ ...prev, jacket: true }));
+        if (jack.name) setTechAccessoryDescriptions((prev: any) => ({ ...prev, jacket: jack.name }));
     };
 
     const handleSavedBagClick = (bag: SavedBag) => {
         setAssets((prev: any) => ({ ...prev, bag: bag.url }));
         setAssetsHighRes((prev: any) => ({ ...prev, bag: null }));
+        setTechAccessories((prev: any) => ({ ...prev, bag: true }));
+        if (bag.name) setTechAccessoryDescriptions((prev: any) => ({ ...prev, bag: bag.name }));
     };
 
     const handleSavedGlassesClick = (gl: SavedGlasses) => {
         setAssets((prev: any) => ({ ...prev, glasses: gl.url }));
         setAssetsHighRes((prev: any) => ({ ...prev, glasses: null }));
+        setTechAccessories((prev: any) => ({ ...prev, glasses: true }));
+        if (gl.name) setTechAccessoryDescriptions((prev: any) => ({ ...prev, glasses: gl.name }));
     };
 
     const handleSavedHatClick = (h: SavedHat) => {
         setAssets((prev: any) => ({ ...prev, hat: h.url }));
         setAssetsHighRes((prev: any) => ({ ...prev, hat: null }));
+        setTechAccessories((prev: any) => ({ ...prev, hat: true }));
+        if (h.name) setTechAccessoryDescriptions((prev: any) => ({ ...prev, hat: h.name }));
     };
 
     const handleSavedJewelryClick = (jw: SavedJewelry) => {
         setAssets((prev: any) => ({ ...prev, jewelry: jw.url }));
         setAssetsHighRes((prev: any) => ({ ...prev, jewelry: null }));
+        setTechAccessories((prev: any) => ({ ...prev, jewelry: true }));
+        if (jw.name) setTechAccessoryDescriptions((prev: any) => ({ ...prev, jewelry: jw.name }));
     };
 
     const handleSavedBeltClick = (bl: SavedBelt) => {
         setAssets((prev: any) => ({ ...prev, belt: bl.url }));
         setAssetsHighRes((prev: any) => ({ ...prev, belt: null }));
+        setTechAccessories((prev: any) => ({ ...prev, belt: true }));
+        if (bl.name) setTechAccessoryDescriptions((prev: any) => ({ ...prev, belt: bl.name }));
     };
 
     const handleSavedInnerWearClick = (iw: SavedInnerWear) => {

@@ -458,7 +458,8 @@ export async function POST(req: NextRequest) {
                     belt: uploadedImages.belt ? true : false,
                     hat: uploadedImages.hat ? true : false,
                     glasses: uploadedImages.glasses ? true : false,
-                    bag: uploadedImages.bag ? true : false
+                    bag: uploadedImages.bag ? true : false,
+                    jewelry: uploadedImages.jewelry ? true : false
                 },
 
                 pose: {
@@ -1042,11 +1043,28 @@ export async function POST(req: NextRequest) {
                     stylingBlock.push(`style accessory: wearing ${sp.styling.socks} colored socks.`);
                 }
             }
-            const accessoryItems = Object.entries(techAccessories || {}).filter(([_, v]) => !!v).map(([k]) => {
+            const technicalAccessoryItems = Object.entries(techAccessories || {}).filter(([_, v]) => !!v).map(([k]) => {
                 const desc = techAccessoryDescriptions[k] || k;
                 return `wearing ${clean(desc)} from reference image`;
             });
-            if (accessoryItems.length > 0) stylingBlock.push(...accessoryItems);
+            if (technicalAccessoryItems.length > 0) stylingBlock.push(...technicalAccessoryItems);
+
+            const currentStylingContent = stylingBlock.join("\n").toLowerCase();
+
+            // Explicit Accessory Mentions (Fallback / Complementary)
+            const accessoryList: string[] = [];
+            if (sp.accessories.glasses && !currentStylingContent.includes("glasses") && !currentStylingContent.includes("eyewear"))
+                accessoryList.push("wearing the eyewear from the provided reference image");
+            if (sp.accessories.hat && !currentStylingContent.includes("hat") && !currentStylingContent.includes("headwear"))
+                accessoryList.push("wearing the headwear from the provided reference image");
+            if (sp.accessories.jewelry && !currentStylingContent.includes("jewelry") && !currentStylingContent.includes("necklace") && !currentStylingContent.includes("earring"))
+                accessoryList.push("wearing the jewelry (necklace, earrings, or accessory) from the provided reference image");
+            if (sp.accessories.belt && !currentStylingContent.includes("belt"))
+                accessoryList.push("wearing the belt from the provided reference image");
+            if (sp.accessories.bag && !currentStylingContent.includes("bag"))
+                accessoryList.push("carrying the bag from the provided reference image");
+
+            if (accessoryList.length > 0) stylingBlock.push(...accessoryList);
             stylingBlock.push(`[/STYLING]`);
             const stylingStr = stylingBlock.length > 2 ? stylingBlock.join("\n") : "";
 
