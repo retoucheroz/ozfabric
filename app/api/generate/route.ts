@@ -816,7 +816,7 @@ export async function POST(req: NextRequest) {
             const framingBlock: string[] = [];
             framingBlock.push(`[FRAMING_DESCRIPTION]`);
             const safeAngleId = (angleId || view || "").toLowerCase();
-            const isThreeQuarter = (safeAngleId.includes('threequarter') || safeAngleId.includes('angled')) && view === 'side';
+            const isThreeQuarter = (safeAngleId.includes('threequarter') || safeAngleId.includes('angled') || view === 'side' || view === 'angled');
             const isTechFullFront = safeAngleId === 'std_tech_full_front';
 
             if (isThreeQuarter && effectiveRole === 'technical') {
@@ -864,7 +864,7 @@ export async function POST(req: NextRequest) {
                     poseBlock.push("Limb Map:");
                     poseBlock.push("- Legs: Slightly staggered stance, front foot angled toward camera, back foot planted behind.");
                     poseBlock.push("- Arms: One arm visible at side, far arm partially obscured by torso rotation.");
-                    poseBlock.push("- Head: Facing away from camera.");
+                    if (framing !== 'waist_to_above_knees') poseBlock.push("- Head: Facing away from camera.");
                 } else {
                     // RESTORE OLD STRUCTURED FORMAT FOR TECHNICAL SHOTS
 
@@ -885,13 +885,13 @@ export async function POST(req: NextRequest) {
                         poseBlock.push("Limb Map:");
                         if (!isUpperOrCloseup) poseBlock.push("- Legs: Perfectly straight, feet parallel to each other.");
                         poseBlock.push("- Arms: Resting straight at sides, hands relaxed.");
-                        poseBlock.push("- Head: Facing directly forward at camera.");
+                        if (framing !== 'waist_to_above_knees') poseBlock.push("- Head: Facing directly forward at camera.");
                     } else {
                         poseBlock.push("Posture: Perfectly straight standing posture with back to camera.");
                         poseBlock.push("Limb Map:");
                         poseBlock.push("- Legs: Straight and parallel.");
                         poseBlock.push("- Arms: Resting straight at sides.");
-                        poseBlock.push("- Head: Facing away from camera.");
+                        if (framing !== 'waist_to_above_knees') poseBlock.push("- Head: Facing away from camera.");
                     }
                 }
             } else {
@@ -899,6 +899,7 @@ export async function POST(req: NextRequest) {
                 if (sp.pose.description) {
                     let bio = clean(sp.pose.description);
                     bio = bio.replace(/the figure/gi, "the model").replace(/figure stands/gi, "model stands").replace(/figure is/gi, "model is");
+                    bio = bio.replace(/\[\/?POSE_PROMPT\]/gi, "").trim();
                     poseBlock.push(bio);
                 } else {
                     // Fallback for styling
