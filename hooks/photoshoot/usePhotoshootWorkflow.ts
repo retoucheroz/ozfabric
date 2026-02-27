@@ -214,9 +214,14 @@ export const usePhotoshootWorkflow = () => {
         setFitDescription, setLightingPositive, setLightingNegative
     );
 
-    const availableBatchShots = isMaviBatch
+    const availableBatchShots = (isMaviBatch
         ? (workflowType === 'upper' ? UPPER_SHOTS : LOWER_SHOTS)
-        : STANDARD_SHOTS;
+        : STANDARD_SHOTS).filter(s => {
+            if (workflowType === 'lower') {
+                return !['std_tech_upper_front', 'std_tech_upper_back', 'std_closeup_front'].includes(s.id);
+            }
+            return true;
+        });
 
     const singleCost = resolution === "4K" ? 100 : 50;
 

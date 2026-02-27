@@ -640,7 +640,7 @@ export async function POST(req: NextRequest) {
             // === FINAL SHOE DETERMINATION (BASED ON FRAMING) ===
             if (structuredPrompt.camera.framing === 'head_to_toe') {
                 structuredPrompt.accessories.shoes = {
-                    style: shoesDescription || (uploadedImages.shoes ? "Footwear matching the provided reference image exactly in style and color" : "slim low-profile sneakers"),
+                    style: shoesDescription || (uploadedImages.shoes ? "Professional footwear matching the reference" : "slim low-profile sneakers"),
                     size: "SMALL, thin, minimal, proportional to body - NOT chunky, NOT oversized"
                 };
             } else {
@@ -913,8 +913,14 @@ export async function POST(req: NextRequest) {
             const productBlock: string[] = [];
             productBlock.push(`[LOCKED_PRODUCT_CONSTRAINTS]`);
             productBlock.push(`Main Garment: ${clean(productNameEn)}.`);
-            if (sp.garment.fabric) productBlock.push(`Fabric & Texture: ${clean(sp.garment.fabric)}.`);
-            if (sp.garment.fit) productBlock.push(`Construction & Fit: ${clean(sp.garment.fit)}.`);
+            if (sp.garment.fabric) {
+                const firstSentence = sp.garment.fabric.split(/[.!?]/)[0].trim();
+                productBlock.push(`Fabric & Texture: ${clean(firstSentence)}.`);
+            }
+            if (sp.garment.fit) {
+                const firstSentence = sp.garment.fit.split(/[.!?]/)[0].trim();
+                productBlock.push(`Construction & Fit: ${clean(firstSentence)}.`);
+            }
             if (canShowCollarHairButtons) {
                 if (sp.garment.details?.collar) productBlock.push(`Collar: ${sp.garment.details.collar}.`);
                 if (sp.garment.details?.shoulder) productBlock.push(`Shoulder: ${sp.garment.details.shoulder}.`);
@@ -970,7 +976,7 @@ export async function POST(req: NextRequest) {
             }
             if (wf === 'upper' || wf === 'set' || wf === 'dress' || uploadedImages.top_front || uploadedImages.jacket) {
                 if (sp.styling.sleeves_rolled) stylingBlock.push("sleeves are rolled up to the elbows");
-                else stylingBlock.push("sleeves are straight down to the wrists");
+                else if (wf !== 'lower') stylingBlock.push("sleeves are straight down to the wrists");
             }
             if (canShowLegHem && sp.styling.socks && sp.styling.socks !== 'none') {
                 const len = sp.garment.details?.pant_length;
