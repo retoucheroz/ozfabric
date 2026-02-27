@@ -114,82 +114,80 @@ export async function POST(req: NextRequest) {
 
                 if (type === 'pose') {
                     prompt = `${langInstruction}
-POSE ANALYSIS ROBOT v2
+# POSE & FRAMING ANALYSIS ROBOT v3
 
-### ROLE DEFINITION
-RESPOND IN ENGLISH ONLY. TECHNICAL FASHION TERMINOLOGY.
-You are an expert fashion photography pose analyst. Your task is to analyze a model's pose from a given photograph and produce a **single flowing English paragraph** that will be used as a pose directive inside a Nano Banana 2 image generation prompt.
-
-Your output must be so precise and relationally clear that a diffusion model can reconstruct the exact same pose from text alone.
+**CRITICAL INSTRUCTION:** YOU MUST RESPOND WITH THE FOLLOWING EXACT TAGGED STRUCTURE. EACH SECTION IS MANDATORY. 
+USE NARRATIVE PARAGRAPHS ONLY. NO LISTS. NO BULLETS. RESPOND IN ENGLISH.
 
 ---
 
-### CRITICAL OUTPUT PRINCIPLES
+### OUTPUT FORMAT (MANDATORY)
 
-**1. NARRATIVE, NOT TAGS**
-NEVER output comma-separated tags. ALWAYS write a single cohesive paragraph where each body part's position is described in relation to the others. The CLIP text encoder understands relational sentences far better than isolated keywords.
+[POSE]
+(Detailed narrative paragraph about body position, weight shift, and limb arrangement)
+[/POSE]
 
-**2. EXPLICIT LATERALITY — ALWAYS SPECIFY LEFT/RIGHT**
-Every limb reference MUST include "left" or "right". Never say "one arm" or "a hand" — always say "the left arm" or "the right hand". This is the #1 reason diffusion models scramble poses.
+[CAMERA]
+(Narrative paragraph about camera height, angle, and lens perspective effect)
+[/CAMERA]
 
-**3. RELATIONAL ANCHORING**
-Always describe each body part's position RELATIVE to another body part or the body's center line. Examples:
-- "right hand resting on the right hip"
-- "left elbow bent, forearm crossing in front of the stomach"
-- "left foot positioned 30cm ahead of the right foot"
+[FRAMING]
+(Narrative paragraph about shot type and exact crop boundaries)
+[/FRAMING]
 
-**4. START WITH THE ANCHOR POSE, THEN LAYER DETAILS**
-Begin your description with a well-known pose archetype that exists strongly in the model's training data. This gives the diffusion model a strong starting point in latent space.
+[FRAME_PLACEMENT]
+(Narrative paragraph about model's 2D position in the frame and negative space)
+[/FRAME_PLACEMENT]
 
-Strong anchor poses (use these as opening phrases):
-- "stands in a classic contrapposto"
-- "stands in a relaxed editorial stance"
-- "stands in a straight-on symmetrical pose"
-- "walks mid-stride"
-- "leans against [surface] with crossed ankles"
-- "stands with hands in both pockets"
-- "stands with arms crossed over the chest"
-- "poses in a strong power stance with feet wide apart"
+[EXPRESSION_GAZE]
+(Narrative paragraph about facial expression, gaze direction, and head tilt)
+[/EXPRESSION_GAZE]
 
-**5. SPATIAL FLOW: TOP → BOTTOM**
-Always describe the pose in this order:
-1. Overall stance archetype (the anchor)
-2. Torso & spine geometry
-3. Shoulders (asymmetry, rotation)
-4. Arms & hands (LEFT first, then RIGHT — always)
-5. Head, chin & gaze direction
-6. Legs & feet (LEFT first, then RIGHT — always)
-
-**6. USE ANGULAR PRECISION SPARINGLY**
-Avoid exact degree measurements like "90 degrees". Instead use: "slightly bent", "bent at a right angle", "nearly straight with a soft bend", "sharply bent with the forearm folded upward".
-
-**7. SENTENCE LENGTH CONTROL**
-Keep the entire output between 60-90 words. Longer descriptions dilute attention.
+[PROP_INTERACTION]
+(Narrative paragraph about interaction with furniture/walls. If none, write "The model stands in open space with no physical prop interaction.")
+[/PROP_INTERACTION]
 
 ---
 
-### POSE TERMINOLOGY REFERENCE
-Stance: contrapposto, S-curve stance, editorial stance, power stance, relaxed stance, mid-stride walk, symmetrical pose.
-Torso/Shoulders: upright posture, torso twist, asymmetrical shoulders, dropped/dipped shoulder (L/R).
-Arms/Hands: arm akimbo, hand on hip, hand in pocket, arms crossed, arm hanging at side.
-Lower Body: weight on left/right leg, crossed legs, knee flexed, feet shoulder-width apart, toe pointed, ankle crossed.
+### SCOPE & RULES
+This is for **Styling/Editorial** shots only. Reconstruction must be pixel-perfect in spatial arrangement.
+
+**SECTION 1: [POSE]**
+- Start with archetype (Contrapposto, Weight-shifted, Editorial lean).
+- **MANDATORY LATERALITY:** Always specify "left arm," "right knee," etc.
+- **TORSO ROTATION:** Describe direction and approximate degree (e.g., "torso rotated 30 degrees to camera-right").
+- No clothing or physical features. Relational descriptions only.
+
+**SECTION 2: [CAMERA]**
+- Describe height: Low (worm's eye), Slight low (waist level), Eye level, High.
+- Describe angle: Frontal, 3/4 angle, Profile.
+- Describe Lens Effect: Compressed/Telephoto feel, Natural, or Wide/Exaggerated perspective. No focal lengths.
+
+**SECTION 3: [FRAMING]**
+- Vocabulary: Close-up, Bust shot, MCU, Cowboy, Medium, Full Body.
+- Crop: Specify exactly where the frame cuts (e.g., "cuts at mid-thigh," "head fully visible with 10% headroom").
+
+**SECTION 4: [FRAME_PLACEMENT]**
+- Horizontal: Dead center, Offset left, Offset right.
+- Ratio: How much % of frame model occupies.
+- Negative Space: Distribution of empty space.
+
+**SECTION 5: [EXPRESSION_GAZE]**
+- Gaze: Direct to lens, Past camera, Away, Downward.
+- Expression: Use physical descriptions (e.g., "parted lips," "relaxed jaw") instead of moods.
+
+**SECTION 6: [PROP_INTERACTION]**
+- Describe contact with furniture, walls, or floors.
+- Describe weight distribution on the object.
 
 ---
 
-### RESTRICTIONS (NEVER DO THESE)
-- ❌ NEVER mention clothing, fabric, colors, or accessories.
-- ❌ NEVER mention background, environment, lighting, or camera technicals.
-- ❌ NEVER mention model's features (age, ethnicity, hair, body type).
-- ❌ NEVER use emotional/mood words (confident, sexy, powerful).
-- ❌ NEVER output tags or bullets.
-- ❌ NEVER exceed 90 words.
-
----
-
-### OUTPUT FORMAT
-[POSE_PROMPT]
-(Your single flowing paragraph here — 60-90 words, narrative style, starting with anchor pose)
-[/POSE_PROMPT]`;
+### FINAL CHECK BEFORE OUTPUT:
+1. Did I use all 6 tags?
+2. Is it in narrative paragraph form?
+3. Did I specify Left/Right for everything?
+4. Is it technical fashion terminology?
+`;
                 } else if (type === 'background') {
                     prompt = `${langInstruction} ${multiImageContext}
                     You are an expert location scout and set designer.
@@ -337,15 +335,7 @@ Lower Body: weight on left/right leg, crossed legs, knee flexed, feet shoulder-w
                 responseText = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
 
                 if (type === 'pose') {
-                    // Extract text between [NANO_BANANA_PRO_POSE] and [END_PROMPT]
-                    let cleaned = responseText;
-                    if (cleaned.includes('[NANO_BANANA_PRO_POSE]')) {
-                        cleaned = cleaned.split('[NANO_BANANA_PRO_POSE]')[1];
-                    }
-                    if (cleaned.includes('[END_PROMPT]')) {
-                        cleaned = cleaned.split('[END_PROMPT]')[0];
-                    }
-                    analysis = { description: cleaned.trim() };
+                    analysis = { description: responseText.trim() };
                 } else {
                     analysis = JSON.parse(responseText);
                 }
