@@ -812,8 +812,9 @@ export async function POST(req: NextRequest) {
             // 2. [FRAMING_DESCRIPTION]
             const framingBlock: string[] = [];
             framingBlock.push(`[FRAMING_DESCRIPTION]`);
-            const isThreeQuarter = angleId.toLowerCase() === 'std_tech_threequarter_front' || angleId.toLowerCase() === 'technical_threequarter_front';
-            const isTechFullFront = angleId.toLowerCase() === 'std_tech_full_front';
+            const safeAngleId = (angleId || "").toLowerCase();
+            const isThreeQuarter = safeAngleId === 'std_tech_threequarter_front' || safeAngleId === 'technical_threequarter_front';
+            const isTechFullFront = safeAngleId === 'std_tech_full_front';
 
             if (isThreeQuarter && effectiveRole === 'technical') {
                 framingBlock.push("Shot Type: Full body editorial photography, three-quarter angle. The model's body is rotated approximately 45 degrees from the camera.");
