@@ -843,28 +843,35 @@ export async function POST(req: NextRequest) {
             const isTechFullFront = angleId === 'std_tech_full_front';
             const poseBlock: string[] = [];
             poseBlock.push(`[POSE]`);
-            if (sp.pose.description) {
-                let bio = clean(sp.pose.description);
-                bio = bio.replace(/the figure/gi, "the model").replace(/figure stands/gi, "model stands").replace(/figure is/gi, "model is");
 
-                // If it's a technical angle and NO custom prompt was given, add standard posture
-                // But if custom prompt exists, prioritize it
-                if (!sp.pose.dynamic && !isBackView) {
-                    bio = `The model ${isTechFullFront ? "" : "professional "}${sp.subject.type} stands in a straight-on symmetrical posture with weight evenly distributed on both feet. ` +
-                        bio +
-                        `. Standing perfectly straight in rigid attention posture, ${isUpperOrCloseup ? "" : "feet parallel to body and straight, "}arms resting straight at sides.`;
-                } else if (!sp.pose.dynamic && isBackView) {
-                    bio = `The model ${isTechFullFront ? "" : "professional "}${sp.subject.type} stands perfectly straight with back to camera. ` +
-                        bio +
-                        ". Head facing away, arms at sides, feet parallel to each other.";
-                }
+            if (effectiveRole === 'technical') {
+                // RESTORE OLD STRUCTURED FORMAT FOR TECHNICAL SHOTS
+                poseBlock.push(`View Angle: ${angleLabel}.`);
+                poseBlock.push(`Subject: The model ${isTechFullFront ? "" : "professional "}${sp.subject.type}.`);
 
-                if (sp.pose.dynamic) {
-                    bio = bio.replace(/arms (hang|stay|placed) (naturally )?at sides/gi, "arms in dynamic fashion placement");
+                if (!isBackView) {
+                    poseBlock.push("Posture: Symmetrical straight-on standing posture. Weight evenly distributed on both feet.");
+                    poseBlock.push("Limb Map:");
+                    if (!isUpperOrCloseup) poseBlock.push("- Legs: Perfectly straight, feet parallel to each other.");
+                    poseBlock.push("- Arms: Resting straight at sides, hands relaxed.");
+                    poseBlock.push("- Head: Facing directly forward at camera.");
+                } else {
+                    poseBlock.push("Posture: Perfectly straight standing posture with back to camera.");
+                    poseBlock.push("Limb Map:");
+                    poseBlock.push("- Legs: Straight and parallel.");
+                    poseBlock.push("- Arms: Resting straight at sides.");
+                    poseBlock.push("- Head: Facing away from camera.");
                 }
-                poseBlock.push(bio);
-            } else if (effectiveRole === 'technical') {
-                poseBlock.push(`The model ${isTechFullFront ? "" : "professional "}${sp.subject.type} stands perfectly straight in rigid attention posture, ${isUpperOrCloseup ? "" : "feet parallel to body and straight, "}arms resting straight at sides.`);
+            } else {
+                // STYLING SHOTS: Use Pose Analysis Robot v2 narrative
+                if (sp.pose.description) {
+                    let bio = clean(sp.pose.description);
+                    bio = bio.replace(/the figure/gi, "the model").replace(/figure stands/gi, "model stands").replace(/figure is/gi, "model is");
+                    poseBlock.push(bio);
+                } else {
+                    // Fallback for styling
+                    poseBlock.push(`The model ${sp.subject.type} stands in a relaxed, natural fashion posture.`);
+                }
             }
             poseBlock.push(`[/POSE]`);
             const poseStr = poseBlock.join("\n");
