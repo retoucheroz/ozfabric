@@ -812,67 +812,82 @@ export async function POST(req: NextRequest) {
             // 2. [FRAMING_DESCRIPTION]
             const framingBlock: string[] = [];
             framingBlock.push(`[FRAMING_DESCRIPTION]`);
-            // View Angle removed from here as requested
-            if (framing === 'head_to_toe') {
-                framingBlock.push(`Shot Type: Head-to-toe full body photography${isAngledView ? ", 3/4 angled." : "."}`);
-                framingBlock.push("Visible: Full model from head to feet.");
-            } else if (framing === 'cowboy_shot') {
-                framingBlock.push("Shot Type: Cowboy shot (Medium shot).");
-                framingBlock.push("Visible: Head to mid-thigh area.");
-                framingBlock.push("FRAME LOCK: Strict medium cowboy crop.");
-                framingBlock.push("Image MUST crop between upper-thigh and mid-thigh.");
-                framingBlock.push("No knees visible.");
-                framingBlock.push("No lower legs visible.");
-                framingBlock.push("No full body.");
-                framingBlock.push("The frame must terminate above the knee line.");
-                framingBlock.push("Hem behavior must be visible within frame.");
-                framingBlock.push("Do not extend framing to show full body for hem clarification.");
-            } else if (framing === 'chest_and_face') {
-                framingBlock.push("Shot Type: Close-up beauty/fashion portrait.");
-                framingBlock.push("Visible: Head, shoulders, and upper chest.");
-                framingBlock.push("Constraint: Exclude waist, legs, and footwear.");
-            } else if (framing === 'waist_to_above_knees') {
-                framingBlock.push("Shot Type: Detail-oriented proximity shot. Strictly centered on the lower body.");
-                framingBlock.push("Visible: MANDATORY - Strict crop from the natural waistline down to the upper knees ONLY.");
-                framingBlock.push("Constraint: ABSOLUTELY EXCLUDE face, shoulders, upper chest, and feet from the frame.");
+            const isThreeQuarter = angleId === 'std_tech_threequarter_front' || angleId === 'technical_threequarter_front';
+            const isTechFullFront = angleId === 'std_tech_full_front';
+
+            if (isThreeQuarter && effectiveRole === 'technical') {
+                framingBlock.push("Shot Type: Full body editorial photography, three-quarter angle. The model's body is rotated approximately 45 degrees from the camera.");
+                framingBlock.push("Visible: Full model from head to feet, shot from a diagonal perspective.");
+            } else {
+                if (framing === 'head_to_toe') {
+                    framingBlock.push(`Shot Type: Head-to-toe full body photography${isAngledView ? ", 3/4 angled." : "."}`);
+                    framingBlock.push("Visible: Full model from head to feet.");
+                } else if (framing === 'cowboy_shot') {
+                    framingBlock.push("Shot Type: Cowboy shot (Medium shot).");
+                    framingBlock.push("Visible: Head to mid-thigh area.");
+                    framingBlock.push("FRAME LOCK: Strict medium cowboy crop.");
+                    framingBlock.push("Image MUST crop between upper-thigh and mid-thigh.");
+                    framingBlock.push("No knees visible.");
+                    framingBlock.push("No lower legs visible.");
+                    framingBlock.push("No full body.");
+                    framingBlock.push("The frame must terminate above the knee line.");
+                    framingBlock.push("Hem behavior must be visible within frame.");
+                    framingBlock.push("Do not extend framing to show full body for hem clarification.");
+                } else if (framing === 'chest_and_face') {
+                    framingBlock.push("Shot Type: Close-up beauty/fashion portrait.");
+                    framingBlock.push("Visible: Head, shoulders, and upper chest.");
+                    framingBlock.push("Constraint: Exclude waist, legs, and footwear.");
+                } else if (framing === 'waist_to_above_knees') {
+                    framingBlock.push("Shot Type: Detail-oriented proximity shot. Strictly centered on the lower body.");
+                    framingBlock.push("Visible: MANDATORY - Strict crop from the natural waistline down to the upper knees ONLY.");
+                    framingBlock.push("Constraint: ABSOLUTELY EXCLUDE face, shoulders, upper chest, and feet from the frame.");
+                }
             }
             framingBlock.push(`[/FRAMING_DESCRIPTION]`);
             const framingStr = framingBlock.join("\n");
 
             // 3. [POSE]
-            const isTechFullFront = angleId === 'std_tech_full_front';
-            const isThreeQuarter = angleId === 'std_tech_threequarter_front' || angleId === 'technical_threequarter_front';
-
             const poseBlock: string[] = [];
             poseBlock.push(`[POSE]`);
 
             if (effectiveRole === 'technical') {
-                // RESTORE OLD STRUCTURED FORMAT FOR TECHNICAL SHOTS
-
-                // Construct enhanced angle label with framing info
-                let enhancedAngleLabel = isThreeQuarter ? "THREE-QUARTER SIDE VIEW" : angleLabel;
-
-                // Add framing info to the label
-                if (framing === 'head_to_toe') enhancedAngleLabel += " (FULL BODY)";
-                else if (framing === 'cowboy_shot') enhancedAngleLabel += " (COWBOY SHOT)";
-                else if (framing === 'chest_and_face') enhancedAngleLabel += " (CLOSE-UP)";
-                else if (framing === 'waist_to_above_knees') enhancedAngleLabel += " (LOWER BODY)";
-
-                poseBlock.push(`View Angle: ${enhancedAngleLabel}.`);
-                poseBlock.push(`Subject: The model ${isThreeQuarter || isTechFullFront ? "" : "professional "}${sp.subject.type}.`);
-
-                if (!isBackView) {
-                    poseBlock.push("Posture: Symmetrical straight-on standing posture. Weight evenly distributed on both feet.");
+                if (isThreeQuarter) {
+                    // NEW SPECIAL OVERRIDE FOR THREE-QUARTER TECHNICAL VIEW
+                    poseBlock.push("View Angle: THREE-QUARTER VIEW (FULL BODY).");
+                    poseBlock.push(`Subject: Professional ${sp.subject.type.replace('_', ' ')}.`);
+                    poseBlock.push("Posture: Body angled 45 degrees to the camera, weight shifted slightly to the back foot.");
                     poseBlock.push("Limb Map:");
-                    if (!isUpperOrCloseup) poseBlock.push("- Legs: Perfectly straight, feet parallel to each other.");
-                    poseBlock.push("- Arms: Resting straight at sides, hands relaxed.");
-                    poseBlock.push("- Head: Facing directly forward at camera.");
+                    poseBlock.push("- Legs: Slightly staggered stance, front foot angled toward camera, back foot planted behind.");
+                    poseBlock.push("- Arms: One arm visible at side, far arm partially obscured by torso rotation.");
+                    poseBlock.push("- Head: Turned slightly toward camera, gazing past the lens.");
                 } else {
-                    poseBlock.push("Posture: Perfectly straight standing posture with back to camera.");
-                    poseBlock.push("Limb Map:");
-                    poseBlock.push("- Legs: Straight and parallel.");
-                    poseBlock.push("- Arms: Resting straight at sides.");
-                    poseBlock.push("- Head: Facing away from camera.");
+                    // RESTORE OLD STRUCTURED FORMAT FOR TECHNICAL SHOTS
+
+                    // Construct enhanced angle label with framing info
+                    let enhancedAngleLabel = angleLabel;
+
+                    // Add framing info to the label
+                    if (framing === 'head_to_toe') enhancedAngleLabel += " (FULL BODY)";
+                    else if (framing === 'cowboy_shot') enhancedAngleLabel += " (COWBOY SHOT)";
+                    else if (framing === 'chest_and_face') enhancedAngleLabel += " (CLOSE-UP)";
+                    else if (framing === 'waist_to_above_knees') enhancedAngleLabel += " (LOWER BODY)";
+
+                    poseBlock.push(`View Angle: ${enhancedAngleLabel}.`);
+                    poseBlock.push(`Subject: The model ${sp.subject.type}.`);
+
+                    if (!isBackView) {
+                        poseBlock.push("Posture: Symmetrical straight-on standing posture. Weight evenly distributed on both feet.");
+                        poseBlock.push("Limb Map:");
+                        if (!isUpperOrCloseup) poseBlock.push("- Legs: Perfectly straight, feet parallel to each other.");
+                        poseBlock.push("- Arms: Resting straight at sides, hands relaxed.");
+                        poseBlock.push("- Head: Facing directly forward at camera.");
+                    } else {
+                        poseBlock.push("Posture: Perfectly straight standing posture with back to camera.");
+                        poseBlock.push("Limb Map:");
+                        poseBlock.push("- Legs: Straight and parallel.");
+                        poseBlock.push("- Arms: Resting straight at sides.");
+                        poseBlock.push("- Head: Facing away from camera.");
+                    }
                 }
             } else {
                 // STYLING SHOTS: Use Pose Analysis Robot v2 narrative

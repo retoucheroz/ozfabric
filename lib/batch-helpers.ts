@@ -212,8 +212,8 @@ export function buildBatchSpecs(
             // 4. Technical 3/4 Front — NO ACCESSORIES
             {
                 view: "technical_threequarter_front",
-                label: "Three-Quarter Front (Technical)",
-                labelTr: "Üç Çeyrek Açı Ön (Teknik)",
+                label: "3/4 Front Full Body",
+                labelTr: "Ön Yan Boy",
                 pose: "upright posture, three-quarter profile view facing right, feet touching and strictly parallel, arms resting straight along the sides, no hand-to-body interaction, weight centered, neutral balanced stance, professional technical shot.",
                 dynamic: false,
                 lookAtCamera: false,
@@ -359,8 +359,8 @@ export function buildStandardBatchSpecs(
         },
         {
             view: "std_tech_threequarter_front",
-            label: "Three-Quarter Front (Technical)",
-            labelTr: "Üç Çeyrek Açı Ön (Teknik)",
+            label: "3/4 Front Full Body",
+            labelTr: "Ön Yan Boy",
             pose: "upright posture, three-quarter profile view facing right, feet touching and strictly parallel, arms resting straight along the sides, no hand-to-body interaction, weight centered, neutral balanced stance, professional technical shot.",
             dynamic: false,
             lookAtCamera: false,
