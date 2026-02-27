@@ -1051,18 +1051,20 @@ export async function POST(req: NextRequest) {
 
             const currentStylingContent = stylingBlock.join("\n").toLowerCase();
 
-            // Explicit Accessory Mentions (Fallback / Complementary)
+            // Explicit Accessory Mentions (Standard for Styling, Optional/Manual for technical)
             const accessoryList: string[] = [];
-            if (sp.accessories.glasses && !currentStylingContent.includes("glasses") && !currentStylingContent.includes("eyewear"))
-                accessoryList.push("wearing the eyewear from the provided reference image");
-            if (sp.accessories.hat && !currentStylingContent.includes("hat") && !currentStylingContent.includes("headwear"))
-                accessoryList.push("wearing the headwear from the provided reference image");
-            if (sp.accessories.jewelry && !currentStylingContent.includes("jewelry") && !currentStylingContent.includes("necklace") && !currentStylingContent.includes("earring"))
-                accessoryList.push("wearing the jewelry (necklace, earrings, or accessory) from the provided reference image");
-            if (sp.accessories.belt && !currentStylingContent.includes("belt"))
-                accessoryList.push("wearing the belt from the provided reference image");
-            if (sp.accessories.bag && !currentStylingContent.includes("bag"))
-                accessoryList.push("carrying the bag from the provided reference image");
+            if (isStyling) {
+                if (sp.accessories.glasses && !currentStylingContent.includes("glasses") && !currentStylingContent.includes("eyewear"))
+                    accessoryList.push("wearing the eyewear from the provided reference image");
+                if (sp.accessories.hat && !currentStylingContent.includes("hat") && !currentStylingContent.includes("headwear"))
+                    accessoryList.push("wearing the headwear from the provided reference image");
+                if (sp.accessories.jewelry && !currentStylingContent.includes("jewelry") && !currentStylingContent.includes("necklace") && !currentStylingContent.includes("earring"))
+                    accessoryList.push("wearing the jewelry (necklace, earrings, or accessory) from the provided reference image");
+                if (sp.accessories.belt && !currentStylingContent.includes("belt"))
+                    accessoryList.push("wearing the belt from the provided reference image");
+                if (sp.accessories.bag && !currentStylingContent.includes("bag"))
+                    accessoryList.push("carrying the bag from the provided reference image");
+            }
 
             if (accessoryList.length > 0) stylingBlock.push(...accessoryList);
             stylingBlock.push(`[/STYLING]`);
