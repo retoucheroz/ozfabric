@@ -180,7 +180,6 @@ Describe the camera's physical position and behavior as if directing a photograp
 
 **LENS BEHAVIOR (do NOT specify focal length — describe the visual effect):**
 - **Compressed/telephoto feel:** Flattened depth, background feels close, minimal perspective distortion
-- **Natural perspective:** Moderate depth, proportions appear natural (most e-commerce)
 - **Wide feel:** Exaggerated perspective, objects closer to camera appear larger, noticeable barrel distortion at edges
 - **Ultra-wide/dramatic:** Extreme perspective distortion, strong barrel effect
 
@@ -334,7 +333,7 @@ The model is seated in a reclined editorial position on a folding chair. The tor
 [/POSE]
 
 [CAMERA]
-The camera is positioned at a slight high angle, looking subtly down at the model — consistent with the seated subject where the photographer is standing while the model sits. The camera is nearly frontal to the model, with a very subtle offset to camera-right creating barely perceptible asymmetry. The lens behavior produces a natural perspective with no noticeable compression or wide-angle distortion — proportions appear true to life with moderate depth separation between the model and the background wall.
+The camera is positioned at a slight high angle, looking subtly down at the model — consistent with the seated subject where the photographer is standing while the model sits. The camera is nearly frontal to the model, with a very subtle offset to camera-right creating barely perceptible asymmetry. The lens behavior produces moderate depth separation between the model and the background wall.
 [/CAMERA]
 
 [FRAMING]

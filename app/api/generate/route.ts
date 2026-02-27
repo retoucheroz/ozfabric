@@ -845,34 +845,34 @@ export async function POST(req: NextRequest) {
             const framingBlock: string[] = [];
             framingBlock.push(`[FRAMING_DESCRIPTION]`);
             const isThreeQuarter = (safeAngleId.includes('threequarter') || safeAngleId.includes('angled') || view === 'side' || view === 'angled');
-            const isTechFullFront = safeAngleId === 'std_tech_full_front';
-
-            if (isThreeQuarter && effectiveRole === 'technical') {
-                framingBlock.push("Shot Type: Full body editorial photography, three-quarter angle. The model's body is rotated approximately 45 degrees from the camera. Visible: Full model from head to feet, shot from a diagonal perspective.");
-            } else {
-                // View Angle removed from framing desc as per user request
-                if (framing === 'head_to_toe') {
-                    framingBlock.push(`Shot Type: Head-to-toe full body photography.`);
-                    framingBlock.push("Visible: Full model from head to feet.");
-                } else if (framing === 'cowboy_shot') {
-                    framingBlock.push("Shot Type: Cowboy shot (Medium shot).");
-                    framingBlock.push("Visible: Head to mid-thigh area.");
-                    framingBlock.push("FRAME LOCK: Strict medium cowboy crop.");
-                    framingBlock.push("Image MUST crop between upper-thigh and mid-thigh.");
-                    framingBlock.push("No knees visible.");
-                    framingBlock.push("No lower legs visible.");
-                    framingBlock.push("No full body.");
-                    framingBlock.push("The frame must terminate above the knee line.");
-                    framingBlock.push("Hem behavior must be visible within frame.");
-                    framingBlock.push("Do not extend framing to show full body for hem clarification.");
-                } else if (framing === 'chest_and_face') {
-                    framingBlock.push("Shot Type: Close-up beauty/fashion portrait.");
-                    framingBlock.push("Visible: Head, shoulders, and upper chest.");
-                    framingBlock.push("Constraint: Exclude waist, legs, and footwear.");
-                } else if (framing === 'waist_to_above_knees') {
-                    framingBlock.push("Shot Type: Proximity detail photography.");
-                    framingBlock.push("Visible: MANDATORY - Strict crop from the natural waistline down to the upper knees ONLY. Focus is centered on the garment's waist, hips, and upper thighs.");
-                    framingBlock.push("Constraint: ABSOLUTELY EXCLUDE head, neck, face, shoulders, chest, and feet from the frame.");
+            if (effectiveRole === 'technical') {
+                if (isThreeQuarter) {
+                    framingBlock.push("Shot Type: Full body editorial photography, three-quarter angle. The model's body is rotated approximately 45 degrees from the camera. Visible: Full model from head to feet, shot from a diagonal perspective.");
+                } else {
+                    // View Angle removed from framing desc as per user request
+                    if (framing === 'head_to_toe') {
+                        framingBlock.push(`Shot Type: Head-to-toe full body photography.`);
+                        framingBlock.push("Visible: Full model from head to feet.");
+                    } else if (framing === 'cowboy_shot') {
+                        framingBlock.push("Shot Type: Cowboy shot (Medium shot).");
+                        framingBlock.push("Visible: Head to mid-thigh area.");
+                        framingBlock.push("FRAME LOCK: Strict medium cowboy crop.");
+                        framingBlock.push("Image MUST crop between upper-thigh and mid-thigh.");
+                        framingBlock.push("No knees visible.");
+                        framingBlock.push("No lower legs visible.");
+                        framingBlock.push("No full body.");
+                        framingBlock.push("The frame must terminate above the knee line.");
+                        framingBlock.push("Hem behavior must be visible within frame.");
+                        framingBlock.push("Do not extend framing to show full body for hem clarification.");
+                    } else if (framing === 'chest_and_face') {
+                        framingBlock.push("Shot Type: Close-up beauty/fashion portrait.");
+                        framingBlock.push("Visible: Head, shoulders, and upper chest.");
+                        framingBlock.push("Constraint: Exclude waist, legs, and footwear.");
+                    } else if (framing === 'waist_to_above_knees') {
+                        framingBlock.push("Shot Type: Proximity detail photography.");
+                        framingBlock.push("Visible: MANDATORY - Strict crop from the natural waistline down to the upper knees ONLY. Focus is centered on the garment's waist, hips, and upper thighs.");
+                        framingBlock.push("Constraint: ABSOLUTELY EXCLUDE head, neck, face, shoulders, chest, and feet from the frame.");
+                    }
                 }
             }
             framingBlock.push(`[/FRAMING_DESCRIPTION]`);
@@ -929,10 +929,11 @@ export async function POST(req: NextRequest) {
 
                 if (isV3Styling && v3Pose) {
                     // PARSE V3 STRUCTURE
-                    poseBlock.push(clean(v3Pose));
+                    const lensFilter = (text: string) => text.split(/[.!?]/).filter(s => !s.toLowerCase().includes("natural perspective") && !s.toLowerCase().includes("proportions appear true to life")).join(". ").trim();
+                    poseBlock.push(clean(lensFilter(v3Pose)));
 
                     const v3Camera = getTag(desc, "CAMERA");
-                    if (v3Camera) analyzedCamera = `[CAMERA]\n${clean(v3Camera)}\n[/CAMERA]`;
+                    if (v3Camera) analyzedCamera = `[CAMERA]\n${clean(lensFilter(v3Camera))}\n[/CAMERA]`;
 
                     const v3Framing = getTag(desc, "FRAMING");
                     if (v3Framing) {
