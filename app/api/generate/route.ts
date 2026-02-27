@@ -750,6 +750,16 @@ export async function POST(req: NextRequest) {
         // === TEXT PROMPT CONVERTER ===
         function convertStructuredToText(sp: any, view: string, wf: string): string {
             const clean = (str: string) => str?.trim().replace(/\n{2,}/g, "\n").replace(/\s{3,}/g, " ").replace(/"/g, "").replace(/\.+$/, "") || "";
+            let analyzedCamera = "";
+            let analyzedFramePlacement = "";
+            let analyzedExpression = "";
+            let analyzedPropInteraction = "";
+
+            const getTag = (text: string, tag: string) => {
+                const regex = new RegExp(`\\[${tag}\\]([\\s\\S]*?)\\[\\/${tag}\\]`, 'i');
+                const match = text.match(regex);
+                return match ? match[1].trim() : null;
+            };
 
             // Comprehensive Turkish to English Translation Map
             const trEnMap: Record<string, string> = {
@@ -908,14 +918,44 @@ export async function POST(req: NextRequest) {
                     }
                 }
             } else {
-                // STYLING SHOTS: Use Pose Analysis Robot v2 narrative
-                if (sp.pose.description) {
+                // STYLING SHOTS
+                const desc = sp.pose.description || "";
+                const v3Pose = getTag(desc, "POSE");
+                const isV3Styling = (safeAngleId === 'std_styling_full' || safeAngleId === 'std_styling_upper');
+
+                if (isV3Styling && v3Pose) {
+                    // PARSE V3 STRUCTURE
+                    poseBlock.push(clean(v3Pose));
+
+                    const v3Camera = getTag(desc, "CAMERA");
+                    if (v3Camera) analyzedCamera = `[CAMERA]\n${clean(v3Camera)}\n[/CAMERA]`;
+
+                    const v3Framing = getTag(desc, "FRAMING");
+                    if (v3Framing) {
+                        // Clear the standard framing block and use the analyzed one
+                        framingBlock.length = 0;
+                        framingBlock.push(`[FRAMING_DESCRIPTION]`);
+                        framingBlock.push(clean(v3Framing));
+                        framingBlock.push(`[/FRAMING_DESCRIPTION]`);
+                    }
+
+                    const v3Placement = getTag(desc, "FRAME_PLACEMENT");
+                    if (v3Placement) analyzedFramePlacement = `[FRAME_PLACEMENT]\n${clean(v3Placement)}\n[/FRAME_PLACEMENT]`;
+
+                    const v3Expression = getTag(desc, "EXPRESSION_GAZE");
+                    if (v3Expression) analyzedExpression = `[EXPRESSION_GAZE]\n${clean(v3Expression)}\n[/EXPRESSION_GAZE]`;
+
+                    const v3Prop = getTag(desc, "PROP_INTERACTION");
+                    if (v3Prop) analyzedPropInteraction = `[PROP_INTERACTION]\n${clean(v3Prop)}\n[/PROP_INTERACTION]`;
+
+                } else if (sp.pose.description) {
+                    // Fallback to V2 / Plain text
                     let bio = clean(sp.pose.description);
                     bio = bio.replace(/the figure/gi, "the model").replace(/figure stands/gi, "model stands").replace(/figure is/gi, "model is");
                     bio = bio.replace(/\[\/?POSE_PROMPT\]/gi, "").trim();
                     poseBlock.push(bio);
                 } else {
-                    // Fallback for styling
+                    // Default Fallback
                     poseBlock.push(`The model ${sp.subject.type} stands in a relaxed, natural fashion posture.`);
                 }
             }
@@ -1019,8 +1059,22 @@ export async function POST(req: NextRequest) {
             const moodStr = (resolvedMood && resolvedMood.promptAddition) ? `[MODEL_MOOD]\nExpression & Vibe: ${clean(resolvedMood.promptAddition)}\n[/MODEL_MOOD]` : "";
 
             // Final Assembly 1-9
-            const finalSections = [poseStr, subjectStr, framingStr, productStr, moodStr, lightingStr, stylingStr, backgroundStr, appearanceStr];
-            return finalSections.map(s => s.trim()).filter(Boolean).join("\n\n");
+            const finalSections = [
+                poseStr,
+                subjectStr,
+                framingStr,
+                analyzedCamera,
+                analyzedFramePlacement,
+                analyzedExpression,
+                analyzedPropInteraction,
+                productStr,
+                moodStr,
+                lightingStr,
+                stylingStr,
+                backgroundStr,
+                appearanceStr
+            ];
+            return finalSections.map(s => s && s.trim()).filter(Boolean).join("\n\n");
         }
 
         // NOTE: detail_1, detail_2, fit_pattern are NOT sent - only used for analysis
