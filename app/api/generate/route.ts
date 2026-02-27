@@ -793,10 +793,15 @@ export async function POST(req: NextRequest) {
 
             const isBackView = view.includes('back') || sp.camera.angle === 'back' || sp.pose.description?.toLowerCase().includes('back to camera');
             const isAngledView = view.includes('side') || view.includes('angled') || view.includes('threequarter') || sp.camera.angle === 'angled';
-            const framing = sp.camera.framing;
+            const safeAngleId = (angleId || view || "").toLowerCase();
+            let framing = sp.camera.framing;
+            if (safeAngleId.includes('detail')) framing = 'waist_to_above_knees';
+            else if (safeAngleId.includes('closeup')) framing = 'chest_and_face';
+            else if (safeAngleId.includes('upper') || safeAngleId.includes('cowboy')) framing = 'cowboy_shot';
+
             const isStyling = sp.isStyling;
             const effectiveRole = isStyling ? 'styling' : 'technical';
-            const isUpperOrCloseup = view.includes('upper') || view.includes('closeup') || framing === 'cowboy_shot' || framing === 'chest_and_face' || view.includes('closeup') || view.includes('detail');
+            const isUpperOrCloseup = safeAngleId.includes('upper') || safeAngleId.includes('closeup') || safeAngleId.includes('detail') || ['cowboy_shot', 'chest_and_face', 'waist_to_above_knees'].includes(framing);
 
             // Visibility Flags
             const canShowFootwear = framing === 'head_to_toe';
@@ -834,12 +839,11 @@ export async function POST(req: NextRequest) {
             subjectBlock.push(`[/SUBJECT_IDENTITY]`);
             const subjectStr = subjectBlock.join("\n");
 
-            const angleLabel = isBackView ? "BACK VIEW" : (isAngledView ? "THREE-QUARTER VIEW" : (view.includes('closeup') ? "CLOSE-UP FRONT VIEW" : (view.includes('detail') ? (view.includes('front') ? "DETAIL FRONT VIEW" : "DETAIL BACK VIEW") : "FRONT VIEW")));
+            const angleLabel = isBackView ? "BACK VIEW" : (isAngledView ? "THREE-QUARTER VIEW" : (safeAngleId.includes('closeup') ? "CLOSE-UP FRONT VIEW" : (safeAngleId.includes('detail') ? (safeAngleId.includes('front') ? "DETAIL FRONT VIEW" : "DETAIL BACK VIEW") : "FRONT VIEW")));
 
             // 2. [FRAMING_DESCRIPTION]
             const framingBlock: string[] = [];
             framingBlock.push(`[FRAMING_DESCRIPTION]`);
-            const safeAngleId = (angleId || view || "").toLowerCase();
             const isThreeQuarter = (safeAngleId.includes('threequarter') || safeAngleId.includes('angled') || view === 'side' || view === 'angled');
             const isTechFullFront = safeAngleId === 'std_tech_full_front';
 
