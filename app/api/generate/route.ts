@@ -822,8 +822,9 @@ export async function POST(req: NextRequest) {
                 framingBlock.push("Shot Type: Full body editorial photography, three-quarter angle. The model's body is rotated approximately 45 degrees from the camera.");
                 framingBlock.push("Visible: Full model from head to feet, shot from a diagonal perspective.");
             } else {
+                // View Angle removed from framing desc as per user request
                 if (framing === 'head_to_toe') {
-                    framingBlock.push(`Shot Type: Head-to-toe full body photography${isAngledView ? ", 3/4 angled." : "."}`);
+                    framingBlock.push(`Shot Type: Head-to-toe full body photography.`);
                     framingBlock.push("Visible: Full model from head to feet.");
                 } else if (framing === 'cowboy_shot') {
                     framingBlock.push("Shot Type: Cowboy shot (Medium shot).");
@@ -862,7 +863,7 @@ export async function POST(req: NextRequest) {
                     poseBlock.push("Limb Map:");
                     poseBlock.push("- Legs: Slightly staggered stance, front foot angled toward camera, back foot planted behind.");
                     poseBlock.push("- Arms: One arm visible at side, far arm partially obscured by torso rotation.");
-                    poseBlock.push("- Head: Turned slightly toward camera, gazing past the lens.");
+                    poseBlock.push("- Head: Facing away from camera.");
                 } else {
                     // RESTORE OLD STRUCTURED FORMAT FOR TECHNICAL SHOTS
 

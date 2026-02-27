@@ -79,18 +79,17 @@ export function ProductSection({
                             setProductName(val);
                             setIsManualProductName(true);
 
-                            // AUTO-DETECT PRODUCT TYPE
-                            const lowerVal = val.toLowerCase();
+                            // Auto-detect Product Type
+                            const n = val.toLowerCase();
+                            const upperKeywords = ["gömlek", "shirt", "t-shirt", "tişört", "kazak", "sweater", "hırka", "cardigan", "ceket", "jacket", "mont", "kaban", "coat", "bluz", "blouse", "atlet", "tank", "vest", "yelek"];
+                            const lowerKeywords = ["pantolon", "pants", "jean", "kot", "şort", "shorts", "etek", "skirt", "tayt", "leggings", "jogger", "chino"];
+                            const dressKeywords = ["elbise", "dress", "tulum", "jumpsuit", "salopet"];
+                            const setKeywords = ["takım", "suit", "pijama", "set", "eşofman takımı"];
 
-                            const upperKeywords = ["gömlek", "tişört", "ceket", "kazak", "hırka", "yelek", "mont", "palto", "bluz", "atlet", "shirt", "t-shirt", "jacket", "sweater", "cardigan", "vest", "coat", "blouse", "tank top", "hoodie", "sweatshirt"];
-                            const lowerKeywords = ["pantolon", "etek", "şort", "tayt", "kot", "jean", "pants", "skirt", "shorts", "leggings", "trousers", "jean", "denim"];
-                            const dressKeywords = ["elbise", "tulum", "dress", "jumpsuit", "gown"];
-                            const setKeywords = ["takım", "set", "suit", "tracksuit"];
-
-                            if (upperKeywords.some(k => lowerVal.includes(k))) setWorkflowType("upper");
-                            else if (lowerKeywords.some(k => lowerVal.includes(k))) setWorkflowType("lower");
-                            else if (dressKeywords.some(k => lowerVal.includes(k))) setWorkflowType("dress");
-                            else if (setKeywords.some(k => lowerVal.includes(k))) setWorkflowType("set");
+                            if (dressKeywords.some(k => n.includes(k))) setWorkflowType("dress");
+                            else if (setKeywords.some(k => n.includes(k))) setWorkflowType("set");
+                            else if (lowerKeywords.some(k => n.includes(k))) setWorkflowType("lower");
+                            else if (upperKeywords.some(k => n.includes(k))) setWorkflowType("upper");
                         }}
                         onBlur={async () => {
                             if (productName && productName.trim().length > 2) {
