@@ -966,6 +966,14 @@ export async function POST(req: NextRequest) {
             const productBlock: string[] = [];
             productBlock.push(`[LOCKED_PRODUCT_CONSTRAINTS]`);
             productBlock.push(`Main Garment: ${clean(productNameEn)}.`);
+            if (sp.garment.fabric) {
+                const firstSentence = sp.garment.fabric.split(/[.!?]/)[0].trim();
+                productBlock.push(`Fabric & Texture: ${clean(firstSentence)}.`);
+            }
+            if (sp.garment.fit) {
+                const firstSentence = sp.garment.fit.split(/[.!?]/)[0].trim();
+                productBlock.push(`Construction & Fit: ${clean(firstSentence)}.`);
+            }
             if (canShowCollarHairButtons) {
                 if (sp.garment.details?.collar) productBlock.push(`Collar: ${sp.garment.details.collar}.`);
                 if (sp.garment.details?.shoulder) productBlock.push(`Shoulder: ${sp.garment.details.shoulder}.`);
@@ -984,10 +992,13 @@ export async function POST(req: NextRequest) {
                 if (sp.garment.details?.hem_finish) productBlock.push(`Hem Finish: ${sp.garment.details.hem_finish}.`);
                 if (sp.garment.details?.pant_length) {
                     const length = sp.garment.details.pant_length;
-                    if (length === 'cropped') productBlock.push("Pant Length: cropped tapered pants ending above the ankle, bare ankles fully exposed, clear visible gap between hem and shoes, no fabric touching footwear.");
-                    else if (length === 'standard') productBlock.push("Pant Length: straight-leg pants ending just below the ankle, hem hovering above the shoe without touching, clean single line at the bottom, no break no stacking no bunching.");
-                    else if (length === 'classic') productBlock.push("Pant Length: pants with hem just touching the top of the shoe, fabric resting on the shoe with barely any fold, no sock visible, clean tailored look with minimal contact at the front crease.");
-                    else if (length === 'covering') productBlock.push("Pant Length: long straight-leg pants with hem draping over the top of the shoes, fabric covering the shoe opening, visible soft break and slight stacking at the front, only the toe area of the shoe peeking out.");
+                    const isWide = productNameEn.toLowerCase().includes('wide') || productNameEn.toLowerCase().includes('flare');
+                    const legType = isWide ? "wide-leg" : "straight-leg";
+
+                    if (length === 'cropped') productBlock.push(`Pant Length: cropped tapered ${legType} pants ending above the ankle, bare ankles fully exposed, clear visible gap between hem and shoes, no fabric touching footwear.`);
+                    else if (length === 'standard') productBlock.push(`Pant Length: ${legType} pants ending just below the ankle, hem hovering above the shoe without touching, clean single line at the bottom, no break no stacking no bunching.`);
+                    else if (length === 'classic') productBlock.push(`Pant Length: ${legType} pants with hem just touching the top of the shoe, fabric resting on the shoe with barely any fold, no sock visible, clean tailored look with minimal contact at the front crease.`);
+                    else if (length === 'covering') productBlock.push(`Pant Length: long ${legType} pants with hem draping over the top of the shoes, fabric covering the shoe opening, visible soft break and slight stacking at the front, only the toe area of the shoe peeking out.`);
                     else if (length === 'flare') productBlock.push("Pant Length: wide flared bell-bottom pants flaring out dramatically from the knee down, wide hem sweeping the floor and covering the shoes almost entirely, only the very toe tip of the shoe barely visible beneath the wide flared hem, vintage 70s flare silhouette.");
                 }
             }
