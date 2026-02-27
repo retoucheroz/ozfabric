@@ -912,25 +912,12 @@ export async function POST(req: NextRequest) {
             const productBlock: string[] = [];
             productBlock.push(`[LOCKED_PRODUCT_CONSTRAINTS]`);
             productBlock.push(`Main Garment: ${clean(productNameEn)}.`);
-            if (sp.garment.fabric) {
-                const firstSentence = sp.garment.fabric.split(/[.!?]/)[0].trim();
-                productBlock.push(`Fabric & Texture: ${clean(firstSentence)}.`);
-            }
-            if (sp.garment.fit) {
-                const firstSentence = sp.garment.fit.split(/[.!?]/)[0].trim();
-                productBlock.push(`Construction & Fit: ${clean(firstSentence)}.`);
-            }
             if (canShowCollarHairButtons) {
                 if (sp.garment.details?.collar) productBlock.push(`Collar: ${sp.garment.details.collar}.`);
                 if (sp.garment.details?.shoulder) productBlock.push(`Shoulder: ${sp.garment.details.shoulder}.`);
             }
             if (canShowWaistRiseFitTuck) {
                 if (sp.garment.details?.waist) productBlock.push(`Waist: ${sp.garment.details.waist}.`);
-                if (sp.styling.tucked === 'tucked') {
-                    productBlock.push(`Style Adjustment:\n[TOP_GARMENT_TUCKED_RENDER_LOCK]\n\nThe top garment is inserted into the bottom garment at the waist.\n\nLayer order:\nBottom garment waistband is clearly visible.\nTop garment fabric enters the waistband opening.\n\nFabric behavior:\nFabric folds inward at the waist.\nUpper section remains smooth above the waist.\nLower section is secured inside the bottom garment.\n\nSilhouette:\nA visible separation line occurs at the waistband.\nThe top garment does not extend below the waistband.\n\n[/TOP_GARMENT_TUCKED_RENDER_LOCK]`);
-                } else if (sp.styling.tucked === 'untucked') {
-                    productBlock.push(`Style Adjustment:\n[TOP_GARMENT_OUTSIDE_RENDER_LOCK]\n\nThe top garment is worn fully outside the bottom garment.\n\nLayer order:\nTop garment is the outermost layer at the waist and hip region.\nBottom garment remains visually behind the top garment.\n\nFabric behavior:\nFabric falls vertically from shoulders to hem.\nGravity pulls the garment straight downward.\nNo upward pull, no inward folding at the waist.\nNo fabric insertion into waistband area.\n\nSilhouette:\nHemline remains continuous and clearly visible across the entire front.\nThe transition from top garment to bottom garment occurs below the waist level.\n\n[/TOP_GARMENT_OUTSIDE_RENDER_LOCK]`);
-                }
                 if (sp.garment.details?.rise) productBlock.push(`Rise: ${sp.garment.details.rise}.`);
             }
             if (canShowLegHem) {
@@ -944,9 +931,6 @@ export async function POST(req: NextRequest) {
                     else if (length === 'covering') productBlock.push("Pant Length: long straight-leg pants with hem draping over the top of the shoes, fabric covering the shoe opening, visible soft break and slight stacking at the front, only the toe area of the shoe peeking out.");
                     else if (length === 'flare') productBlock.push("Pant Length: wide flared bell-bottom pants flaring out dramatically from the knee down, wide hem sweeping the floor and covering the shoes almost entirely, only the very toe tip of the shoe barely visible beneath the wide flared hem, vintage 70s flare silhouette.");
                 }
-            }
-            if (sp.styling.buttons === 'open' && canShowCollarHairButtons) {
-                productBlock.push("Style Adjustment: Front is open and unbuttoned.");
             }
             if (canShowFootwear && sp.accessories.shoes) {
                 let shoeStyle = clean(sp.accessories.shoes.style).replace(/sneakers?/gi, "shoes");
