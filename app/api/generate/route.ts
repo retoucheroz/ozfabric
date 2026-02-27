@@ -476,6 +476,7 @@ export async function POST(req: NextRequest) {
                     background: uploadedImages.background ? "match_provided_background" : "clean_studio",
                     lighting: lightingPositive || "soft_fashion_lighting"
                 },
+                isStyling: isActiveStyling,
 
                 // Removed duplicate pose block
                 // NEW: Analysis block for detailed descriptions
@@ -814,8 +815,8 @@ export async function POST(req: NextRequest) {
             // 2. [FRAMING_DESCRIPTION]
             const framingBlock: string[] = [];
             framingBlock.push(`[FRAMING_DESCRIPTION]`);
-            const safeAngleId = (view || "").toLowerCase();
-            const isThreeQuarter = safeAngleId === 'std_tech_threequarter_front' || safeAngleId === 'technical_threequarter_front';
+            const safeAngleId = (angleId || view || "").toLowerCase();
+            const isThreeQuarter = (safeAngleId.includes('threequarter') || safeAngleId.includes('angled')) && view === 'side';
             const isTechFullFront = safeAngleId === 'std_tech_full_front';
 
             if (isThreeQuarter && effectiveRole === 'technical') {
