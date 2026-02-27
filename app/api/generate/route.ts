@@ -769,6 +769,8 @@ export async function POST(req: NextRequest) {
             const isBackView = view.includes('back') || sp.camera.angle === 'back' || sp.pose.description?.toLowerCase().includes('back to camera');
             const isAngledView = view.includes('side') || view.includes('angled') || view.includes('threequarter') || sp.camera.angle === 'angled';
             const framing = sp.camera.framing;
+            const isStyling = sp.isStyling;
+            const effectiveRole = isStyling ? 'styling' : 'technical';
             const isUpperOrCloseup = view.includes('upper') || view.includes('closeup') || framing === 'cowboy_shot' || framing === 'chest_and_face' || view.includes('closeup') || view.includes('detail');
 
             // Visibility Flags
@@ -812,7 +814,7 @@ export async function POST(req: NextRequest) {
             // 2. [FRAMING_DESCRIPTION]
             const framingBlock: string[] = [];
             framingBlock.push(`[FRAMING_DESCRIPTION]`);
-            const safeAngleId = (angleId || "").toLowerCase();
+            const safeAngleId = (view || "").toLowerCase();
             const isThreeQuarter = safeAngleId === 'std_tech_threequarter_front' || safeAngleId === 'technical_threequarter_front';
             const isTechFullFront = safeAngleId === 'std_tech_full_front';
 
