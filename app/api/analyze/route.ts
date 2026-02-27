@@ -202,7 +202,12 @@ This is for **Styling/Editorial** shots only. Reconstruction must be pixel-perfe
                 } else {
                     // TECH PACK MODE - Comprehensive Technical Analysis
                     const workflowStr = workflowType || 'upper';
-                    const productNameContext = productName ? `CRITICAL RULE: The user is analyzing a specific product: "${productName}". describe ONLY "${productName}". DO NOT describe the background, model, or setting. STRICTLY describe the garment itself matching the attributes of "${productName}". IGNORE any other garments (like inner shirts or pants) that might be visible but are not "${productName}".` : `CRITICAL RULE: Focus EXCLUSIVELY on the main garment (the ${workflowStr} piece). DO NOT describe base layers, innerwear, pants, or footwear unless they are the product being analyzed.`;
+                    const productNameContext = productName ? `CRITICAL RULE: The user is analyzing a specific product: "${productName}". 
+                    - Your task is to describe ONLY the "${productName}". 
+                    - ABSOLUTELY IGNORE any other garments visible in the image (e.g. if you are analyzing pants, ignore the shirt; if you are analyzing a jacket, ignore the inner t-shirt).
+                    - If the user explicitly mentions "${productName}" and it is a ${workflowStr} product, DO NOT provide descriptions for any other category.
+                    - If the image contains a full outfit, focus 100% of your technical analysis on the ${productName}.`
+                        : `CRITICAL RULE: Focus EXCLUSIVELY on the main garment (the ${workflowStr} piece). DO NOT describe base layers, innerwear, pants, or footwear unless they are the product being analyzed.`;
 
                     prompt = `${langInstruction} ${multiImageContext} You are a Senior Textile Engineer and Technical Designer. 
                     Analyze the garment in the image(s) to create a professional Technical Specification (Tech Pack).
@@ -227,7 +232,7 @@ This is for **Styling/Editorial** shots only. Reconstruction must be pixel-perfe
                         "productName": "...",
                         "sku": "...",
                         "category": "...",
-                        "visualPrompt": "One paragraph highly detailed technical script focusing EXCLUSIVELY on the garment's fabric, construction, texture, and fit. CRITICAL: DO NOT mention the color of the garment. Describe only its shape, material properties, and design details. This allows the reference image and lighting to define the final color palette. If you describe the color, the AI generation will lose consistency with the setting.",
+                        "visualPrompt": "One paragraph highly detailed technical script focusing EXCLUSIVELY on the target garment's fabric, construction, texture, and fit. CRITICAL: If you are analyzing pants, DO NOT describe the shirt. Describe only its shape, material properties, and design details. This allows the reference image and lighting to define the final color palette.",
                         "innerBrief": "Detailed description of the inner layer (like a sweater, t-shirt) if present.",
                         "upperBrief": "Detailed description of the upper garment (like a coat or jacket) if present.",
                         "lowerBrief": "Detailed description of the lower garment (like pants/skirt) if present.",

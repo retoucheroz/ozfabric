@@ -1075,7 +1075,8 @@ export async function POST(req: NextRequest) {
             const appearanceStr = appearanceBlock.length > 2 ? appearanceBlock.join("\n") : "";
 
             // 9. [MODEL_MOOD]
-            const resolvedMood = resolveMood(angleId, selectedMoodId, effectiveRole);
+            const canShowMood = framing !== 'waist_to_above_knees';
+            const resolvedMood = canShowMood ? resolveMood(angleId, selectedMoodId, effectiveRole) : null;
             const moodStr = (resolvedMood && resolvedMood.promptAddition) ? `[MODEL_MOOD]\nExpression & Vibe: ${clean(resolvedMood.promptAddition)}\n[/MODEL_MOOD]` : "";
 
             // Final Assembly 1-9
