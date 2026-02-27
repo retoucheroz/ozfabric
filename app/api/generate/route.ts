@@ -751,12 +751,26 @@ export async function POST(req: NextRequest) {
         function convertStructuredToText(sp: any, view: string, wf: string): string {
             const clean = (str: string) => str?.trim().replace(/\n{2,}/g, "\n").replace(/\s{3,}/g, " ").replace(/"/g, "").replace(/\.+$/, "") || "";
 
-            // Simple English Translation Map for Product Names
+            // Comprehensive Turkish to English Translation Map
             const trEnMap: Record<string, string> = {
+                // Garments
                 'gömlek': 'shirt', 'tişört': 't-shirt', 'pantolon': 'pants', 'etek': 'skirt', 'elbise': 'dress',
                 'kaban': 'coat', 'ceket': 'jacket', 'kazak': 'sweater', 'hırka': 'cardigan', 'yelek': 'vest',
                 'şort': 'shorts', 'tayt': 'leggings', 'tulum': 'jumpsuit', 'pijama': 'pajamas', 'takım': 'suit',
-                'mont': 'jacket', 'palto': 'coat', 'trençkot': 'trench coat', 'bluz': 'blouse', 'atlet': 'tank top'
+                'mont': 'jacket', 'palto': 'coat', 'trençkot': 'trench coat', 'bluz': 'blouse', 'atlet': 'tank top',
+                // Colors
+                'lacivert': 'navy blue', 'siyah': 'black', 'beyaz': 'white', 'kırmızı': 'red', 'mavi': 'blue',
+                'yeşil': 'green', 'sarı': 'yellow', 'kahverengi': 'brown', 'gri': 'grey', 'bej': 'beige',
+                'pembe': 'pink', 'mor': 'purple', 'turuncu': 'orange', 'antrasit': 'anthracite', 'ekru': 'ecru',
+                'haki': 'khaki', 'vizon': 'taupe', 'bordo': 'burgundy', 'lila': 'lilac', 'hardal': 'mustard',
+                'somon': 'salmon', 'turkuaz': 'turquoise', 'altın': 'gold', 'gümüş': 'silver',
+                // Patterns & Textures
+                'çizgili': 'striped', 'kareli': 'checkered', 'çiçekli': 'floral', 'desenli': 'patterned',
+                'düz': 'plain', 'benekli': 'polka dot', 'baskılı': 'printed', 'kot': 'denim', 'keten': 'linen',
+                'pamuklu': 'cotton', 'yünlü': 'woolen', 'ipek': 'silk', 'kadife': 'velvet', 'deri': 'leather',
+                // Styles & Cuts
+                'dar': 'slim-fit', 'bol': 'oversized', 'geniş': 'wide-leg', 'kısa': 'cropped', 'uzun': 'long',
+                'örgü': 'knitted', 'dokuma': 'woven', 'yırtık': 'distressed'
             };
 
             let productNameEn = sp.garment.name || "";
