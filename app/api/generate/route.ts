@@ -870,9 +870,9 @@ export async function POST(req: NextRequest) {
                     framingBlock.push("Visible: Head, shoulders, and upper chest.");
                     framingBlock.push("Constraint: Exclude waist, legs, and footwear.");
                 } else if (framing === 'waist_to_above_knees') {
-                    framingBlock.push("Shot Type: Detail-oriented proximity shot. Strictly centered on the lower body.");
-                    framingBlock.push("Visible: MANDATORY - Strict crop from the natural waistline down to the upper knees ONLY.");
-                    framingBlock.push("Constraint: ABSOLUTELY EXCLUDE face, shoulders, upper chest, and feet from the frame.");
+                    framingBlock.push("Shot Type: Proximity detail photography.");
+                    framingBlock.push("Visible: MANDATORY - Strict crop from the natural waistline down to the upper knees ONLY. Focus is centered on the garment's waist, hips, and upper thighs.");
+                    framingBlock.push("Constraint: ABSOLUTELY EXCLUDE head, neck, face, shoulders, chest, and feet from the frame.");
                 }
             }
             framingBlock.push(`[/FRAMING_DESCRIPTION]`);
@@ -902,7 +902,7 @@ export async function POST(req: NextRequest) {
                     if (framing === 'head_to_toe') enhancedAngleLabel += " (FULL BODY)";
                     else if (framing === 'cowboy_shot') enhancedAngleLabel += " (COWBOY SHOT)";
                     else if (framing === 'chest_and_face') enhancedAngleLabel += " (CLOSE-UP)";
-                    else if (framing === 'waist_to_above_knees') enhancedAngleLabel += " (LOWER BODY)";
+                    else if (framing === 'waist_to_above_knees') enhancedAngleLabel += " (WAIST-TO-KNEE DETAIL)";
 
                     poseBlock.push(`View Angle: ${enhancedAngleLabel}.`);
                     poseBlock.push(`Subject: The model ${sp.subject.type}.`);
