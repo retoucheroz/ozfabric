@@ -209,23 +209,7 @@ export function buildBatchSpecs(
                 excludeAllAccessories: true,
                 isStyling: false
             },
-            // 4. Technical Back — NO ACCESSORIES
-            {
-                view: "technical_back",
-                label: "Back Full Body (Technical)",
-                labelTr: "Arka Tam Boy (Teknik)",
-                pose: "Standing perfectly straight, back to camera, feet touching and strictly parallel, arms at sides. No styling pose, professional technical studio photography.",
-                dynamic: false,
-                lookAtCamera: false,
-                hairBehind: true,
-                camera: { shot_type: 'full_body', framing: 'head_to_toe', angle: "back" },
-                assets: ['back'],
-                fitDescriptionMode: 'full',
-                excludeHairInfo: true,
-                excludeAllAccessories: true,
-                isStyling: false
-            },
-            // 4.5. Technical 3/4 Front — NO ACCESSORIES
+            // 4. Technical 3/4 Front — NO ACCESSORIES
             {
                 view: "technical_threequarter_front",
                 label: "Three-Quarter Front (Technical)",
@@ -240,6 +224,22 @@ export function buildBatchSpecs(
                 excludeBeltAsset: true,
                 excludeHatAsset: true,
                 excludeBagAsset: true,
+                isStyling: false
+            },
+            // 5. Technical Back — NO ACCESSORIES
+            {
+                view: "technical_back",
+                label: "Back Full Body (Technical)",
+                labelTr: "Arka Tam Boy (Teknik)",
+                pose: "Standing perfectly straight, back to camera, feet touching and strictly parallel, arms at sides. No styling pose, professional technical studio photography.",
+                dynamic: false,
+                lookAtCamera: false,
+                hairBehind: true,
+                camera: { shot_type: 'full_body', framing: 'head_to_toe', angle: "back" },
+                assets: ['back'],
+                fitDescriptionMode: 'full',
+                excludeHairInfo: true,
+                excludeAllAccessories: true,
                 isStyling: false
             },
             // 5. Detail Front
@@ -358,20 +358,6 @@ export function buildStandardBatchSpecs(
             isStyling: false
         },
         {
-            view: "std_tech_full_back",
-            label: "Full Body Back (Technical)",
-            labelTr: "Arka Tam Boy (Teknik)",
-            pose: "Standing perfectly straight, back to camera, feet touching and strictly parallel, arms at sides. No styling pose, professional technical studio photography.",
-            dynamic: false,
-            lookAtCamera: false,
-            hairBehind: true,
-            camera: { shot_type: 'full_body', framing: 'head_to_toe', angle: "back" },
-            assets: ['back'],
-            fitDescriptionMode: 'full',
-            excludeHairInfo: true,
-            isStyling: false
-        },
-        {
             view: "std_tech_threequarter_front",
             label: "Three-Quarter Front (Technical)",
             labelTr: "Üç Çeyrek Açı Ön (Teknik)",
@@ -385,6 +371,20 @@ export function buildStandardBatchSpecs(
             excludeBeltAsset: true,
             excludeHatAsset: true,
             excludeBagAsset: true,
+            isStyling: false
+        },
+        {
+            view: "std_tech_full_back",
+            label: "Full Body Back (Technical)",
+            labelTr: "Arka Tam Boy (Teknik)",
+            pose: "Standing perfectly straight, back to camera, feet touching and strictly parallel, arms at sides. No styling pose, professional technical studio photography.",
+            dynamic: false,
+            lookAtCamera: false,
+            hairBehind: true,
+            camera: { shot_type: 'full_body', framing: 'head_to_toe', angle: "back" },
+            assets: ['back'],
+            fitDescriptionMode: 'full',
+            excludeHairInfo: true,
             isStyling: false
         },
         {

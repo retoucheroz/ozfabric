@@ -812,7 +812,7 @@ export async function POST(req: NextRequest) {
             // 2. [FRAMING_DESCRIPTION]
             const framingBlock: string[] = [];
             framingBlock.push(`[FRAMING_DESCRIPTION]`);
-            framingBlock.push(`View Angle: ${angleLabel}.`);
+            // View Angle removed from here as requested
             if (framing === 'head_to_toe') {
                 framingBlock.push(`Shot Type: Head-to-toe full body photography${isAngledView ? ", 3/4 angled." : "."}`);
                 framingBlock.push("Visible: Full model from head to feet.");
@@ -841,13 +841,25 @@ export async function POST(req: NextRequest) {
 
             // 3. [POSE]
             const isTechFullFront = angleId === 'std_tech_full_front';
+            const isThreeQuarter = angleId === 'std_tech_threequarter_front' || angleId === 'technical_threequarter_front';
+
             const poseBlock: string[] = [];
             poseBlock.push(`[POSE]`);
 
             if (effectiveRole === 'technical') {
                 // RESTORE OLD STRUCTURED FORMAT FOR TECHNICAL SHOTS
-                poseBlock.push(`View Angle: ${angleLabel}.`);
-                poseBlock.push(`Subject: The model ${isTechFullFront ? "" : "professional "}${sp.subject.type}.`);
+
+                // Construct enhanced angle label with framing info
+                let enhancedAngleLabel = isThreeQuarter ? "THREE-QUARTER SIDE VIEW" : angleLabel;
+
+                // Add framing info to the label
+                if (framing === 'head_to_toe') enhancedAngleLabel += " (FULL BODY)";
+                else if (framing === 'cowboy_shot') enhancedAngleLabel += " (COWBOY SHOT)";
+                else if (framing === 'chest_and_face') enhancedAngleLabel += " (CLOSE-UP)";
+                else if (framing === 'waist_to_above_knees') enhancedAngleLabel += " (LOWER BODY)";
+
+                poseBlock.push(`View Angle: ${enhancedAngleLabel}.`);
+                poseBlock.push(`Subject: The model ${isThreeQuarter || isTechFullFront ? "" : "professional "}${sp.subject.type}.`);
 
                 if (!isBackView) {
                     poseBlock.push("Posture: Symmetrical straight-on standing posture. Weight evenly distributed on both feet.");
