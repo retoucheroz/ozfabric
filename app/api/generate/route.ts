@@ -972,6 +972,11 @@ export async function POST(req: NextRequest) {
             }
             if (canShowWaistRiseFitTuck) {
                 if (sp.garment.details?.waist) productBlock.push(`Waist: ${sp.garment.details.waist}.`);
+                if (sp.styling.tucked === 'tucked') {
+                    productBlock.push(`[TOP_GARMENT_TUCKED_RENDER_LOCK]\n\nThe top garment is inserted into the bottom garment at the waist.\n\nLayer order:\nBottom garment waistband is clearly visible.\nTop garment fabric enters the waistband opening.\n\nFabric behavior:\nFabric folds inward at the waist.\nUpper section remains smooth above the waist.\nLower section is secured inside the bottom garment.\n\nSilhouette:\nA visible separation line occurs at the waistband.\nThe top garment does not extend below the waistband.\n\n[/TOP_GARMENT_TUCKED_RENDER_LOCK]`);
+                } else if (sp.styling.tucked === 'untucked') {
+                    productBlock.push(`[TOP_GARMENT_OUTSIDE_RENDER_LOCK]\n\nThe top garment is worn fully outside the bottom garment.\n\nLayer order:\nTop garment is the outermost layer at the waist and hip region.\nBottom garment remains visually behind the top garment.\n\nFabric behavior:\nFabric falls vertically from shoulders to hem.\nGravity pulls the garment straight downward.\nNo upward pull, no inward folding at the waist.\nNo fabric insertion into waistband area.\n\nSilhouette:\nHemline remains continuous and clearly visible across the entire front.\nThe transition from top garment to bottom garment occurs below the waist level.\n\n[/TOP_GARMENT_OUTSIDE_RENDER_LOCK]`);
+                }
                 if (sp.garment.details?.rise) productBlock.push(`Rise: ${sp.garment.details.rise}.`);
             }
             if (canShowLegHem) {
