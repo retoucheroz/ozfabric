@@ -820,8 +820,7 @@ export async function POST(req: NextRequest) {
             const isTechFullFront = safeAngleId === 'std_tech_full_front';
 
             if (isThreeQuarter && effectiveRole === 'technical') {
-                framingBlock.push("Shot Type: Full body editorial photography, three-quarter angle. The model's body is rotated approximately 45 degrees from the camera.");
-                framingBlock.push("Visible: Full model from head to feet, shot from a diagonal perspective.");
+                framingBlock.push("Shot Type: Full body editorial photography, three-quarter angle. The model's body is rotated approximately 45 degrees from the camera. Visible: Full model from head to feet, shot from a diagonal perspective.");
             } else {
                 // View Angle removed from framing desc as per user request
                 if (framing === 'head_to_toe') {
@@ -860,11 +859,11 @@ export async function POST(req: NextRequest) {
                     // NEW SPECIAL OVERRIDE FOR THREE-QUARTER TECHNICAL VIEW
                     poseBlock.push("View Angle: THREE-QUARTER VIEW (FULL BODY).");
                     poseBlock.push(`Subject: Professional ${sp.subject.type.replace('_', ' ')}.`);
-                    poseBlock.push("Posture: Body angled 45 degrees to the camera, weight shifted slightly to the back foot.");
+                    poseBlock.push("Posture: Body angled 45 degrees to the camera, weight shifted slightly to one foot.");
                     poseBlock.push("Limb Map:");
-                    poseBlock.push("- Legs: Slightly staggered stance, front foot angled toward camera, back foot planted behind.");
+                    poseBlock.push("- Legs: Standing upright, feet close together and nearly parallel, no stride or step.");
                     poseBlock.push("- Arms: One arm visible at side, far arm partially obscured by torso rotation.");
-                    if (framing !== 'waist_to_above_knees') poseBlock.push("- Head: Facing away from camera.");
+                    if (framing !== 'waist_to_above_knees') poseBlock.push("- Head: Turned slightly toward camera, gazing past the lens.");
                 } else {
                     // RESTORE OLD STRUCTURED FORMAT FOR TECHNICAL SHOTS
 
