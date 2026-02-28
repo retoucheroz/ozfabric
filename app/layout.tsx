@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
-import { Outfit, Geist_Mono, Playfair_Display } from "next/font/google";
+import { Outfit, Geist_Mono, Playfair_Display, Bodoni_Moda } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { ProjectsProvider } from "@/context/projects-context";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { OzzieChat } from "@/components/features/OzzieChat";
 import { CookieBanner } from "@/components/cookie-banner";
 import { ActivityTracker } from "@/components/activity-tracker";
 import { AuthSessionProvider } from "@/components/providers/session-provider";
@@ -17,6 +16,11 @@ const outfit = Outfit({
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
+  subsets: ["latin"],
+});
+
+const bodoni = Bodoni_Moda({
+  variable: "--font-bodoni",
   subsets: ["latin"],
 });
 
@@ -78,7 +82,7 @@ export default function RootLayout({
         </Script>
       </head>
       <body
-        className={`${outfit.variable} ${playfair.variable} ${geistMono.variable} antialiased font-sans`}
+        className={`${outfit.variable} ${playfair.variable} ${bodoni.variable} ${geistMono.variable} antialiased font-sans`}
         suppressHydrationWarning
       >
         <ThemeProvider
@@ -91,7 +95,6 @@ export default function RootLayout({
               <ProjectsProvider>
                 {children}
                 <Toaster />
-                <OzzieChat />
                 <CookieBanner />
                 <ActivityTracker />
               </ProjectsProvider>

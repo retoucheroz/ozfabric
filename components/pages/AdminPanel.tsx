@@ -22,6 +22,14 @@ import {
     History,
     Image as ImageIcon
 } from "lucide-react"
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+} from "@/components/ui/dialog"
 import { toast } from "sonner"
 import { useLanguage } from "@/context/language-context"
 
@@ -69,6 +77,7 @@ export default function AdminPanel() {
     const [creditHistory, setCreditHistory] = useState<any[]>([]);
     const [isHistoryLoading, setIsHistoryLoading] = useState(false);
     const [provider, setProvider] = useState<string>('fal_ai');
+    const [userToDelete, setUserToDelete] = useState<string | null>(null);
 
     const fetchData = async () => {
         setIsLoading(true);
@@ -128,8 +137,15 @@ export default function AdminPanel() {
         }
     };
 
-    const deleteUser = async (username: string) => {
-        if (!confirm(t('admin.deleteConfirm'))) return;
+    const deleteUser = (username: string) => {
+        setUserToDelete(username);
+    };
+
+    const handlePerformDelete = async () => {
+        if (!userToDelete) return;
+        const username = userToDelete;
+        setUserToDelete(null); // Close dialog immediately
+
         try {
             const res = await fetch('/api/admin/users', {
                 method: 'DELETE',
@@ -148,17 +164,17 @@ export default function AdminPanel() {
         }
     };
 
-    const adjustCredits = async (email: string, amount: number, description: string = '') => {
+    const adjustCredits = async (username: string, amount: number, description: string = '') => {
         try {
             const res = await fetch('/api/admin/users/credits', {
                 method: 'POST',
                 headers: getAdminHeaders(),
-                body: JSON.stringify({ email, amount, description })
+                body: JSON.stringify({ email: username, amount, description })
             });
 
             if (res.ok) {
                 const data = await res.json();
-                setUsers(prev => prev.map(u => u.username === email ? { ...u, credits: data.credits } : u));
+                setUsers(prev => prev.map(u => u.username === username ? { ...u, credits: data.credits } : u));
                 toast.success(t('admin.addUser'));
             } else {
                 const data = await res.json();
@@ -620,6 +636,30 @@ export default function AdminPanel() {
                     </Card>
                 </div>
             )}
+            {/* User Deletion Confirmation Dialog */}
+            <Dialog open={!!userToDelete} onOpenChange={(open) => !open && setUserToDelete(null)}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2 text-red-600">
+                            <Trash2 className="w-5 h-5" />
+                            {t('admin.deleteUser')}
+                        </DialogTitle>
+                        <DialogDescription className="py-2">
+                            {t('admin.deleteConfirm')}
+                            <br /><br />
+                            <span className="font-black text-foreground">{userToDelete}</span>
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="gap-2 sm:gap-0">
+                        <Button variant="outline" onClick={() => setUserToDelete(null)}>
+                            {t('common.cancel')}
+                        </Button>
+                        <Button variant="destructive" onClick={handlePerformDelete}>
+                            {t('common.delete')}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div >
     )
 }
