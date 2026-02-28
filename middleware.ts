@@ -12,6 +12,8 @@ export async function middleware(request: NextRequest) {
         pathname === '/terms' ||
         pathname === '/privacy' ||
         pathname === '/verify' ||
+        pathname === '/api/register' ||
+        pathname === '/api/verify' ||
         pathname.startsWith('/api/auth') ||
         pathname.startsWith('/api/webhooks') ||
         pathname.startsWith('/_next') ||
