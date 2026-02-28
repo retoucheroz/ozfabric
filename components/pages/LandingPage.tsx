@@ -197,12 +197,12 @@ export default function LandingPage() {
                         {/* 2x3 GRID */}
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
                             {[
-                                { src: "/lp/p2/1 2.webp", label: "Model A", isOutput: true },
-                                { src: "/lp/p2/2.webp", label: "Model B", isOutput: true },
-                                { src: "/lp/p2/3.webp", label: "Model C", isOutput: true },
+                                { src: "/lp/p2/1 2.webp", label: "Model 1", isOutput: true },
+                                { src: "/lp/p2/3.webp", label: "Model 3", isOutput: true },
+                                { src: "/lp/p2/5.webp", label: "Model 5", isOutput: true },
+                                { src: "/lp/p2/2.webp", label: "Model 2", isOutput: true },
                                 { src: "/lp/p2/4.webp", label: "Product Input", isOutput: false },
-                                { src: "/lp/p2/5.webp", label: "Model D", isOutput: true },
-                                { src: "/lp/p2/6.webp", label: "Model E", isOutput: true },
+                                { src: "/lp/p2/6.webp", label: "Model 6", isOutput: true },
                             ].map((item, idx) => (
                                 <motion.div
                                     key={idx}
