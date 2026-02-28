@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Sparkles, ArrowRight, Camera, Image as ImageIcon, Zap, Upload, Wand2, Layers, Video, ChevronDown } from "lucide-react";
 import { useLanguage } from "@/context/language-context";
+import { cn } from "@/lib/utils";
 
 
 const ScrollDownIcon = ({ targetId }: { targetId?: string }) => {
@@ -39,6 +40,7 @@ const ScrollDownIcon = ({ targetId }: { targetId?: string }) => {
 export default function LandingPage() {
     const { language, t } = useLanguage();
     const [mounted, setMounted] = useState(false);
+    const [isModeOn, setIsModeOn] = useState(true);
 
     // For general scroll progress
     const { scrollYProgress, scrollY } = useScroll();
@@ -177,63 +179,129 @@ export default function LandingPage() {
 
             </section>
 
-            {/* PIPELINE / HOW IT WORKS SECTION */}
-            <section id="pipeline" className="py-32 px-6 bg-transparent relative">
-                <div className="max-w-6xl mx-auto">
-                    <motion.div
-                        initial={{ opacity: 0, y: 50 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: "-100px" }}
-                        className="text-center mb-24"
-                    >
-                        <h2 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight mb-4">
-                            {translate("Sadece Hayal Et, Biz Yaratalım", "Imagine It, We Create It")}
-                        </h2>
-                        <p className="text-zinc-400 text-base md:text-lg max-w-xl mx-auto">
-                            {translate("E-ticaret markaları için baştan sona yapay zeka destekli moda prodüksiyon süreci. Hayalet manken görsellerini, gerçeğe dönüştür.", "A complete AI-driven fashion production pipeline for e-commerce. Turn ghost mannequin images into hyper-realistic photography.")}
-                        </p>
-                    </motion.div>
+            {/* INTERACTIVE SHOWCASE SECTION (Page 2) */}
+            <section id="interactive-grid" className="py-24 px-6 bg-transparent relative min-h-screen flex items-center justify-center overflow-hidden">
+                {/* Background Decor */}
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[#0D0D0F]">
+                    <Image
+                        src="/lp/1.jpg"
+                        alt="Background"
+                        fill
+                        className="object-cover opacity-10 blur-xl"
+                    />
+                </div>
 
-                    <div className="grid md:grid-cols-3 gap-8 relative">
-                        {/* Connecting Line */}
-                        <div className="hidden md:block absolute top-[60px] left-[15%] right-[15%] h-[2px] bg-gradient-to-r from-transparent via-[#F5F5F5]/30 to-transparent" />
+                <div className="max-w-6xl w-full mx-auto relative z-10">
+                    <div className="relative">
+                        {/* 2x3 GRID */}
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
+                            {[
+                                { src: "/lp/p2/1 2.webp", label: "Model A", isOutput: true },
+                                { src: "/lp/p2/2.webp", label: "Model B", isOutput: true },
+                                { src: "/lp/p2/3.webp", label: "Model C", isOutput: true },
+                                { src: "/lp/p2/4.webp", label: "Product Input", isOutput: false },
+                                { src: "/lp/p2/5.webp", label: "Model D", isOutput: true },
+                                { src: "/lp/p2/6.webp", label: "Model E", isOutput: true },
+                            ].map((item, idx) => (
+                                <motion.div
+                                    key={idx}
+                                    initial={{ opacity: 0, y: 30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: idx * 0.1, duration: 0.8 }}
+                                    viewport={{ once: true }}
+                                    className={cn(
+                                        "relative aspect-[3/4] rounded-3xl overflow-hidden border border-white/5 shadow-2xl transition-all duration-700 ease-in-out",
+                                        "hover:border-white/20 group",
+                                        !isModeOn && item.isOutput && "grayscale opacity-40 scale-[0.98]",
+                                        isModeOn && item.isOutput && "grayscale-0 opacity-100 scale-100",
+                                        !item.isOutput && "border-white/20 ring-1 ring-white/10"
+                                    )}
+                                >
+                                    <Image
+                                        src={item.src}
+                                        alt={item.label}
+                                        fill
+                                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                        sizes="(max-width: 768px) 50vw, 33vw"
+                                    />
 
-                        {[
-                            {
-                                step: "01",
-                                title: translate("Yükle", "Upload"),
-                                desc: translate("Ürününüzün düz yatay veya hayalet manken görselini sisteme yükleyin.", "Upload your flat-lay or ghost mannequin product image to the system."),
-                                icon: Upload
-                            },
-                            {
-                                step: "02",
-                                title: translate("Kurgula", "Design"),
-                                desc: translate("Stüdyo veya editoryal konseptini, modeli, pozu ve arkaplanı seçin.", "Select the studio or editorial concept, model demographics, pose, and background."),
-                                icon: Wand2
-                            },
-                            {
-                                step: "03",
-                                title: translate("Sonuç", "Result"),
-                                desc: translate("Saniyeler içinde, web sitenizde veya sosyal medyanızda kullanıma hazır görseller.", "Get ready-to-publish visuals for your website or social media in seconds."),
-                                icon: ImageIcon
-                            }
-                        ].map((item, idx) => (
-                            <motion.div
-                                key={idx}
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                transition={{ delay: idx * 0.2 }}
-                                viewport={{ once: true }}
-                                className="relative bg-white/[0.02] border border-white/[0.05] p-8 rounded-3xl flex flex-col items-center text-center hover:bg-white/[0.04] transition-colors"
+                                    {/* Overlay for output images when on */}
+                                    {isModeOn && item.isOutput && (
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
+                                    )}
+
+                                    {/* Input indicator */}
+                                    {!item.isOutput && (
+                                        <div className="absolute top-4 left-4 z-20 px-3 py-1 bg-black/60 backdrop-blur-md rounded-lg font-mono text-[9px] font-bold text-white uppercase tracking-widest border border-white/10">
+                                            {translate("GİRDİ", "INPUT")}
+                                        </div>
+                                    )}
+                                </motion.div>
+                            ))}
+                        </div>
+
+                        {/* CENTRAL SWITCH */}
+                        <motion.div
+                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30"
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            viewport={{ once: true }}
+                        >
+                            <div
+                                onClick={() => setIsModeOn(!isModeOn)}
+                                className="cursor-pointer group flex items-center justify-center p-4"
                             >
-                                <div className="w-20 h-20 bg-[#0A0A0A] border border-white/10 rounded-2xl flex items-center justify-center mb-8 relative z-10 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
-                                    <item.icon className="w-8 h-8 text-[#F5F5F5]" />
-                                    <div className="absolute -top-3 -right-3 text-3xl font-black text-white/5">{item.step}</div>
+                                <div className={cn(
+                                    "w-16 h-8 rounded-full flex items-center justify-between px-1.5 shadow-2xl border transition-all duration-500",
+                                    isModeOn
+                                        ? "bg-[#F5F5F5] border-white/20 shadow-[0_0_30px_rgba(245,245,245,0.3)]"
+                                        : "bg-[#0D0D0F] border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)]"
+                                )}>
+                                    <motion.div
+                                        className={cn(
+                                            "w-[2px] h-4 rounded-full transition-colors duration-500",
+                                            isModeOn ? "bg-[#0D0D0F]/70" : "bg-[#F5F5F5]/70"
+                                        )}
+                                        animate={{ opacity: isModeOn ? 1 : 0.4 }}
+                                    />
+                                    <motion.div
+                                        layout
+                                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                        className={cn(
+                                            "w-6 h-6 rounded-full shadow-md",
+                                            isModeOn ? "bg-[#0D0D0F]" : "bg-[#F5F5F5]"
+                                        )}
+                                    />
+                                    <motion.div
+                                        className={cn(
+                                            "w-[2px] h-4 rounded-full transition-colors duration-500",
+                                            isModeOn ? "bg-[#0D0D0F]/70" : "bg-[#F5F5F5]/70"
+                                        )}
+                                        animate={{ opacity: isModeOn ? 0.4 : 1 }}
+                                    />
                                 </div>
-                                <h3 className="text-lg font-bold mb-3">{item.title}</h3>
-                                <p className="text-xs text-zinc-400 leading-relaxed font-medium">{item.desc}</p>
-                            </motion.div>
-                        ))}
+                            </div>
+                        </motion.div>
+                    </div>
+
+                    <div className="mt-20 text-center">
+                        <motion.h2
+                            initial={{ opacity: 0 }}
+                            whileInView={{ opacity: 1 }}
+                            className="text-2xl md:text-3xl font-black tracking-tight mb-4"
+                        >
+                            {isModeOn
+                                ? translate("AI Gücüyle Gerçekleşen Dönüşüm", "The Power of AI Transformation")
+                                : translate("Ürününüzü Hazırlayın", "Ready Your Product")
+                            }
+                        </motion.h2>
+                        <p className="text-zinc-500 text-sm md:text-base max-w-xl mx-auto">
+                            {translate(
+                                "Modelleri, mekanları ve ışığı saniyeler içinde değiştirin. Hayal ettiğiniz koleksiyonu tek bir ürün görseliyle gerçeğe dönüştürün.",
+                                "Change models, locations, and lighting in seconds. Turn your collection into reality with just one product image."
+                            )}
+                        </p>
                     </div>
                 </div>
                 <ScrollDownIcon targetId="showcase" />
