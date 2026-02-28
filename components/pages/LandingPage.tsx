@@ -196,7 +196,7 @@ export default function LandingPage() {
                     <div className="relative">
                         <div className="flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-0 relative">
                             {/* LEFT GROUP: INPUT/BASE (Images 1 & 2) */}
-                            <div className="grid grid-cols-1 gap-4 md:gap-8 w-full lg:w-[30%]">
+                            <div className="grid grid-cols-1 gap-4 md:gap-8 w-full lg:w-[24%]">
                                 {[
                                     { src: "/lp/p2/1.webp", label: translate("model görseli", "model visual"), isOutput: true },
                                     { src: "/lp/p2/2.webp", label: translate("ürün görseli", "product visual"), isOutput: false },
@@ -238,13 +238,13 @@ export default function LandingPage() {
                             </div>
 
                             {/* GAP / SEPARATOR */}
-                            <div className="w-full lg:w-[8%] flex items-center justify-center py-8 lg:py-0 relative">
+                            <div className="w-full lg:w-[6%] flex items-center justify-center py-8 lg:py-0 relative">
                                 {/* Optional Vertical Line */}
                                 <div className="hidden lg:block h-32 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
                             </div>
 
                             {/* RIGHT GROUP: OUTPUTS (Images 3, 5, 4, 6) */}
-                            <div className="grid grid-cols-2 gap-4 md:gap-8 w-full lg:w-[55%]">
+                            <div className="grid grid-cols-2 gap-4 md:gap-8 w-full lg:w-[44%]">
                                 {[
                                     { src: "/lp/p2/3.webp", label: translate("editorial", "editorial"), isOutput: true },
                                     { src: "/lp/p2/5.webp", label: translate("imaj görseli", "image visual"), isOutput: true },
