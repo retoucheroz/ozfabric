@@ -237,52 +237,10 @@ export default function LandingPage() {
                                 ))}
                             </div>
 
-                            {/* CENTRAL SWITCH CONTAINER (The Gap) */}
-                            <div className="w-full lg:w-[15%] flex flex-row lg:flex-col items-center justify-center py-8 lg:py-0 relative">
+                            {/* GAP / SEPARATOR */}
+                            <div className="w-full lg:w-[8%] flex items-center justify-center py-8 lg:py-0 relative">
                                 {/* Optional Vertical Line */}
-                                <div className="hidden lg:block absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
-
-                                <motion.div
-                                    className="z-30 relative"
-                                    initial={{ opacity: 0, scale: 0.8 }}
-                                    whileInView={{ opacity: 1, scale: 1 }}
-                                    viewport={{ once: true }}
-                                >
-                                    <div
-                                        onClick={() => setIsModeOn(!isModeOn)}
-                                        className="cursor-pointer group flex items-center justify-center p-4"
-                                    >
-                                        <div className={cn(
-                                            "w-16 h-8 rounded-full flex items-center justify-between px-1.5 shadow-2xl border transition-all duration-500",
-                                            isModeOn
-                                                ? "bg-[#F5F5F5] border-white/20 shadow-[0_0_30px_rgba(245,245,245,0.3)]"
-                                                : "bg-[#0D0D0F] border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)]"
-                                        )}>
-                                            <motion.div
-                                                className={cn(
-                                                    "w-[2px] h-4 rounded-full transition-colors duration-500",
-                                                    isModeOn ? "bg-[#0D0D0F]/70" : "bg-[#F5F5F5]/70"
-                                                )}
-                                                animate={{ opacity: isModeOn ? 1 : 0.4 }}
-                                            />
-                                            <motion.div
-                                                layout
-                                                transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                                                className={cn(
-                                                    "w-6 h-6 rounded-full shadow-md",
-                                                    isModeOn ? "bg-[#0D0D0F]" : "bg-[#F5F5F5]"
-                                                )}
-                                            />
-                                            <motion.div
-                                                className={cn(
-                                                    "w-[2px] h-4 rounded-full transition-colors duration-500",
-                                                    isModeOn ? "bg-[#0D0D0F]/70" : "bg-[#F5F5F5]/70"
-                                                )}
-                                                animate={{ opacity: isModeOn ? 0.4 : 1 }}
-                                            />
-                                        </div>
-                                    </div>
-                                </motion.div>
+                                <div className="hidden lg:block h-32 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
                             </div>
 
                             {/* RIGHT GROUP: OUTPUTS (Images 3, 5, 4, 6) */}
