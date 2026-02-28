@@ -25,7 +25,7 @@ export async function sendActivationEmail(email: string) {
     `&email=${encodeURIComponent(email)}`;
 
   await mailer.sendMail({
-    from: `"ModeOn.ai" <${process.env.MAIL_FROM}>`,
+    from: process.env.MAIL_FROM,
     to: email,
     subject: "E-postanızı doğrulayın - ModeOn.ai",
     html: `
