@@ -83,7 +83,58 @@ export default function LoginPage() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(language === 'tr' ? 'Kayıt işlemi admin tarafından yapılmaktadır.' : 'Registration is handled by admin.');
+    setError("");
+
+    if (password !== confirmPassword) {
+      setError(language === 'tr' ? 'Şifreler eşleşmiyor.' : 'Passwords do not match.');
+      return;
+    }
+
+    if (password.length < 8) {
+      setError(language === 'tr' ? 'Şifreniz en az 8 karakter olmalıdır.' : 'Password must be at least 8 characters.');
+      return;
+    }
+
+    if (!acceptTerms) {
+      setError(language === 'tr' ? 'Lütfen kullanım koşullarını kabul edin.' : 'Please accept the terms.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: fullName,
+          email: username,
+          password
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.ok) {
+        toast.success(
+          language === 'tr'
+            ? 'Kayıt başarılı! Lütfen doğrulama için e-postanızı kontrol edin.'
+            : 'Registration successful! Please check your email to verify.'
+        );
+        setIsRegistering(false);
+        setPassword("");
+        setConfirmPassword("");
+      } else {
+        if (data.reason === "exists") {
+          setError(language === 'tr' ? 'Bu e-posta adresi zaten kullanılıyor.' : 'This email is already in use.');
+        } else {
+          setError(language === 'tr' ? 'Kayıt olurken bir hata oluştu.' : 'Failed to register.');
+        }
+      }
+    } catch (err) {
+      setError(language === 'tr' ? 'Bağlantı hatası, lütfen tekrar deneyin.' : 'Connection error, please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
