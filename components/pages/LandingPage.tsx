@@ -208,7 +208,7 @@ export default function LandingPage() {
                                         transition={{ delay: idx * 0.1, duration: 0.8 }}
                                         viewport={{ once: true }}
                                         className={cn(
-                                            "relative aspect-[3/4] rounded-3xl overflow-hidden border border-white/5 shadow-2xl transition-all duration-700 ease-in-out",
+                                            "relative aspect-[2/3] rounded-3xl overflow-hidden border border-white/5 shadow-2xl transition-all duration-700 ease-in-out",
                                             "hover:border-white/20 group",
                                             !isModeOn && item.isOutput && "grayscale opacity-40 scale-[0.98]",
                                             isModeOn && item.isOutput && "grayscale-0 opacity-100 scale-100",
@@ -258,7 +258,7 @@ export default function LandingPage() {
                                         transition={{ delay: idx * 0.1, duration: 0.8 }}
                                         viewport={{ once: true }}
                                         className={cn(
-                                            "relative aspect-[3/4] rounded-3xl overflow-hidden border border-white/5 shadow-2xl transition-all duration-700 ease-in-out",
+                                            "relative aspect-[2/3] rounded-3xl overflow-hidden border border-white/5 shadow-2xl transition-all duration-700 ease-in-out",
                                             "hover:border-white/20 group",
                                             !isModeOn && item.isOutput && "grayscale opacity-40 scale-[0.98]",
                                             isModeOn && item.isOutput && "grayscale-0 opacity-100 scale-100"
