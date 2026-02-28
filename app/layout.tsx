@@ -21,8 +21,31 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "OzFabric - AI Fashion Design",
-  description: "AI-Powered Fashion Design & Photoshoot Platform",
+  title: "modeon.ai - AI Moda Görsel Üretimi",
+  description: "Ürün fotoğraflarınızı saniyeler içinde profesyonel moda görsellerine dönüştürün. AI destekli fashion photoshoot platformu.",
+  metadataBase: new URL("https://modeon.ai"),
+  openGraph: {
+    title: "modeon.ai - AI Moda Görsel Üretimi",
+    description: "Ürün fotoğraflarınızı saniyeler içinde profesyonel moda görsellerine dönüştürün.",
+    url: "https://modeon.ai",
+    siteName: "modeon.ai",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "modeon.ai - AI Fashion Platform",
+      },
+    ],
+    locale: "tr_TR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "modeon.ai - AI Moda Görsel Üretimi",
+    description: "Ürün fotoğraflarınızı saniyeler içinde profesyonel moda görsellerine dönüştürün.",
+    images: ["/og-image.jpg"],
+  },
 };
 
 import { LanguageProvider } from "@/context/language-context";
