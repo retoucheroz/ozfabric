@@ -240,7 +240,7 @@ export default function LandingPage() {
                             {/* GAP / SEPARATOR */}
                             <div className="w-full lg:w-[6%] flex items-center justify-center py-8 lg:py-0 relative">
                                 {/* Optional Vertical Line */}
-                                <div className="hidden lg:block h-32 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+                                <div className="hidden lg:block h-full w-px bg-gradient-to-b from-transparent via-white/10 to-transparent absolute" />
                             </div>
 
                             {/* RIGHT GROUP: OUTPUTS (Images 3, 5, 4, 6) */}
