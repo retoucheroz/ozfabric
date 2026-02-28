@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { motion, useScroll, useTransform, AnimatePresence, useMotionValueEvent } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence, useMotionValueEvent, useSpring } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Sparkles, ArrowRight, Camera, Image as ImageIcon, Zap, Upload, Wand2, Layers, Video, ChevronDown } from "lucide-react";
+import { Sparkles, ArrowRight, Camera, Image as ImageIcon, Zap, Upload, Wand2, Layers, Video, ChevronDown, Plus } from "lucide-react";
 import { useLanguage } from "@/context/language-context";
 import { cn } from "@/lib/utils";
 
@@ -37,13 +37,172 @@ const ScrollDownIcon = ({ targetId }: { targetId?: string }) => {
     );
 };
 
+const InteractiveShowcaseCard = ({ item, baseProgress, index, isModeOn }: any) => {
+    // Tighter sequential stagger: each card starts 0.025 later and animates for 0.12
+    const start = 0.05 + index * 0.025;
+    const end = start + 0.12;
+    const progress = useTransform(baseProgress, [start, end], [0, 1]);
+
+    const x = useTransform(progress, [0, 1], [item.startPos.x, 0]);
+    const y = useTransform(progress, [0, 1], [item.startPos.y, 0]);
+    const rotate = useTransform(progress, [0, 1], [item.startPos.r, 0]);
+    const scale = useTransform(progress, [0, 1], [0.8, 1]);
+
+    // Sequential blur clearing
+    const blurStrength = item.blurStrength || 0;
+    const blur = useTransform(progress, [0, 0.7], [`blur(${blurStrength}px)`, "blur(0px)"]);
+
+    return (
+        <motion.div
+            style={{ x, y, rotate, scale, filter: blur }}
+            className={cn(
+                "relative aspect-[2/3] rounded-3xl overflow-hidden border border-white/5 shadow-2xl transition-all duration-700 ease-in-out",
+                "hover:border-white/20 group",
+                !isModeOn && item.isOutput && "grayscale opacity-40 scale-[0.98]",
+                isModeOn && item.isOutput && "grayscale-0 opacity-100 scale-100",
+                !item.isOutput && "border-white/20 ring-1 ring-white/10 shadow-white/5"
+            )}
+        >
+            <Image
+                src={item.src}
+                alt={item.label}
+                fill
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                sizes="(max-width: 768px) 100vw, 33vw"
+            />
+            {isModeOn && item.isOutput && (
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+            )}
+            <div className={cn(
+                "absolute bottom-4 left-4 z-20 px-3 py-1 backdrop-blur-[1.5px] rounded-md font-mono text-[9px] font-black uppercase tracking-widest border transition-all duration-500",
+                !item.isOutput
+                    ? "bg-black/10 text-black/80 border-black/5"
+                    : "bg-black/10 text-white/90 border-white/10"
+            )}>
+                {item.label}
+            </div>
+        </motion.div>
+    );
+};
+
+const ShowcaseSection = ({ isModeOn, translate }: { isModeOn: boolean, translate: (tr: string, en: string) => string }) => {
+    const scrollSectionRef = useRef<HTMLElement>(null);
+
+    // Scroll handling for the interactive grid
+    const { scrollYProgress: sectionScrollProgress } = useScroll({
+        target: scrollSectionRef,
+        offset: ["start end", "end start"]
+    });
+
+    // Add a spring for buttery smooth scroll-linked movement
+    const smoothProgress = useSpring(sectionScrollProgress, {
+        stiffness: 100,
+        damping: 30,
+        restDelta: 0.001
+    });
+
+    // Sequential staggered values
+    const textOpacity = useTransform(smoothProgress, [0.35, 0.5], [0, 1]);
+    const plusOpacity = useTransform(smoothProgress, [0.12, 0.2], [0, 1]);
+
+    return (
+        <section
+            ref={scrollSectionRef}
+            id="interactive-grid"
+            className="py-24 px-6 bg-[#0D0D0F] relative min-h-[120vh] flex flex-col items-center justify-start overflow-visible -mt-px z-20"
+        >
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <Image
+                    src="/lp/p2/lp2_bg.webp"
+                    alt="Background"
+                    fill
+                    className="object-cover object-top opacity-20 blur-[1px]"
+                />
+                {/* Seamless Blend Gradient */}
+                <div className="absolute inset-x-0 top-0 h-96 bg-gradient-to-b from-[#0D0D0F] via-[#0D0D0F]/80 to-transparent" />
+            </div>
+
+            <div className="sticky top-[15vh] w-full max-w-6xl mx-auto z-10">
+                <div className="relative">
+                    <div className="flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-0 relative">
+                        {/* LEFT GROUP: INPUT/BASE (Images 1 & 2) */}
+                        <div className="grid grid-cols-1 gap-4 md:gap-8 w-full lg:w-[24%] relative z-30">
+                            {/* Animated Plus Icon Center-Aligned in the Gap */}
+                            <motion.div
+                                style={{ opacity: plusOpacity, scale: plusOpacity }}
+                                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-40 flex items-center justify-center pointer-events-none"
+                            >
+                                <Plus className="w-8 h-8 text-white/60" strokeWidth={2.5} />
+                            </motion.div>
+
+                            {[
+                                { src: "/lp/p2/1.webp", label: translate("model görseli", "model visual"), isOutput: false, startPos: { x: 150, y: 100, r: -5 }, blurStrength: 0 },
+                                { src: "/lp/p2/2.webp", label: translate("ürün görseli", "product visual"), isOutput: false, startPos: { x: 150, y: -100, r: 5 }, blurStrength: 0 },
+                            ].map((item, idx) => (
+                                <InteractiveShowcaseCard
+                                    key={idx}
+                                    item={item}
+                                    index={idx} // 0, 1
+                                    baseProgress={smoothProgress}
+                                    isModeOn={isModeOn}
+                                />
+                            ))}
+                        </div>
+
+                        {/* GAP / SEPARATOR */}
+                        <div className="w-full lg:w-[8%] flex items-center justify-center py-8 lg:py-0 relative z-20">
+                            <div className="hidden lg:block h-[500px] w-[2.5px] bg-gradient-to-b from-transparent via-white/30 to-transparent" />
+                        </div>
+
+                        {/* RIGHT GROUP: OUTPUTS (Images 3, 5, 4, 6) */}
+                        <div className="grid grid-cols-2 gap-4 md:gap-8 w-full lg:w-[44%] relative z-10">
+                            {[
+                                { src: "/lp/p2/3.webp", label: translate("editorial", "editorial"), isOutput: true, startPos: { x: -100, y: 120, r: -8 }, blurStrength: 8 },
+                                { src: "/lp/p2/5.webp", label: translate("imaj görseli", "image visual"), isOutput: true, startPos: { x: -250, y: 120, r: 12 }, blurStrength: 4 },
+                                { src: "/lp/p2/4.webp", label: translate("editorial", "editorial"), isOutput: true, startPos: { x: -100, y: -120, r: -4 }, blurStrength: 8 },
+                                { src: "/lp/p2/6.webp", label: translate("ecom görseli", "ecom visual"), isOutput: true, startPos: { x: -250, y: -120, r: 6 }, blurStrength: 4 },
+                            ].map((item, idx) => (
+                                <InteractiveShowcaseCard
+                                    key={idx}
+                                    item={item}
+                                    index={idx + 2} // 2, 3, 4, 5
+                                    baseProgress={smoothProgress}
+                                    isModeOn={isModeOn}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                <motion.div
+                    style={{ opacity: textOpacity }}
+                    className="mt-20 text-center"
+                >
+                    <h2 className="text-2xl md:text-3xl font-black tracking-tight mb-4">
+                        {isModeOn
+                            ? translate("AI Gücüyle Gerçekleşen Dönüşüm", "The Power of AI Transformation")
+                            : translate("Ürününüzü Hazırlayın", "Ready Your Product")
+                        }
+                    </h2>
+                    <p className="text-zinc-500 text-sm md:text-base max-w-xl mx-auto">
+                        {translate(
+                            "Modelleri, mekanları ve ışığı saniyeler içinde değiştirin. Hayal ettiğiniz koleksiyonu tek bir ürün görseliyle gerçeğe dönüştürün.",
+                            "Change models, locations, and lighting in seconds. Turn your collection into reality with just one product image."
+                        )}
+                    </p>
+                </motion.div>
+            </div>
+            <ScrollDownIcon targetId="showcase" />
+        </section>
+    );
+};
+
 export default function LandingPage() {
     const { language, t } = useLanguage();
     const [mounted, setMounted] = useState(false);
     const [isModeOn, setIsModeOn] = useState(true);
-
     // For general scroll progress
-    const { scrollYProgress, scrollY } = useScroll();
+    const { scrollY } = useScroll();
     const [showNavCTA, setShowNavCTA] = useState(false);
 
     useMotionValueEvent(scrollY, "change", (latest) => {
@@ -58,9 +217,11 @@ export default function LandingPage() {
         setMounted(true);
     }, []);
 
-    if (!mounted) return null;
-
     const translate = (tr: string, en: string) => language === "tr" ? tr : en;
+
+    if (!mounted) {
+        return <div className="bg-[#0D0D0F] min-h-screen" />;
+    }
 
     return (
         <div className="bg-[#0D0D0F] min-h-screen text-white selection:bg-[#F5F5F5]/30 selection:text-black font-sans overflow-x-hidden relative">
@@ -69,15 +230,18 @@ export default function LandingPage() {
             {/* NAVBAR */}
             <nav className="fixed top-0 w-full pt-6 pb-12 flex justify-center z-40 bg-gradient-to-b from-[#0D0D0F]/90 via-[#0D0D0F]/50 to-transparent pointer-events-none">
                 <div className="w-full max-w-6xl flex justify-between items-center px-6 md:px-12 pointer-events-auto">
-                    <div className="flex items-center gap-2 font-black text-xl tracking-tighter text-white">
-                        <div className="w-10 h-5 bg-[#F5F5F5] rounded-full flex items-center justify-between px-1 shadow-inner border border-white/20">
+                    <div
+                        className="flex items-center gap-2 font-black text-xl tracking-tighter text-white cursor-pointer group"
+                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                    >
+                        <div className="w-10 h-5 bg-[#F5F5F5] rounded-full flex items-center justify-between px-1 shadow-inner border border-white/20 transition-transform group-hover:scale-105">
                             <div className="w-[1.5px] h-2.5 bg-[#0D0D0F]/70 rounded-full ml-1" />
                             <div className="w-3.5 h-3.5 bg-[#0D0D0F] rounded-full shadow-sm" />
                         </div>
-                        <span>ModeOn<span className="text-[#F5F5F5]">.ai</span></span>
+                        <span className="group-hover:text-zinc-200 transition-colors">ModeOn<span className="text-[#F5F5F5]">.ai</span></span>
                     </div>
                     <div className="flex items-center gap-3">
-                        <Link href="#pipeline" onClick={(e) => { e.preventDefault(); document.getElementById('pipeline')?.scrollIntoView({ behavior: 'smooth' }); }}>
+                        <Link href="#interactive-grid" onClick={(e) => { e.preventDefault(); document.getElementById('interactive-grid')?.scrollIntoView({ behavior: 'smooth' }); }}>
                             <Button variant="ghost" className="hidden md:inline-flex h-9 text-[10px] px-3 font-medium text-white/60 uppercase tracking-widest hover:bg-white/5 hover:text-white rounded-md transition-colors">
                                 {translate("Nasıl Çalışır?", "How it Works?")}
                             </Button>
@@ -175,137 +339,12 @@ export default function LandingPage() {
                     </motion.div>
                 </div>
 
-                <ScrollDownIcon targetId="pipeline" />
+                <ScrollDownIcon targetId="interactive-grid" />
 
             </section>
 
             {/* INTERACTIVE SHOWCASE SECTION (Page 2) */}
-            <section id="interactive-grid" className="py-24 px-6 bg-transparent relative min-h-screen flex items-center justify-center overflow-hidden">
-                {/* Background Decor */}
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[#0D0D0F]">
-                    <Image
-                        src="/lp/1.jpg"
-                        alt="Background"
-                        fill
-                        className="object-cover opacity-10 blur-xl"
-                    />
-                </div>
-
-                <div className="max-w-6xl w-full mx-auto relative z-10">
-                    <div className="relative">
-                        <div className="flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-0 relative">
-                            {/* LEFT GROUP: INPUT/BASE (Images 1 & 2) */}
-                            <div className="grid grid-cols-1 gap-4 md:gap-8 w-full lg:w-[24%]">
-                                {[
-                                    { src: "/lp/p2/1.webp", label: translate("model görseli", "model visual"), isOutput: true },
-                                    { src: "/lp/p2/2.webp", label: translate("ürün görseli", "product visual"), isOutput: false },
-                                ].map((item, idx) => (
-                                    <motion.div
-                                        key={idx}
-                                        initial={{ opacity: 0, x: -30 }}
-                                        whileInView={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: idx * 0.1, duration: 0.8 }}
-                                        viewport={{ once: true }}
-                                        className={cn(
-                                            "relative aspect-[2/3] rounded-3xl overflow-hidden border border-white/5 shadow-2xl transition-all duration-700 ease-in-out",
-                                            "hover:border-white/20 group",
-                                            !isModeOn && item.isOutput && "grayscale opacity-40 scale-[0.98]",
-                                            isModeOn && item.isOutput && "grayscale-0 opacity-100 scale-100",
-                                            !item.isOutput && "border-white/20 ring-1 ring-white/10 shadow-white/5"
-                                        )}
-                                    >
-                                        <Image
-                                            src={item.src}
-                                            alt={item.label}
-                                            fill
-                                            className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                            sizes="(max-width: 768px) 100vw, 33vw"
-                                        />
-                                        {isModeOn && item.isOutput && (
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
-                                        )}
-                                        <div className={cn(
-                                            "absolute top-4 left-4 z-20 px-3 py-1 backdrop-blur-md rounded-lg font-mono text-[9px] font-black uppercase tracking-widest border transition-all duration-500",
-                                            !item.isOutput
-                                                ? "bg-white/90 text-black border-white"
-                                                : "bg-black/60 text-white border-white/10"
-                                        )}>
-                                            {item.label}
-                                        </div>
-                                    </motion.div>
-                                ))}
-                            </div>
-
-                            {/* GAP / SEPARATOR */}
-                            <div className="w-full lg:w-[6%] flex items-center justify-center py-8 lg:py-0 relative">
-                                {/* Optional Vertical Line */}
-                                <div className="hidden lg:block h-full w-px bg-gradient-to-b from-transparent via-white/10 to-transparent absolute" />
-                            </div>
-
-                            {/* RIGHT GROUP: OUTPUTS (Images 3, 5, 4, 6) */}
-                            <div className="grid grid-cols-2 gap-4 md:gap-8 w-full lg:w-[44%]">
-                                {[
-                                    { src: "/lp/p2/3.webp", label: translate("editorial", "editorial"), isOutput: true },
-                                    { src: "/lp/p2/5.webp", label: translate("imaj görseli", "image visual"), isOutput: true },
-                                    { src: "/lp/p2/4.webp", label: translate("editorial", "editorial"), isOutput: true },
-                                    { src: "/lp/p2/6.webp", label: translate("ecom görseli", "ecom visual"), isOutput: true },
-                                ].map((item, idx) => (
-                                    <motion.div
-                                        key={idx}
-                                        initial={{ opacity: 0, x: 30 }}
-                                        whileInView={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: idx * 0.1, duration: 0.8 }}
-                                        viewport={{ once: true }}
-                                        className={cn(
-                                            "relative aspect-[2/3] rounded-3xl overflow-hidden border border-white/5 shadow-2xl transition-all duration-700 ease-in-out",
-                                            "hover:border-white/20 group",
-                                            !isModeOn && item.isOutput && "grayscale opacity-40 scale-[0.98]",
-                                            isModeOn && item.isOutput && "grayscale-0 opacity-100 scale-100"
-                                        )}
-                                    >
-                                        <Image
-                                            src={item.src}
-                                            alt={item.label}
-                                            fill
-                                            className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                            sizes="(max-width: 768px) 50vw, 33vw"
-                                        />
-                                        {isModeOn && item.isOutput && (
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
-                                        )}
-                                        <div className={cn(
-                                            "absolute top-4 left-4 z-20 px-3 py-1 bg-black/60 text-white border border-white/10 backdrop-blur-md rounded-lg font-mono text-[9px] font-black uppercase tracking-widest transition-all duration-500"
-                                        )}>
-                                            {item.label}
-                                        </div>
-                                    </motion.div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="mt-20 text-center">
-                        <motion.h2
-                            initial={{ opacity: 0 }}
-                            whileInView={{ opacity: 1 }}
-                            className="text-2xl md:text-3xl font-black tracking-tight mb-4"
-                        >
-                            {isModeOn
-                                ? translate("AI Gücüyle Gerçekleşen Dönüşüm", "The Power of AI Transformation")
-                                : translate("Ürününüzü Hazırlayın", "Ready Your Product")
-                            }
-                        </motion.h2>
-                        <p className="text-zinc-500 text-sm md:text-base max-w-xl mx-auto">
-                            {translate(
-                                "Modelleri, mekanları ve ışığı saniyeler içinde değiştirin. Hayal ettiğiniz koleksiyonu tek bir ürün görseliyle gerçeğe dönüştürün.",
-                                "Change models, locations, and lighting in seconds. Turn your collection into reality with just one product image."
-                            )}
-                        </p>
-                    </div>
-                </div>
-                <ScrollDownIcon targetId="showcase" />
-            </section>
+            <ShowcaseSection isModeOn={isModeOn} translate={translate} />
 
             {/* BEFORE / AFTER HIGHLIGHT SECTION */}
             <section id="showcase" className="py-32 px-6 relative overflow-hidden">

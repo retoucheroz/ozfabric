@@ -36,21 +36,21 @@ export function CookieBanner() {
 
     return (
         <div className="fixed bottom-6 right-6 z-[100] max-w-[600px] w-[calc(100%-3rem)] pointer-events-none group animate-in fade-in slide-in-from-right-5 duration-500">
-            <div className="glass-strong rounded-3xl border border-[var(--border-accent)] shadow-2xl p-4 sm:p-5 pointer-events-auto relative overflow-hidden transition-all duration-300 hover:shadow-purple-500/10 hover:border-purple-500/30">
+            <div className="glass-strong rounded-3xl border border-white/10 shadow-2xl p-4 sm:p-5 pointer-events-auto relative overflow-hidden transition-all duration-300 hover:shadow-white/5 hover:border-white/20">
                 {/* Background Glow */}
-                <div className="absolute -top-10 -right-10 w-32 h-32 bg-[var(--accent-primary)]/10 blur-[40px] rounded-full" />
+                <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/5 blur-[40px] rounded-full" />
 
                 <div className="relative z-10 flex flex-col md:flex-row items-center gap-4">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <div className="bg-[var(--accent-primary)]/10 p-2 rounded-xl shrink-0 hidden sm:block">
-                            <Cookie className="w-5 h-5 text-[var(--accent-primary)]" />
+                        <div className="bg-white/5 p-2 rounded-xl shrink-0 hidden sm:block border border-white/10">
+                            <Cookie className="w-5 h-5 text-white" />
                         </div>
-                        <p className="text-[13px] text-[var(--text-secondary)] leading-tight">
+                        <p className="text-[13px] text-zinc-400 leading-tight">
                             {language === 'tr'
                                 ? 'Daha iyi bir kullanıcı deneyimi için çerezler kullanıyoruz.'
                                 : 'We use cookies to enhance your experience.'}
                             {' '}
-                            <Link href="/cookie-policy" className="text-[var(--accent-primary)] hover:underline font-semibold whitespace-nowrap">
+                            <Link href="/cookie-policy" className="text-white hover:underline font-semibold whitespace-nowrap">
                                 {language === 'tr' ? 'Detaylar' : 'Details'}
                             </Link>
                         </p>
@@ -61,14 +61,14 @@ export function CookieBanner() {
                             variant="outline"
                             size="sm"
                             onClick={handleAcceptEssential}
-                            className="flex-1 md:flex-none h-8 px-3 text-[10px] font-bold uppercase tracking-wider rounded-xl bg-transparent border-[var(--border-default)] hover:bg-[var(--bg-elevated)] transition-all"
+                            className="flex-1 md:flex-none h-10 px-5 text-[11px] font-black uppercase tracking-widest rounded-md bg-transparent border-white/10 text-white hover:bg-white/5 transition-all"
                         >
                             {language === 'tr' ? 'Gerekli' : 'Essential'}
                         </Button>
                         <Button
                             size="sm"
                             onClick={handleAcceptAll}
-                            className="flex-1 md:flex-none h-8 px-3 text-[10px] font-bold uppercase tracking-wider rounded-xl bg-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/90 text-white shadow-lg shadow-purple-500/10 active:scale-95 transition-all text-nowrap"
+                            className="flex-1 md:flex-none h-10 px-5 text-[11px] font-black uppercase tracking-widest rounded-md bg-[#F5F5F5] hover:bg-white text-black transition-all text-nowrap shadow-none border-none"
                         >
                             {language === 'tr' ? 'Kabul Et' : 'Accept All'}
                         </Button>
