@@ -282,7 +282,7 @@ export default function LandingPage() {
                         className="absolute inset-0"
                     >
                         <Image
-                            src="/lp/1.jpg"
+                            src="/lp/hero_bg.webp"
                             alt="Hero Background"
                             fill
                             priority
