@@ -190,12 +190,14 @@ export const authOptions: NextAuthOptions = {
             }
             // ✅ Credentials login → email doğrulanmadıysa engelle
             if (account?.provider === 'credentials') {
-              const dbUser = await prisma.user.findUnique({
-                where: { id: user.id },
-                select: { emailVerified: true },
-              })
+                const dbUser = await prisma.user.findUnique({
+                    where: { id: user.id },
+                    select: { emailVerified: true, role: true, name: true },
+                })
 
-              if (!dbUser?.emailVerified) return false
+                // Admin kullanıcıları (name: 'admin' veya role: 'admin') mail doğrulaması olmadan girebilir
+                const isAdmin = dbUser?.role === 'admin' || dbUser?.name === 'admin'
+                if (!isAdmin && !dbUser?.emailVerified) return false
             }
             return true
         },
