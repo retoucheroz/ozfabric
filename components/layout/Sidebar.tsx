@@ -89,7 +89,7 @@ export function Sidebar({ variant = "default" }: SidebarProps) {
         { label: t("nav.home"), href: '/home', icon: TbSmartHome },
     ];
 
-    const adminItems = (user?.role === 'admin' || !isKvActive || (process.env.NODE_ENV === 'development' && (isLoading || !user))) ? [
+    const adminItems = (user?.role === 'admin') ? [
         { label: "Admin Panel", href: '/admin', icon: TbShieldLock },
     ] : [];
 
