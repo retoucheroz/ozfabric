@@ -20,14 +20,18 @@ export async function POST(req: NextRequest) {
             resolution = "1K",
             aspectRatio = "3:4",
             seed = null,
-            modelType = "full_body"
+            modelType = "full_body",
+            modelDescription
         } = await req.json();
 
         const finalSeed = seed !== null ? Number(seed) : Math.floor(Math.random() * 1000000000);
 
         // Sanitize input images
         const { ensureR2Url } = await import("@/lib/s3");
-        const sanitizedModel = await ensureR2Url(image, "editorial/inputs");
+        let sanitizedModel = null;
+        if (image && !modelDescription) {
+            sanitizedModel = await ensureR2Url(image, "editorial/inputs");
+        }
         let sanitizedOutfit = null;
         let sanitizedBackground = null;
         let sanitizedPose = null;
@@ -42,9 +46,10 @@ export async function POST(req: NextRequest) {
             sanitizedPose = await ensureR2Url(poseStickman, "editorial/inputs");
         }
 
-        const imageUrlsPayload: any = {
-            model: sanitizedModel
-        };
+        const imageUrlsPayload: any = {};
+        if (sanitizedModel) {
+            imageUrlsPayload.model = sanitizedModel;
+        }
 
         if (sanitizedOutfit) {
             imageUrlsPayload.outfit = sanitizedOutfit;

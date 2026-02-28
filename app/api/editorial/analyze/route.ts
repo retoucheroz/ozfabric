@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
             poseStickman,
             posePrompt,
             modelType = "full_body",
+            modelDescription,
             language = "tr"
         } = await req.json();
 
@@ -41,7 +42,15 @@ export async function POST(req: NextRequest) {
 
         // 1. SUBJECT SOURCE BLOCK
         let subjectSourceBlock = "";
-        if (modelType === "full_body") {
+
+        if (modelDescription) {
+            subjectSourceBlock = `SUBJECT SOURCE LOGIC:
+The user has provided a custom subject description:
+"${modelDescription}"
+Ignore any uploaded model image for identity reference. Generate a subject matching this exact description.
+Ensure natural integration with the environment and clothing.
+        `;
+        } else if (modelType === "full_body") {
             subjectSourceBlock = `SUBJECT SOURCE LOGIC:
 The user has selected "Outfit Included". 
 Use the uploaded model image as base identity reference. 

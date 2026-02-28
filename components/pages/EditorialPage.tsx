@@ -147,6 +147,8 @@ export default function EditorialPage() {
     const [selectedBackgroundPrompt, setSelectedBackgroundPrompt] = useState<string | null>(null);
     const [selectedPosePrompt, setSelectedPosePrompt] = useState<string | null>(null);
     const [activeLibraryAsset, setActiveLibraryAsset] = useState<'model' | 'background' | 'outfit' | 'pose' | null>(null);
+    const [modelLibraryTab, setModelLibraryTab] = useState<string>("library");
+    const [modelDescription, setModelDescription] = useState<string>("");
 
     // Camera States
     const [isManualCamera, setIsManualCamera] = useState(false);
@@ -284,8 +286,8 @@ export default function EditorialPage() {
         if (targetStep <= wizardStep) return true;
 
         if (targetStep >= 2) {
-            if (!modelImage) {
-                toast.error(language === "tr" ? "Lütfen bir model görseli yükleyin" : "Please upload a model image");
+            if (!modelImage && !modelDescription) {
+                toast.error(language === "tr" ? "Lütfen bir model görseli yükleyin veya kütüphaneden açıklama yazın" : "Please upload a model image or write a description from library");
                 return false;
             }
             if (modelType === 'face_only' && !outfitImage) {
@@ -306,8 +308,8 @@ export default function EditorialPage() {
 
     // Handle Initial "Generate" Click - Triggers Analysis
     const handleGenerate = async () => {
-        if (!modelImage) {
-            toast.error(language === "tr" ? "Lütfen bir model görseli yükleyin" : "Please upload a model image");
+        if (!modelImage && !modelDescription) {
+            toast.error(language === "tr" ? "Lütfen bir model görseli yükleyin veya açıklama yazın" : "Please upload a model image or write a description");
             return;
         }
         if (!assets.background && !selectedBackgroundPrompt) {
@@ -331,6 +333,7 @@ export default function EditorialPage() {
                     posePrompt: selectedPosePrompt,
                     outfitImage: outfitImage,
                     modelType,
+                    modelDescription,
                     language
                 })
             });
@@ -373,6 +376,7 @@ export default function EditorialPage() {
                     resolution,
                     aspectRatio,
                     modelType,
+                    modelDescription,
                     prompt: analyzedAesthetic, // Use the structured prompt from analyze
                     seed: seed || null
                 })
@@ -570,8 +574,8 @@ export default function EditorialPage() {
                                                         </div>
                                                         <p className="text-[10px] text-muted-foreground leading-relaxed">
                                                             {language === "tr"
-                                                                ? "Model görselinizi yükleyin ve çekim modunu (Kombinli veya Sadece Yüz) belirleyerek süreci başlatın."
-                                                                : "Upload your model and choose the shoot mode (Outfit Included or Face Only) to start."}
+                                                                ? "Model portrenizi yükleyin; çekim moduna göre mevcut kıyafeti koruyabilir veya tamamen yeni bir stil kurgulayabilirsiniz."
+                                                                : "Upload your model portrait; depending on the mode, preserve the existing outfit or curate a completely new style."}
                                                         </p>
                                                     </div>
                                                     <div className="space-y-2 border-x border-zinc-200 dark:border-white/5 px-8">
@@ -581,8 +585,8 @@ export default function EditorialPage() {
                                                         </div>
                                                         <p className="text-[10px] text-muted-foreground leading-relaxed">
                                                             {language === "tr"
-                                                                ? "Dünya çapındaki ikonik lokasyonlardan birini seçin ve sanal kamera ayarlarıyla çekim atmosferini kurgulayın."
-                                                                : "Choose from iconic global locations and set the atmosphere with virtual camera controls."}
+                                                                ? "Dünya çapındaki ikonik lokasyonlar arasından seçim yapın, gelişmiş kamera ve ışık ayarlarıyla çekim atmosferinizi tasarlayın."
+                                                                : "Choose from iconic global locations and design your shoot atmosphere with professional camera and lighting controls."}
                                                         </p>
                                                     </div>
                                                     <div className="space-y-2">
@@ -592,8 +596,8 @@ export default function EditorialPage() {
                                                         </div>
                                                         <p className="text-[10px] text-muted-foreground leading-relaxed">
                                                             {language === "tr"
-                                                                ? "Gemini 2.0 destekli analiz ile yüksek moda standartlarında, gerçekçi ve estetik editoryal kareler üretin."
-                                                                : "Generate high-fashion, realistic editorial shots with Gemini 2.0 powered scene analysis."}
+                                                                ? "Gelişmiş sahne analizi teknolojisi ile yüksek moda standartlarında, gerçekçi ve estetik editoryal karelerinizi oluşturun."
+                                                                : "Generate high-fashion, realistic editorial imagery through advanced scene analysis and aesthetic processing."}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -892,23 +896,61 @@ export default function EditorialPage() {
                                         <button onClick={() => setActiveLibraryAsset(null)} className="p-2 hover:bg-zinc-100 dark:hover:bg-white/5 rounded-full transition-colors"><ChevronLeft size={20} /></button>
                                         <div>
                                             <h3 className="text-sm font-bold tracking-tight">{language === "tr" ? "Model Kütüphanesi" : "Model Library"}</h3>
-                                            <p className="text-[10px] text-violet-500 font-bold uppercase tracking-widest">{language === "tr" ? "STUDYO VARLIKLARI" : "STUDIO ASSETS"}</p>
                                         </div>
                                     </div>
                                     <button onClick={() => setActiveLibraryAsset(null)} className="text-zinc-400 hover:text-foreground p-2"><X size={18} /></button>
                                 </div>
 
-                                <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-                                    <ModelSection
-                                        view="library" language={language} gender={gender} setGender={setGender}
-                                        assets={{ model: modelImage }} activeLibraryAsset="model"
-                                        setActiveLibraryAsset={() => setActiveLibraryAsset(null)}
-                                        handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove}
-                                        savedModels={savedModels}
-                                        setAssets={(updater: any) => { const newVal = typeof updater === 'function' ? updater({ model: modelImage }).model : updater.model; setModelImage(newVal); }}
-                                        setAssetsHighRes={(updater: any) => { const newVal = typeof updater === 'function' ? updater({ model: modelImageHighRes }).model : updater.model; setModelImageHighRes(newVal); }}
-                                    />
-                                </div>
+                                <Tabs value={modelLibraryTab} onValueChange={setModelLibraryTab} className="flex-1 flex flex-col overflow-hidden">
+                                    <div className="px-4 pt-4 shrink-0">
+                                        <TabsList className="w-full grid grid-cols-2">
+                                            <TabsTrigger value="library" className="text-xs">{language === "tr" ? "Kütüphane" : "Library"}</TabsTrigger>
+                                            <TabsTrigger value="prompt" className="text-[10px] uppercase font-bold tracking-tight">
+                                                {language === "tr" ? "PROMPT" : "PROMPT"}
+                                            </TabsTrigger>
+                                        </TabsList>
+                                    </div>
+
+                                    <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+                                        <TabsContent value="library" className="m-0 h-full">
+                                            <ModelSection
+                                                view="library" language={language} gender={gender} setGender={setGender}
+                                                assets={{ model: modelImage }} activeLibraryAsset="model"
+                                                setActiveLibraryAsset={() => setActiveLibraryAsset(null)}
+                                                handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove}
+                                                savedModels={savedModels}
+                                                setAssets={(updater: any) => { const newVal = typeof updater === 'function' ? updater({ model: modelImage }).model : updater.model; setModelImage(newVal); }}
+                                                setAssetsHighRes={(updater: any) => { const newVal = typeof updater === 'function' ? updater({ model: modelImageHighRes }).model : updater.model; setModelImageHighRes(newVal); }}
+                                            />
+                                        </TabsContent>
+
+                                        <TabsContent value="prompt" className="m-0 h-full p-2">
+                                            <div className="space-y-4">
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest block px-1">{language === "tr" ? "ÖZEL MODEL TANIMI" : "CUSTOM MODEL DESCRIPTION"}</label>
+                                                    <textarea
+                                                        value={modelDescription}
+                                                        onChange={(e) => setModelDescription(e.target.value)}
+                                                        className="w-full h-48 p-4 text-xs rounded-2xl border border-[var(--border-subtle)] bg-white dark:bg-card text-[var(--text-primary)] resize-none focus:ring-2 focus:ring-violet-500 outline-none shadow-inner"
+                                                        placeholder={language === "tr" ? "Modelin görünümünü, yaşını, etnik kökenini ve stilini tarif edin..." : "Describe the model's appearance, age, ethnicity, and style..."}
+                                                    ></textarea>
+                                                </div>
+                                                <Button
+                                                    onClick={() => {
+                                                        setActiveLibraryAsset(null);
+                                                        toast.success(language === "tr" ? "Model tanımı güncellendi" : "Model description updated");
+                                                    }}
+                                                    className="w-full h-12 bg-violet-600 hover:bg-violet-700 text-white font-black uppercase tracking-widest rounded-2xl shadow-lg transition-all"
+                                                >
+                                                    {language === "tr" ? "TANIMI UYGULA" : "APPLY DESCRIPTION"}
+                                                </Button>
+                                                <p className="text-[10px] text-muted-foreground leading-relaxed px-1">
+                                                    {language === "tr" ? "Not: Görsel yüklemek yerine sadece metin ile model tarif edebilirsiniz. Bu durumda kütüphanedeki görseller yoksayılır." : "Note: You can describe the model with text instead of uploading an image. In this case, library images will be ignored."}
+                                                </p>
+                                            </div>
+                                        </TabsContent>
+                                    </div>
+                                </Tabs>
                             </motion.div>
                         </>
                     )}
