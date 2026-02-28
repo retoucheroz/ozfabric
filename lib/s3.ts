@@ -1,5 +1,6 @@
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
+const CloudFrontUrl = process.env.NEXT_PUBLIC_CLOUDFRONT_URL;
 const Bucket = process.env.AWS_S3_BUCKET || process.env.R2_BUCKET;
 const Region = process.env.AWS_REGION || "eu-central-1";
 
@@ -32,7 +33,9 @@ export async function uploadBase64(base64: string, prefix: string = "uploads") {
       ContentType: contentType,
     }));
 
-    return `https://${Bucket}.s3.${Region}.amazonaws.com/${key}`;
+    return CloudFrontUrl
+      ? `${CloudFrontUrl}/${key}`
+      : `https://${Bucket}.s3.${Region}.amazonaws.com/${key}`;
   } catch (e: any) {
     console.error("====== AWS S3 Base64 Upload Failed ======");
     console.error("Bucket:", Bucket);
@@ -96,7 +99,9 @@ export async function uploadFromUrl(url: string, prefix: string = "generations")
       return `${process.env.NEXT_PUBLIC_R2_PUBLIC_BASE_URL.replace(/\/$/, "")}/${key}`;
     }
 
-    return `https://${Bucket}.s3.${Region}.amazonaws.com/${key}`;
+    return CloudFrontUrl
+      ? `${CloudFrontUrl}/${key}`
+      : `https://${Bucket}.s3.${Region}.amazonaws.com/${key}`;
   } catch (e) {
     console.error("S3 Server Upload Error:", e);
     return url;
