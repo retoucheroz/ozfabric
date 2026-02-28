@@ -194,98 +194,137 @@ export default function LandingPage() {
 
                 <div className="max-w-6xl w-full mx-auto relative z-10">
                     <div className="relative">
-                        {/* 2x3 GRID */}
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
-                            {[
-                                { src: "/lp/p2/1.webp", label: translate("model görseli", "model visual"), isOutput: true },
-                                { src: "/lp/p2/3.webp", label: translate("editorial", "editorial"), isOutput: true },
-                                { src: "/lp/p2/5.webp", label: translate("imaj görseli", "image visual"), isOutput: true },
-                                { src: "/lp/p2/2.webp", label: translate("ürün görseli", "product visual"), isOutput: false },
-                                { src: "/lp/p2/4.webp", label: translate("editorial", "editorial"), isOutput: true },
-                                { src: "/lp/p2/6.webp", label: translate("ecom görseli", "ecom visual"), isOutput: true },
-                            ].map((item, idx) => (
+                        <div className="flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-0 relative">
+                            {/* LEFT GROUP: INPUT/BASE (Images 1 & 2) */}
+                            <div className="grid grid-cols-1 gap-4 md:gap-8 w-full lg:w-[30%]">
+                                {[
+                                    { src: "/lp/p2/1.webp", label: translate("model görseli", "model visual"), isOutput: true },
+                                    { src: "/lp/p2/2.webp", label: translate("ürün görseli", "product visual"), isOutput: false },
+                                ].map((item, idx) => (
+                                    <motion.div
+                                        key={idx}
+                                        initial={{ opacity: 0, x: -30 }}
+                                        whileInView={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: idx * 0.1, duration: 0.8 }}
+                                        viewport={{ once: true }}
+                                        className={cn(
+                                            "relative aspect-[3/4] rounded-3xl overflow-hidden border border-white/5 shadow-2xl transition-all duration-700 ease-in-out",
+                                            "hover:border-white/20 group",
+                                            !isModeOn && item.isOutput && "grayscale opacity-40 scale-[0.98]",
+                                            isModeOn && item.isOutput && "grayscale-0 opacity-100 scale-100",
+                                            !item.isOutput && "border-white/20 ring-1 ring-white/10 shadow-white/5"
+                                        )}
+                                    >
+                                        <Image
+                                            src={item.src}
+                                            alt={item.label}
+                                            fill
+                                            className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                            sizes="(max-width: 768px) 100vw, 33vw"
+                                        />
+                                        {isModeOn && item.isOutput && (
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+                                        )}
+                                        <div className={cn(
+                                            "absolute top-4 left-4 z-20 px-3 py-1 backdrop-blur-md rounded-lg font-mono text-[9px] font-black uppercase tracking-widest border transition-all duration-500",
+                                            !item.isOutput
+                                                ? "bg-white/90 text-black border-white"
+                                                : "bg-black/60 text-white border-white/10"
+                                        )}>
+                                            {item.label}
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </div>
+
+                            {/* CENTRAL SWITCH CONTAINER (The Gap) */}
+                            <div className="w-full lg:w-[15%] flex flex-row lg:flex-col items-center justify-center py-8 lg:py-0 relative">
+                                {/* Optional Vertical Line */}
+                                <div className="hidden lg:block absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+
                                 <motion.div
-                                    key={idx}
-                                    initial={{ opacity: 0, y: 30 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: idx * 0.1, duration: 0.8 }}
+                                    className="z-30 relative"
+                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    whileInView={{ opacity: 1, scale: 1 }}
                                     viewport={{ once: true }}
-                                    className={cn(
-                                        "relative aspect-[3/4] rounded-3xl overflow-hidden border border-white/5 shadow-2xl transition-all duration-700 ease-in-out",
-                                        "hover:border-white/20 group",
-                                        !isModeOn && item.isOutput && "grayscale opacity-40 scale-[0.98]",
-                                        isModeOn && item.isOutput && "grayscale-0 opacity-100 scale-100",
-                                        !item.isOutput && "border-white/20 ring-1 ring-white/10"
-                                    )}
                                 >
-                                    <Image
-                                        src={item.src}
-                                        alt={item.label}
-                                        fill
-                                        className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                        sizes="(max-width: 768px) 50vw, 33vw"
-                                    />
-
-                                    {/* Overlay for output images when on */}
-                                    {isModeOn && item.isOutput && (
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
-                                    )}
-
-                                    {/* Label indicator */}
-                                    <div className={cn(
-                                        "absolute top-4 left-4 z-20 px-3 py-1 backdrop-blur-md rounded-lg font-mono text-[9px] font-black uppercase tracking-widest border transition-all duration-500",
-                                        !item.isOutput
-                                            ? "bg-white/90 text-black border-white"
-                                            : "bg-black/60 text-white border-white/10"
-                                    )}>
-                                        {item.label}
+                                    <div
+                                        onClick={() => setIsModeOn(!isModeOn)}
+                                        className="cursor-pointer group flex items-center justify-center p-4"
+                                    >
+                                        <div className={cn(
+                                            "w-16 h-8 rounded-full flex items-center justify-between px-1.5 shadow-2xl border transition-all duration-500",
+                                            isModeOn
+                                                ? "bg-[#F5F5F5] border-white/20 shadow-[0_0_30px_rgba(245,245,245,0.3)]"
+                                                : "bg-[#0D0D0F] border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)]"
+                                        )}>
+                                            <motion.div
+                                                className={cn(
+                                                    "w-[2px] h-4 rounded-full transition-colors duration-500",
+                                                    isModeOn ? "bg-[#0D0D0F]/70" : "bg-[#F5F5F5]/70"
+                                                )}
+                                                animate={{ opacity: isModeOn ? 1 : 0.4 }}
+                                            />
+                                            <motion.div
+                                                layout
+                                                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                                className={cn(
+                                                    "w-6 h-6 rounded-full shadow-md",
+                                                    isModeOn ? "bg-[#0D0D0F]" : "bg-[#F5F5F5]"
+                                                )}
+                                            />
+                                            <motion.div
+                                                className={cn(
+                                                    "w-[2px] h-4 rounded-full transition-colors duration-500",
+                                                    isModeOn ? "bg-[#0D0D0F]/70" : "bg-[#F5F5F5]/70"
+                                                )}
+                                                animate={{ opacity: isModeOn ? 0.4 : 1 }}
+                                            />
+                                        </div>
                                     </div>
                                 </motion.div>
-                            ))}
-                        </div>
-
-                        {/* CENTRAL SWITCH */}
-                        <motion.div
-                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30"
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            viewport={{ once: true }}
-                        >
-                            <div
-                                onClick={() => setIsModeOn(!isModeOn)}
-                                className="cursor-pointer group flex items-center justify-center p-4"
-                            >
-                                <div className={cn(
-                                    "w-16 h-8 rounded-full flex items-center justify-between px-1.5 shadow-2xl border transition-all duration-500",
-                                    isModeOn
-                                        ? "bg-[#F5F5F5] border-white/20 shadow-[0_0_30px_rgba(245,245,245,0.3)]"
-                                        : "bg-[#0D0D0F] border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)]"
-                                )}>
-                                    <motion.div
-                                        className={cn(
-                                            "w-[2px] h-4 rounded-full transition-colors duration-500",
-                                            isModeOn ? "bg-[#0D0D0F]/70" : "bg-[#F5F5F5]/70"
-                                        )}
-                                        animate={{ opacity: isModeOn ? 1 : 0.4 }}
-                                    />
-                                    <motion.div
-                                        layout
-                                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                                        className={cn(
-                                            "w-6 h-6 rounded-full shadow-md",
-                                            isModeOn ? "bg-[#0D0D0F]" : "bg-[#F5F5F5]"
-                                        )}
-                                    />
-                                    <motion.div
-                                        className={cn(
-                                            "w-[2px] h-4 rounded-full transition-colors duration-500",
-                                            isModeOn ? "bg-[#0D0D0F]/70" : "bg-[#F5F5F5]/70"
-                                        )}
-                                        animate={{ opacity: isModeOn ? 0.4 : 1 }}
-                                    />
-                                </div>
                             </div>
-                        </motion.div>
+
+                            {/* RIGHT GROUP: OUTPUTS (Images 3, 5, 4, 6) */}
+                            <div className="grid grid-cols-2 gap-4 md:gap-8 w-full lg:w-[55%]">
+                                {[
+                                    { src: "/lp/p2/3.webp", label: translate("editorial", "editorial"), isOutput: true },
+                                    { src: "/lp/p2/5.webp", label: translate("imaj görseli", "image visual"), isOutput: true },
+                                    { src: "/lp/p2/4.webp", label: translate("editorial", "editorial"), isOutput: true },
+                                    { src: "/lp/p2/6.webp", label: translate("ecom görseli", "ecom visual"), isOutput: true },
+                                ].map((item, idx) => (
+                                    <motion.div
+                                        key={idx}
+                                        initial={{ opacity: 0, x: 30 }}
+                                        whileInView={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: idx * 0.1, duration: 0.8 }}
+                                        viewport={{ once: true }}
+                                        className={cn(
+                                            "relative aspect-[3/4] rounded-3xl overflow-hidden border border-white/5 shadow-2xl transition-all duration-700 ease-in-out",
+                                            "hover:border-white/20 group",
+                                            !isModeOn && item.isOutput && "grayscale opacity-40 scale-[0.98]",
+                                            isModeOn && item.isOutput && "grayscale-0 opacity-100 scale-100"
+                                        )}
+                                    >
+                                        <Image
+                                            src={item.src}
+                                            alt={item.label}
+                                            fill
+                                            className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                            sizes="(max-width: 768px) 50vw, 33vw"
+                                        />
+                                        {isModeOn && item.isOutput && (
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
+                                        )}
+                                        <div className={cn(
+                                            "absolute top-4 left-4 z-20 px-3 py-1 bg-black/60 text-white border border-white/10 backdrop-blur-md rounded-lg font-mono text-[9px] font-black uppercase tracking-widest transition-all duration-500"
+                                        )}>
+                                            {item.label}
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
 
                     <div className="mt-20 text-center">
