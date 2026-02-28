@@ -197,12 +197,12 @@ export default function LandingPage() {
                         {/* 2x3 GRID */}
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
                             {[
-                                { src: "/lp/p2/1.webp", label: "Model 1", isOutput: true },
-                                { src: "/lp/p2/3.webp", label: "Model 3", isOutput: true },
-                                { src: "/lp/p2/5.webp", label: "Model 5", isOutput: true },
-                                { src: "/lp/p2/2.webp", label: "Product Input", isOutput: false },
-                                { src: "/lp/p2/4.webp", label: "Model 4", isOutput: true },
-                                { src: "/lp/p2/6.webp", label: "Model 6", isOutput: true },
+                                { src: "/lp/p2/1.webp", label: translate("model görseli", "model visual"), isOutput: true },
+                                { src: "/lp/p2/3.webp", label: translate("editorial", "editorial"), isOutput: true },
+                                { src: "/lp/p2/5.webp", label: translate("imaj görseli", "image visual"), isOutput: true },
+                                { src: "/lp/p2/2.webp", label: translate("ürün görseli", "product visual"), isOutput: false },
+                                { src: "/lp/p2/4.webp", label: translate("editorial", "editorial"), isOutput: true },
+                                { src: "/lp/p2/6.webp", label: translate("ecom görseli", "ecom visual"), isOutput: true },
                             ].map((item, idx) => (
                                 <motion.div
                                     key={idx}
@@ -231,12 +231,15 @@ export default function LandingPage() {
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
                                     )}
 
-                                    {/* Input indicator */}
-                                    {!item.isOutput && (
-                                        <div className="absolute top-4 left-4 z-20 px-3 py-1 bg-black/60 backdrop-blur-md rounded-lg font-mono text-[9px] font-bold text-white uppercase tracking-widest border border-white/10">
-                                            {translate("GİRDİ", "INPUT")}
-                                        </div>
-                                    )}
+                                    {/* Label indicator */}
+                                    <div className={cn(
+                                        "absolute top-4 left-4 z-20 px-3 py-1 backdrop-blur-md rounded-lg font-mono text-[9px] font-black uppercase tracking-widest border transition-all duration-500",
+                                        !item.isOutput
+                                            ? "bg-white/90 text-black border-white"
+                                            : "bg-black/60 text-white border-white/10"
+                                    )}>
+                                        {item.label}
+                                    </div>
                                 </motion.div>
                             ))}
                         </div>
