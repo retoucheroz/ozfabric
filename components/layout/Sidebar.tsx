@@ -130,13 +130,13 @@ export function Sidebar({ variant = "default" }: SidebarProps) {
             return (
                 <Link key={item.href} href={item.href}>
                     <div className={cn(
-                        "flex items-center gap-3 px-4 py-3 rounded-xl transition-all",
+                        "flex items-center gap-3 px-4 py-3 rounded-md transition-all",
                         isActive
-                            ? "bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)] font-medium"
-                            : "text-[var(--sidebar-item-text)] hover:bg-[var(--sidebar-hover-bg)]"
+                            ? "bg-white/5 text-white font-black"
+                            : "text-zinc-500 hover:bg-white/5 hover:text-white"
                     )}>
-                        <Icon className={cn("w-5 h-5 shrink-0", isActive ? "text-[var(--accent-primary)]" : "text-[var(--sidebar-icon-passive)]")} />
-                        <span className="text-sm">{item.label}</span>
+                        <Icon className={cn("w-5 h-5 shrink-0 transition-colors", isActive ? "text-[#F5F5F5]" : "text-zinc-600")} />
+                        <span className="text-[11px] uppercase tracking-widest">{item.label}</span>
                     </div>
                 </Link>
             );
@@ -145,15 +145,15 @@ export function Sidebar({ variant = "default" }: SidebarProps) {
         return (
             <Link key={item.href} href={item.href} className="flex-shrink-0 block w-full group relative mb-0.5" title={!isExpanded ? item.label : undefined}>
                 <div className={cn(
-                    "flex items-center gap-3 px-4 py-2.5 mx-2 rounded-lg transition-all duration-150 overflow-hidden whitespace-nowrap",
+                    "flex items-center gap-3 px-4 py-2.5 mx-2 rounded-md transition-all duration-150 overflow-hidden whitespace-nowrap border-l-2",
                     isActive
-                        ? "bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)] font-medium border-l-[3px] border-[var(--accent-primary)]"
-                        : "text-[var(--sidebar-item-text)] hover:bg-[var(--sidebar-hover-bg)] hover:text-[var(--text-primary)] border-l-[3px] border-transparent"
+                        ? "bg-white/5 text-white font-black border-white"
+                        : "text-zinc-500 hover:bg-white/5 hover:text-zinc-200 border-transparent"
                 )}>
-                    <Icon className={cn("w-5 h-5 shrink-0 transition-colors", isActive ? "text-[var(--accent-primary)]" : "text-[var(--sidebar-icon-passive)] group-hover:text-[var(--text-primary)]")} />
+                    <Icon className={cn("w-5 h-5 shrink-0 transition-colors", isActive ? "text-[#F5F5F5]" : "text-zinc-600 group-hover:text-zinc-300")} />
 
                     {isExpanded && (
-                        <span className="text-sm truncate transition-colors">
+                        <span className="text-[10px] font-black uppercase tracking-[0.15em] truncate transition-colors">
                             {item.label}
                         </span>
                     )}

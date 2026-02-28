@@ -37,32 +37,28 @@ export function TopNav() {
     ];
 
     return (
-        <header className="h-16 border-b bg-background flex items-center justify-between px-4 md:px-6 sticky top-0 z-50">
+        <header className="h-[72px] border-b border-white/5 bg-[#0D0D0F] flex items-center justify-between px-6 md:px-10 sticky top-0 z-50">
             {/* Left Section: Mobile Menu & Logo */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-6">
                 {mounted && (
                     <Sheet>
                         <SheetTrigger asChild>
-                            <Button variant="ghost" size="icon" className="md:hidden">
+                            <Button variant="ghost" size="icon" className="md:hidden text-zinc-400 font-bold">
                                 <Menu className="w-5 h-5" />
                             </Button>
                         </SheetTrigger>
-                        <SheetContent side="left" className="p-0 w-[240px]">
+                        <SheetContent side="left" className="p-0 w-[240px] bg-[#0D0D0F] border-white/5">
                             <SheetHeader className="sr-only">
                                 <SheetTitle>Navigation Menu</SheetTitle>
                                 <SheetDescription>Access design and photoshoot tools</SheetDescription>
                             </SheetHeader>
-                            <div className="p-6 border-b">
-                                <Link href="/home" className="flex items-center font-bold text-xl tracking-tight">
-                                    {user?.customLogo ? (
-                                        <img src={user.customLogo} alt="Logo" className="h-8 md:h-10 w-auto object-contain" />
-                                    ) : user?.customTitle ? (
-                                        <span className="bg-gradient-to-r from-violet-500 to-purple-600 bg-clip-text text-transparent font-black">{user.customTitle}</span>
-                                    ) : (
-                                        <>
-                                            <span className="bg-gradient-to-r from-violet-500 to-purple-600 bg-clip-text text-transparent font-black">ModeOn</span><span className="font-black">.ai</span>
-                                        </>
-                                    )}
+                            <div className="p-6 border-b border-white/5">
+                                <Link href="/home" className="flex items-center gap-2 font-black text-xl tracking-tighter text-white">
+                                    <div className="w-9 h-4.5 bg-[#F5F5F5] rounded-full flex items-center justify-between px-1 shadow-inner border border-white/20">
+                                        <div className="w-[1px] h-2 bg-[#0D0D0F]/70 rounded-full ml-1" />
+                                        <div className="w-3 h-3 bg-[#0D0D0F] rounded-full shadow-sm" />
+                                    </div>
+                                    <span>ModeOn.<span className="text-[#F5F5F5]">ai</span></span>
                                 </Link>
                             </div>
                             <div className="flex flex-col py-4 h-full">
@@ -73,54 +69,42 @@ export function TopNav() {
                 )}
 
                 {/* Logo */}
-                <Link href="/home" className="flex items-center font-bold text-xl tracking-tight hover:opacity-80 transition-opacity">
-                    {user?.customLogo ? (
-                        <img src={user.customLogo} alt="Logo" className="h-8 md:h-10 w-auto object-contain" />
-                    ) : user?.customTitle ? (
-                        <span className="bg-gradient-to-r from-violet-500 to-purple-600 bg-clip-text text-transparent font-black">{user.customTitle}</span>
-                    ) : (
-                        <>
-                            <span className="bg-gradient-to-r from-violet-500 to-purple-600 bg-clip-text text-transparent font-black">ModeOn</span><span className="font-black">.ai</span>
-                        </>
-                    )}
+                <Link href="/home" className="flex items-center gap-2 font-black text-xl tracking-tighter text-white hover:opacity-80 transition-opacity">
+                    <div className="w-10 h-5 bg-[#F5F5F5] rounded-full flex items-center justify-between px-1 shadow-inner border border-white/20">
+                        <div className="w-[1.5px] h-2.5 bg-[#0D0D0F]/70 rounded-full ml-1" />
+                        <div className="w-3.5 h-3.5 bg-[#0D0D0F] rounded-full shadow-sm" />
+                    </div>
+                    <span>ModeOn<span className="text-[#F5F5F5]">.ai</span></span>
                 </Link>
             </div>
 
-
-
-
             {/* Right Actions */}
-            <div className="flex items-center gap-1 md:gap-3">
+            <div className="flex items-center gap-2 md:gap-4">
                 {/* Pro Upgrade Pill */}
                 {mounted && (
                     <div
-                        className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-violet-600/90 to-indigo-600/90 hover:from-violet-600 hover:to-indigo-600 text-white rounded-lg cursor-pointer transition-all shadow-sm hover:shadow-violet-500/20 group border border-violet-400/20"
+                        className="hidden sm:flex items-center gap-2 px-4 py-2 bg-[#F5F5F5] hover:bg-white text-black rounded-md cursor-pointer transition-all shadow-none group"
                         onClick={() => router.push('/pricing')}
                     >
-                        <Zap className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
-                        <span className="text-xs font-bold tracking-tight">{t("home.upgradeNow")}</span>
-                        <div className="bg-amber-400 text-black text-[9px] font-black px-1.5 py-0.5 rounded-md leading-none">PRO</div>
+                        <Zap className="w-3.5 h-3.5 fill-black" />
+                        <span className="text-[10px] font-black uppercase tracking-widest">{t("home.upgradeNow")}</span>
                     </div>
                 )}
 
                 {/* Credit Display */}
                 {mounted && (
                     <div
-                        className="flex items-center gap-1.5 md:gap-3 px-2 md:px-4 py-1.5 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-lg cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/20 transition-all group"
+                        className="flex items-center gap-2 md:gap-3 px-3 py-1.5 bg-white/5 border border-white/10 rounded-md cursor-pointer hover:bg-white/10 transition-all group"
                         onClick={() => router.push('/settings?tab=billing')}
                     >
-                        <div className="flex items-center gap-1.5 md:gap-2">
-                            <div className="p-1 rounded-md bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 group-hover:bg-amber-200 dark:group-hover:bg-amber-900/60 transition-colors">
-                                <Sparkles className="w-4 h-4" />
+                        <div className="flex items-center gap-2">
+                            <div className="p-1.5 rounded-md bg-white/5 text-[#F5F5F5] group-hover:bg-white/10 transition-colors">
+                                <Sparkles className="w-3.5 h-3.5" />
                             </div>
                             <div className="flex flex-col items-start leading-none gap-0.5">
-                                <span className="hidden md:inline text-[10px] text-amber-600/70 dark:text-amber-400/70 font-medium uppercase tracking-wider">{t("settings.credits")}</span>
-                                <span className="text-sm font-bold text-amber-700 dark:text-amber-300 tabular-nums">{credits}</span>
+                                <span className="hidden md:inline text-[9px] text-zinc-500 font-black uppercase tracking-widest">{t("settings.credits")}</span>
+                                <span className="text-sm font-black text-[#F5F5F5] tabular-nums">{credits}</span>
                             </div>
-                        </div>
-                        <div className="hidden sm:block w-[1px] h-6 bg-amber-200 dark:bg-amber-800 mx-1" />
-                        <div className="hidden sm:block rounded-full p-1 hover:bg-amber-200 dark:hover:bg-amber-800 transition-colors">
-                            <Plus className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                         </div>
                     </div>
                 )}

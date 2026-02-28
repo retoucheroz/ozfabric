@@ -49,56 +49,56 @@ export default function HomePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                     {/* 1. Photoshoot */}
                     <Link href="/photoshoot" className="group block h-full">
-                        <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-xl p-6 h-full shadow-[var(--shadow-card)] card-interactive hover:shadow-[var(--shadow-card-hover)] hover:border-[var(--border-accent)] border-l-[3px] border-l-violet-500">
-                            <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center mb-4 text-violet-600 dark:text-violet-400 group-hover:bg-violet-200 dark:group-hover:bg-violet-800/50 transition-colors">
+                        <div className="bg-[#12121a] border border-white/5 rounded-md p-6 h-full transition-all hover:bg-white/[0.03] hover:border-white/20 border-l-2 border-l-[#F5F5F5]">
+                            <div className="w-10 h-10 rounded-md bg-white/5 flex items-center justify-center mb-4 text-[#F5F5F5] group-hover:bg-white/10 transition-colors">
                                 <Camera className="w-5 h-5" />
                             </div>
-                            <h3 className="text-base font-semibold text-[var(--text-primary)] mb-1">{t("home.photoshootTitle")}</h3>
-                            <p className="text-sm text-[var(--text-secondary)] line-clamp-2">{t("home.photoshootDesc")}</p>
+                            <h3 className="text-sm font-black uppercase tracking-widest text-[#F5F5F5] mb-1">{t("home.photoshootTitle")}</h3>
+                            <p className="text-xs text-zinc-500 line-clamp-2 leading-relaxed">{t("home.photoshootDesc")}</p>
                         </div>
                     </Link>
 
                     {/* 2. Video Studio */}
                     <Link href="/video" className="group block h-full">
-                        <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-xl p-6 h-full shadow-[var(--shadow-card)] card-interactive hover:shadow-[var(--shadow-card-hover)] hover:border-[var(--border-accent)] border-l-[3px] border-l-cyan-500">
-                            <div className="w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center mb-4 text-cyan-600 dark:text-cyan-400 group-hover:bg-cyan-200 dark:group-hover:bg-cyan-800/50 transition-colors">
+                        <div className="bg-[#12121a] border border-white/5 rounded-md p-6 h-full transition-all hover:bg-white/[0.03] hover:border-white/20 border-l-2 border-l-zinc-500">
+                            <div className="w-10 h-10 rounded-md bg-white/5 flex items-center justify-center mb-4 text-zinc-400 group-hover:bg-white/10 transition-colors">
                                 <VideoIcon className="w-5 h-5" />
                             </div>
-                            <h3 className="text-base font-semibold text-[var(--text-primary)] mb-1">{t("home.videoTitle")}</h3>
-                            <p className="text-sm text-[var(--text-secondary)] line-clamp-2">{t("home.videoDesc")}</p>
+                            <h3 className="text-sm font-black uppercase tracking-widest text-[#F5F5F5] mb-1">{t("home.videoTitle")}</h3>
+                            <p className="text-xs text-zinc-500 line-clamp-2 leading-relaxed">{t("home.videoDesc")}</p>
                         </div>
                     </Link>
 
                     {/* 3. Face Head Swap */}
                     <Link href="/face-head-swap" className="group block h-full">
-                        <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-xl p-6 h-full shadow-[var(--shadow-card)] card-interactive hover:shadow-[var(--shadow-card-hover)] hover:border-[var(--border-accent)] border-l-[3px] border-l-fuchsia-500">
-                            <div className="w-10 h-10 rounded-lg bg-fuchsia-100 dark:bg-fuchsia-900/30 flex items-center justify-center mb-4 text-fuchsia-600 dark:text-fuchsia-400 group-hover:bg-fuchsia-200 dark:group-hover:bg-fuchsia-800/50 transition-colors">
+                        <div className="bg-[#12121a] border border-white/5 rounded-md p-6 h-full transition-all hover:bg-white/[0.03] hover:border-white/20 border-l-2 border-l-zinc-600">
+                            <div className="w-10 h-10 rounded-md bg-white/5 flex items-center justify-center mb-4 text-zinc-500 group-hover:bg-white/10 transition-colors">
                                 <Sparkles className="w-5 h-5" />
                             </div>
-                            <h3 className="text-base font-semibold text-[var(--text-primary)] mb-1">{t("sidebar.faceHeadSwap") || "Face Swap"}</h3>
-                            <p className="text-sm text-[var(--text-secondary)] line-clamp-2">{language === 'tr' ? 'Modellerin yüzünü değiştirin.' : 'Swap model faces.'}</p>
+                            <h3 className="text-sm font-black uppercase tracking-widest text-[#F5F5F5] mb-1">{t("sidebar.faceHeadSwap") || "Face Swap"}</h3>
+                            <p className="text-xs text-zinc-500 line-clamp-2 leading-relaxed">{language === 'tr' ? 'Modellerin yüzünü değiştirin.' : 'Swap model faces.'}</p>
                         </div>
                     </Link>
 
                     {/* 4. Ghost Model */}
                     <Link href="/photoshoot/ghost" className="group block h-full">
-                        <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-xl p-6 h-full shadow-[var(--shadow-card)] card-interactive hover:shadow-[var(--shadow-card-hover)] hover:border-[var(--border-accent)] border-l-[3px] border-l-indigo-500">
-                            <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center mb-4 text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-200 dark:group-hover:bg-indigo-800/50 transition-colors">
+                        <div className="bg-[#12121a] border border-white/5 rounded-md p-6 h-full transition-all hover:bg-white/[0.03] hover:border-white/20 border-l-2 border-l-zinc-700">
+                            <div className="w-10 h-10 rounded-md bg-white/5 flex items-center justify-center mb-4 text-zinc-600 group-hover:bg-white/10 transition-colors">
                                 <Shirt className="w-5 h-5" />
                             </div>
-                            <h3 className="text-base font-semibold text-[var(--text-primary)] mb-1">{t("home.ghostModelTitle")}</h3>
-                            <p className="text-sm text-[var(--text-secondary)] line-clamp-2">{t("home.ghostModelDesc")}</p>
+                            <h3 className="text-sm font-black uppercase tracking-widest text-[#F5F5F5] mb-1">{t("home.ghostModelTitle")}</h3>
+                            <p className="text-xs text-zinc-500 line-clamp-2 leading-relaxed">{t("home.ghostModelDesc")}</p>
                         </div>
                     </Link>
 
                     {/* 5. Train */}
                     <Link href="/train" className="group block h-full">
-                        <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-xl p-6 h-full shadow-[var(--shadow-card)] card-interactive hover:shadow-[var(--shadow-card-hover)] hover:border-[var(--border-accent)] border-l-[3px] border-l-orange-500">
-                            <div className="w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center mb-4 text-orange-600 dark:text-orange-400 group-hover:bg-orange-200 dark:group-hover:bg-orange-800/50 transition-colors">
+                        <div className="bg-[#12121a] border border-white/5 rounded-md p-6 h-full transition-all hover:bg-white/[0.03] hover:border-white/20 border-l-2 border-l-zinc-800">
+                            <div className="w-10 h-10 rounded-md bg-white/5 flex items-center justify-center mb-4 text-zinc-700 group-hover:bg-white/10 transition-colors">
                                 <Wand2 className="w-5 h-5" />
                             </div>
-                            <h3 className="text-base font-semibold text-[var(--text-primary)] mb-1">{t("home.trainTitle")}</h3>
-                            <p className="text-sm text-[var(--text-secondary)] line-clamp-2">{t("home.trainDesc")}</p>
+                            <h3 className="text-sm font-black uppercase tracking-widest text-[#F5F5F5] mb-1">{t("home.trainTitle")}</h3>
+                            <p className="text-xs text-zinc-500 line-clamp-2 leading-relaxed">{t("home.trainDesc")}</p>
                         </div>
                     </Link>
                 </div>
