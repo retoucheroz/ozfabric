@@ -9,6 +9,8 @@ export async function middleware(request: NextRequest) {
     if (
         pathname === '/' ||
         pathname === '/login' ||
+        pathname === '/terms' ||
+        pathname === '/privacy' ||
         pathname.startsWith('/api/auth') ||
         pathname.startsWith('/api/webhooks') ||
         pathname.startsWith('/_next') ||
@@ -27,7 +29,7 @@ export async function middleware(request: NextRequest) {
 
     if (!token) {
         // No valid session, redirect to login
-        const loginUrl = new URL('/', request.url);
+        const loginUrl = new URL('/login', request.url);
         return NextResponse.redirect(loginUrl);
     }
 

@@ -188,6 +188,15 @@ export const authOptions: NextAuthOptions = {
                     })
                 }
             }
+            // ✅ Credentials login → email doğrulanmadıysa engelle
+            if (account?.provider === 'credentials') {
+              const dbUser = await prisma.user.findUnique({
+                where: { id: user.id },
+                select: { emailVerified: true },
+              })
+
+              if (!dbUser?.emailVerified) return false
+            }
             return true
         },
     },

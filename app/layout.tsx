@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Outfit, Geist_Mono, Playfair_Display } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { ProjectsProvider } from "@/context/projects-context";
@@ -10,8 +10,13 @@ import { CookieBanner } from "@/components/cookie-banner";
 import { ActivityTracker } from "@/components/activity-tracker";
 import { AuthSessionProvider } from "@/components/providers/session-provider";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const outfit = Outfit({
+  variable: "--font-outfit",
+  subsets: ["latin"],
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
   subsets: ["latin"],
 });
 
@@ -73,7 +78,7 @@ export default function RootLayout({
         </Script>
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${outfit.variable} ${playfair.variable} ${geistMono.variable} antialiased font-sans`}
         suppressHydrationWarning
       >
         <ThemeProvider
