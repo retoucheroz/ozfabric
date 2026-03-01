@@ -12,6 +12,7 @@ declare module 'next-auth' {
             customTitle?: string | null
             customLogo?: string | null
             authType: string
+            avatar?: string | null
         } & DefaultSession['user']
     }
 
@@ -37,5 +38,6 @@ declare module 'next-auth/jwt' {
         customTitle?: string | null
         customLogo?: string | null
         authType: string
+        avatar?: string | null
     }
 }

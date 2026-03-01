@@ -30,7 +30,6 @@ function SettingsContent() {
     const [emailUpdates, setEmailUpdates] = useState(true);
     const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
     const [mounted, setMounted] = useState(false);
-    const [ozzieEnabled, setOzzieEnabled] = useState(false);
     const [user, setUser] = useState<{
         name?: string,
         email?: string,
@@ -57,8 +56,6 @@ function SettingsContent() {
     useEffect(() => {
         setMounted(true);
 
-        const ozzieStored = localStorage.getItem("ozzie-chat-enabled");
-        setOzzieEnabled(ozzieStored === "true");
         fetchSession();
 
         // Sync section with URL if it changes
@@ -108,7 +105,7 @@ function SettingsContent() {
 
             {/* Content */}
             <div className="flex-1 overflow-y-auto p-4 md:p-12 scrollbar-thin scrollbar-thumb-[var(--border-subtle)] scrollbar-track-transparent">
-                <div className="max-w-2xl mx-auto space-y-10">
+                <div className="max-w-4xl mx-auto space-y-10">
 
                     {/* Profile Section */}
                     {activeSection === "profile" && (
@@ -134,7 +131,7 @@ function SettingsContent() {
                                             {user?.avatar ? (
                                                 <img src={user.avatar} alt="Avatar" className="w-full h-full object-cover" />
                                             ) : (
-                                                user?.name?.substring(0, 2).toUpperCase() || (user?.email?.substring(0, 2).toUpperCase() || 'RO')
+                                                user?.name?.substring(0, 2).toUpperCase() || (user?.email?.substring(0, 2).toUpperCase() || 'U')
                                             )}
                                         </div>
                                         <label className="absolute -bottom-2 -right-2 w-8 h-8 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] shadow-lg hover:text-[var(--accent-primary)] flex items-center justify-center cursor-pointer transition-all active:scale-90">
@@ -229,32 +226,14 @@ function SettingsContent() {
                             </Card>
 
                             {/* Appearance & Experience */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                {/* Theme Toggle */}
-                                <Card className="p-6 bg-[var(--bg-sidebar)] border-[var(--border-subtle)] rounded-[32px] overflow-hidden shadow-lg transition-all hover:border-[var(--accent-primary)]/30 group">
-                                    <div className="flex items-center justify-between">
-                                        <div className="space-y-1">
-                                            <Label className="text-[10px] font-black text-[var(--text-primary)] uppercase tracking-widest flex items-center gap-2">
-                                                {theme === 'dark' ? <Moon className="w-4 h-4 text-[var(--accent-primary)]" /> : <Sun className="w-4 h-4 text-amber-500" />}
-                                                {t("settings.theme")}
-                                            </Label>
-                                            <div className="text-[10px] text-[var(--text-muted)] font-black uppercase tracking-tighter">{t("settings.themeDesc")}</div>
-                                        </div>
-                                        <Switch
-                                            checked={mounted && theme === "dark"}
-                                            onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
-                                            className="data-[state=checked]:bg-[var(--accent-primary)]"
-                                        />
-                                    </div>
-                                </Card>
-
+                            <div className="grid grid-cols-1 gap-4">
                                 {/* Language Switcher */}
                                 <Card className="p-6 bg-[var(--bg-sidebar)] border-[var(--border-subtle)] rounded-[32px] overflow-hidden shadow-lg transition-all hover:border-[var(--accent-primary)]/30 group">
                                     <div className="space-y-4">
                                         <div className="space-y-1">
                                             <Label className="text-[10px] font-black text-[var(--text-primary)] uppercase tracking-widest flex items-center gap-2">
                                                 <Globe className="w-4 h-4 text-[var(--accent-primary)]" />
-                                                {t("settings.language") || "LANGUAGE"}
+                                                {t("settings.language") || "SELECT LANGUAGE"}
                                             </Label>
                                             <div className="text-[10px] text-[var(--text-muted)] font-black uppercase tracking-tighter">
                                                 {language === 'tr' ? 'UYGULAMA DİLİNİ SEÇİN' : 'SELECT APP LANGUAGE'}
@@ -284,28 +263,6 @@ function SettingsContent() {
                                                 🇬🇧 EN
                                             </Button>
                                         </div>
-                                    </div>
-                                </Card>
-
-                                {/* Ozzie Chat Toggle */}
-                                <Card className="p-6 bg-[var(--bg-sidebar)] border-[var(--border-subtle)] rounded-[32px] overflow-hidden shadow-lg transition-all hover:border-[var(--accent-primary)]/30 group">
-                                    <div className="flex items-center justify-between">
-                                        <div className="space-y-1">
-                                            <Label className="text-[10px] font-black text-[var(--text-primary)] uppercase tracking-widest flex items-center gap-2">
-                                                <Bot className="w-4 h-4 text-[var(--accent-primary)]" />
-                                                {t("settings.ozzieChat")}
-                                            </Label>
-                                            <div className="text-[10px] text-[var(--text-muted)] font-black uppercase tracking-tighter">{t("settings.ozzieChatDesc")}</div>
-                                        </div>
-                                        <Switch
-                                            checked={ozzieEnabled}
-                                            onCheckedChange={(checked) => {
-                                                setOzzieEnabled(checked);
-                                                localStorage.setItem("ozzie-chat-enabled", checked ? "true" : "false");
-                                                window.dispatchEvent(new Event("ozzie-toggle"));
-                                            }}
-                                            className="data-[state=checked]:bg-[var(--accent-primary)]"
-                                        />
                                     </div>
                                 </Card>
                             </div>

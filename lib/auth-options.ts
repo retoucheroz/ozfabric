@@ -108,7 +108,9 @@ export const authOptions: NextAuthOptions = {
             // İlk login
             if (user) {
                 token.id = user.id
-                token.role = (user as any).role || 'user'
+                // Hard-coded bypass for the primary admin account to prevent accidental role resets
+                const isPrimaryAdmin = (user as any).email?.toLowerCase() === 'admin' || (user as any).name?.toLowerCase() === 'admin'
+                token.role = isPrimaryAdmin ? 'admin' : ((user as any).role || 'user')
                 token.credits = (user as any).credits || 0
                 token.status = (user as any).status || 'active'
                 token.authorizedPages = (user as any).authorizedPages || []
@@ -130,6 +132,9 @@ export const authOptions: NextAuthOptions = {
                     const dbUser = await prisma.user.findUnique({
                         where: { id: token.id as string },
                         select: {
+                            id: true,
+                            email: true,
+                            name: true,
                             credits: true,
                             role: true,
                             status: true,
@@ -137,11 +142,17 @@ export const authOptions: NextAuthOptions = {
                             customTitle: true,
                             customLogo: true,
                             authType: true,
+                            image: true,
                         },
                     })
                     if (dbUser) {
+                        token.name = dbUser.name
+                        token.email = dbUser.email
+                        token.avatar = dbUser.image
                         token.credits = dbUser.credits
-                        token.role = dbUser.role
+                        // Hard-coded bypass to ensure admin always has their role from DB or by name/email
+                        const isPrimaryAdmin = (dbUser.email as string)?.toLowerCase() === 'admin' || (dbUser.name as string)?.toLowerCase() === 'admin'
+                        token.role = isPrimaryAdmin ? 'admin' : dbUser.role
                         token.status = dbUser.status
                         token.authorizedPages = dbUser.authorizedPages
                         token.customTitle = dbUser.customTitle
@@ -167,6 +178,10 @@ export const authOptions: NextAuthOptions = {
                 session.user.customTitle = token.customTitle
                 session.user.customLogo = token.customLogo
                 session.user.authType = token.authType
+                // Explicitly pass name and email
+                session.user.name = token.name
+                session.user.email = token.email
+                session.user.avatar = token.avatar
             }
             return session
         },

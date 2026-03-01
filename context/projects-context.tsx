@@ -4,11 +4,13 @@ import React, { createContext, useContext, useEffect, useState } from "react"
 
 export type Project = {
     id: string;
-    type: "Style" | "Pattern" | "Try-On" | "Ghost" | "Tech Pack" | "Expand" | "Upscale" | "Retexture" | "Photoshoot" | "Sketch" | "Editorial";
+    type: "Style" | "Pattern" | "Try-On" | "Ghost" | "Tech Pack" | "Expand" | "Upscale" | "Retexture" | "Photoshoot" | "Sketch" | "Editorial" | "Video";
     title: string;
     imageUrl: string;
     createdAt: number;
     description?: string;
+    isFavorite?: boolean;
+    mediaType?: "image" | "video";
 }
 
 export type Collection = {

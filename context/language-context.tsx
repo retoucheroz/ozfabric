@@ -196,8 +196,12 @@ const translations: Translations = {
     "settings.twoFactorDesc": { en: "Add an extra layer of security to your account", tr: "Hesabınıza ekstra güvenlik katmanı ekleyin" },
     "settings.deleteAccount": { en: "Delete Account", tr: "Hesabı Sil" },
     "settings.deleteAccountDesc": { en: "Permanently delete your account and all data", tr: "Hesabınızı ve tüm verilerinizi kalıcı olarak silin" },
-    "settings.ozzieChat": { en: "Ozzie AI Assistant", tr: "Ozzie AI Asistanı" },
-    "settings.ozzieChatDesc": { en: "Enable the floating AI chat assistant", tr: "Yüzen AI sohbet asistanını etkinleştir" },
+    "settings.profileDesc": { en: "Personal Information & Account Settings", tr: "Kişisel Bilgiler ve Hesap Ayarları" },
+    "settings.saveSuccess": { en: "Changes saved successfully.", tr: "Değişiklikler başarıyla kaydedildi." },
+    "settings.billingDesc": { en: "Balance, Subscriptions & Payments", tr: "Bakiye, Abonelikler ve Ödemeler" },
+    "settings.notificationsDesc": { en: "Preferences, Alerts & Updates", tr: "Tercihler, Uyarılar ve Güncellemeler" },
+    "settings.securityDesc": { en: "Password & Account Protection", tr: "Şifre ve Hesap Koruması" },
+    "settings.language": { en: "SELECT LANGUAGE", tr: "DİL SEÇİMİ" },
 
     // Styles Page
     "styles.title": { en: "AI Style Studio", tr: "AI Stil Stüdyosu" },
@@ -470,13 +474,13 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     const [language, setLanguage] = useState<Language>("tr");
 
     useEffect(() => {
-        const stored = localStorage.getItem("retoucheroz_language") as Language;
+        const stored = localStorage.getItem("modeon_language") as Language;
         if (stored) setLanguage(stored);
     }, []);
 
     const handleSetLanguage = (lang: Language) => {
         setLanguage(lang);
-        localStorage.setItem("retoucheroz_language", lang);
+        localStorage.setItem("modeon_language", lang);
         document.documentElement.lang = lang;
     };
 

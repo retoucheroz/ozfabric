@@ -108,7 +108,8 @@ function StylesPageContent() {
           title: prompt.slice(0, 30) + (prompt.length > 30 ? "..." : ""),
           type: "Style",
           imageUrl: data.imageUrl,
-          description: prompt
+          description: prompt,
+          mediaType: "image"
         });
       } else {
         toast.error("No image URL returned from API");

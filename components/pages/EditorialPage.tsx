@@ -397,7 +397,8 @@ export default function EditorialPage() {
                     title: `Editorial - ${activeCamera.name} - ${new Date().toLocaleTimeString()}`,
                     type: "Editorial",
                     imageUrl: img,
-                    description: `Prompt: ${data.prompt} | Seed: ${data.seed}`
+                    description: `Prompt: ${data.prompt} | Seed: ${data.seed}`,
+                    mediaType: "image"
                 });
             });
 
@@ -457,34 +458,14 @@ export default function EditorialPage() {
             <div className="flex-1 flex overflow-hidden relative">
                 <div className="flex-1 overflow-y-auto custom-scrollbar">
                     <div className={cn(
-                        "p-4 md:p-6 mx-auto space-y-4 transition-all duration-500 flex-1 w-full",
-                        wizardStep === 1 ? "max-w-[1200px]" : wizardStep === 3 ? "max-w-6xl" : "max-w-4xl"
+                        "p-4 md:p-8 mx-auto space-y-8 transition-all duration-500 flex-1 w-full",
+                        wizardStep === 1 ? "max-w-[1230px]" : wizardStep === 3 ? "max-w-[1182px]" : "max-w-[926px]"
                     )}>
                         {/* Progress */}
                         <div>
                             <WizardProgress currentStep={wizardStep} onStepClick={(s) => { if (canMoveToStep(s)) setWizardStep(s as any); }} language={language} />
                         </div>
 
-                        {/* Page Title */}
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2 border-b border-white/5 mb-6">
-                            <div className="flex items-center gap-4">
-                                <div className="p-3 rounded-2xl bg-zinc-900 border border-white/10 text-white shadow-xl">
-                                    <TbCamera className="w-6 h-6" />
-                                </div>
-                                <div className="flex flex-col">
-                                    <h1 className="text-3xl font-black uppercase tracking-tighter text-white italic">{language === "tr" ? "EDİTORYAL" : "EDITORIAL"}</h1>
-                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mt-0.5">{language === "tr" ? "YARATICI EDİTORYAL ÇEKİMLER • NANO BANANA" : "CREATIVE EDITORIAL SHOOTS • NANO BANANA"}</p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <div className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 flex items-center gap-2">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-[#F5F5F5] animate-pulse" />
-                                    <span className="text-[10px] font-black text-white uppercase tracking-widest">
-                                        Creative AI v2.0
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
 
                         {/* ===== STEP 1: MODEL & ASSETS ===== */}
                         {wizardStep === 1 && (

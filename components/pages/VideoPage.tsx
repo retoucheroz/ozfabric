@@ -47,6 +47,7 @@ import {
     TbLayoutGrid as TbElements,
 } from "react-icons/tb"
 import { useLanguage } from "@/context/language-context"
+import { useProjects } from "@/context/projects-context"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { Separator } from "@/components/ui/separator"
@@ -150,6 +151,7 @@ interface VisualElement {
 
 export default function VideoPage() {
     const { language, t } = useLanguage();
+    const { addProject } = useProjects();
     const router = useRouter();
 
     // --- STATE ---
@@ -158,6 +160,7 @@ export default function VideoPage() {
     const [endFrame, setEndFrame] = useState<string | null>(null);
     const [prompt, setPrompt] = useState("");
     const [multiShot, setMultiShot] = useState(false);
+    const [isLoopEnabled, setIsLoopEnabled] = useState(false);
     const [isSoundOn, setIsSoundOn] = useState(false);
     const [elements, setElements] = useState<VisualElement[]>([]);
     const [showElementsDialog, setShowElementsDialog] = useState(false);
@@ -208,6 +211,12 @@ export default function VideoPage() {
     useEffect(() => {
         setIsMounted(true);
     }, []);
+
+    useEffect(() => {
+        if (isLoopEnabled && firstFrame) {
+            setEndFrame(firstFrame);
+        }
+    }, [isLoopEnabled, firstFrame]);
 
     // --- REFS ---
     const firstFrameInputRef = useRef<HTMLInputElement>(null);
@@ -628,6 +637,15 @@ export default function VideoPage() {
                 setGeneratedVideoUrl(data.video.url);
                 setGenerationProgress('');
                 toast.success(language === 'tr' ? "Video başarıyla üretildi!" : "Video generated successfully!");
+
+                // Add to projects history
+                addProject({
+                    title: multiShot ? (language === 'tr' ? "Çoklu Sahne Video" : "Multi-shot Video") : (prompt?.slice(0, 30) || (language === 'tr' ? "Video Üretimi" : "Video Generation")),
+                    type: "Video",
+                    imageUrl: data.video.url,
+                    description: multiShot ? shots.map(s => s.prompt).join(" | ") : prompt,
+                    mediaType: "video"
+                });
             } else {
                 throw new Error('No video URL in response');
             }
@@ -671,61 +689,11 @@ export default function VideoPage() {
     const estimatedCost = currentDuration * costPerSec;
 
     return (
-        <div className="flex flex-col h-[calc(100vh-64px)] bg-[var(--bg-surface)] text-foreground overflow-hidden">
-            {/* Header Area */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-8 py-8 border-b border-white/5 bg-[#0D0D0F] shrink-0 z-20">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-white/10 text-white flex items-center justify-center shadow-xl">
-                        <TbVideo className="w-6 h-6" />
-                    </div>
-                    <div>
-                        <h1 className="text-3xl font-black tracking-tighter text-white uppercase italic">{t("sidebar.video")}</h1>
-                        <p className="text-[11px] text-zinc-500 font-black uppercase tracking-[0.2em] mt-1">
-                            {language === 'tr' ? 'NANO BANANA PRO • SİNEMATİK MODA VİDEOLARI' : 'NANO BANANA PRO • CINEMATIC FASHION VIDEOS'}
-                        </p>
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                    <Select value={productionModel} onValueChange={setProductionModel}>
-                        <SelectTrigger className="w-48 bg-white/5 border-white/5 text-white rounded-xl text-[10px] font-black uppercase tracking-widest h-12 focus:ring-1 focus:ring-white/20 transition-all">
-                            <SelectValue placeholder="Model Seçin" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-zinc-900 border-white/10">
-                            {PRODUCTION_MODELS.map(m => (
-                                <SelectItem key={m.id} value={m.id} className="focus:bg-white focus:text-black text-[10px] font-black uppercase tracking-widest">
-                                    <span className="flex items-center gap-3">
-                                        <span className="text-base">{m.icon}</span>
-                                        <span>{language === 'tr' ? (m.labelTr || m.label) : m.label}</span>
-                                    </span>
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-
-                    <Button
-                        onClick={handleGenerate}
-                        disabled={isProcessing}
-                        className="bg-white hover:bg-zinc-200 text-black font-black h-12 px-10 rounded-2xl shadow-2xl transition-all active:scale-[0.98] text-[11px] uppercase tracking-[0.2em] flex items-center gap-4"
-                    >
-                        {isProcessing ? (
-                            <TbLoader2 className="w-5 h-5 animate-spin" />
-                        ) : (
-                            <>
-                                <TbSparkles className="w-5 h-5 opacity-50" />
-                                <span>{language === 'tr' ? 'OLUŞTUR' : 'GENERATE'}</span>
-                                <span className="ml-1 opacity-40 font-black border-l border-black/10 pl-4">
-                                    {estimatedCost} {language === 'tr' ? 'KR' : 'CR'}
-                                </span>
-                            </>
-                        )}
-                    </Button>
-                </div>
-            </div>
+        <div className="flex flex-col h-[calc(100vh-64px)] bg-[#0D0D0F] text-foreground overflow-hidden">
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-card scrollbar-track-transparent">
-                <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <main className="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-thin scrollbar-thumb-card scrollbar-track-transparent">
+                <div className="max-w-[1180px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
 
                     {/* LEFT COLUMN: EDITOR */}
                     <div className="lg:col-span-12">
@@ -735,31 +703,48 @@ export default function VideoPage() {
                             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     {/* Story Selection */}
-                                    <Card className="md:col-span-2 bg-zinc-900 border border-white/5 p-4 sm:p-6 backdrop-blur-sm space-y-6 rounded-2xl shadow-2xl">
-                                        <div className="flex items-center justify-between border-b border-white/5 pb-4">
-                                            <h2 className="text-lg font-black tracking-tighter uppercase italic text-white flex items-center gap-3">
-                                                <TbMovie className="w-5 h-5 text-white" />
+                                    <Card className="md:col-span-2 bg-[#0D0D0F] border border-white/5 p-4 sm:p-6 backdrop-blur-sm space-y-6 rounded-2xl shadow-2xl">
+                                        <div className="flex items-center justify-between border-b border-white/5 pb-4 gap-4">
+                                            <h2 className="text-lg font-black tracking-tighter uppercase italic text-[#F5F5F5] flex items-center gap-3">
+                                                <TbMovie className="w-5 h-5 text-[#F5F5F5]" />
                                                 {language === 'tr' ? 'Hikaye Detayları' : 'Story Details'}
                                             </h2>
-                                            <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white text-[9px] font-black uppercase tracking-widest">
-                                                AI Storyboarding
+                                            <div className="flex items-center gap-3">
+                                                <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[#F5F5F5] text-[9px] font-black uppercase tracking-widest hidden sm:flex">
+                                                    AI Storyboarding
+                                                </div>
+                                                <Select value={productionModel} onValueChange={setProductionModel}>
+                                                    <SelectTrigger className="bg-[#0D0D0F] border-[var(--border-subtle)] text-[#F5F5F5] rounded-xl text-[10px] font-black uppercase tracking-widest h-9 px-3 hover:border-white/20 transition-all">
+                                                        <SelectValue placeholder="Model Seçin" />
+                                                    </SelectTrigger>
+                                                    <SelectContent className="bg-[#0D0D0F] border-white/10">
+                                                        {PRODUCTION_MODELS.map(m => (
+                                                            <SelectItem key={m.id} value={m.id} className="text-[10px] font-black uppercase tracking-widest">
+                                                                <span className="flex items-center gap-2">
+                                                                    <span className="text-sm">{m.icon}</span>
+                                                                    <span>{language === 'tr' ? (m.labelTr || m.label) : m.label}</span>
+                                                                </span>
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
                                             </div>
                                         </div>
 
                                         <div className="space-y-4">
-                                            <Label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest px-1">
+                                            <Label className="text-[10px] font-black text-[#a1a1aa] uppercase tracking-widest px-1">
                                                 {language === 'tr' ? 'AKLINIZDAKİ HİKAYEYİ KISACA YAZIN' : 'BRIEFLY DESCRIBE YOUR STORY'}
                                             </Label>
                                             <Textarea
                                                 value={userStory}
                                                 onChange={(e) => setUserStory(e.target.value)}
                                                 placeholder={language === 'tr' ? 'Örn: Paris sokaklarında zarif bir yürüyüş...' : 'e.g. An elegant walk on the streets of Paris...'}
-                                                className="min-h-[120px] bg-[var(--bg-surface)] border-[var(--border-subtle)] text-base sm:text-lg focus:border-[var(--accent-primary)] transition-all rounded-2xl text-[var(--text-primary)]"
+                                                className="min-h-[120px] bg-[#0D0D0F] border-[var(--border-subtle)] text-base sm:text-lg focus:border-[var(--accent-primary)] transition-all rounded-2xl text-[#F5F5F5]"
                                             />
                                         </div>
 
                                         <div className="space-y-3">
-                                            <Label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest px-1">
+                                            <Label className="text-[10px] font-black text-[#a1a1aa] uppercase tracking-widest px-1">
                                                 {language === 'tr' ? 'HIZLI ŞABLONLAR' : 'QUICK TEMPLATES'}
                                             </Label>
                                             <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 gap-3">
@@ -767,12 +752,12 @@ export default function VideoPage() {
                                                     <button
                                                         key={t.id}
                                                         onClick={() => setUserStory(language === 'tr' ? t.contentTr : t.contentEn)}
-                                                        className="p-3 text-xs text-left bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-xl hover:border-[var(--accent-primary)] transition-all group"
+                                                        className="p-3 text-xs text-left bg-[#0D0D0F] border border-[var(--border-subtle)] rounded-xl hover:border-[var(--accent-primary)] transition-all group"
                                                     >
-                                                        <div className="font-black text-[var(--text-primary)] uppercase tracking-tight mb-1">
+                                                        <div className="font-black text-[#F5F5F5] uppercase tracking-tight mb-1">
                                                             {language === 'tr' ? t.labelTr : t.label}
                                                         </div>
-                                                        <div className="text-[10px] text-[var(--text-muted)] line-clamp-2">
+                                                        <div className="text-[10px] text-[#a1a1aa] line-clamp-2">
                                                             {language === 'tr' ? t.contentTr : t.contentEn}
                                                         </div>
                                                     </button>
@@ -782,18 +767,18 @@ export default function VideoPage() {
                                     </Card>
 
                                     {/* Model/Subject Selection */}
-                                    <Card className="bg-zinc-900 border border-white/5 p-6 backdrop-blur-sm space-y-6 rounded-2xl shadow-2xl">
-                                        <h2 className="text-lg font-black tracking-tighter uppercase italic text-white flex items-center gap-3 border-b border-white/5 pb-4">
-                                            <TbUserCircle className="w-5 h-5 text-white" />
+                                    <Card className="bg-[#0D0D0F] border border-white/5 p-6 backdrop-blur-sm space-y-6 rounded-2xl shadow-2xl">
+                                        <h2 className="text-lg font-black tracking-tighter uppercase italic text-[#F5F5F5] flex items-center gap-3 border-b border-white/5 pb-4">
+                                            <TbUserCircle className="w-5 h-5 text-[#F5F5F5]" />
                                             {language === 'tr' ? 'Model & Karakter' : 'Model & Character'}
                                         </h2>
 
-                                        <div className="grid grid-cols-3 gap-2 p-1 bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-xl">
+                                        <div className="grid grid-cols-3 gap-2 p-1 bg-[#0D0D0F] border border-[var(--border-subtle)] rounded-xl">
                                             {(['library', 'upload', 'gender'] as const).map(src => (
                                                 <button
                                                     key={src}
                                                     onClick={() => setModelSource(src)}
-                                                    className={`py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${modelSource === src ? 'bg-[var(--accent-primary)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}
+                                                    className={`py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${modelSource === src ? 'bg-[var(--accent-primary)] text-[#F5F5F5] shadow-sm' : 'text-[#a1a1aa] hover:text-[#F5F5F5]'}`}
                                                 >
                                                     {src}
                                                 </button>
@@ -806,7 +791,7 @@ export default function VideoPage() {
                                                     <button
                                                         key={g}
                                                         onClick={() => setSelectedGender(g)}
-                                                        className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${selectedGender === g ? 'bg-[var(--accent-soft)] border-[var(--accent-primary)] text-[var(--accent-primary)]' : 'bg-[var(--bg-surface)] border-[var(--border-subtle)] text-[var(--text-muted)] hover:border-[var(--text-primary)]/30'}`}
+                                                        className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${selectedGender === g ? 'bg-[var(--accent-soft)] border-[var(--accent-primary)] text-[var(--accent-primary)]' : 'bg-[#0D0D0F] border-[var(--border-subtle)] text-[#a1a1aa] hover:border-[#F5F5F5]/30'}`}
                                                     >
                                                         <div className="text-xl">{g === 'female' ? '👩' : g === 'male' ? '👨' : '👤'}</div>
                                                         <span className="text-[10px] font-black uppercase tracking-widest">{g}</span>
@@ -818,16 +803,16 @@ export default function VideoPage() {
                                         {modelSource === 'upload' && (
                                             <div
                                                 onClick={() => firstFrameInputRef.current?.click()}
-                                                className="aspect-[3/4] rounded-2xl border-2 border-dashed border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col items-center justify-center p-6 cursor-pointer hover:border-[var(--accent-primary)] hover:bg-[var(--accent-soft)] transition-all group"
+                                                className="aspect-[3/4] rounded-2xl border-2 border-dashed border-[var(--border-subtle)] bg-[#18181b] flex flex-col items-center justify-center p-6 cursor-pointer hover:border-[var(--accent-primary)] transition-all group"
                                             >
                                                 {firstFrame ? (
                                                     <img src={firstFrame} alt="Model" className="w-full h-full object-cover rounded-xl" />
                                                 ) : (
                                                     <>
-                                                        <div className="w-12 h-12 rounded-xl bg-[var(--bg-sidebar)] border border-[var(--border-subtle)] flex items-center justify-center mb-4 group-hover:scale-110 transition-all text-[var(--accent-primary)]">
+                                                        <div className="w-12 h-12 rounded-xl bg-[#18181b] border border-[var(--border-subtle)] flex items-center justify-center mb-4 group-hover:scale-110 transition-all text-[var(--accent-primary)]">
                                                             <TbPhoto className="w-6 h-6" />
                                                         </div>
-                                                        <span className="text-[10px] text-[var(--text-muted)] text-center font-black uppercase tracking-widest">Model görseli yükle</span>
+                                                        <span className="text-[10px] text-[#a1a1aa] text-center font-black uppercase tracking-widest">Model görseli yükle</span>
                                                     </>
                                                 )}
                                             </div>
@@ -835,11 +820,11 @@ export default function VideoPage() {
 
                                         <div className="flex items-center justify-between pt-4">
                                             <div className="flex items-center gap-2 cursor-pointer" onClick={() => setIsSoundOn(!isSoundOn)}>
-                                                <div className={`w-10 h-6 rounded-full relative transition-all ${isSoundOn ? 'bg-[var(--accent-primary)]' : 'bg-[var(--bg-surface)] border border-[var(--border-subtle)]'}`}>
+                                                <div className={`w-10 h-6 rounded-full relative transition-all ${isSoundOn ? 'bg-[var(--accent-primary)]' : 'bg-[#0D0D0F] border border-[var(--border-subtle)]'}`}>
                                                     <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${isSoundOn ? 'left-5' : 'left-1'}`} />
                                                 </div>
-                                                <span className="text-xs font-black uppercase tracking-widest text-[var(--text-primary)] flex items-center gap-1.5">
-                                                    {isSoundOn ? <TbVolume className="w-4 h-4 text-[var(--accent-primary)]" /> : <TbVolumeOff className="w-4 h-4 text-[var(--text-muted)]" />}
+                                                <span className="text-xs font-black uppercase tracking-widest text-[#F5F5F5] flex items-center gap-1.5">
+                                                    {isSoundOn ? <TbVolume className="w-4 h-4 text-[var(--accent-primary)]" /> : <TbVolumeOff className="w-4 h-4 text-[#a1a1aa]" />}
                                                     {language === 'tr' ? 'Sesli Üretim' : 'Audio Sync'}
                                                 </span>
                                             </div>
@@ -850,54 +835,72 @@ export default function VideoPage() {
                                 {storyboard ? (
                                     <div className="space-y-6 animate-in fade-in zoom-in duration-500">
                                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                            <h3 className="text-lg font-black tracking-tight uppercase italic text-[var(--text-primary)] flex items-center gap-2">
+                                            <h3 className="text-lg font-black tracking-tight uppercase italic text-[#F5F5F5] flex items-center gap-2">
                                                 <TbMovie className="w-5 h-5 text-[var(--accent-primary)]" />
                                                 {language === 'tr' ? 'ÜRETİM PLANI' : 'PRODUCTION PLAN'}
                                             </h3>
-                                            <Button variant="ghost" size="sm" onClick={() => setStoryboard(null)} className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] hover:text-red-500 hover:bg-red-500/10 rounded-xl px-4">
+                                            <Button variant="ghost" size="sm" onClick={() => setStoryboard(null)} className="text-[10px] font-black uppercase tracking-widest text-[#a1a1aa] hover:text-red-500 hover:bg-red-500/10 rounded-xl px-4">
                                                 {language === 'tr' ? 'SIFIRLA' : 'RESET'}
                                             </Button>
                                         </div>
 
                                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                                             {storyboard.shots.map((shot: any, idx: number) => (
-                                                <div key={idx} className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-2xl p-4 space-y-3 relative group overflow-hidden hover:border-[var(--accent-primary)]/30 transition-all">
-                                                    <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-[var(--accent-primary)] text-white flex items-center justify-center text-[10px] font-black shadow-lg shadow-[var(--accent-primary)]/20">
+                                                <div key={idx} className="bg-[#0D0D0F] border border-[var(--border-subtle)] rounded-2xl p-4 space-y-3 relative group overflow-hidden hover:border-[var(--accent-primary)]/30 transition-all">
+                                                    <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-[var(--accent-primary)] text-[#F5F5F5] flex items-center justify-center text-[10px] font-black shadow-lg shadow-[var(--accent-primary)]/20">
                                                         {idx + 1}
                                                     </div>
-                                                    <div className="aspect-[3/4] rounded-xl bg-[var(--bg-sidebar)] border border-[var(--border-subtle)] flex items-center justify-center group-hover:scale-[1.02] transition-transform duration-500">
+                                                    <div className="aspect-[3/4] rounded-xl bg-[#0D0D0F] border border-[var(--border-subtle)] flex items-center justify-center group-hover:scale-[1.02] transition-transform duration-500">
                                                         <TbVideo className="w-8 h-8 text-[var(--border-subtle)]" />
                                                     </div>
                                                     <div className="space-y-1.5">
-                                                        <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest truncate">{shot.title}</div>
-                                                        <div className="text-[11px] font-medium text-[var(--text-primary)] line-clamp-3 leading-relaxed opacity-80">{shot.prompt}</div>
+                                                        <div className="text-[9px] font-black text-[#a1a1aa] uppercase tracking-widest truncate">{shot.title}</div>
+                                                        <div className="text-[11px] font-medium text-[#F5F5F5] line-clamp-3 leading-relaxed opacity-80">{shot.prompt}</div>
                                                     </div>
                                                     <div className="pt-3 flex items-center justify-between border-t border-[var(--border-subtle)]">
                                                         <span className="text-[10px] font-black italic text-[var(--accent-primary)]">{shot.duration}s</span>
-                                                        <span className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-tight">{shot.camera}</span>
+                                                        <span className="text-[9px] font-black text-[#a1a1aa] uppercase tracking-tight">{shot.camera}</span>
                                                     </div>
                                                 </div>
                                             ))}
                                         </div>
 
                                         <div className="p-4 bg-[var(--accent-soft)] border border-[var(--accent-primary)]/20 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                                            <div className="p-3 bg-[var(--accent-primary)] text-white rounded-xl shadow-lg shadow-[var(--accent-primary)]/20">
+                                            <div className="p-3 bg-[var(--accent-primary)] text-[#F5F5F5] rounded-xl shadow-lg shadow-[var(--accent-primary)]/20">
                                                 <TbShieldCheck className="w-5 h-5" />
                                             </div>
                                             <div className="flex-1">
                                                 <div className="text-[10px] font-black text-[var(--accent-primary)] uppercase tracking-widest">{language === 'tr' ? 'TUTARLILIK MOTORU AKTİF' : 'CONSISTENCY ENGINE ACTIVE'}</div>
-                                                <p className="text-[11px] font-medium text-[var(--text-primary)] mt-0.5 opacity-70 leading-relaxed">{storyboard.visualDictionary}</p>
+                                                <p className="text-[11px] font-medium text-[#F5F5F5] mt-0.5 opacity-70 leading-relaxed">{storyboard.visualDictionary}</p>
                                             </div>
                                         </div>
+
+                                        <Button
+                                            onClick={handleGenerate}
+                                            disabled={isProcessing}
+                                            className="w-full bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-[#F5F5F5] font-black h-14 rounded-2xl text-[12px] uppercase tracking-[0.2em] shadow-xl transition-all active:scale-[0.98]"
+                                        >
+                                            {isProcessing ? (
+                                                <TbLoader2 className="w-5 h-5 animate-spin mr-2" />
+                                            ) : (
+                                                <>
+                                                    <TbSparkles className="w-5 h-5 mr-3 opacity-80" />
+                                                    <span>{language === 'tr' ? 'VİDEOYU OLUŞTUR' : 'GENERATE VIDEO'}</span>
+                                                    <span className="ml-3 pl-3 border-l border-white/20 opacity-80 flex-shrink-0">
+                                                        {estimatedCost} {language === 'tr' ? 'KR' : 'CR'}
+                                                    </span>
+                                                </>
+                                            )}
+                                        </Button>
                                     </div>
                                 ) : (
-                                    <div className="p-12 border-2 border-dashed border-[var(--border-subtle)] rounded-[32px] bg-[var(--bg-sidebar)]/50 text-center space-y-6 backdrop-blur-sm">
+                                    <div className="p-12 border-2 border-dashed border-[var(--border-subtle)] rounded-[32px] bg-[#0D0D0F]/50 text-center space-y-6 backdrop-blur-sm">
                                         <div className="w-20 h-20 bg-[var(--accent-soft)] rounded-3xl flex items-center justify-center mx-auto shadow-xl shadow-[var(--accent-primary)]/10 ring-1 ring-[var(--accent-primary)]/20">
                                             <TbSparkles className="w-10 h-10 text-[var(--accent-primary)]" />
                                         </div>
                                         <div className="max-w-md mx-auto space-y-3">
-                                            <h3 className="text-2xl font-black uppercase italic tracking-tight text-[var(--text-primary)]">ModeOn Storyboard Engine</h3>
-                                            <p className="text-xs font-medium text-[var(--text-muted)] leading-relaxed">
+                                            <h3 className="text-2xl font-black uppercase italic tracking-tight text-[#F5F5F5]">ModeOn Storyboard Engine</h3>
+                                            <p className="text-xs font-medium text-[#a1a1aa] leading-relaxed">
                                                 {language === 'tr'
                                                     ? 'Mavi AI, girdiğiniz hikayeyi analiz ederek 5 ardışık sahne oluşturur. Karakter, mekân ve stil tutarlılığı otomatik olarak denetlenir.'
                                                     : 'Mavi AI analyzes your story to create 5 sequential shots. Character, location, and style consistency are automatically maintained.'}
@@ -905,7 +908,7 @@ export default function VideoPage() {
                                             <Button
                                                 onClick={handleAnalyzeStory}
                                                 disabled={isProcessing}
-                                                className="mt-4 bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-white font-black h-12 px-10 rounded-xl shadow-xl shadow-[var(--accent-primary)]/20 transition-all active:scale-95 uppercase tracking-widest text-xs"
+                                                className="mt-4 bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-[#F5F5F5] font-black h-12 px-10 rounded-xl shadow-xl shadow-[var(--accent-primary)]/20 transition-all active:scale-95 uppercase tracking-widest text-xs"
                                             >
                                                 {isProcessing ? <TbLoader2 className="w-4 h-4 animate-spin mr-2" /> : <TbMovie className="w-4 h-4 mr-2" />}
                                                 {language === 'tr' ? 'HİKAYEYİ ANALİZ ET' : 'ANALYZE STORY'}
@@ -921,38 +924,46 @@ export default function VideoPage() {
                                     {/* Left: Compact Frames */}
                                     <div className="space-y-4">
                                         <div className="grid grid-cols-2 gap-4 relative">
-                                            <div
-                                                onClick={() => firstFrameInputRef.current?.click()}
-                                                className="relative h-[160px] rounded-2xl border-2 border-dashed border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col items-center justify-center p-3 cursor-pointer hover:border-[var(--accent-primary)] hover:bg-[var(--accent-soft)] transition-all group overflow-hidden"
-                                            >
-                                                {firstFrame ? (
-                                                    <>
-                                                        <img src={firstFrame} alt="Start frame" className="absolute inset-0 w-full h-full object-cover" />
-                                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
-                                                            <TbRefresh className="w-8 h-8 text-white" />
-                                                        </div>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <div className="w-10 h-10 rounded-xl bg-[var(--bg-sidebar)] border border-[var(--border-subtle)] flex items-center justify-center mb-2 group-hover:scale-110 transition-all text-[var(--accent-primary)]">
-                                                            <TbPhoto className="w-5 h-5" />
-                                                        </div>
-                                                        <span className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)]">
-                                                            {language === 'tr' ? 'BAŞLANGIÇ' : 'START'}
-                                                        </span>
-                                                    </>
-                                                )}
-                                                <Badge className="absolute top-3 left-3 bg-[var(--accent-primary)] text-white text-[9px] font-black uppercase tracking-widest px-2 h-5">
-                                                    {language === 'tr' ? 'İLK KARE' : 'START F.'}
-                                                </Badge>
-                                                {firstFrame && (
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); setFirstFrame(null); }}
-                                                        className="absolute top-2 right-2 w-6 h-6 bg-black/60 rounded-full flex items-center justify-center hover:bg-red-500 transition-all text-white"
-                                                    >
-                                                        <TbTrash className="w-3 h-3" />
-                                                    </button>
-                                                )}
+                                            <div className="flex flex-col gap-2">
+                                                <div
+                                                    onClick={() => firstFrameInputRef.current?.click()}
+                                                    className="relative h-[220px] rounded-2xl border-2 border-dashed border-[var(--border-subtle)] bg-[#18181b] flex flex-col items-center justify-center p-3 cursor-pointer hover:border-[var(--accent-primary)] transition-all group overflow-hidden"
+                                                >
+                                                    {firstFrame ? (
+                                                        <>
+                                                            <img src={firstFrame} alt="Start frame" className="absolute inset-0 w-full h-full object-cover" />
+                                                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+                                                                <TbRefresh className="w-8 h-8 text-[#F5F5F5]" />
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <div className="w-10 h-10 rounded-xl bg-[#18181b] border border-[var(--border-subtle)] flex items-center justify-center mb-2 group-hover:scale-110 transition-all text-[var(--accent-primary)]">
+                                                                <TbPhoto className="w-5 h-5" />
+                                                            </div>
+                                                            <span className="text-[10px] font-black uppercase tracking-widest text-[#a1a1aa]">
+                                                                {language === 'tr' ? 'BAŞLANGIÇ' : 'START'}
+                                                            </span>
+                                                        </>
+                                                    )}
+                                                    <Badge className="absolute top-3 left-3 bg-[var(--accent-primary)] text-black text-[9px] font-black uppercase tracking-widest px-2 h-5">
+                                                        {language === 'tr' ? 'İLK KARE' : 'START F.'}
+                                                    </Badge>
+                                                    {firstFrame && (
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); setFirstFrame(null); }}
+                                                            className="absolute top-2 right-2 w-6 h-6 bg-black/60 rounded-full flex items-center justify-center hover:bg-red-500 transition-all text-[#F5F5F5]"
+                                                        >
+                                                            <TbTrash className="w-3 h-3" />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center gap-2 mt-1 px-1">
+                                                    <Switch id="loop-frame" checked={isLoopEnabled} onCheckedChange={setIsLoopEnabled} className="scale-75 origin-left data-[state=checked]:bg-zinc-500" />
+                                                    <label htmlFor="loop-frame" className="text-[10px] font-black uppercase text-[#a1a1aa] cursor-pointer hover:text-[#F5F5F5] transition-colors">
+                                                        {language === 'tr' ? 'LOOP (SONA KOPYALA)' : 'LOOP (COPY TO END)'}
+                                                    </label>
+                                                </div>
                                             </div>
 
                                             {/* Mid Swap Button */}
@@ -961,7 +972,7 @@ export default function VideoPage() {
                                                     variant="outline"
                                                     size="icon"
                                                     onClick={(e) => { e.stopPropagation(); swapFrames(); }}
-                                                    className="h-9 w-9 rounded-full bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--accent-primary)] hover:border-[var(--accent-primary)] shadow-xl transition-all"
+                                                    className="h-9 w-9 rounded-full bg-[#0D0D0F] border border-[var(--border-subtle)] text-[#a1a1aa] hover:text-[var(--accent-primary)] hover:border-[var(--accent-primary)] shadow-xl transition-all"
                                                 >
                                                     <TbArrowLeftRight className="w-4 h-4" />
                                                 </Button>
@@ -970,32 +981,32 @@ export default function VideoPage() {
                                             <div className="flex flex-col gap-2">
                                                 <div
                                                     onClick={() => endFrameInputRef.current?.click()}
-                                                    className="relative h-[160px] rounded-2xl border-2 border-dashed border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col items-center justify-center p-3 cursor-pointer hover:border-[var(--accent-primary)] hover:bg-[var(--accent-soft)] transition-all group overflow-hidden"
+                                                    className="relative h-[220px] rounded-2xl border-2 border-dashed border-[var(--border-subtle)] bg-[#18181b] flex flex-col items-center justify-center p-3 cursor-pointer hover:border-[var(--accent-primary)] transition-all group overflow-hidden"
                                                 >
                                                     {endFrame ? (
                                                         <>
                                                             <img src={endFrame} alt="End frame" className="absolute inset-0 w-full h-full object-cover" />
                                                             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
-                                                                <TbRefresh className="w-8 h-8 text-white" />
+                                                                <TbRefresh className="w-8 h-8 text-[#F5F5F5]" />
                                                             </div>
                                                         </>
                                                     ) : (
                                                         <>
-                                                            <div className="w-10 h-10 rounded-xl bg-[var(--bg-sidebar)] border border-[var(--border-subtle)] flex items-center justify-center mb-2 group-hover:scale-110 transition-all text-[var(--text-muted)]">
+                                                            <div className="w-10 h-10 rounded-xl bg-[#18181b] border border-[var(--border-subtle)] flex items-center justify-center mb-2 group-hover:scale-110 transition-all text-[#a1a1aa]">
                                                                 <TbPhoto className="w-5 h-5" />
                                                             </div>
-                                                            <span className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)]">
+                                                            <span className="text-[10px] font-black uppercase tracking-widest text-[#a1a1aa]">
                                                                 {language === 'tr' ? 'BİTİŞ' : 'END'}
                                                             </span>
                                                         </>
                                                     )}
-                                                    <Badge variant="outline" className="absolute top-3 left-3 border-[var(--border-subtle)] text-[var(--text-muted)] text-[9px] font-black uppercase tracking-widest px-2 h-5 bg-[var(--bg-surface)]">
+                                                    <Badge variant="outline" className="absolute top-3 left-3 border-[var(--border-subtle)] text-[#a1a1aa] text-[9px] font-black uppercase tracking-widest px-2 h-5 bg-[#18181b]">
                                                         {language === 'tr' ? 'SON KARE' : 'END F.'}
                                                     </Badge>
                                                     {endFrame && (
                                                         <button
                                                             onClick={(e) => { e.stopPropagation(); setEndFrame(null); setGeneratedEndFrameUrl(null); }}
-                                                            className="absolute top-2 right-2 w-6 h-6 bg-black/60 rounded-full flex items-center justify-center hover:bg-red-500 transition-all text-white"
+                                                            className="absolute top-2 right-2 w-6 h-6 bg-black/60 rounded-full flex items-center justify-center hover:bg-red-500 transition-all text-[#F5F5F5]"
                                                         >
                                                             <TbTrash className="w-3 h-3" />
                                                         </button>
@@ -1011,7 +1022,7 @@ export default function VideoPage() {
                                                         }
                                                         setShowEndFrameDialog(true);
                                                     }}
-                                                    className="flex items-center justify-center gap-1.5 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-[var(--accent-primary)] hover:text-white bg-[var(--accent-soft)] hover:bg-[var(--accent-primary)] border border-[var(--accent-primary)]/20 rounded-xl transition-all"
+                                                    className="flex items-center justify-center gap-1.5 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-[var(--accent-primary)] hover:text-[#F5F5F5] bg-[var(--accent-soft)] hover:bg-[var(--accent-primary)] border border-[var(--accent-primary)]/20 rounded-xl transition-all"
                                                 >
                                                     <TbWand className="w-3.5 h-3.5" />
                                                     {language === 'tr' ? 'End Frame Üret' : 'Gen End Frame'}
@@ -1021,78 +1032,133 @@ export default function VideoPage() {
                                     </div>
 
                                     {/* Right: Settings Summary */}
-                                    <Card className="bg-[var(--bg-sidebar)] border-[var(--border-subtle)] p-6 backdrop-blur-sm rounded-2xl h-full flex items-center">
-                                        <div className="grid grid-cols-1 xs:grid-cols-2 gap-6 w-full">
-                                            {!multiShot ? (
-                                                <div className="space-y-4">
-                                                    <div className="flex items-center justify-between">
-                                                        <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest flex items-center gap-2">
-                                                            <TbPlayerPlay className="w-4 h-4 text-white" />
-                                                            {language === 'tr' ? 'Süre' : 'Dur'}
-                                                        </label>
-                                                        <span className="text-xs font-black italic text-white">{duration}s</span>
+                                    <div className="flex flex-col gap-4 h-full">
+                                        <Card className="bg-[#0D0D0F] border-[var(--border-subtle)] p-6 backdrop-blur-sm rounded-2xl flex flex-col flex-1">
+                                            <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] lg:grid-cols-[1fr_320px] gap-8 w-full h-full flex-1">
+
+                                                {/* Sol Kolon: Süre, En/Boy, Kalite */}
+                                                <div className="flex flex-col gap-6 relative">
+                                                    {!multiShot && (
+                                                        <div className="space-y-4">
+                                                            <div className="flex items-center justify-between">
+                                                                <label className="text-[10px] font-black text-[#a1a1aa] uppercase tracking-widest flex items-center gap-2">
+                                                                    <TbPlayerPlay className="w-4 h-4 text-[var(--accent-primary)]" />
+                                                                    {language === 'tr' ? 'Süre' : 'Dur'}
+                                                                </label>
+                                                                <span className="text-xs font-black italic text-[#F5F5F5]">{duration}s</span>
+                                                            </div>
+                                                            <Slider
+                                                                value={[duration]}
+                                                                min={3}
+                                                                max={15}
+                                                                step={1}
+                                                                onValueChange={([val]) => setDuration(val)}
+                                                                className="cursor-pointer"
+                                                            />
+                                                        </div>
+                                                    )}
+
+                                                    <div className="grid grid-cols-2 gap-4 mt-auto border-t border-[var(--border-subtle)] pt-6 md:border-none md:pt-0 pb-1">
+                                                        <div className="space-y-2 flex flex-col justify-end">
+                                                            <Label className="text-[10px] font-black text-[#a1a1aa] uppercase tracking-widest pl-1">
+                                                                {language === 'tr' ? 'KALİTE' : 'RESOLUTION'}
+                                                            </Label>
+                                                            <div className="flex bg-black/20 p-[3px] rounded-xl border border-[var(--border-subtle)] shadow-inner">
+                                                                {['720p', '1080p'].map(res => (
+                                                                    <button
+                                                                        key={res}
+                                                                        onClick={() => setResolution(res)}
+                                                                        className={`flex-1 text-[11px] font-black uppercase h-9 rounded-[10px] transition-all flex items-center justify-center ${resolution === res ? 'bg-[#18181b] text-[#F5F5F5] shadow-md border border-white/5' : 'text-[#a1a1aa] hover:text-zinc-300'}`}
+                                                                    >
+                                                                        {res}
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                        <div className="space-y-2 flex flex-col justify-end">
+                                                            <Label className="text-[10px] font-black text-[#a1a1aa] uppercase tracking-widest pl-1">
+                                                                {language === 'tr' ? 'EN/BOY' : 'ASPECT RATIO'}
+                                                            </Label>
+                                                            <div className="flex bg-black/20 p-[3px] rounded-xl border border-[var(--border-subtle)] shadow-inner">
+                                                                {['16:9', '9:16'].map(ratio => (
+                                                                    <button
+                                                                        key={ratio}
+                                                                        onClick={() => setAspectRatio(ratio)}
+                                                                        className={`flex-1 text-[11px] font-black uppercase h-9 rounded-[10px] transition-all flex items-center justify-center ${aspectRatio === ratio ? 'bg-[#18181b] text-[var(--accent-primary)] shadow-md border border-white/5' : 'text-[#a1a1aa] hover:text-[var(--accent-primary)]/70'}`}
+                                                                    >
+                                                                        {ratio}
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    <Slider
-                                                        value={[duration]}
-                                                        min={3}
-                                                        max={15}
-                                                        step={1}
-                                                        onValueChange={([val]) => setDuration(val)}
-                                                        className="cursor-pointer"
-                                                    />
                                                 </div>
-                                            ) : (
-                                                <div className="flex flex-col justify-center items-center text-center px-4 bg-white/5 rounded-2xl py-6 border border-white/10 shadow-xl">
-                                                    <div className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center mb-3 shadow-2xl">
-                                                        <TbBolt className="w-6 h-6" />
+
+                                                {/* Sağ Kolon: Model Seçimi, Oluştur */}
+                                                <div className="flex flex-col gap-6 relative md:border-l border-[var(--border-subtle)] md:pl-8">
+                                                    <div className="space-y-4">
+                                                        <div className="flex items-center justify-between pb-2 border-b border-transparent">
+                                                            <label className="text-[10px] font-black text-[#a1a1aa] uppercase tracking-widest flex items-center gap-2">
+                                                                <TbMovie className="w-4 h-4 text-[var(--accent-primary)]" />
+                                                                {language === 'tr' ? 'Oluşturucu Model' : 'Generator Model'}
+                                                            </label>
+                                                        </div>
+                                                        <Select value={productionModel} onValueChange={setProductionModel}>
+                                                            <SelectTrigger className="w-full bg-[#0D0D0F] border-[var(--border-subtle)] text-[#F5F5F5] rounded-xl text-[10px] font-black uppercase tracking-widest h-12 flex items-center px-4 hover:border-[var(--accent-primary)]/50 transition-all">
+                                                                <SelectValue placeholder="Model Seçin" />
+                                                            </SelectTrigger>
+                                                            <SelectContent className="bg-[#0D0D0F] border-[var(--border-subtle)]">
+                                                                {PRODUCTION_MODELS.map(m => (
+                                                                    <SelectItem key={m.id} value={m.id} className="text-[10px] font-black uppercase tracking-widest focus:bg-[#0D0D0F]">
+                                                                        <span className="flex items-center gap-3">
+                                                                            <span className="text-base">{m.icon}</span>
+                                                                            <span className="text-[#F5F5F5]">{language === 'tr' ? (m.labelTr || m.label) : m.label}</span>
+                                                                        </span>
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+
+                                                        <div className="flex items-center justify-between bg-black/20 px-4 py-3 rounded-xl border border-[var(--border-subtle)] mt-4 shadow-inner">
+                                                            <div className="flex items-center gap-4">
+                                                                <TbBolt className="w-4 h-4 text-zinc-400" />
+                                                                <span className="text-[10px] font-black text-[#F5F5F5] uppercase tracking-widest">
+                                                                    {language === 'tr' ? 'ÇOKLU SAHNE' : 'MULTI-SHOT'}
+                                                                </span>
+                                                            </div>
+                                                            <Switch checked={multiShot} onCheckedChange={setMultiShot} className="data-[state=checked]:bg-white" />
+                                                        </div>
                                                     </div>
-                                                    <span className="text-[10px] font-black text-white uppercase leading-tight tracking-[0.2em]">
-                                                        {language === 'tr' ? 'ÇOKLU SAHNE AKTİF' : 'MULTI-SHOT ACTIVE'}
+                                                </div>
+
+                                            </div>
+                                        </Card>
+
+                                        <Button
+                                            onClick={handleGenerate}
+                                            disabled={isProcessing}
+                                            className="w-[90%] mx-auto h-14 shrink-0 overflow-hidden bg-[#F5F5F5] hover:opacity-80 text-[#0D0D0F] font-black rounded-[0.85rem] text-[12px] uppercase tracking-[0.2em] flex items-center justify-center shadow-2xl transition-all active:scale-[0.98] ring-1 ring-[#F5F5F5] ring-offset-2 ring-offset-[#0D0D0F]"
+                                        >
+                                            {isProcessing ? (
+                                                <TbLoader2 className="w-2.5 h-2.5 animate-spin" />
+                                            ) : (
+                                                <div className="flex items-center justify-center whitespace-nowrap">
+                                                    <TbSparkles className="w-2.5 h-2.5 mr-2" />
+                                                    <span className="block">{language === 'tr' ? 'VİDEOYU OLUŞTUR' : 'GENERATE VIDEO'}</span>
+                                                    <span className="ml-3 pl-3 border-l border-current/20 shrink-0 text-[12px] tracking-widest font-black">
+                                                        {estimatedCost} {language === 'tr' ? 'KR' : 'CR'}
                                                     </span>
                                                 </div>
                                             )}
-                                            <div className="space-y-3">
-                                                <div className="space-y-1.5">
-                                                    <Label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest px-1 flex items-center gap-1.5">
-                                                        <TbAspectRatio className="w-3.5 h-3.5" />
-                                                        {language === 'tr' ? 'EN/BOY' : 'RATIO'}
-                                                    </Label>
-                                                    <Select value={aspectRatio} onValueChange={setAspectRatio}>
-                                                        <SelectTrigger className="bg-[var(--bg-surface)] border-[var(--border-subtle)] text-[10px] font-black uppercase h-10 px-4 rounded-xl ring-0 focus:ring-0">
-                                                            <SelectValue />
-                                                        </SelectTrigger>
-                                                        <SelectContent className="bg-[var(--bg-sidebar)] border-[var(--border-subtle)]">
-                                                            <SelectItem value="16:9" className="text-[10px] font-black uppercase">{language === 'tr' ? '16:9 (Yatay)' : '16:9 (Landscape)'}</SelectItem>
-                                                            <SelectItem value="9:16" className="text-[10px] font-black uppercase">{language === 'tr' ? '9:16 (Story)' : '9:16 (Story)'}</SelectItem>
-                                                            <SelectItem value="1:1" className="text-[10px] font-black uppercase">{language === 'tr' ? '1:1 (Kare)' : '1:1 (Square)'}</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                </div>
-                                                <div className="space-y-1.5">
-                                                    <Label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest px-1 flex items-center gap-1.5">
-                                                        <TbHdr className="w-3.5 h-3.5" />
-                                                        {language === 'tr' ? 'KALİTE' : 'QUALITY'}
-                                                    </Label>
-                                                    <Select value={resolution} onValueChange={setResolution}>
-                                                        <SelectTrigger className="bg-[var(--bg-surface)] border-[var(--border-subtle)] text-[10px] font-black uppercase h-10 px-4 rounded-xl ring-0 focus:ring-0">
-                                                            <SelectValue />
-                                                        </SelectTrigger>
-                                                        <SelectContent className="bg-[var(--bg-sidebar)] border-[var(--border-subtle)]">
-                                                            <SelectItem value="720p" className="text-[10px] font-black uppercase">720p (HD)</SelectItem>
-                                                            <SelectItem value="1080p" className="text-[10px] font-black uppercase">1080p (Full HD)</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </Card>
+                                        </Button>
+                                    </div>
                                 </div>
 
                                 {/* Prompt & Multi-shot Section */}
-                                <Card className="bg-[var(--bg-sidebar)] border-[var(--border-subtle)] overflow-hidden rounded-2xl">
-                                    <div className="px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]/50 gap-4">
+                                <Card className="bg-[#0D0D0F] border-[var(--border-subtle)] overflow-hidden rounded-2xl">
+                                    <div className="px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between border-b border-[var(--border-subtle)] bg-[#0D0D0F]/50 gap-4">
                                         <div className="flex items-center gap-2">
-                                            <span className="text-xs font-black uppercase tracking-widest text-[var(--text-primary)] italic">
+                                            <span className="text-xs font-black uppercase tracking-widest text-[#F5F5F5] italic">
                                                 {multiShot
                                                     ? (language === 'tr' ? 'Çoklu Sahne Yapılandırması' : 'Multi-Shot Configuration')
                                                     : (language === 'tr' ? 'Video Komutu' : 'Video Prompt')}
@@ -1100,9 +1166,9 @@ export default function VideoPage() {
                                             <TooltipProvider>
                                                 <Tooltip>
                                                     <TooltipTrigger asChild>
-                                                        <Info className="w-4 h-4 text-zinc-500 cursor-help hover:text-white transition-colors" />
+                                                        <Info className="w-4 h-4 text-[#a1a1aa] cursor-help hover:text-[#F5F5F5] transition-colors" />
                                                     </TooltipTrigger>
-                                                    <TooltipContent className="bg-zinc-900 border-white/10 text-white text-[11px] max-w-[200px]">
+                                                    <TooltipContent className="bg-[#0D0D0F] border-white/10 text-[#F5F5F5] text-[11px] max-w-[200px]">
                                                         {multiShot
                                                             ? (language === 'tr' ? 'Birden fazla sahne oluşturarak hikayenizi detaylandırın.' : 'Detail your story by creating multiple shots.')
                                                             : (language === 'tr' ? 'Videonuzun içeriğini ve tarzını buradan tarif edin.' : 'Describe the content and style of your video here.')}
@@ -1111,30 +1177,24 @@ export default function VideoPage() {
                                             </TooltipProvider>
                                         </div>
 
-                                        <div className="flex items-center justify-between sm:justify-end gap-4 px-1">
-                                            <span className="text-[10px] font-black text-white uppercase tracking-widest">
-                                                {language === 'tr' ? 'ÇOKLU SAHNE' : 'MULTI-SHOT'}
-                                            </span>
-                                            <Switch checked={multiShot} onCheckedChange={setMultiShot} className="data-[state=checked]:bg-white" />
-                                        </div>
                                     </div>
 
-                                    <div className="p-4 sm:p-6 bg-[var(--bg-sidebar)]">
+                                    <div className="p-4 sm:p-6 bg-[#0D0D0F]">
                                         {multiShot ? (
                                             <div className="space-y-6">
                                                 {/* MULTI SHOT LIST */}
                                                 <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[var(--border-subtle)]">
                                                     {shots.map((shot, index) => (
-                                                        <div key={shot.id} className="relative p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] animate-in slide-in-from-right-2">
+                                                        <div key={shot.id} className="relative p-5 rounded-2xl bg-[#0D0D0F] border border-[var(--border-subtle)] animate-in slide-in-from-right-2">
                                                             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
-                                                                <h4 className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest flex items-center gap-3">
+                                                                <h4 className="text-[10px] font-black text-[#a1a1aa] uppercase tracking-widest flex items-center gap-3">
                                                                     <div className="w-7 h-7 rounded-full bg-white text-black flex items-center justify-center text-[11px] font-black italic shadow-xl">{index + 1}</div>
                                                                     {language === 'tr' ? 'SAHNE' : 'SHOT'} {index + 1}
                                                                 </h4>
                                                                 <div className="flex items-center justify-between sm:justify-end gap-4 overflow-hidden">
                                                                     <div className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/5 group/dur cursor-pointer hover:border-white/20 transition-all flex-1 sm:flex-none">
-                                                                        <TbPlayerPlay className="w-3.5 h-3.5 text-white shrink-0" />
-                                                                        <span className="text-[10px] font-black text-white pr-3 border-r border-white/5 select-none shrink-0 whitespace-nowrap">
+                                                                        <TbPlayerPlay className="w-3.5 h-3.5 text-[#F5F5F5] shrink-0" />
+                                                                        <span className="text-[10px] font-black text-[#F5F5F5] pr-3 border-r border-white/5 select-none shrink-0 whitespace-nowrap">
                                                                             {shot.duration}s
                                                                         </span>
                                                                         <Slider
@@ -1147,7 +1207,7 @@ export default function VideoPage() {
                                                                         />
                                                                     </div>
                                                                     {shots.length > 1 && (
-                                                                        <Button variant="ghost" size="icon" onClick={() => removeShot(shot.id)} className="h-9 w-9 text-[var(--text-muted)] hover:text-red-500 hover:bg-red-500/10 rounded-xl shrink-0">
+                                                                        <Button variant="ghost" size="icon" onClick={() => removeShot(shot.id)} className="h-9 w-9 text-[#a1a1aa] hover:text-red-500 hover:bg-red-500/10 rounded-xl shrink-0">
                                                                             <TbTrash className="w-4 h-4" />
                                                                         </Button>
                                                                     )}
@@ -1160,7 +1220,7 @@ export default function VideoPage() {
                                                                     onDragOver={(e) => e.preventDefault()}
                                                                     onDrop={(e) => handleDrop(e, shot.id)}
                                                                     placeholder={language === 'tr' ? `Sahne ${index + 1} detaylarını yazın...` : `Describe shot ${index + 1}...`}
-                                                                    className="min-h-[100px] bg-[var(--bg-sidebar)] border-[var(--border-subtle)] text-sm resize-none focus:border-[var(--accent-primary)]/50 rounded-2xl p-4"
+                                                                    className="min-h-[100px] bg-[#0D0D0F] border-[var(--border-subtle)] text-sm resize-none focus:border-[var(--accent-primary)]/50 rounded-2xl p-4"
                                                                 />
                                                             </div>
                                                             <div className="flex justify-end mt-3">
@@ -1168,7 +1228,7 @@ export default function VideoPage() {
                                                                     variant="ghost"
                                                                     size="sm"
                                                                     onClick={() => setShowElementsDialog(true)}
-                                                                    className="h-9 gap-2 text-[10px] font-black uppercase tracking-widest bg-[var(--bg-sidebar)] hover:bg-[var(--accent-soft)] text-[var(--text-muted)] hover:text-[var(--accent-primary)] rounded-xl border border-[var(--border-subtle)] px-4"
+                                                                    className="h-9 gap-2 text-[10px] font-black uppercase tracking-widest bg-[#0D0D0F] hover:bg-[var(--accent-soft)] text-[#a1a1aa] hover:text-[var(--accent-primary)] rounded-xl border border-[var(--border-subtle)] px-4"
                                                                 >
                                                                     <TbLayoutGrid className="w-4 h-4" />
                                                                     {language === 'tr' ? 'ELEMENTLER' : 'ELEMENTS'}
@@ -1188,20 +1248,20 @@ export default function VideoPage() {
                                                             <TbPlus className="w-4 h-4" />
                                                             {language === 'tr' ? 'YENİ SAHNE' : 'NEW SHOT'}
                                                         </Button>
-                                                        <div className="flex items-center gap-3 px-4 py-2 bg-[var(--bg-surface)] rounded-xl border border-[var(--border-subtle)]">
-                                                            <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest whitespace-nowrap">
+                                                        <div className="flex items-center gap-3 px-4 py-2 bg-[#0D0D0F] rounded-xl border border-[var(--border-subtle)]">
+                                                            <span className="text-[10px] font-black text-[#a1a1aa] uppercase tracking-widest whitespace-nowrap">
                                                                 {language === 'tr' ? 'TOPLAM:' : 'TOTAL:'}
                                                             </span>
                                                             <span className={`text-xs font-black italic tracking-tighter ${totalDuration > 12 ? 'text-orange-500' : 'text-[var(--accent-primary)]'}`}>{totalDuration}s / 15s</span>
                                                         </div>
                                                     </div>
 
-                                                    <div className="flex items-center gap-4 bg-[var(--bg-surface)] px-4 py-2 rounded-xl border border-[var(--border-subtle)] self-start sm:self-auto">
+                                                    <div className="flex items-center gap-4 bg-[#0D0D0F] px-4 py-2 rounded-xl border border-[var(--border-subtle)] self-start sm:self-auto">
                                                         <div className="flex items-center gap-3 cursor-pointer" onClick={() => setIsSoundOn(!isSoundOn)}>
-                                                            <div className={`w-10 h-6 rounded-full relative transition-all ${isSoundOn ? 'bg-[var(--accent-primary)]' : 'bg-[var(--bg-sidebar)] border border-[var(--border-subtle)]'}`}>
+                                                            <div className={`w-10 h-6 rounded-full relative transition-all ${isSoundOn ? 'bg-[var(--accent-primary)]' : 'bg-[#0D0D0F] border border-[var(--border-subtle)]'}`}>
                                                                 <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${isSoundOn ? 'left-5' : 'left-1'}`} />
                                                             </div>
-                                                            <span className="text-[10px] font-black uppercase tracking-widest text-[var(--text-primary)]">
+                                                            <span className="text-[10px] font-black uppercase tracking-widest text-[#F5F5F5]">
                                                                 {isSoundOn
                                                                     ? (language === 'tr' ? 'SES AÇIK' : 'SOUND ON')
                                                                     : (language === 'tr' ? 'SES KAPALI' : 'SOUND OFF')}
@@ -1219,7 +1279,7 @@ export default function VideoPage() {
                                                     onDragOver={(e) => e.preventDefault()}
                                                     onDrop={(e) => handleDrop(e)}
                                                     placeholder={language === 'tr' ? "Neon ışıklı bir şehirde sinematik moda yürüyüşü..." : "A cinematic fashion editorial walk through a neon-lit city..."}
-                                                    className="min-h-[160px] bg-[var(--bg-surface)] border-[var(--border-subtle)] text-base sm:text-lg resize-none focus:ring-1 focus:ring-[var(--accent-primary)]/30 rounded-2xl p-6 text-[var(--text-primary)]"
+                                                    className="min-h-[160px] bg-[#0D0D0F] border-[var(--border-subtle)] text-base sm:text-lg resize-none focus:ring-1 focus:ring-[var(--accent-primary)]/30 rounded-2xl p-6 text-[#F5F5F5]"
                                                 />
                                                 {/* Mention Menu placeholder - handled by code logic */}
 
@@ -1229,24 +1289,24 @@ export default function VideoPage() {
                                                             variant="ghost"
                                                             size="sm"
                                                             onClick={() => setShowElementsDialog(true)}
-                                                            className="h-10 gap-2 text-[10px] font-black uppercase tracking-widest bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--accent-primary)] rounded-xl hover:bg-[var(--accent-soft)] px-5"
+                                                            className="h-10 gap-2 text-[10px] font-black uppercase tracking-widest bg-[#0D0D0F] border border-[var(--border-subtle)] text-[#a1a1aa] hover:text-[var(--accent-primary)] rounded-xl hover:bg-[var(--accent-soft)] px-5"
                                                         >
                                                             <TbLayoutGrid className="w-4 h-4" />
                                                             {language === 'tr' ? 'Elementler' : 'Elements'}
                                                         </Button>
                                                         <Separator orientation="vertical" className="hidden sm:block h-6 bg-[var(--border-subtle)]" />
                                                         <div className="flex items-center gap-3 cursor-pointer" onClick={() => setIsSoundOn(!isSoundOn)}>
-                                                            <div className={`w-10 h-6 rounded-full relative transition-all ${isSoundOn ? 'bg-[var(--accent-primary)]' : 'bg-[var(--bg-surface)] border border-[var(--border-subtle)]'}`}>
+                                                            <div className={`w-10 h-6 rounded-full relative transition-all ${isSoundOn ? 'bg-[var(--accent-primary)]' : 'bg-[#0D0D0F] border border-[var(--border-subtle)]'}`}>
                                                                 <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${isSoundOn ? 'left-5' : 'left-1'}`} />
                                                             </div>
-                                                            <span className="text-[10px] font-black uppercase tracking-widest text-[var(--text-primary)] whitespace-nowrap">
+                                                            <span className="text-[10px] font-black uppercase tracking-widest text-[#F5F5F5] whitespace-nowrap">
                                                                 {isSoundOn
                                                                     ? (language === 'tr' ? 'Ses Açık' : 'Sound On')
                                                                     : (language === 'tr' ? 'Sessiz' : 'Silent')}
                                                             </span>
                                                         </div>
                                                     </div>
-                                                    <div className="text-[10px] font-black uppercase italic tracking-widest text-[var(--text-muted)] sm:max-w-[300px] leading-relaxed">
+                                                    <div className="text-[10px] font-black uppercase italic tracking-widest text-[#a1a1aa] sm:max-w-[300px] leading-relaxed">
                                                         {language === 'tr'
                                                             ? 'En iyi sonuçlar için aydınlatma, kamera hareketleri ve kumaş dokularından bahsedin.'
                                                             : 'Mention lighting, camera movement, and fabric textures for better results.'}
@@ -1259,20 +1319,20 @@ export default function VideoPage() {
 
                                 {/* Video Generation Progress */}
                                 {isProcessing && generationProgress && (
-                                    <Card className="bg-zinc-900 border border-white/5 overflow-hidden rounded-2xl shadow-2xl mt-8">
+                                    <Card className="bg-[#0D0D0F] border border-white/5 overflow-hidden rounded-2xl shadow-2xl mt-8">
                                         <div className="p-10 flex flex-col items-center justify-center gap-6">
                                             <div className="relative w-20 h-20">
                                                 <div className="absolute inset-0 rounded-full border-4 border-white/5" />
                                                 <div className="absolute inset-0 rounded-full border-4 border-white border-t-transparent animate-spin" />
                                                 <div className="absolute inset-2 rounded-full bg-white/5 flex items-center justify-center">
-                                                    <TbVideo className="w-8 h-8 text-white" />
+                                                    <TbVideo className="w-8 h-8 text-[#F5F5F5]" />
                                                 </div>
                                             </div>
                                             <div className="text-center space-y-2">
-                                                <p className="text-lg font-black uppercase italic tracking-tighter text-white">
+                                                <p className="text-lg font-black uppercase italic tracking-tighter text-[#F5F5F5]">
                                                     {language === 'tr' ? 'Video Üretiliyor' : 'Generating Video'}
                                                 </p>
-                                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 max-w-sm">
+                                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#a1a1aa] max-w-sm">
                                                     {generationProgress}
                                                 </p>
                                             </div>
@@ -1285,13 +1345,13 @@ export default function VideoPage() {
 
                                 {/* Generated Video Result */}
                                 {generatedVideoUrl && !isProcessing && (
-                                    <Card className="bg-zinc-900 border border-white/5 overflow-hidden rounded-2xl shadow-2xl mt-8">
+                                    <Card className="bg-[#0D0D0F] border border-white/5 overflow-hidden rounded-2xl shadow-2xl mt-8">
                                         <div className="px-6 py-5 flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/5 bg-white/[0.02] gap-4">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 bg-white text-black rounded-xl flex items-center justify-center shadow-xl">
                                                     <TbMovie className="w-6 h-6" />
                                                 </div>
-                                                <span className="text-xs font-black uppercase tracking-[0.2em] text-white italic">
+                                                <span className="text-xs font-black uppercase tracking-[0.2em] text-[#F5F5F5] italic">
                                                     {language === 'tr' ? 'Tamamlanan Video' : 'Completed Video'}
                                                 </span>
                                             </div>
@@ -1300,7 +1360,7 @@ export default function VideoPage() {
                                                     variant="ghost"
                                                     size="sm"
                                                     onClick={handleDownloadVideo}
-                                                    className="h-11 gap-3 text-[10px] font-black uppercase tracking-widest text-white border border-white/5 bg-white/5 hover:bg-white hover:text-black rounded-xl px-6 transition-all"
+                                                    className="h-11 gap-3 text-[10px] font-black uppercase tracking-widest text-[#F5F5F5] border border-white/5 bg-white/5 hover:bg-white hover:text-black rounded-xl px-6 transition-all"
                                                 >
                                                     <TbDownload className="w-4 h-4" />
                                                     {language === 'tr' ? 'İNDİR' : 'DOWNLOAD'}
@@ -1309,7 +1369,7 @@ export default function VideoPage() {
                                                     variant="ghost"
                                                     size="icon"
                                                     onClick={() => setGeneratedVideoUrl(null)}
-                                                    className="h-11 w-11 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+                                                    className="h-11 w-11 text-[#a1a1aa] hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
                                                 >
                                                     <TbTrash className="w-5 h-5" />
                                                 </Button>
@@ -1334,7 +1394,7 @@ export default function VideoPage() {
 
             {/* Elements Dialog */}
             <Dialog open={showElementsDialog} onOpenChange={(open) => { setShowElementsDialog(open); if (!open) setIsCreatingElement(false); }}>
-                <DialogContent className="bg-[var(--bg-sidebar)] border-[var(--border-subtle)] text-[var(--text-primary)] max-w-2xl rounded-[32px] p-0 overflow-hidden shadow-2xl">
+                <DialogContent className="bg-[#0D0D0F] border-[var(--border-subtle)] text-[#F5F5F5] max-w-2xl rounded-[32px] p-0 overflow-hidden shadow-2xl">
                     {!isCreatingElement ? (
                         <div className="p-8">
                             <DialogHeader>
@@ -1342,7 +1402,7 @@ export default function VideoPage() {
                                     <TbLayoutGrid className="w-6 h-6 text-[var(--accent-primary)]" />
                                     {language === 'tr' ? 'Görsel Elementler' : 'Visual Elements'}
                                 </DialogTitle>
-                                <DialogDescription className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mt-1">
+                                <DialogDescription className="text-[10px] font-black uppercase tracking-widest text-[#a1a1aa] mt-1">
                                     {language === 'tr'
                                         ? 'Videonun genelinde tutarlı kalması gereken varlıkları yönetin.'
                                         : 'Manage assets to keep consistent throughout the video.'}
@@ -1352,10 +1412,10 @@ export default function VideoPage() {
                             <div className="grid grid-cols-2 xs:grid-cols-3 md:grid-cols-4 gap-4 mt-8">
                                 <button
                                     onClick={() => setIsCreatingElement(true)}
-                                    className="aspect-square rounded-[24px] border-2 border-dashed border-[var(--border-subtle)] bg-[var(--bg-surface)]/50 flex flex-col items-center justify-center cursor-pointer hover:border-[var(--accent-primary)] hover:bg-[var(--accent-soft)] transition-all group"
+                                    className="aspect-square rounded-[24px] border-2 border-dashed border-[var(--border-subtle)] bg-[#0D0D0F]/50 flex flex-col items-center justify-center cursor-pointer hover:border-[var(--accent-primary)] hover:bg-[var(--accent-soft)] transition-all group"
                                 >
-                                    <TbPlus className="w-6 h-6 text-[var(--text-muted)] group-hover:scale-110 group-hover:text-[var(--accent-primary)] transition-all" />
-                                    <span className="text-[10px] text-[var(--text-muted)] group-hover:text-[var(--accent-primary)] font-black uppercase tracking-widest mt-2">
+                                    <TbPlus className="w-6 h-6 text-[#a1a1aa] group-hover:scale-110 group-hover:text-[var(--accent-primary)] transition-all" />
+                                    <span className="text-[10px] text-[#a1a1aa] group-hover:text-[var(--accent-primary)] font-black uppercase tracking-widest mt-2">
                                         {language === 'tr' ? 'YENİ ELEMENT' : 'NEW ELEMENT'}
                                     </span>
                                 </button>
@@ -1372,14 +1432,14 @@ export default function VideoPage() {
                                             <span className="text-[10px] font-black text-[var(--accent-primary)] uppercase tracking-widest mb-2 shadow-sm font-mono">@{el.name}</span>
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); setElements(elements.filter(item => item.id !== el.id)); }}
-                                                className="w-10 h-10 bg-red-500/80 hover:bg-red-500 rounded-xl flex items-center justify-center text-white shadow-xl transition-all active:scale-95"
+                                                className="w-10 h-10 bg-red-500/80 hover:bg-red-500 rounded-xl flex items-center justify-center text-[#F5F5F5] shadow-xl transition-all active:scale-95"
                                             >
                                                 <TbTrash className="w-5 h-5" />
                                             </button>
                                         </div>
                                         <div className="absolute bottom-2 right-2 flex -space-x-1.5 opacity-80">
                                             {el.images.map((img, i) => (
-                                                <div key={i} className="w-5 h-5 rounded-full border border-black overflow-hidden bg-[var(--bg-surface)] shadow-sm">
+                                                <div key={i} className="w-5 h-5 rounded-full border border-black overflow-hidden bg-[#0D0D0F] shadow-sm">
                                                     <img src={img} className="w-full h-full object-cover" />
                                                 </div>
                                             ))}
@@ -1389,7 +1449,7 @@ export default function VideoPage() {
                             </div>
 
                             <div className="flex justify-end mt-8">
-                                <Button onClick={() => setShowElementsDialog(false)} className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--accent-soft)] h-11 px-8 rounded-2xl font-black uppercase tracking-widest text-xs">
+                                <Button onClick={() => setShowElementsDialog(false)} className="bg-[#0D0D0F] border border-[var(--border-subtle)] text-[#a1a1aa] hover:text-[#F5F5F5] hover:bg-[var(--accent-soft)] h-11 px-8 rounded-2xl font-black uppercase tracking-widest text-xs">
                                     {language === 'tr' ? 'Kapat' : 'Close'}
                                 </Button>
                             </div>
@@ -1398,10 +1458,10 @@ export default function VideoPage() {
                         <div className="animate-in fade-in slide-in-from-right-4 duration-300">
                             <div className="p-8 space-y-8">
                                 <div className="flex items-center gap-4">
-                                    <Button variant="ghost" size="icon" onClick={() => setIsCreatingElement(false)} className="rounded-xl w-10 h-10 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]">
+                                    <Button variant="ghost" size="icon" onClick={() => setIsCreatingElement(false)} className="rounded-xl w-10 h-10 text-[#a1a1aa] hover:text-[#F5F5F5] hover:bg-[#0D0D0F]">
                                         <TbChevronLeft className="w-6 h-6" />
                                     </Button>
-                                    <h2 className="text-xl font-black uppercase italic tracking-tight text-[var(--text-primary)]">{language === 'tr' ? 'Yeni Element' : 'New Element'}</h2>
+                                    <h2 className="text-xl font-black uppercase italic tracking-tight text-[#F5F5F5]">{language === 'tr' ? 'Yeni Element' : 'New Element'}</h2>
                                 </div>
 
                                 <div className="flex flex-wrap gap-4">
@@ -1410,7 +1470,7 @@ export default function VideoPage() {
                                             <img src={img} className="w-full h-full object-cover" />
                                             <button
                                                 onClick={() => setNewElement(prev => ({ ...prev, images: prev.images.filter((_, idx) => idx !== i) }))}
-                                                className="absolute top-1.5 right-1.5 w-6 h-6 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 text-white"
+                                                className="absolute top-1.5 right-1.5 w-6 h-6 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 text-[#F5F5F5]"
                                             >
                                                 <TbX className="w-3.5 h-3.5" />
                                             </button>
@@ -1419,10 +1479,10 @@ export default function VideoPage() {
                                     {newElement.images.length < 3 && (
                                         <button
                                             onClick={() => elementInputRef.current?.click()}
-                                            className="w-24 h-24 rounded-2xl border-2 border-dashed border-[var(--border-subtle)] bg-[var(--bg-surface)]/50 flex flex-col items-center justify-center cursor-pointer hover:border-[var(--accent-primary)] hover:bg-[var(--accent-soft)] transition-all group"
+                                            className="w-24 h-24 rounded-2xl border-2 border-dashed border-[var(--border-subtle)] bg-[#0D0D0F]/50 flex flex-col items-center justify-center cursor-pointer hover:border-[var(--accent-primary)] hover:bg-[var(--accent-soft)] transition-all group"
                                         >
-                                            <TbPlus className="w-6 h-6 text-[var(--text-muted)] group-hover:text-[var(--accent-primary)] transition-all" />
-                                            <span className="text-[9px] font-black uppercase tracking-widest text-center px-1 text-[var(--text-muted)] group-hover:text-[var(--accent-primary)]">
+                                            <TbPlus className="w-6 h-6 text-[#a1a1aa] group-hover:text-[var(--accent-primary)] transition-all" />
+                                            <span className="text-[9px] font-black uppercase tracking-widest text-center px-1 text-[#a1a1aa] group-hover:text-[var(--accent-primary)]">
                                                 {language === 'tr' ? 'Açı Ekle' : 'Add angle'}
                                             </span>
                                         </button>
@@ -1431,37 +1491,37 @@ export default function VideoPage() {
 
                                 <div className="space-y-6">
                                     <div className="space-y-2.5">
-                                        <label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest px-1">{language === 'tr' ? 'ELEMENT ADI (ZORUNLU)' : 'ELEMENT NAME (REQUIRED)'}</label>
+                                        <label className="text-[10px] font-black text-[#a1a1aa] uppercase tracking-widest px-1">{language === 'tr' ? 'ELEMENT ADI (ZORUNLU)' : 'ELEMENT NAME (REQUIRED)'}</label>
                                         <div className="relative">
-                                            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] font-black text-xs">@</span>
+                                            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-[#a1a1aa] font-black text-xs">@</span>
                                             <input
                                                 value={newElement.name}
                                                 onChange={(e) => setNewElement(prev => ({ ...prev, name: e.target.value.toLowerCase().replace(/[^a-z0-9]/g, '') }))}
                                                 placeholder="a1"
-                                                className="w-full h-12 bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-2xl pl-10 pr-4 text-sm font-bold focus:border-[var(--accent-primary)] outline-none transition-all text-[var(--text-primary)]"
+                                                className="w-full h-12 bg-[#0D0D0F] border border-[var(--border-subtle)] rounded-2xl pl-10 pr-4 text-sm font-bold focus:border-[var(--accent-primary)] outline-none transition-all text-[#F5F5F5]"
                                             />
                                         </div>
                                     </div>
 
                                     <div className="space-y-2.5">
-                                        <label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest px-1">{language === 'tr' ? 'AÇIKLAMA (ZORUNLU)' : 'DESCRIPTION (REQUIRED)'}</label>
+                                        <label className="text-[10px] font-black text-[#a1a1aa] uppercase tracking-widest px-1">{language === 'tr' ? 'AÇIKLAMA (ZORUNLU)' : 'DESCRIPTION (REQUIRED)'}</label>
                                         <Textarea
                                             value={newElement.description}
                                             onChange={(e) => setNewElement(prev => ({ ...prev, description: e.target.value }))}
                                             placeholder={language === 'tr' ? "Objenin önemli özelliklerini tanımlayın..." : "Describe the subject's key features..."}
-                                            className="min-h-[120px] bg-[var(--bg-surface)] border-[var(--border-subtle)] rounded-2xl text-sm font-medium focus:ring-1 focus:ring-[var(--accent-primary)]/30 text-[var(--text-primary)]"
+                                            className="min-h-[120px] bg-[#0D0D0F] border-[var(--border-subtle)] rounded-2xl text-sm font-medium focus:ring-1 focus:ring-[var(--accent-primary)]/30 text-[#F5F5F5]"
                                         />
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="px-8 py-6 bg-[var(--bg-surface)]/50 border-t border-[var(--border-subtle)] flex justify-end gap-3">
-                                <Button onClick={() => setIsCreatingElement(false)} variant="ghost" className="h-11 px-8 rounded-xl font-black uppercase tracking-widest text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)]">
+                            <div className="px-8 py-6 bg-[#0D0D0F]/50 border-t border-[var(--border-subtle)] flex justify-end gap-3">
+                                <Button onClick={() => setIsCreatingElement(false)} variant="ghost" className="h-11 px-8 rounded-xl font-black uppercase tracking-widest text-xs text-[#a1a1aa] hover:text-[#F5F5F5]">
                                     {language === 'tr' ? 'İptal' : 'Cancel'}
                                 </Button>
                                 <Button
                                     onClick={handleSaveElement}
-                                    className="h-11 px-10 rounded-xl font-black uppercase tracking-widest text-xs bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-white shadow-lg shadow-[var(--accent-primary)]/20 shadow-xl transition-all active:scale-95"
+                                    className="h-11 px-10 rounded-xl font-black uppercase tracking-widest text-xs bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-[#F5F5F5] shadow-lg shadow-[var(--accent-primary)]/20 shadow-xl transition-all active:scale-95"
                                 >
                                     {language === 'tr' ? 'Oluştur' : 'Generate'}
                                 </Button>
@@ -1478,7 +1538,7 @@ export default function VideoPage() {
                     setEndFrameDescription("");
                 }
             }}>
-                <DialogContent className="max-w-lg bg-[var(--bg-sidebar)] border-[var(--border-subtle)] p-0 overflow-hidden rounded-[32px] shadow-2xl text-[var(--text-primary)]">
+                <DialogContent className="max-w-lg bg-[#0D0D0F] border-[var(--border-subtle)] p-0 overflow-hidden rounded-[32px] shadow-2xl text-[#F5F5F5]">
                     <div className="p-8 space-y-6">
                         <DialogHeader className="flex flex-row items-center gap-4 space-y-0">
                             <div className="w-12 h-12 bg-[var(--accent-soft)] text-[var(--accent-primary)] rounded-2xl flex items-center justify-center shadow-lg shadow-[var(--accent-primary)]/10 shrink-0">
@@ -1488,7 +1548,7 @@ export default function VideoPage() {
                                 <DialogTitle className="text-xl font-black uppercase italic tracking-tight">
                                     {language === 'tr' ? 'Son Kare Üret' : 'Generate End Frame'}
                                 </DialogTitle>
-                                <DialogDescription className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mt-0.5">
+                                <DialogDescription className="text-[10px] font-black uppercase tracking-widest text-[#a1a1aa] mt-0.5">
                                     {language === 'tr' ? 'AI ile son karenizi tasarlayın' : 'Design your end frame with AI'}
                                 </DialogDescription>
                             </div>
@@ -1496,10 +1556,10 @@ export default function VideoPage() {
 
                         {/* First frame preview */}
                         {firstFrame && (
-                            <div className="relative rounded-2xl overflow-hidden border border-[var(--border-subtle)] h-[160px] bg-[var(--bg-surface)]">
+                            <div className="relative rounded-2xl overflow-hidden border border-[var(--border-subtle)] h-[160px] bg-[#0D0D0F]">
                                 <img src={firstFrame} alt="First frame" className="w-full h-full object-cover opacity-80" />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-4">
-                                    <span className="text-[10px] font-black text-white uppercase tracking-widest opacity-80">
+                                    <span className="text-[10px] font-black text-[#F5F5F5] uppercase tracking-widest opacity-80">
                                         {language === 'tr' ? 'Referans: İlk Kare' : 'Reference: First Frame'}
                                     </span>
                                 </div>
@@ -1508,16 +1568,16 @@ export default function VideoPage() {
 
                         {/* Description input */}
                         <div className="space-y-3">
-                            <label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest px-1">
+                            <label className="text-[10px] font-black text-[#a1a1aa] uppercase tracking-widest px-1">
                                 {language === 'tr' ? 'Son karede ne görmek istiyorsunuz?' : 'What do you want to see in the last frame?'}
                             </label>
                             <Textarea
                                 value={endFrameDescription}
                                 onChange={(e) => setEndFrameDescription(e.target.value)}
                                 placeholder={language === 'tr' ? "Örn: Model kameraya dönüp gülümsüyor..." : "e.g. Model turns to camera and smiles..."}
-                                className="min-h-[100px] bg-[var(--bg-surface)] border-[var(--border-subtle)] rounded-2xl text-sm font-medium focus:ring-1 focus:ring-[var(--accent-primary)]/30 text-[var(--text-primary)]"
+                                className="min-h-[100px] bg-[#0D0D0F] border-[var(--border-subtle)] rounded-2xl text-sm font-medium focus:ring-1 focus:ring-[var(--accent-primary)]/30 text-[#F5F5F5]"
                             />
-                            <p className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-tight leading-relaxed px-1">
+                            <p className="text-[9px] font-bold text-[#a1a1aa] uppercase tracking-tight leading-relaxed px-1">
                                 {language === 'tr'
                                     ? '💡 İpucu: Modelin duruşu, bakışı veya mekândaki değişimi tarif edin.'
                                     : '💡 Tip: Describe the pose, gaze, or change in the environment.'}
@@ -1544,7 +1604,7 @@ export default function VideoPage() {
                                         onClick={handleDownloadEndFrame}
                                         className="w-9 h-9 bg-black/60 hover:bg-[var(--accent-primary)] rounded-xl transition-all shadow-xl"
                                     >
-                                        <TbDownload className="w-4 h-4 text-white" />
+                                        <TbDownload className="w-4 h-4 text-[#F5F5F5]" />
                                     </Button>
                                 </div>
                                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-4 py-3">
@@ -1562,14 +1622,14 @@ export default function VideoPage() {
                                 variant="ghost"
                                 onClick={() => setShowEndFrameDialog(false)}
                                 disabled={isGeneratingEndFrame}
-                                className="flex-1 h-12 rounded-xl font-black uppercase tracking-widest text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]"
+                                className="flex-1 h-12 rounded-xl font-black uppercase tracking-widest text-xs text-[#a1a1aa] hover:text-[#F5F5F5] hover:bg-[#0D0D0F]"
                             >
                                 {language === 'tr' ? 'İptal' : 'Cancel'}
                             </Button>
                             <Button
                                 onClick={handleGenerateEndFrame}
                                 disabled={isGeneratingEndFrame || !endFrameDescription.trim()}
-                                className="flex-1 h-12 bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-white font-black shadow-lg shadow-[var(--accent-primary)]/20 transition-all uppercase tracking-widest text-xs active:scale-95"
+                                className="flex-1 h-12 bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-[#F5F5F5] font-black shadow-lg shadow-[var(--accent-primary)]/20 transition-all uppercase tracking-widest text-xs active:scale-95"
                             >
                                 {isGeneratingEndFrame ? (
                                     <>

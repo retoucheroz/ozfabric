@@ -261,7 +261,8 @@ function StudioPageContent() {
         title: data.productName || "New Tech Pack",
         imageUrl: preview,
         type: "Tech Pack",
-        description: data.category
+        description: data.category,
+        mediaType: "image"
       });
       projectId = newId;
     }

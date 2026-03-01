@@ -89,14 +89,16 @@ const InteractiveShowcaseCard = ({ item, baseProgress, index, isModeOn }: any) =
             {isModeOn && item.isOutput && (
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
             )}
-            <div className={cn(
-                "absolute bottom-4 left-4 z-20 px-3 py-1 backdrop-blur-[1.5px] rounded-md font-mono text-[9px] font-black uppercase tracking-widest border transition-all duration-500",
-                !item.isOutput
-                    ? "bg-black/10 text-black/80 border-black/5"
-                    : "bg-black/10 text-white/90 border-white/10"
-            )}>
-                {item.label}
-            </div>
+            {item.label && (
+                <div className={cn(
+                    "absolute bottom-4 left-4 z-20 px-3 py-1 backdrop-blur-[1.5px] rounded-md font-mono text-[9px] font-black uppercase tracking-widest border transition-all duration-500",
+                    !item.isOutput
+                        ? "bg-black/10 text-black/80 border-black/5"
+                        : "bg-black/10 text-white/90 border-white/10"
+                )}>
+                    {item.label}
+                </div>
+            )}
         </motion.div>
     );
 };
@@ -212,8 +214,8 @@ const ShowcaseSection = ({ isModeOn, translate }: { isModeOn: boolean, translate
                                     </motion.div>
 
                                     {[
-                                        { src: "/lp/p2/1.webp", label: translate("MODEL GÖRSELİ", "MODEL VISUAL"), isOutput: false, startPos: { x: 150, y: 100, r: -5 }, blurStrength: 0 },
-                                        { src: "/lp/p2/2.webp", label: translate("ÜRÜN GÖRSELİ", "PRODUCT VISUAL"), isOutput: false, startPos: { x: 150, y: -100, r: 5 }, blurStrength: 0 },
+                                        { src: "/lp/p2/1.webp", label: "", isOutput: false, startPos: { x: 150, y: 100, r: -5 }, blurStrength: 0 },
+                                        { src: "/lp/p2/2.webp", label: "", isOutput: false, startPos: { x: 150, y: -100, r: 5 }, blurStrength: 0 },
                                     ].map((item, idx) => (
                                         <InteractiveShowcaseCard
                                             key={idx}

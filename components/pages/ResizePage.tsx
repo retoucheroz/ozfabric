@@ -95,7 +95,8 @@ export default function ResizePage() {
                     imageUrl: data.imageUrl,
                     description: mode === "expand"
                         ? `Expanded ${expandDirection} by ${expandAmount}%`
-                        : `Upscaled ${upscaleFactor}`
+                        : `Upscaled ${upscaleFactor}`,
+                    mediaType: "image"
                 });
                 toast.success(mode === "expand" ? t("resize.expandSuccess") : t("resize.upscaleSuccess"));
             } else if (data.error) {

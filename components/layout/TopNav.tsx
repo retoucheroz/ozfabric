@@ -141,38 +141,31 @@ export function TopNav() {
                             <DropdownMenuTrigger asChild>
                                 <Avatar className="w-9 h-9 border cursor-pointer hover:ring-2 ring-violet-500 transition-all">
                                     <AvatarImage src={user?.avatar} />
-                                    <AvatarFallback>{user?.name?.substring(0, 2).toUpperCase() || user?.email?.substring(0, 2).toUpperCase() || "RO"}</AvatarFallback>
+                                    <AvatarFallback>{user?.name?.substring(0, 2).toUpperCase() || user?.email?.substring(0, 2).toUpperCase() || "U"}</AvatarFallback>
                                 </Avatar>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-64">
                                 {/* User Info */}
                                 <DropdownMenuLabel className="font-normal">
                                     <div className="flex flex-col space-y-1">
-                                        <p className="text-sm font-medium leading-none">{user?.name || user?.email || "RetoucherOZ"}</p>
-                                        <p className="text-xs leading-none text-muted-foreground">{user?.email || user?.email}</p>
+                                        <p className="text-sm font-medium leading-none">{user?.name || user?.email || "User"}</p>
+                                        <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
                                     </div>
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
 
                                 {/* Menu Items */}
-                                <DropdownMenuItem onClick={() => router.push('/history')} className="cursor-pointer">
-                                    <LayoutGrid className="mr-2 h-4 w-4" />
-                                    <span>{t("sidebar.history") || "History"}</span>
-                                </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => router.push('/settings')} className="cursor-pointer">
                                     <User className="mr-2 h-4 w-4" />
                                     <span>{t("settings.profile")}</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => router.push('/settings')} className="cursor-pointer">
-                                    <CreditCard className="mr-2 h-4 w-4" />
-                                    <span>{t("settings.billing")}</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => router.push('/settings')} className="cursor-pointer">
                                     <Settings className="mr-2 h-4 w-4" />
                                     <span>{t("settings.security")}</span>
                                 </DropdownMenuItem>
 
-                                {user?.role === 'admin' && (
+                                {/* === CRITICAL SECURITY RULE: The Admin Panel MUST be visible to users with the 'admin' role OR the legacy 'admin' username/email. === */}
+                                {(user?.role === 'admin' || user?.name?.toLowerCase() === 'admin' || (user?.email as string)?.toLowerCase() === 'admin' || user?.name?.toLowerCase() === 'retoucheroz') && (
                                     <>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem onClick={() => router.push('/admin')} className="cursor-pointer text-amber-500 focus:text-amber-500">
@@ -181,6 +174,7 @@ export function TopNav() {
                                         </DropdownMenuItem>
                                     </>
                                 )}
+                                {/* ================================================================ */}
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
                                     onClick={async () => {
@@ -204,10 +198,10 @@ export function TopNav() {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        transition={{ duration: 0.15, ease: "easeOut" }}
                         className="overflow-hidden bg-[#0D0D0F] border-b border-white/5"
                     >
-                        <div className="max-w-7xl mx-auto px-4 md:px-8 py-3 flex items-center gap-6">
+                        <div className="max-w-7xl mx-auto px-4 md:px-8 py-3 flex items-center justify-center gap-6 md:gap-8">
                             {activeCategory === "studio" ? (
                                 <>
                                     <SubNavItem href="/photoshoot" icon={TbCameraPlus} label={t("sidebar.photoshoot")} active={pathname === "/photoshoot"} />
