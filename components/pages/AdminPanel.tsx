@@ -240,11 +240,11 @@ export default function AdminPanel() {
                     <p className="text-muted-foreground text-sm">{t('admin.subtitle')}</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <Card className="flex items-center gap-4 px-4 py-2 bg-violet-500/5 border-violet-500/20">
-                        <Activity className="w-5 h-5 text-violet-500" />
+                    <Card className="flex items-center gap-4 px-4 py-2 bg-white/5 border-white/10 shadow-lg">
+                        <Activity className="w-5 h-5 text-zinc-400" />
                         <div>
-                            <p className="text-[10px] font-bold text-muted-foreground uppercase">{t('admin.onlineUsers')}</p>
-                            <p className="text-xl font-bold text-violet-600 leading-none">{onlineStats.onlineCount}</p>
+                            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{t('admin.onlineUsers')}</p>
+                            <p className="text-xl font-black text-[#F5F5F5] leading-none">{onlineStats.onlineCount}</p>
                         </div>
                     </Card>
                     <Button variant="outline" size="icon" onClick={fetchData} disabled={isLoading}>
@@ -254,10 +254,10 @@ export default function AdminPanel() {
             </header>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <Card className="border-violet-500/20 bg-zinc-50/50 dark:bg-background/50">
+                <Card className="border-white/10 bg-[#12121a]">
                     <CardHeader className="pb-4">
-                        <CardTitle className="text-sm font-bold flex items-center gap-2">
-                            <Settings2 className="w-4 h-4 text-violet-500" /> System Settings
+                        <CardTitle className="text-sm font-bold flex items-center gap-2 text-zinc-300">
+                            <Settings2 className="w-4 h-4 text-zinc-400" /> System Settings
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -265,7 +265,7 @@ export default function AdminPanel() {
                             <Label htmlFor="provider">Nano Banana Pro Provider</Label>
                             <select
                                 id="provider"
-                                className="w-full h-10 px-3 rounded-md border bg-background text-sm focus:ring-2 ring-violet-500 outline-none"
+                                className="w-full h-10 px-3 rounded-md border border-white/10 bg-black text-sm focus:ring-1 ring-white/20 outline-none"
                                 value={provider}
                                 onChange={(e) => updateProvider(e.target.value)}
                             >
@@ -277,10 +277,10 @@ export default function AdminPanel() {
                     </CardContent>
                 </Card>
 
-                <Card className="col-span-1 md:col-span-1 lg:col-span-2 border-violet-500/20 bg-zinc-50/50 dark:bg-background/50">
+                <Card className="col-span-1 md:col-span-1 lg:col-span-2 border-white/10 bg-[#12121a]">
                     <CardHeader className="pb-4">
-                        <CardTitle className="text-sm font-bold flex items-center gap-2">
-                            <Users className="w-4 h-4 text-violet-500" /> {t('admin.createNewUser')}
+                        <CardTitle className="text-sm font-bold flex items-center gap-2 text-zinc-300">
+                            <Users className="w-4 h-4 text-zinc-400" /> {t('admin.createNewUser')}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -329,13 +329,13 @@ export default function AdminPanel() {
                                 <select
                                     id="role"
                                     name="role"
-                                    className="w-full h-10 px-3 rounded-md border bg-background text-sm focus:ring-2 ring-violet-500 outline-none"
+                                    className="w-full h-10 px-3 rounded-md border border-white/10 bg-black text-sm focus:ring-1 ring-white/20 outline-none"
                                 >
                                     <option value="user">User</option>
                                     <option value="admin">Admin</option>
                                 </select>
                             </div>
-                            <Button type="submit" className="bg-violet-600 hover:bg-violet-700">
+                            <Button type="submit" className="bg-zinc-100 text-black hover:bg-white font-bold transition-all px-8">
                                 {t('admin.addUser')}
                             </Button>
                         </form>
@@ -350,11 +350,11 @@ export default function AdminPanel() {
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <div className={`w-2 h-2 rounded-full ${onlineStats.users.includes(user.username) ? 'bg-green-500 animate-pulse' : 'bg-muted'}`} />
-                                    <CardTitle className="text-sm font-black break-all flex-1">{user.username}</CardTitle>
+                                    <CardTitle className="text-sm font-black break-all flex-1 text-zinc-200">{user.username}</CardTitle>
                                     <div className="flex flex-col items-end gap-1">
-                                        <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>{user.role}</Badge>
+                                        <Badge variant={user.role === 'admin' ? 'default' : 'secondary'} className={user.role === 'admin' ? "bg-zinc-100 text-black" : "bg-white/5 text-zinc-400"}>{user.role}</Badge>
                                         {user.lastSeenAt && (
-                                            <span className="text-[9px] font-bold text-violet-500 uppercase tracking-tighter">
+                                            <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-tighter">
                                                 {new Date(user.lastSeenAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                             </span>
                                         )}
@@ -391,11 +391,11 @@ export default function AdminPanel() {
                                 </div>
                             </div>
                             <div className="flex items-center justify-between mt-1">
-                                <CardDescription className="text-[10px] uppercase font-bold tracking-wider">
+                                <CardDescription className="text-[10px] uppercase font-bold tracking-wider text-zinc-500">
                                     Joined: {new Date(user.createdAt || Date.now()).toLocaleDateString()}
                                 </CardDescription>
                                 {user.lastSeenPage && (
-                                    <Badge variant="outline" className="text-[9px] font-bold bg-violet-500/5 text-violet-600 border-violet-500/20 max-w-[150px] truncate">
+                                    <Badge variant="outline" className="text-[9px] font-bold bg-white/5 text-zinc-300 border-white/10 max-w-[150px] truncate">
                                         <Layout className="w-2.5 h-2.5 mr-1" />
                                         {user.lastSeenPage}
                                     </Badge>
@@ -457,11 +457,11 @@ export default function AdminPanel() {
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <Label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
-                                        <RefreshCw className="w-3 h-3 text-amber-500" /> {t('settings.credits')}
+                                    <Label className="text-[10px] font-bold text-zinc-500 uppercase flex items-center gap-2">
+                                        <RefreshCw className="w-3 h-3 text-zinc-400" /> {t('settings.credits')}
                                     </Label>
                                     <div className="flex items-center gap-2">
-                                        <div className="flex-1 h-9 flex items-center px-3 rounded-lg bg-background border font-black text-sm text-amber-600">
+                                        <div className="flex-1 h-9 flex items-center px-3 rounded-lg bg-black border border-white/10 font-black text-sm text-[#F5F5F5]">
                                             {user.credits || 0}
                                         </div>
                                         <div className="flex items-center gap-1">
@@ -474,7 +474,7 @@ export default function AdminPanel() {
                                             <Button
                                                 size="sm"
                                                 variant="outline"
-                                                className="h-9 border-amber-500/20 hover:bg-amber-500/10 text-amber-600 font-bold text-[10px]"
+                                                className="h-9 border-white/10 hover:bg-white/5 text-[#F5F5F5] font-bold text-[10px] transition-all"
                                                 onClick={() => {
                                                     const input = document.getElementById(`credits-${user.username}`) as HTMLInputElement;
                                                     const val = parseInt(input.value);
@@ -575,9 +575,9 @@ export default function AdminPanel() {
 
             {/* Credit History Dialog */}
             {selectedUserForHistory && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-                    <Card className="w-full max-w-2xl max-h-[80vh] flex flex-col overflow-hidden shadow-2xl border-violet-500/20 animate-in fade-in zoom-in duration-200">
-                        <CardHeader className="border-b bg-violet-500/5 relative">
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+                    <Card className="w-full max-w-2xl max-h-[80vh] flex flex-col overflow-hidden shadow-2xl border-white/10 bg-[#0D0D0F] animate-in fade-in zoom-in duration-200">
+                        <CardHeader className="border-b border-white/5 bg-white/[0.02] relative">
                             <Button
                                 variant="ghost"
                                 size="icon"
@@ -586,17 +586,17 @@ export default function AdminPanel() {
                             >
                                 <X className="w-4 h-4" />
                             </Button>
-                            <CardTitle className="text-lg flex items-center gap-2">
-                                <History className="w-5 h-5 text-violet-500" />
+                            <CardTitle className="text-lg flex items-center gap-2 text-[#F5F5F5]">
+                                <History className="w-5 h-5 text-zinc-400" />
                                 {t('settings.credits')} {t('admin.history')}
                             </CardTitle>
-                            <CardDescription className="font-bold text-violet-600">{selectedUserForHistory}</CardDescription>
+                            <CardDescription className="font-bold text-zinc-500 tracking-wider uppercase text-[10px]">{selectedUserForHistory}</CardDescription>
                         </CardHeader>
                         <CardContent className="p-0 overflow-y-auto custom-scrollbar">
                             {isHistoryLoading ? (
-                                <div className="p-12 flex flex-col items-center justify-center gap-4 text-muted-foreground">
-                                    <RefreshCw className="w-8 h-8 animate-spin text-violet-500" />
-                                    <p className="text-xs font-bold uppercase tracking-widest animate-pulse">Loading History...</p>
+                                <div className="p-12 flex flex-col items-center justify-center gap-4 text-zinc-500">
+                                    <RefreshCw className="w-8 h-8 animate-spin text-zinc-400" />
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] animate-pulse">Loading History...</p>
                                 </div>
                             ) : creditHistory.length === 0 ? (
                                 <div className="p-12 text-center text-muted-foreground">

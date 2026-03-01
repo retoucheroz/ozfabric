@@ -89,10 +89,6 @@ export function Sidebar({ variant = "default" }: SidebarProps) {
         { label: t("nav.home"), href: '/home', icon: TbSmartHome },
     ];
 
-    const adminItems = (user?.role === 'admin') ? [
-        { label: "Admin Panel", href: '/admin', icon: TbShieldLock },
-    ] : [];
-
     // STÜDYO Group
     const studioItems = [
         { label: t("sidebar.photoshoot"), href: '/photoshoot', icon: TbCameraPlus },
@@ -197,7 +193,6 @@ export function Sidebar({ variant = "default" }: SidebarProps) {
 
             <div className="space-y-0.5">
                 {mainItems.map(renderItem)}
-                {adminItems.map(renderItem)}
             </div>
 
             {/* STÜDYO */}

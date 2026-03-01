@@ -38,29 +38,29 @@
 .dark,
 [data-theme="dark"] {
   --bg-base: #0D0D0F;
-  --bg-surface: #12121a;
-  --bg-elevated: #1a1a25;
+  --bg-surface: #121212;
+  --bg-elevated: #1A1A1A;
   --bg-sidebar: #0D0D0F;
 
   --border-subtle: rgba(255, 255, 255, 0.04);
   --border-default: rgba(255, 255, 255, 0.08);
-  --border-accent: rgba(245, 245, 245, 0.2);
+  --border-accent: rgba(245, 245, 245, 0.15);
 
   --text-primary: #F5F5F5;
   --text-secondary: #a1a1aa;
   --text-muted: #52525b;
 
   --accent-primary: #F5F5F5;
-  --accent-soft: rgba(245, 245, 245, 0.05);
-  --accent-hover: rgba(245, 245, 245, 0.1);
+  --accent-soft: rgba(245, 245, 245, 0.04);
+  --accent-hover: rgba(245, 245, 245, 0.08);
 
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.5);
   --shadow-card-hover: 0 4px 20px rgba(0, 0, 0, 0.6);
-  --shadow-glow: 0 0 20px rgba(245, 245, 245, 0.03);
+  --shadow-glow: 0 0 30px rgba(255, 255, 255, 0.02);
 
-  --sidebar-active-bg: rgba(245, 245, 245, 0.05);
+  --sidebar-active-bg: rgba(245, 245, 245, 0.04);
   --sidebar-active-text: #F5F5F5;
-  --sidebar-hover-bg: rgba(255, 255, 255, 0.02);
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.015);
   --sidebar-item-text: #a1a1aa;
   --sidebar-icon-passive: #52525b;
   --sidebar-group-label: #52525b;

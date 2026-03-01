@@ -7,13 +7,25 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Home, Plus, Edit3, BrainCircuit, LayoutGrid, Settings, CreditCard, User, LogOut, Sparkles, Globe, Moon, Sun, Menu, Zap } from "lucide-react"
+import { Home, Plus, Edit3, BrainCircuit, LayoutGrid, Settings, CreditCard, User, LogOut, Sparkles, Globe, Moon, Sun, Zap, Coins } from "lucide-react"
 import { useProjects } from "@/context/projects-context"
 import { useLanguage } from "@/context/language-context"
 import { useTheme } from "next-themes"
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet"
-import { Sidebar } from "@/components/layout/Sidebar"
 import { useSession, signOut } from "next-auth/react"
+import { motion, AnimatePresence } from "framer-motion"
+import {
+    TbCameraPlus,
+    TbPhotoScan,
+    TbMovie,
+    TbFaceId,
+    TbHanger,
+    TbMaximize,
+    TbAnalyze,
+    TbWand,
+    TbShieldLock,
+    TbClipboardText,
+    TbHistory
+} from "react-icons/tb"
 
 export function TopNav() {
     const pathname = usePathname();
@@ -22,6 +34,7 @@ export function TopNav() {
     const { language, setLanguage, t } = useLanguage();
     const { theme, setTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
+    const [activeCategory, setActiveCategory] = useState<"studio" | "tools" | null>(null);
     const { data: session } = useSession();
     const user = session?.user as any;
 
@@ -37,110 +50,93 @@ export function TopNav() {
     ];
 
     return (
-        <header className="h-[72px] border-b border-white/5 bg-[#0D0D0F] flex items-center justify-between px-6 md:px-10 sticky top-0 z-50">
-            {/* Left Section: Mobile Menu & Logo */}
-            <div className="flex items-center gap-6">
-                {mounted && (
-                    <Sheet>
-                        <SheetTrigger asChild>
-                            <Button variant="ghost" size="icon" className="md:hidden text-zinc-400 font-bold">
-                                <Menu className="w-5 h-5" />
-                            </Button>
-                        </SheetTrigger>
-                        <SheetContent side="left" className="p-0 w-[240px] bg-[#0D0D0F] border-white/5">
-                            <SheetHeader className="sr-only">
-                                <SheetTitle>Navigation Menu</SheetTitle>
-                                <SheetDescription>Access design and photoshoot tools</SheetDescription>
-                            </SheetHeader>
-                            <div className="p-6 border-b border-white/5">
-                                <Link href="/home" className="flex items-center gap-2 font-black text-xl tracking-tighter text-white">
-                                    <div className="w-9 h-4.5 bg-[#F5F5F5] rounded-full flex items-center justify-between px-1 shadow-inner border border-white/20">
-                                        <div className="w-[1px] h-2 bg-[#0D0D0F]/70 rounded-full ml-1" />
-                                        <div className="w-3 h-3 bg-[#0D0D0F] rounded-full shadow-sm" />
-                                    </div>
-                                    <span>ModeOn.<span className="text-[#F5F5F5]">ai</span></span>
-                                </Link>
-                            </div>
-                            <div className="flex flex-col py-4 h-full">
-                                <Sidebar variant="mobile" />
-                            </div>
-                        </SheetContent>
-                    </Sheet>
-                )}
+        <header className="sticky top-0 z-50 flex flex-col w-full bg-[#0D0D0F] border-b border-white/5">
+            {/* Main Header Row */}
+            <div className="h-[72px] flex items-center justify-between px-4 md:px-8 max-w-7xl mx-auto w-full">
+                {/* Left Section: Mobile Menu & Logo */}
+                <div className="flex items-center gap-6">
+                    {/* Logo */}
+                    <Link href="/home" className="flex items-center gap-2 font-black text-xl tracking-tighter text-white hover:opacity-80 transition-opacity">
+                        <div className="w-10 h-5 bg-[#F5F5F5] rounded-full flex items-center justify-between px-1 shadow-inner border border-white/20">
+                            <div className="w-[1.5px] h-2.5 bg-[#0D0D0F]/70 rounded-full ml-1" />
+                            <div className="w-3.5 h-3.5 bg-[#0D0D0F] rounded-full shadow-sm" />
+                        </div>
+                        <span>ModeOn<span className="text-[#F5F5F5]">.ai</span></span>
+                    </Link>
 
-                {/* Logo */}
-                <Link href="/home" className="flex items-center gap-2 font-black text-xl tracking-tighter text-white hover:opacity-80 transition-opacity">
-                    <div className="w-10 h-5 bg-[#F5F5F5] rounded-full flex items-center justify-between px-1 shadow-inner border border-white/20">
-                        <div className="w-[1.5px] h-2.5 bg-[#0D0D0F]/70 rounded-full ml-1" />
-                        <div className="w-3.5 h-3.5 bg-[#0D0D0F] rounded-full shadow-sm" />
-                    </div>
-                    <span>ModeOn<span className="text-[#F5F5F5]">.ai</span></span>
-                </Link>
-            </div>
+                    {/* Main Navigation Categories */}
+                    {mounted && (
+                        <nav className="flex items-center ml-4">
+                            <button
+                                onClick={() => setActiveCategory(activeCategory === "studio" ? null : "studio")}
+                                className={cn(
+                                    "px-4 md:px-6 h-[72px] text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] transition-all relative",
+                                    activeCategory === "studio"
+                                        ? "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]"
+                                        : "text-zinc-500 hover:text-zinc-300"
+                                )}
+                            >
+                                {t("sidebar.studio") || "STUDIO"}
+                            </button>
+                            <button
+                                onClick={() => setActiveCategory(activeCategory === "tools" ? null : "tools")}
+                                className={cn(
+                                    "px-4 md:px-6 h-[72px] text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] transition-all relative",
+                                    activeCategory === "tools"
+                                        ? "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]"
+                                        : "text-zinc-500 hover:text-zinc-300"
+                                )}
+                            >
+                                {t("sidebar.tools") || "TOOLS"}
+                            </button>
+                            <Link
+                                href="/history"
+                                className={cn(
+                                    "px-4 md:px-6 h-[72px] flex items-center text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] transition-all relative",
+                                    pathname === "/history"
+                                        ? "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]"
+                                        : "text-zinc-500 hover:text-zinc-300"
+                                )}
+                            >
+                                {t("sidebar.history") || "HISTORY"}
+                            </Link>
+                        </nav>
+                    )}
+                </div>
 
-            {/* Right Actions */}
-            <div className="flex items-center gap-2 md:gap-4">
-                {/* Pro Upgrade Pill */}
-                {mounted && (
-                    <div
-                        className="hidden sm:flex items-center gap-2 px-4 py-2 bg-[#F5F5F5] hover:bg-white text-black rounded-md cursor-pointer transition-all shadow-none group"
-                        onClick={() => router.push('/pricing')}
-                    >
-                        <Zap className="w-3.5 h-3.5 fill-black" />
-                        <span className="text-[10px] font-black uppercase tracking-widest">{t("home.upgradeNow")}</span>
-                    </div>
-                )}
+                {/* Right Actions */}
+                <div className="flex items-center gap-2 md:gap-4">
+                    {/* Pro Upgrade Pill */}
+                    {mounted && (
+                        <div
+                            className="hidden sm:flex items-center gap-2 px-4 py-2 bg-[#F5F5F5] hover:bg-white text-black rounded-md cursor-pointer transition-all shadow-none group"
+                            onClick={() => router.push('/pricing')}
+                        >
+                            <Zap className="w-3.5 h-3.5 fill-black" />
+                            <span className="text-[10px] font-black uppercase tracking-widest">{t("home.upgradeNow")}</span>
+                        </div>
+                    )}
 
-                {/* Credit Display */}
-                {mounted && (
-                    <div
-                        className="flex items-center gap-2 md:gap-3 px-3 py-1.5 bg-white/5 border border-white/10 rounded-md cursor-pointer hover:bg-white/10 transition-all group"
-                        onClick={() => router.push('/settings?tab=billing')}
-                    >
-                        <div className="flex items-center gap-2">
-                            <div className="p-1.5 rounded-md bg-white/5 text-[#F5F5F5] group-hover:bg-white/10 transition-colors">
-                                <Sparkles className="w-3.5 h-3.5" />
-                            </div>
-                            <div className="flex flex-col items-start leading-none gap-0.5">
-                                <span className="hidden md:inline text-[9px] text-zinc-500 font-black uppercase tracking-widest">{t("settings.credits")}</span>
-                                <span className="text-sm font-black text-[#F5F5F5] tabular-nums">{credits}</span>
+                    {/* Credit Display */}
+                    {mounted && (
+                        <div
+                            className="flex items-center gap-2 md:gap-3 px-3 py-1 bg-white/5 border border-white/10 rounded-md cursor-pointer hover:bg-white/10 transition-all group"
+                            onClick={() => router.push('/settings?tab=billing')}
+                        >
+                            <div className="flex items-center gap-2">
+                                <div className="p-1 rounded-md bg-white/5 text-[#F5F5F5] group-hover:bg-white/10 transition-colors">
+                                    <Coins className="w-3.5 h-3.5" />
+                                </div>
+                                <div className="flex flex-col items-start leading-none gap-0">
+                                    <span className="hidden md:inline text-[9px] text-zinc-500 font-black uppercase tracking-widest">{t("settings.credits")}</span>
+                                    <span className="text-sm font-black text-[#F5F5F5] tabular-nums">{credits}</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )}
 
-                {/* Theme Toggle */}
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className="w-9 h-9"
-                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                >
-                    {mounted && (theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />)}
-                </Button>
-
-                {/* Language Switcher & User Dropdown */}
-                {mounted && (
-                    <>
-                        {/* Language Switcher */}
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" className="gap-1 text-xs">
-                                    <Globe className="w-4 h-4" />
-                                    {language.toUpperCase()}
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => setLanguage("en")} className={language === "en" ? "bg-accent" : ""}>
-                                    🇬🇧 English
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setLanguage("tr")} className={language === "tr" ? "bg-accent" : ""}>
-                                    🇹🇷 Türkçe
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-
-                        {/* User Dropdown */}
+                    {/* User Dropdown */}
+                    {mounted && (
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Avatar className="w-9 h-9 border cursor-pointer hover:ring-2 ring-violet-500 transition-all">
@@ -158,26 +154,11 @@ export function TopNav() {
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
 
-                                {/* Credits */}
-                                <div className="px-2 py-3">
-                                    <div className="flex items-center justify-between bg-violet-50 dark:bg-violet-900/20 rounded-lg p-3 border border-violet-200 dark:border-violet-800">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-8 h-8 rounded-full bg-violet-500 flex items-center justify-center">
-                                                <Sparkles className="w-4 h-4 text-black" />
-                                            </div>
-                                            <div>
-                                                <p className="text-xs text-muted-foreground">{t("settings.credits")}</p>
-                                                <p className="font-bold text-lg leading-none">{credits}</p>
-                                            </div>
-                                        </div>
-                                        <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => router.push('/settings')}>
-                                            {t("settings.topUp")}
-                                        </Button>
-                                    </div>
-                                </div>
-                                <DropdownMenuSeparator />
-
                                 {/* Menu Items */}
+                                <DropdownMenuItem onClick={() => router.push('/history')} className="cursor-pointer">
+                                    <LayoutGrid className="mr-2 h-4 w-4" />
+                                    <span>{t("sidebar.history") || "History"}</span>
+                                </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => router.push('/settings')} className="cursor-pointer">
                                     <User className="mr-2 h-4 w-4" />
                                     <span>{t("settings.profile")}</span>
@@ -190,6 +171,16 @@ export function TopNav() {
                                     <Settings className="mr-2 h-4 w-4" />
                                     <span>{t("settings.security")}</span>
                                 </DropdownMenuItem>
+
+                                {user?.role === 'admin' && (
+                                    <>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem onClick={() => router.push('/admin')} className="cursor-pointer text-amber-500 focus:text-amber-500">
+                                            <TbShieldLock className="mr-2 h-4 w-4" />
+                                            <span>Admin Panel</span>
+                                        </DropdownMenuItem>
+                                    </>
+                                )}
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
                                     onClick={async () => {
@@ -202,9 +193,56 @@ export function TopNav() {
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
-                    </>
-                )}
+                    )}
+                </div>
             </div>
+
+            {/* Sub-navigation Bar (Integrated) */}
+            <AnimatePresence>
+                {activeCategory && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className="overflow-hidden bg-[#0D0D0F] border-b border-white/5"
+                    >
+                        <div className="max-w-7xl mx-auto px-4 md:px-8 py-3 flex items-center gap-6">
+                            {activeCategory === "studio" ? (
+                                <>
+                                    <SubNavItem href="/photoshoot" icon={TbCameraPlus} label={t("sidebar.photoshoot")} active={pathname === "/photoshoot"} />
+                                    <SubNavItem href="/editorial" icon={TbPhotoScan} label={t("sidebar.editorial")} active={pathname === "/editorial"} />
+                                    <SubNavItem href="/video" icon={TbMovie} label={t("sidebar.video")} active={pathname === "/video"} />
+                                    <SubNavItem href="/face-head-swap" icon={TbFaceId} label={t("sidebar.faceHeadSwap")} active={pathname === "/face-head-swap"} />
+                                    <SubNavItem href="/photoshoot/ghost" icon={TbHanger} label={t("sidebar.ghost")} active={pathname === "/photoshoot/ghost"} />
+                                </>
+                            ) : (
+                                <>
+                                    <SubNavItem href="/resize" icon={TbMaximize} label={t("sidebar.resize")} active={pathname === "/resize"} />
+                                    <SubNavItem href="/studio" icon={TbClipboardText} label={t("sidebar.techPack")} active={pathname === "/studio"} />
+                                    <SubNavItem href="/analysis" icon={TbAnalyze} label={t("sidebar.analysis")} active={pathname === "/analysis"} />
+                                    <SubNavItem href="/train" icon={TbWand} label={t("sidebar.train")} active={pathname === "/train"} />
+                                </>
+                            )}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </header>
+    )
+}
+
+function SubNavItem({ href, icon: Icon, label, active }: { href: string; icon: any; label: string; active: boolean }) {
+    return (
+        <Link
+            href={href}
+            className={cn(
+                "flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all group",
+                active ? "bg-white/10 text-[#F5F5F5]" : "text-zinc-500 hover:text-zinc-200 hover:bg-white/5"
+            )}
+        >
+            <Icon className={cn("w-4 h-4 transition-colors", active ? "text-[#F5F5F5]" : "text-zinc-600 group-hover:text-zinc-400")} />
+            <span className="text-[10px] font-black uppercase tracking-widest">{label}</span>
+        </Link>
     )
 }

@@ -277,23 +277,23 @@ function StudioPageContent() {
 
   return (
     <>
-      <div className="flex flex-col h-[calc(100vh-64px)] overflow-hidden bg-[var(--bg-surface)]">
+      <div className="flex flex-col h-[calc(100vh-64px)] overflow-hidden bg-[#0D0D0F]">
         {/* Header Area */}
-        <div className="h-16 border-b border-[var(--border-subtle)] bg-[var(--bg-sidebar)] flex items-center justify-between px-6 shrink-0 z-20">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[var(--accent-soft)] flex items-center justify-center text-[var(--accent-primary)] shadow-lg shadow-[var(--accent-primary)]/10">
+        <div className="h-20 border-b border-white/5 bg-[#0D0D0F] flex items-center justify-between px-8 shrink-0 z-30">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-white/10 text-white flex items-center justify-center shadow-xl">
               <TbChartBar className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-xl font-black tracking-tight uppercase italic text-[var(--text-primary)]">Product Studio</h1>
-              <p className="text-[10px] text-[var(--text-muted)] font-black uppercase tracking-widest -mt-0.5">AI Product Information & Tech Specs</p>
+              <h1 className="text-3xl font-black tracking-tighter uppercase italic text-white leading-none">PRODUCT STUDIO</h1>
+              <p className="text-[11px] text-zinc-500 uppercase font-black tracking-[0.2em] mt-1.5 grayscale opacity-70">AI PRODUCT INFORMATION & TECH SPECS</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="text-[var(--text-muted)] hover:text-[var(--text-primary)]">
+            <Button variant="ghost" size="icon" className="text-zinc-500 hover:text-white transition-colors">
               <TbSettings className="w-5 h-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="text-[var(--text-muted)] hover:text-[var(--text-primary)]">
+            <Button variant="ghost" size="icon" className="text-zinc-500 hover:text-white transition-colors">
               <TbHelp className="w-5 h-5" />
             </Button>
           </div>
@@ -301,18 +301,18 @@ function StudioPageContent() {
 
         <div className="flex-1 lg:overflow-hidden flex flex-col lg:flex-row">
           {/* Left: Visual Asset */}
-          <div className="w-full lg:w-[420px] lg:border-r border-[var(--border-subtle)] bg-[var(--bg-sidebar)] p-6 lg:overflow-y-auto space-y-6 shrink-0 border-b lg:border-b-0">
+          <div className="w-full lg:w-[420px] lg:border-r border-white/5 bg-[#0D0D0F] p-8 lg:overflow-y-auto space-y-8 shrink-0 border-b lg:border-b-0">
             <div className="space-y-1">
-              <h2 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">{t("studio.title")}</h2>
-              <p className="text-[var(--text-muted)] text-sm">{t("studio.techAnalysis")}</p>
+              <h2 className="text-2xl font-black tracking-tighter uppercase italic text-white leading-none">{t("studio.title")}</h2>
+              <p className="text-[11px] text-zinc-500 uppercase font-black tracking-[0.2em] mt-2">{t("studio.techAnalysis")}</p>
             </div>
 
             <section className="space-y-4">
-              <Label className="text-[10px] uppercase font-black tracking-widest text-[var(--text-muted)] px-1 flex items-center gap-2">
-                <TbPhoto className="w-4 h-4 text-[var(--accent-primary)]" />
+              <Label className="text-[10px] uppercase font-black tracking-widest text-white px-1 flex items-center gap-2">
+                <TbPhoto className="w-4 h-4" />
                 {language === "tr" ? "ÜRÜN GÖRÜNÜMÜ" : "PRODUCT VIEW"}
               </Label>
-              <div className="border-2 border-dashed rounded-2xl h-48 border-[var(--border-subtle)] hover:border-[var(--accent-primary)] transition-all relative group overflow-hidden cursor-pointer bg-[var(--bg-surface)]">
+              <div className="border-2 border-dashed rounded-2xl h-56 border-white/5 hover:border-white/20 transition-all relative group overflow-hidden cursor-pointer bg-white/[0.02]">
                 <input
                   type="file"
                   accept="image/*"
@@ -320,11 +320,11 @@ function StudioPageContent() {
                   onChange={handleFileChange}
                 />
                 {preview ? (
-                  <img src={preview} className="w-full h-full object-contain p-2" />
+                  <img src={preview} className="w-full h-full object-contain p-4 grayscale group-hover:grayscale-0 transition-all" />
                 ) : (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-[var(--text-muted)] gap-3">
-                    <div className="w-12 h-12 rounded-full bg-[var(--bg-sidebar)] border border-[var(--border-subtle)] flex items-center justify-center shadow-sm">
-                      <TbPhoto className="w-6 h-6 opacity-50" />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-zinc-500 gap-3">
+                    <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
+                      <TbPhoto className="w-6 h-6 opacity-30" />
                     </div>
                     <span className="text-[10px] font-black uppercase tracking-widest">{t("studio.uploadRef") || "Upload Product Image"}</span>
                   </div>
@@ -363,70 +363,70 @@ function StudioPageContent() {
             )}
           </div>
 
-          {/* Right: Technical Spec Sheet */}
-          <div className="flex-1 bg-white dark:bg-background overflow-y-auto p-8 lg:px-12">
+          <div className="flex-1 bg-[#0D0D0F] overflow-y-auto p-8 lg:p-16">
             {isAnalyzing ? (
-              <div className="h-full flex flex-col items-center justify-center space-y-4">
-                <Loader2 className="w-10 h-10 animate-spin text-primary" />
+              <div className="h-full flex flex-col items-center justify-center space-y-8 opacity-20">
+                <Loader2 className="w-16 h-16 animate-spin text-white" />
                 <div className="text-center">
-                  <h3 className="font-semibold text-lg">{t("studio.analyzing") || "Analyzing Garment Structure..."}</h3>
-                  <p className="text-muted-foreground">{t("studio.extracting") || "Extracting fabric points, measurements, and Pantone codes."}</p>
+                  <h3 className="text-3xl font-black uppercase italic tracking-tighter text-white mb-3">{t("studio.analyzing") || "Analyzing Garment..."}</h3>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 leading-relaxed">{t("studio.extracting") || "EXTRACTING FABRIC POINTS, MEASUREMENTS, AND PANTONE CODES."}</p>
                 </div>
               </div>
             ) : data ? (
-              <div id="tech-pack-content" className="max-w-3xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 bg-white text-black p-8 border border-gray-200 rounded-xl">
+              <div id="tech-pack-content" className="max-w-4xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 bg-white text-black p-12 shadow-2xl rounded-3xl border border-gray-100">
                 {/* Title Block */}
-                <div>
-                  <h1 className="text-3xl font-bold tracking-tight mb-2 text-black">{data.productName}</h1>
-                  <p className="text-gray-500">{t("studio.techSpecSheet")} • {new Date().getFullYear()} Collection</p>
+                <div className="border-b-4 border-black pb-8">
+                  <h1 className="text-5xl font-black tracking-tighter uppercase italic mb-2 text-black">{data.productName}</h1>
+                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400">{t("studio.techSpecSheet")} • {new Date().getFullYear()} COLLECTION</p>
                 </div>
 
-                {/* BOM / Fabric Section */}
                 <section>
-                  <div className="flex items-center gap-2 mb-4">
-                    <FileText className="w-5 h-5 text-black" />
-                    <h3 className="text-lg font-semibold text-black">{language === 'tr' ? 'Kumaş & Yapı' : 'Fabric & Construction'}</h3>
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white">
+                      <FileText className="w-4 h-4" />
+                    </div>
+                    <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-black">{language === 'tr' ? 'KUMAŞ & YAPI' : 'FABRIC & CONSTRUCTION'}</h3>
                   </div>
-                  <Card className="bg-white border-gray-200 shadow-none">
+                  <Card className="bg-transparent border-gray-200 shadow-none rounded-2xl overflow-hidden">
                     <Table>
                       <TableBody>
-                        <TableRow className="border-gray-100 hover:bg-transparent">
-                          <TableCell className="font-medium w-[150px] text-gray-900">{language === 'tr' ? 'Ana Kumaş' : 'Main Fabric'}</TableCell>
-                          <TableCell className="text-gray-700 p-2">
+                        <TableRow className="border-gray-100 hover:bg-gray-50/50">
+                          <TableCell className="font-black text-[10px] uppercase tracking-widest w-[180px] text-gray-400 border-r border-gray-100">{language === 'tr' ? 'ANA KUMAŞ' : 'MAIN FABRIC'}</TableCell>
+                          <TableCell className="p-4">
                             <Input
                               value={data.fabric.main}
                               onChange={(e) => handleFabricChange('main', e.target.value)}
-                              className="h-8 border-transparent hover:border-gray-200 focus:border-violet-500 font-normal shadow-none px-2 -ml-2 w-full"
+                              className="h-9 border-transparent hover:bg-gray-50 focus:bg-gray-50 focus:border-black font-bold text-sm shadow-none px-3 w-full transition-all"
                             />
                           </TableCell>
                         </TableRow>
-                        <TableRow className="border-gray-100 hover:bg-transparent">
-                          <TableCell className="font-medium text-gray-900">{language === 'tr' ? 'İçerik' : 'Composition'}</TableCell>
-                          <TableCell className="text-gray-700 p-2">
+                        <TableRow className="border-gray-100 hover:bg-gray-50/50">
+                          <TableCell className="font-black text-[10px] uppercase tracking-widest text-gray-400 border-r border-gray-100">{language === 'tr' ? 'İÇERİK' : 'COMPOSITION'}</TableCell>
+                          <TableCell className="p-4">
                             <Input
                               value={data.fabric.composition}
                               onChange={(e) => handleFabricChange('composition', e.target.value)}
-                              className="h-8 border-transparent hover:border-gray-200 focus:border-violet-500 font-normal shadow-none px-2 -ml-2 w-full"
+                              className="h-9 border-transparent hover:bg-gray-50 focus:bg-gray-50 focus:border-black font-bold text-sm shadow-none px-3 w-full transition-all"
                             />
                           </TableCell>
                         </TableRow>
-                        <TableRow className="border-gray-100 hover:bg-transparent">
-                          <TableCell className="font-medium text-gray-900">{language === 'tr' ? 'Gramaj' : 'Weight'}</TableCell>
-                          <TableCell className="text-gray-700 p-2">
+                        <TableRow className="border-gray-100 hover:bg-gray-50/50">
+                          <TableCell className="font-black text-[10px] uppercase tracking-widest text-gray-400 border-r border-gray-100">{language === 'tr' ? 'GRAMAJ' : 'WEIGHT'}</TableCell>
+                          <TableCell className="p-4">
                             <Input
                               value={data.fabric.weight}
                               onChange={(e) => handleFabricChange('weight', e.target.value)}
-                              className="h-8 border-transparent hover:border-gray-200 focus:border-violet-500 font-normal shadow-none px-2 -ml-2 w-full"
+                              className="h-9 border-transparent hover:bg-gray-50 focus:bg-gray-50 focus:border-black font-bold text-sm shadow-none px-3 w-full transition-all"
                             />
                           </TableCell>
                         </TableRow>
-                        <TableRow className="border-gray-100 hover:bg-transparent">
-                          <TableCell className="font-medium text-gray-900">{language === 'tr' ? 'Kalıp' : 'Fit Type'}</TableCell>
-                          <TableCell className="text-gray-700 p-2">
+                        <TableRow className="border-gray-100 hover:bg-gray-50/50">
+                          <TableCell className="font-black text-[10px] uppercase tracking-widest text-gray-400 border-r border-gray-100">{language === 'tr' ? 'KALIP' : 'FIT TYPE'}</TableCell>
+                          <TableCell className="p-4">
                             <Input
                               value={data?.fit || ""}
                               onChange={(e) => handleFitChange(e.target.value)}
-                              className="h-8 border-transparent hover:border-gray-200 focus:border-violet-500 font-normal shadow-none px-2 -ml-2 w-full"
+                              className="h-9 border-transparent hover:bg-gray-50 focus:bg-gray-50 focus:border-black font-bold text-sm shadow-none px-3 w-full transition-all"
                             />
                           </TableCell>
                         </TableRow>
@@ -435,43 +435,44 @@ function StudioPageContent() {
                   </Card>
                 </section>
 
-                {/* Measurements */}
                 <section>
-                  <div className="flex items-center gap-2 mb-4">
-                    <Ruler className="w-5 h-5 text-black" />
-                    <h3 className="text-lg font-semibold text-black">{language === 'tr' ? 'Ölçü Tablosu (36 Beden)' : 'Key Measurements (Sample 36)'}</h3>
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white">
+                      <Ruler className="w-4 h-4" />
+                    </div>
+                    <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-black">{language === 'tr' ? 'ÖLÇÜ TABLOSU (36 BEDEN)' : 'KEY MEASUREMENTS (SAMPLE 36)'}</h3>
                   </div>
-                  <Card className="bg-white border-gray-200 shadow-none">
+                  <Card className="bg-transparent border-gray-200 shadow-none rounded-2xl overflow-hidden">
                     <Table>
-                      <TableHeader>
+                      <TableHeader className="bg-gray-50/50">
                         <TableRow className="border-gray-100 hover:bg-transparent">
-                          <TableHead className="text-gray-500">{language === 'tr' ? 'Ölçüm Noktası' : 'Point of Measure (POM)'}</TableHead>
-                          <TableHead className="text-right text-gray-500">{language === 'tr' ? 'Değer (cm)' : 'Value (cm)'}</TableHead>
+                          <TableHead className="font-black text-[9px] uppercase tracking-widest text-gray-400 h-10">{language === 'tr' ? 'ÖLÇÜM NOKTASI' : 'POINT OF MEASURE (POM)'}</TableHead>
+                          <TableHead className="text-right font-black text-[9px] uppercase tracking-widest text-gray-400 h-10">{language === 'tr' ? 'DEĞER (CM)' : 'VALUE (CM)'}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {data?.measurements?.points ? (
                           data.measurements.points.map((m: any, i: number) => (
-                            <TableRow key={i} className="border-gray-100 hover:bg-transparent">
-                              <TableCell className="text-gray-700 p-2">
+                            <TableRow key={i} className="border-gray-100 hover:bg-gray-50/50">
+                              <TableCell className="p-4">
                                 <Input
                                   value={m.label}
                                   onChange={(e) => handleMeasurementChange(i, 'label', e.target.value)}
-                                  className="h-8 border-transparent hover:border-gray-200 focus:border-violet-500 font-normal shadow-none px-2 -ml-2 w-full"
+                                  className="h-9 border-transparent hover:bg-gray-50 focus:bg-gray-50 focus:border-black font-bold text-sm shadow-none px-3 w-full transition-all"
                                 />
                               </TableCell>
-                              <TableCell className="text-right font-mono text-gray-700 p-2">
+                              <TableCell className="text-right p-4">
                                 <Input
                                   value={m.value}
                                   onChange={(e) => handleMeasurementChange(i, 'value', e.target.value)}
-                                  className="h-8 text-right border-transparent hover:border-gray-200 focus:border-violet-500 font-normal shadow-none px-2 -ml-2 w-full"
+                                  className="h-9 text-right border-transparent hover:bg-gray-50 focus:bg-gray-50 focus:border-black font-mono font-black text-sm shadow-none px-3 w-full transition-all"
                                 />
                               </TableCell>
                             </TableRow>
                           ))
                         ) : (
                           <TableRow>
-                            <TableCell colSpan={2} className="text-center py-4 text-muted-foreground italic">
+                            <TableCell colSpan={2} className="text-center py-12 text-gray-400 text-[10px] font-black uppercase tracking-widest italic">
                               {language === 'tr' ? 'Ölçü verisi bulunamadı' : 'No measurement data found'}
                             </TableCell>
                           </TableRow>

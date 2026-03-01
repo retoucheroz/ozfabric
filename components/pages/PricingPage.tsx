@@ -10,9 +10,12 @@ import { motion } from "framer-motion"
 import { SERVICE_COSTS, PRICING_PLANS, CREDIT_PACKS } from "@/lib/pricingConstants"
 import { useSession } from "next-auth/react"
 import { toast } from "sonner"
+import { useProjects } from "@/context/projects-context"
+import { Coins } from "lucide-react"
 
 export default function PricingPage() {
     const { t, language } = useLanguage();
+    const { credits } = useProjects();
     const { data: session } = useSession();
     const user = session?.user as any;
     const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
@@ -74,27 +77,43 @@ export default function PricingPage() {
         <div className="min-h-screen bg-[var(--bg-base)] py-8 px-6 overflow-y-auto">
             {/* Background Decorations */}
             <div className="fixed inset-0 pointer-events-none overflow-hidden opacity-10">
-                <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-violet-500 rounded-full blur-[120px]" />
-                <div className="absolute top-[20%] -right-[10%] w-[30%] h-[50%] bg-indigo-500 rounded-full blur-[120px]" />
+                <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-zinc-500 rounded-full blur-[120px]" />
+                <div className="absolute top-[20%] -right-[10%] w-[30%] h-[50%] bg-zinc-600 rounded-full blur-[120px]" />
             </div>
 
             <div className="max-w-5xl mx-auto relative z-10">
                 {/* Header */}
-                <div className="text-center space-y-3 mb-10">
+                <div className="text-center space-y-3 mb-12">
                     <motion.div
                         initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4 }}
                     >
-                        <Badge variant="outline" className="px-3 py-1 border-violet-500/30 bg-violet-500/10 text-violet-500 font-bold mb-3 text-[10px] uppercase tracking-wider">
-                            {language === "tr" ? "Fiyatlandırma" : "Pricing Plans"}
-                        </Badge>
-                        <h1 className="text-2xl md:text-3xl font-black tracking-tight text-[var(--text-primary)]">
-                            {language === "tr" ? "Yaratıcılığınızı" : "Unleash Your"}{" "}
-                            <span className="bg-gradient-to-r from-violet-500 to-indigo-600 bg-clip-text text-transparent">
-                                {language === "tr" ? "Ölçeklendirin" : "Creativity"}
-                            </span>
-                        </h1>
+                        {/* Current Balance - Moved from Settings */}
+                        <div className="inline-flex items-center gap-6 px-8 py-4 bg-[#12121a] border border-white/5 rounded-2xl mb-8 shadow-xl">
+                            <div className="flex flex-col items-center sm:items-start text-center sm:text-left gap-1">
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">{t("settings.currentBalance") || "CURRENT BALANCE"}</span>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
+                                        <Coins className="w-6 h-6 text-[#F5F5F5]" />
+                                    </div>
+                                    <span className="text-4xl font-black italic tracking-tighter text-[#F5F5F5]">{credits}</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mt-2">{t("settings.credits") || "CREDITS"}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <Badge variant="outline" className="px-3 py-1 border-white/10 bg-white/5 text-zinc-400 font-bold mb-3 text-[10px] uppercase tracking-wider">
+                                {language === "tr" ? "Fiyatlandırma" : "Pricing Plans"}
+                            </Badge>
+                            <h1 className="text-2xl md:text-3xl font-black tracking-tight text-[var(--text-primary)]">
+                                {language === "tr" ? "Yaratıcılığınızı" : "Unleash Your"}{" "}
+                                <span className="text-[#F5F5F5]">
+                                    {language === "tr" ? "Ölçeklendirin" : "Creativity"}
+                                </span>
+                            </h1>
+                        </div>
                         <p className="text-[var(--text-secondary)] text-sm max-w-xl mx-auto mt-2">
                             {language === "tr"
                                 ? "Sizin için en uygun planı seçin. İstediğiniz zaman iptal edebilirsiniz."
@@ -120,32 +139,32 @@ export default function PricingPage() {
                                 className={cn(
                                     "relative group rounded-3xl p-8 transition-all duration-300 flex flex-col h-full",
                                     isMain
-                                        ? "bg-gradient-to-b from-violet-600 to-indigo-700 text-white shadow-2xl shadow-violet-900/20 scale-105 z-10 border-0"
-                                        : "bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-violet-500/30 shadow-lg shadow-black/5"
+                                        ? "bg-zinc-100 text-black shadow-2xl scale-105 z-10 border-0"
+                                        : "bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-zinc-500/30 shadow-lg shadow-black/5"
                                 )}
                             >
                                 {isMain && (
-                                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[10px] font-black px-4 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 z-20 uppercase tracking-wider">
+                                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#0D0D0F] border border-white/10 text-[#F5F5F5] text-[10px] font-black px-4 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 z-20 uppercase tracking-wider">
                                         <Star className="w-3 h-3 fill-white" />
                                         {language === "tr" ? "Önerilen" : "Most Popular"}
                                     </div>
                                 )}
 
                                 <div className="mb-6 text-center">
-                                    <h3 className={cn("text-lg font-black uppercase tracking-tight mb-2", isMain ? "text-white" : "text-[var(--text-primary)]")}>
+                                    <h3 className={cn("text-lg font-black uppercase tracking-tight mb-2", isMain ? "text-black" : "text-[var(--text-primary)]")}>
                                         {language === "tr" ? plan.nameTr : plan.name}
                                     </h3>
-                                    <div className={cn("text-xs font-medium opacity-80", isMain ? "text-white/80" : "text-[var(--text-secondary)]")}>
+                                    <div className={cn("text-xs font-medium opacity-80", isMain ? "text-black/80" : "text-[var(--text-secondary)]")}>
                                         {language === "tr" ? plan.descriptionTr : plan.description}
                                     </div>
                                 </div>
 
                                 <div className="mb-6 text-center">
                                     <div className="flex items-baseline gap-1 justify-center">
-                                        <span className={cn("text-4xl font-black heading-font", isMain ? "text-white" : "text-[var(--text-primary)]")}>${plan.price}</span>
-                                        {!isFree && <span className={cn("text-sm font-medium", isMain ? "text-white/60" : "text-[var(--text-muted)]")}>/{language === "tr" ? "ay" : "mo"}</span>}
+                                        <span className={cn("text-4xl font-black heading-font", isMain ? "text-black" : "text-[var(--text-primary)]")}>${plan.price}</span>
+                                        {!isFree && <span className={cn("text-sm font-medium", isMain ? "text-black/60" : "text-[var(--text-muted)]")}>/{language === "tr" ? "ay" : "mo"}</span>}
                                     </div>
-                                    <Badge variant="secondary" className={cn("mt-3 font-bold", isMain ? "bg-white/20 text-white border-none" : "bg-violet-500/10 text-violet-500 border-violet-500/20")}>
+                                    <Badge variant="secondary" className={cn("mt-3 font-bold", isMain ? "bg-black text-white border-none" : "bg-white/5 text-zinc-400 border-white/10")}>
                                         {plan.credits.toLocaleString()} {language === "tr" ? "KREDİ" : "CREDITS"}
                                     </Badge>
                                 </div>
@@ -153,10 +172,10 @@ export default function PricingPage() {
                                 <div className="space-y-4 flex-1 mb-8">
                                     {(language === "tr" ? plan.featuresTr : plan.features).map((feature, fIdx) => (
                                         <div key={fIdx} className="flex items-center gap-3">
-                                            <div className={cn("p-0.5 rounded-full", isMain ? "bg-white/20" : "bg-emerald-500/10")}>
-                                                <Check className={cn("w-3 h-3", isMain ? "text-white" : "text-emerald-500")} />
+                                            <div className={cn("p-0.5 rounded-full", isMain ? "bg-black/10" : "bg-emerald-500/10")}>
+                                                <Check className={cn("w-3 h-3", isMain ? "text-black" : "text-emerald-500")} />
                                             </div>
-                                            <span className={cn("text-xs font-medium", isMain ? "text-white/90" : "text-[var(--text-secondary)]")}>{feature}</span>
+                                            <span className={cn("text-xs font-medium", isMain ? "text-black/90" : "text-[var(--text-secondary)]")}>{feature}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -171,7 +190,7 @@ export default function PricingPage() {
                                     className={cn(
                                         "w-full h-12 rounded-xl font-bold text-xs uppercase tracking-widest transition-all duration-300",
                                         isMain
-                                            ? "bg-white text-violet-600 hover:bg-white/90 shadow-xl disabled:opacity-70"
+                                            ? "bg-[#0D0D0F] text-white hover:bg-black shadow-xl disabled:opacity-70"
                                             : "bg-[var(--bg-elevated)] hover:bg-[var(--bg-muted)] text-[var(--text-primary)] border border-[var(--border-subtle)] disabled:opacity-50"
                                     )}
                                 >
@@ -199,7 +218,7 @@ export default function PricingPage() {
                             return (
                                 <div key={i} className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-center hover:border-violet-500/30 transition-all relative overflow-hidden group">
                                     {(pack.label === "Pro" || pack.label === "Ultra") && (
-                                        <div className="absolute top-0 right-0 bg-violet-500/10 text-violet-500 text-[9px] font-bold px-2 py-0.5 rounded-bl-lg">
+                                        <div className="absolute top-0 right-0 bg-[#F5F5F5] text-black text-[9px] font-black px-2 py-0.5 rounded-bl-lg">
                                             BONUS
                                         </div>
                                     )}
@@ -210,7 +229,7 @@ export default function PricingPage() {
                                         variant="outline"
                                         disabled={isLoading}
                                         onClick={() => handleCheckout(packProductKeys[i], i)}
-                                        className="w-full text-xs font-bold border-violet-500/20 text-violet-500 hover:bg-violet-500/10 hover:text-violet-600 transition-all group-hover:scale-105 active:scale-95 disabled:opacity-70"
+                                        className="w-full text-xs font-bold border-white/10 text-[#F5F5F5] hover:bg-white/5 transition-all group-hover:scale-105 active:scale-95 disabled:opacity-70"
                                     >
                                         {isLoading ? (
                                             <Loader2 className="w-3 h-3 animate-spin" />
@@ -303,7 +322,7 @@ export default function PricingPage() {
                 {/* Footer Disclaimer */}
                 <div className="mt-12 text-center">
                     <p className="text-[var(--text-muted)] text-[10px] font-medium flex items-center justify-center gap-4">
-                        <span className="flex items-center gap-1"><Sparkles className="w-3.5 h-3.5 text-violet-500" /> {language === "tr" ? "Güvenli Ödeme" : "Secure Payment"}</span>
+                        <span className="flex items-center gap-1"><Sparkles className="w-3.5 h-3.5 text-zinc-400" /> {language === "tr" ? "Güvenli Ödeme" : "Secure Payment"}</span>
                         <span>•</span>
                         <span>{language === "tr" ? "Para İade Garantisi" : "Money Back Guarantee"}</span>
                         <span>•</span>

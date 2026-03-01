@@ -260,23 +260,23 @@ function GhostPageContent() {
     <div className="flex flex-col lg:flex-row h-auto lg:h-[calc(100vh-64px)] overflow-hidden lg:overflow-hidden overflow-y-auto lg:overflow-y-hidden">
       {/* Left: Input */}
       <div className="w-full lg:w-[420px] lg:border-r border-b lg:border-b-0 bg-background p-4 lg:overflow-y-auto space-y-4 shrink-0">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-[var(--accent-soft)] flex items-center justify-center text-[var(--accent-primary)] shadow-lg shadow-[var(--accent-primary)]/10">
+        <div className="flex items-center gap-4 mb-8">
+          <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-white/10 text-white flex items-center justify-center shadow-xl">
             <TbHanger className="w-6 h-6" />
           </div>
-          <div>
-            <h2 className="text-xl font-black tracking-tight uppercase italic text-[var(--text-primary)]">{t("ghost.title")}</h2>
-            <p className="text-[10px] text-[var(--text-muted)] uppercase font-black tracking-widest -mt-0.5">{t("ghost.subtitle")}</p>
+          <div className="flex flex-col">
+            <h2 className="text-2xl font-black tracking-tighter uppercase italic text-white">{t("ghost.title")}</h2>
+            <p className="text-[10px] text-zinc-500 uppercase font-black tracking-[0.2em] mt-0.5">{t("ghost.subtitle")}</p>
           </div>
         </div>
 
         {/* Main Garment Upload */}
-        <div className="space-y-2">
-          <label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest flex items-center gap-2 mb-1">
-            <TbShirt className="w-4 h-4 text-[var(--accent-primary)]" />
+        <div className="space-y-3">
+          <label className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-2 px-1">
+            <TbShirt className="w-4 h-4 text-white" />
             {language === "tr" ? "ANA GİYSİ GÖRSELİ" : "MAIN GARMENT IMAGE"} *
           </label>
-          <div className="h-32 border-2 border-dashed rounded-xl bg-muted/20 relative group hover:border-violet-500 transition-colors cursor-pointer overflow-hidden">
+          <div className="h-40 border-2 border-dashed border-white/5 rounded-2xl bg-white/[0.02] relative group hover:border-white transition-all cursor-pointer overflow-hidden">
             <input
               type="file"
               accept="image/*"
@@ -305,12 +305,12 @@ function GhostPageContent() {
         {/* Optional Detail Images */}
         <div className="grid grid-cols-2 gap-3">
           {/* Logo/Detail Image */}
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest flex items-center gap-1.5 mb-1">
-              <TbSignature className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
+          <div className="space-y-3">
+            <label className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-1.5 px-1">
+              <TbSignature className="w-3.5 h-3.5 text-white" />
               {language === "tr" ? "LOGO / DETAY" : "LOGO / DETAIL"}
             </label>
-            <div className="h-28 border-2 border-dashed rounded-lg bg-muted/20 relative group hover:bg-muted/40 transition-colors cursor-pointer overflow-hidden">
+            <div className="h-32 border-2 border-dashed border-white/5 rounded-2xl bg-white/[0.02] relative group hover:bg-white/[0.05] transition-all cursor-pointer overflow-hidden">
               <input
                 type="file"
                 accept="image/*"
@@ -337,12 +337,12 @@ function GhostPageContent() {
           </div>
 
           {/* Fabric Image */}
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest flex items-center gap-1.5 mb-1">
-              <TbPalette className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
+          <div className="space-y-3">
+            <label className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-1.5 px-1">
+              <TbPalette className="w-3.5 h-3.5 text-white" />
               {language === "tr" ? "KUMAŞ / DOKU" : "FABRIC / TEXTURE"}
             </label>
-            <div className="h-28 border-2 border-dashed rounded-lg bg-muted/20 relative group hover:bg-muted/40 transition-colors cursor-pointer overflow-hidden">
+            <div className="h-32 border-2 border-dashed border-white/5 rounded-2xl bg-white/[0.02] relative group hover:bg-white/[0.05] transition-all cursor-pointer overflow-hidden">
               <input
                 type="file"
                 accept="image/*"
@@ -376,26 +376,26 @@ function GhostPageContent() {
         </p>
 
         {/* Angle Grid Section */}
-        <div className="space-y-3 pt-2">
-          <label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest flex items-center gap-2 mb-1">
-            <TbAdjustmentsHorizontal className="w-4 h-4 text-[var(--accent-primary)]" />
+        <div className="space-y-4 pt-4">
+          <label className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-2 px-1">
+            <TbAdjustmentsHorizontal className="w-4 h-4 text-white" />
             {language === "tr" ? "GÖRÜNÜM AÇILARI" : "VIEW ANGLES"}
           </label>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-3">
             {ANGLE_OPTIONS.map((angle) => (
               <Button
                 key={angle.id}
                 variant={selectedAngle === angle.id ? "default" : "outline"}
                 className={cn(
-                  "h-20 flex-col gap-1 transition-all duration-300 border-[var(--border-subtle)]",
+                  "h-24 flex-col gap-2 transition-all duration-300 rounded-2xl border-white/5",
                   selectedAngle === angle.id
-                    ? "bg-violet-600 text-white shadow-lg shadow-violet-500/30 border-violet-600"
-                    : "bg-[var(--bg-elevated)] hover:border-violet-500/50 hover:bg-violet-500/5 text-[var(--text-primary)]"
+                    ? "bg-white text-black shadow-2xl border-white ring-2 ring-white/20"
+                    : "bg-white/[0.02] hover:border-white/20 text-zinc-500 hover:text-white"
                 )}
                 onClick={() => setSelectedAngle(angle.id)}
               >
-                <angle.icon className={cn("w-8 h-8 mb-1", selectedAngle === angle.id ? "text-white" : "text-violet-500")} />
-                <span className="font-bold text-[10px] uppercase tracking-tight">{language === "tr" ? angle.labelTr : angle.label}</span>
+                <angle.icon className={cn("w-8 h-8 mb-1", selectedAngle === angle.id ? "text-black" : "text-white opacity-40")} />
+                <span className="font-black text-[10px] uppercase tracking-widest">{language === "tr" ? angle.labelTr : angle.label}</span>
               </Button>
             ))}
           </div>
@@ -505,23 +505,23 @@ function GhostPageContent() {
         )}
 
         {/* Generate Button */}
-        <div className="space-y-2">
+        <div className="space-y-2 pt-6">
           <Button
-            className="w-full py-6 rounded-2xl bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-white font-black text-sm shadow-xl shadow-[var(--accent-primary)]/20 transition-all active:scale-95 flex items-center gap-3"
+            className="w-full py-8 rounded-2xl bg-white hover:bg-zinc-200 text-black font-black text-[11px] shadow-2xl transition-all active:scale-[0.98] flex items-center gap-4 uppercase tracking-[0.2em]"
             disabled={!mainImage || isProcessing}
             onClick={handleGenerate}
           >
             {isProcessing ? (
               <>
                 <TbLoader2 className="w-5 h-5 animate-spin" />
-                <span className="uppercase tracking-widest">{t("ghost.processing") || "Generating..."}</span>
+                <span>{t("ghost.processing") || "GENERATING..."}</span>
               </>
             ) : (
               <>
-                <TbSparkles className="w-5 h-5" />
-                <span className="uppercase tracking-widest">{t("ghost.generate") || "Generate Ghost"}</span>
-                <span className="ml-1 text-[10px] bg-white/20 px-1.5 py-0.5 rounded font-normal">
-                  {selectedResolution === "4K" ? SERVICE_COSTS.IMAGE_GENERATION.GHOST_MODEL_4K : SERVICE_COSTS.IMAGE_GENERATION.GHOST_MODEL_1_2K} {language === "tr" ? "Kr" : "Cr"}
+                <TbSparkles className="w-5 h-5 opacity-50" />
+                <span>{t("ghost.generate") || "GENERATE GHOST"}</span>
+                <span className="ml-1 opacity-40 font-black border-l border-black/10 pl-4">
+                  {selectedResolution === "4K" ? SERVICE_COSTS.IMAGE_GENERATION.GHOST_MODEL_4K : SERVICE_COSTS.IMAGE_GENERATION.GHOST_MODEL_1_2K} {language === "tr" ? "KR" : "CR"}
                 </span>
               </>
             )}
@@ -530,45 +530,45 @@ function GhostPageContent() {
       </div>
 
       {/* Middle: Result */}
-      <div className="flex-1 bg-stone-50/50 dark:bg-stone-950/50 p-8 flex items-center justify-center min-h-[400px]">
+      <div className="flex-1 bg-[#0D0D0F] p-8 flex items-center justify-center min-h-[400px]">
         {isProcessing ? (
-          <div className="max-w-md w-full space-y-6 text-center animate-in fade-in duration-500">
+          <div className="max-w-md w-full space-y-8 text-center animate-in fade-in duration-500">
             <div className="relative w-48 h-48 mx-auto">
-              <div className="absolute inset-0 rounded-full border-4 border-violet-100 dark:border-violet-900/30"></div>
-              <div className="absolute inset-0 rounded-full border-4 border-t-violet-500 border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-white/5"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-t-white border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
               <div className="absolute inset-0 flex items-center justify-center">
-                <Shirt className="w-16 h-16 text-violet-500 animate-pulse" />
+                <Shirt className="w-16 h-16 text-white animate-pulse" />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <h3 className="text-xl font-semibold">{t("styles.generating")}</h3>
-              <p className="text-muted-foreground transition-all duration-300 min-h-[1.5em]">
+            <div className="space-y-3">
+              <h3 className="text-xl font-black uppercase italic tracking-tighter text-white">{t("styles.generating")}</h3>
+              <p className="text-[10px] uppercase font-black tracking-[0.2em] text-zinc-500 transition-all duration-300 min-h-[1.5em]">
                 {language === 'tr' ? LOADING_MESSAGES[currentMessageIndex].tr : LOADING_MESSAGES[currentMessageIndex].en}
               </p>
             </div>
 
-            <div className="space-y-2">
-              <Progress value={generationProgress} className="h-2 w-full bg-violet-100 dark:bg-violet-900/20" />
-              <div className="flex justify-between text-xs text-muted-foreground">
+            <div className="space-y-4">
+              <Progress value={generationProgress} className="h-1.5 w-full bg-white/5" />
+              <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-zinc-500">
                 <span>{generationProgress}%</span>
                 <span>{language === 'tr' ? 'Tahmini süre: 10-15sn' : 'Est. time: 10-15s'}</span>
               </div>
             </div>
           </div>
         ) : resultImage ? (
-          <Card className="max-w-xl w-full aspect-[2/3] p-2 bg-white shadow-xl animate-in zoom-in-95 duration-500 relative group">
-            <img src={resultImage} className="w-full h-full object-contain rounded-md" />
-            <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Button variant="secondary" onClick={() => router.push(`/studio?image=${encodeURIComponent(resultImage)}`)}>{t("common.getSpecs")}</Button>
-              <Button variant="secondary" size="icon" onClick={handleDownload}><Download className="w-4 h-4" /></Button>
+          <Card className="max-w-xl w-full aspect-[2/3] p-3 bg-zinc-900 border border-white/10 shadow-2xl animate-in zoom-in-95 duration-500 relative group rounded-2xl">
+            <img src={resultImage} className="w-full h-full object-contain rounded-xl" />
+            <div className="absolute top-6 right-6 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+              <Button variant="secondary" className="bg-white text-black hover:bg-zinc-200 font-black h-10 px-5 rounded-xl uppercase tracking-widest text-[10px]" onClick={() => router.push(`/studio?image=${encodeURIComponent(resultImage)}`)}>{t("common.getSpecs")}</Button>
+              <Button variant="secondary" size="icon" className="bg-white text-black hover:bg-zinc-200 h-10 w-10 rounded-xl" onClick={handleDownload}><Download className="w-5 h-5" /></Button>
             </div>
           </Card>
         ) : (
-          <div className="text-center opacity-40 max-w-sm">
-            <Shirt className="w-24 h-24 mx-auto mb-4 stroke-1" />
-            <h3 className="text-2xl font-semibold mb-2">{t("ghost.studioTitle")}</h3>
-            <p>{t("ghost.studioDesc")}</p>
+          <div className="text-center opacity-20 max-w-sm">
+            <Shirt className="w-32 h-32 mx-auto mb-6 stroke-[0.5]" />
+            <h3 className="text-3xl font-black uppercase italic tracking-tighter mb-2 text-white">{t("ghost.studioTitle")}</h3>
+            <p className="text-[10px] uppercase font-black tracking-widest text-zinc-500">{t("ghost.studioDesc")}</p>
           </div>
         )}
       </div>

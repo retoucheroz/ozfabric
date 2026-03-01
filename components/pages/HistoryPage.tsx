@@ -93,33 +93,40 @@ export default function HistoryPage() {
     return (
         <div className="flex flex-col h-full bg-[var(--bg-background)] overflow-hidden">
             {/* Header Area */}
-            <div className="shrink-0 p-6 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]/80 backdrop-blur-md sticky top-0 z-10">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 max-w-7xl mx-auto w-full">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl bg-[var(--bg-elevated)] text-[var(--accent-primary)]">
+            <div className="shrink-0 p-8 border-b border-white/5 bg-[#0D0D0F]">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 max-w-7xl mx-auto w-full">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-white/10 text-white flex items-center justify-center shadow-xl">
                             <Clock className="w-6 h-6" />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">{language === "tr" ? "İşlem Geçmişi" : "Activity History"}</h1>
-                            <p className="text-sm text-[var(--text-secondary)]">{language === "tr" ? "Tüm üretimlerinizi ve projelerinizi yönetin" : "Manage all your generations and projects"}</p>
+                            <h1 className="text-3xl font-black tracking-tighter uppercase italic text-white leading-none">
+                                {language === "tr" ? "GEÇMİŞ" : "HISTORY"}
+                            </h1>
+                            <p className="text-[11px] text-zinc-500 uppercase font-black tracking-[0.2em] mt-1.5 grayscale opacity-70">
+                                {language === "tr" ? "TÜM ÜRETİMLERİNİZİ YÖNETİN" : "MANAGE ALL YOUR GENERATIONS"}
+                            </p>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <div className="relative w-64">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <div className="relative w-64 group">
+                            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-white transition-colors" />
                             <Input
-                                placeholder={language === "tr" ? "Ara..." : "Search..."}
-                                className="pl-9 h-10 border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-primary)]"
+                                placeholder={language === "tr" ? "ARA..." : "SEARCH..."}
+                                className="pl-10 h-11 border-white/5 bg-white/5 text-white placeholder:text-zinc-600 rounded-xl text-[10px] font-black uppercase tracking-widest focus:ring-1 focus:ring-white/20 transition-all"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                         </div>
-                        <div className="flex items-center gap-1 p-1 bg-muted rounded-lg border">
+                        <div className="flex items-center gap-1 p-1 bg-white/5 rounded-xl border border-white/5 h-11">
                             <Button
                                 variant={viewMode === "grid" ? "secondary" : "ghost"}
                                 size="icon"
-                                className="h-8 w-8"
+                                className={cn(
+                                    "h-9 w-9 rounded-lg transition-all",
+                                    viewMode === "grid" ? "bg-white text-black hover:bg-zinc-200" : "text-zinc-500 hover:text-white"
+                                )}
                                 onClick={() => setViewMode("grid")}
                             >
                                 <Grid2X2 className="w-4 h-4" />
@@ -127,7 +134,10 @@ export default function HistoryPage() {
                             <Button
                                 variant={viewMode === "list" ? "secondary" : "ghost"}
                                 size="icon"
-                                className="h-8 w-8"
+                                className={cn(
+                                    "h-9 w-9 rounded-lg transition-all",
+                                    viewMode === "list" ? "bg-white text-black hover:bg-zinc-200" : "text-zinc-500 hover:text-white"
+                                )}
                                 onClick={() => setViewMode("list")}
                             >
                                 <List className="w-4 h-4" />
@@ -190,15 +200,15 @@ export default function HistoryPage() {
                             </div>
                         )
                     ) : (
-                        <div className="h-[400px] flex flex-col items-center justify-center text-center">
-                            <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mb-4">
-                                <ImageIcon className="w-10 h-10 text-muted-foreground/50" />
+                        <div className="h-[400px] flex flex-col items-center justify-center text-center opacity-20">
+                            <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mb-6 border border-white/5">
+                                <ImageIcon className="w-10 h-10 text-white" />
                             </div>
-                            <h3 className="text-lg font-semibold">{language === "tr" ? "Sonuç Bulunamadı" : "No Results Found"}</h3>
-                            <p className="text-sm text-muted-foreground max-w-xs mx-auto">
+                            <h3 className="text-2xl font-black uppercase italic tracking-tighter text-white">{language === "tr" ? "Henüz Bir Şey Yok" : "Nothing Here Yet"}</h3>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 max-w-xs mx-auto mt-2 leading-relaxed">
                                 {language === "tr"
-                                    ? "Arama kriterlerinize uygun geçmiş işlemi bulunamadı."
-                                    : "No historical activity found matching your search criteria."}
+                                    ? "Ürettiğiniz görseller burada güvenle saklanır."
+                                    : "Everything you generate will be safely stored here."}
                             </p>
                         </div>
                     )}
@@ -230,8 +240,8 @@ function ProjectCard({ project, language, onDelete, onDownload, isAdmin }: { pro
     }
 
     return (
-        <div className="group bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-            <div className="relative aspect-[3/4] overflow-hidden bg-muted">
+        <div className="group bg-zinc-900 border border-white/5 rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl hover:border-white/20 transition-all duration-500">
+            <div className="relative aspect-[3/4] overflow-hidden bg-black/50">
                 <img
                     src={project.imageUrl}
                     alt={project.title}

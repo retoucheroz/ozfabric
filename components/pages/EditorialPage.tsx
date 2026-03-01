@@ -466,9 +466,24 @@ export default function EditorialPage() {
                         </div>
 
                         {/* Page Title */}
-                        <div className="text-center -mt-2 mb-2">
-                            <h1 className="text-xl font-black uppercase tracking-tight text-[var(--text-primary)]">📸 {language === "tr" ? "EDİTORYAL" : "EDITORIAL"}</h1>
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] opacity-60 mt-0.5">{language === "tr" ? "YARATICI EDİTORYAL ÇEKİMLER" : "CREATIVE EDITORIAL SHOOTS"}</p>
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2 border-b border-white/5 mb-6">
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 rounded-2xl bg-zinc-900 border border-white/10 text-white shadow-xl">
+                                    <TbCamera className="w-6 h-6" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <h1 className="text-3xl font-black uppercase tracking-tighter text-white italic">{language === "tr" ? "EDİTORYAL" : "EDITORIAL"}</h1>
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mt-0.5">{language === "tr" ? "YARATICI EDİTORYAL ÇEKİMLER • NANO BANANA" : "CREATIVE EDITORIAL SHOOTS • NANO BANANA"}</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-[#F5F5F5] animate-pulse" />
+                                    <span className="text-[10px] font-black text-white uppercase tracking-widest">
+                                        Creative AI v2.0
+                                    </span>
+                                </div>
+                            </div>
                         </div>
 
                         {/* ===== STEP 1: MODEL & ASSETS ===== */}
@@ -477,21 +492,21 @@ export default function EditorialPage() {
                                 <div className="grid grid-cols-1 lg:grid-cols-11 gap-6 items-stretch">
                                     {/* Left: Asset Cards */}
                                     <div className="lg:col-span-3 flex flex-col">
-                                        <div className="flex items-center gap-3 mb-2 px-1">
-                                            <div className="p-2 rounded-xl bg-violet-100 dark:bg-violet-900/30 text-violet-600 shadow-sm"><TbUserCircle className="w-5 h-5" /></div>
+                                        <div className="flex items-center gap-3 mb-4 px-1">
+                                            <div className="p-2.5 rounded-xl bg-white/5 text-white border border-white/10 shadow-lg"><TbUserCircle className="w-5 h-5" /></div>
                                             <div className="flex flex-col">
-                                                <label className="text-xs uppercase font-black text-foreground tracking-[0.2em]">{language === "tr" ? "MODEL SEÇİMİ" : "MODEL SELECTION"}</label>
-                                                <span className="text-[10px] text-muted-foreground font-black uppercase tracking-tighter opacity-60">{language === "tr" ? "ÜRETİM İÇİN MODEL BELİRLE" : "DEFINE MODEL FOR PRODUCTION"}</span>
+                                                <label className="text-xs uppercase font-black text-white tracking-[0.2em]">{language === "tr" ? "MODEL SEÇİMİ" : "MODEL SELECTION"}</label>
+                                                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter opacity-80">{language === "tr" ? "ÜRETİM İÇİN MODEL BELİRLE" : "DEFINE MODEL FOR PRODUCTION"}</span>
                                             </div>
                                         </div>
 
                                         {/* Model Type Toggle */}
-                                        <div className="mb-4 bg-zinc-100 dark:bg-white/5 p-1 rounded-xl flex">
+                                        <div className="mb-4 bg-white/5 border border-white/5 p-1 rounded-2xl flex">
                                             <button
                                                 onClick={() => setModelType('full_body')}
                                                 className={cn(
-                                                    "flex-1 py-2 text-[9px] font-black uppercase tracking-wider rounded-lg transition-all",
-                                                    modelType === 'full_body' ? "bg-white dark:bg-white/10 shadow-sm text-violet-500" : "text-muted-foreground hover:text-foreground"
+                                                    "flex-1 py-2.5 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all",
+                                                    modelType === 'full_body' ? "bg-white text-black shadow-xl" : "text-zinc-500 hover:text-white"
                                                 )}
                                             >
                                                 {language === "tr" ? "KOMBİN DAHİL" : "OUTFIT INCLUDED"}
@@ -499,8 +514,8 @@ export default function EditorialPage() {
                                             <button
                                                 onClick={() => setModelType('face_only')}
                                                 className={cn(
-                                                    "flex-1 py-2 text-[9px] font-black uppercase tracking-wider rounded-lg transition-all",
-                                                    modelType === 'face_only' ? "bg-white dark:bg-white/10 shadow-sm text-violet-500" : "text-muted-foreground hover:text-foreground"
+                                                    "flex-1 py-2.5 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all",
+                                                    modelType === 'face_only' ? "bg-white text-black shadow-xl" : "text-zinc-500 hover:text-white"
                                                 )}
                                             >
                                                 {language === "tr" ? "SADECE YÜZ / YENİ KOMBİN" : "FACE ONLY / NEW OUTFIT"}
@@ -569,21 +584,21 @@ export default function EditorialPage() {
                                                 <div className="grid grid-cols-3 gap-6 text-left border-t border-border/50 pt-4">
                                                     <div className="space-y-2">
                                                         <div className="flex items-center gap-2">
-                                                            <span className="w-5 h-5 rounded-full bg-violet-600 text-white text-[10px] flex items-center justify-center font-bold italic">1</span>
-                                                            <span className="text-[10px] font-black uppercase tracking-widest text-foreground">{language === "tr" ? "VARLIK YÜKLEME" : "ASSET UPLOAD"}</span>
+                                                            <span className="w-6 h-6 rounded-full bg-white text-black text-[11px] flex items-center justify-center font-black italic shadow-lg">1</span>
+                                                            <span className="text-[10px] font-black uppercase tracking-widest text-white">{language === "tr" ? "VARLIK YÜKLEME" : "ASSET UPLOAD"}</span>
                                                         </div>
-                                                        <p className="text-[10px] text-muted-foreground leading-relaxed">
+                                                        <p className="text-[10px] text-zinc-500 font-bold leading-relaxed uppercase tracking-tighter">
                                                             {language === "tr"
                                                                 ? "Model portrenizi yükleyin; çekim moduna göre mevcut kıyafeti koruyabilir veya tamamen yeni bir stil kurgulayabilirsiniz."
                                                                 : "Upload your model portrait; depending on the mode, preserve the existing outfit or curate a completely new style."}
                                                         </p>
                                                     </div>
-                                                    <div className="space-y-2 border-x border-zinc-200 dark:border-white/5 px-8">
+                                                    <div className="space-y-2 border-x border-white/5 px-8">
                                                         <div className="flex items-center gap-2">
-                                                            <span className="w-5 h-5 rounded-full bg-violet-600 text-white text-[10px] flex items-center justify-center font-bold italic">2</span>
-                                                            <span className="text-[10px] font-black uppercase tracking-widest text-foreground">{language === "tr" ? "EDİTORYAL KURGU" : "EDITORIAL CURATION"}</span>
+                                                            <span className="w-6 h-6 rounded-full bg-white text-black text-[11px] flex items-center justify-center font-black italic shadow-lg">2</span>
+                                                            <span className="text-[10px] font-black uppercase tracking-widest text-white">{language === "tr" ? "EDİTORYAL KURGU" : "EDITORIAL CURATION"}</span>
                                                         </div>
-                                                        <p className="text-[10px] text-muted-foreground leading-relaxed">
+                                                        <p className="text-[10px] text-zinc-500 font-bold leading-relaxed uppercase tracking-tighter">
                                                             {language === "tr"
                                                                 ? "Dünya çapındaki ikonik lokasyonlar arasından seçim yapın, gelişmiş kamera ve ışık ayarlarıyla çekim atmosferinizi tasarlayın."
                                                                 : "Choose from iconic global locations and design your shoot atmosphere with professional camera and lighting controls."}
@@ -591,10 +606,10 @@ export default function EditorialPage() {
                                                     </div>
                                                     <div className="space-y-2">
                                                         <div className="flex items-center gap-2">
-                                                            <span className="w-5 h-5 rounded-full bg-violet-600 text-white text-[10px] flex items-center justify-center font-bold italic">3</span>
-                                                            <span className="text-[10px] font-black uppercase tracking-widest text-foreground">{language === "tr" ? "PROFESYONEL ÜRETİM" : "PRODUCTION"}</span>
+                                                            <span className="w-6 h-6 rounded-full bg-white text-black text-[11px] flex items-center justify-center font-black italic shadow-lg">3</span>
+                                                            <span className="text-[10px] font-black uppercase tracking-widest text-white">{language === "tr" ? "PROFESYONEL ÜRETİM" : "PRODUCTION"}</span>
                                                         </div>
-                                                        <p className="text-[10px] text-muted-foreground leading-relaxed">
+                                                        <p className="text-[10px] text-zinc-500 font-bold leading-relaxed uppercase tracking-tighter">
                                                             {language === "tr"
                                                                 ? "Gelişmiş sahne analizi teknolojisi ile yüksek moda standartlarında, gerçekçi ve estetik editoryal karelerinizi oluşturun."
                                                                 : "Generate high-fashion, realistic editorial imagery through advanced scene analysis and aesthetic processing."}
@@ -607,9 +622,9 @@ export default function EditorialPage() {
                                 </div>
 
                                 {/* Step 1 Footer */}
-                                <div className="flex justify-end pt-4 border-t border-zinc-200 dark:border-white/5">
-                                    <Button onClick={() => canMoveToStep(2) && setWizardStep(2)} className="px-10 py-6 rounded-2xl bg-violet-600 hover:bg-violet-700 text-white font-black uppercase tracking-widest shadow-lg transition-all hover:scale-[1.02]">
-                                        {language === "tr" ? "İLERLE" : "NEXT"} <ChevronRight className="ml-2 w-5 h-5" />
+                                <div className="flex justify-end pt-6 border-t border-white/5">
+                                    <Button onClick={() => canMoveToStep(2) && setWizardStep(2)} className="px-12 py-7 rounded-2xl bg-white hover:bg-zinc-200 text-black font-black uppercase tracking-[0.2em] shadow-2xl transition-all hover:scale-[1.02] active:scale-[0.98]">
+                                        {language === "tr" ? "İLERLE" : "NEXT"} <ChevronRight className="ml-3 w-5 h-5" />
                                     </Button>
                                 </div>
                             </div>
@@ -621,11 +636,11 @@ export default function EditorialPage() {
                                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                                     {/* Left: Background & Pose */}
                                     <div className="lg:col-span-5 space-y-4">
-                                        <div className="flex items-center gap-3 mb-2 px-1">
-                                            <div className="p-2 rounded-xl bg-violet-100 dark:bg-violet-900/30 text-violet-600 shadow-sm"><TbGlobe className="w-5 h-5" /></div>
+                                        <div className="flex items-center gap-3 mb-4 px-1">
+                                            <div className="p-2.5 rounded-xl bg-white/5 text-white border border-white/10 shadow-lg"><TbGlobe className="w-5 h-5" /></div>
                                             <div className="flex flex-col">
-                                                <label className="text-xs uppercase font-black text-foreground tracking-[0.2em]">{language === "tr" ? "KÜTÜPHANE ÖĞELERİ" : "LIBRARY ASSETS"}</label>
-                                                <span className="text-[10px] text-muted-foreground font-black uppercase tracking-tighter opacity-60">{language === "tr" ? "ARKAPLAN VE POZ SEÇİN" : "CHOOSE BACKGROUND & POSE"}</span>
+                                                <label className="text-xs uppercase font-black text-white tracking-[0.2em]">{language === "tr" ? "KÜTÜPHANE ÖĞELERİ" : "LIBRARY ASSETS"}</label>
+                                                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter opacity-80">{language === "tr" ? "ARKAPLAN VE POZ SEÇİN" : "CHOOSE BACKGROUND & POSE"}</span>
                                             </div>
                                         </div>
                                         <div className="grid grid-cols-2 gap-4 h-[400px]">
@@ -656,11 +671,11 @@ export default function EditorialPage() {
                                         </div>
 
                                         {/* Aspect Ratio */}
-                                        <section className="space-y-3 pt-2">
-                                            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2"><TbAspectRatio className="w-4 h-4 text-violet-500" />{language === "tr" ? "GÖRÜNTÜ ORANI" : "ASPECT RATIO"}</label>
+                                        <section className="space-y-4 pt-4">
+                                            <label className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-2"><TbAspectRatio className="w-4 h-4 text-white" />{language === "tr" ? "GÖRÜNTÜ ORANI" : "ASPECT RATIO"}</label>
                                             <div className="grid grid-cols-4 gap-2">
                                                 {["1:1", "3:4", "4:3", "9:16", "16:9", "2:3", "3:2", "21:9"].map((ratio) => (
-                                                    <button key={ratio} onClick={() => setAspectRatio(ratio)} className={`h-10 rounded-xl text-[10px] font-bold border transition-all ${aspectRatio === ratio ? 'bg-violet-600 border-violet-600 text-white shadow-lg' : 'bg-transparent border-zinc-200 dark:border-white/5 hover:border-violet-500/50 text-muted-foreground'}`}>{ratio}</button>
+                                                    <button key={ratio} onClick={() => setAspectRatio(ratio)} className={`h-11 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${aspectRatio === ratio ? 'bg-white border-white text-black shadow-xl ring-2 ring-white/20' : 'bg-white/5 border-white/5 hover:border-white/20 text-zinc-500 hover:text-white'}`}>{ratio}</button>
                                                 ))}
                                             </div>
                                         </section>
@@ -668,22 +683,22 @@ export default function EditorialPage() {
 
                                     {/* Right: Camera Settings */}
                                     <div className="lg:col-span-7 space-y-4">
-                                        <div className="flex items-center justify-between gap-3 mb-2 px-1">
+                                        <div className="flex items-center justify-between gap-3 mb-4 px-1">
                                             <div className="flex items-center gap-3">
-                                                <div className="p-2 rounded-xl bg-violet-100 dark:bg-violet-900/30 text-violet-600 shadow-sm"><TbSettings2 className="w-5 h-5" /></div>
+                                                <div className="p-2.5 rounded-xl bg-white/5 text-white border border-white/10 shadow-lg"><TbSettings2 className="w-5 h-5" /></div>
                                                 <div className="flex flex-col">
-                                                    <label className="text-xs uppercase font-black text-foreground tracking-[0.2em]">{language === "tr" ? "KAMERA KONTROL" : "CAMERA CONTROL"}</label>
-                                                    <span className="text-[10px] text-muted-foreground font-black uppercase tracking-tighter opacity-60">{language === "tr" ? "PROFESYONEL KAMERA AYARLARI" : "PROFESSIONAL CAMERA SETTINGS"}</span>
+                                                    <label className="text-xs uppercase font-black text-white tracking-[0.2em]">{language === "tr" ? "KAMERA KONTROL" : "CAMERA CONTROL"}</label>
+                                                    <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter opacity-80">{language === "tr" ? "PROFESYONEL KAMERA AYARLARI" : "PROFESSIONAL CAMERA SETTINGS"}</span>
                                                 </div>
                                             </div>
 
                                             {/* Camera Mode Toggle */}
-                                            <div className="bg-zinc-100 dark:bg-white/5 p-1 rounded-xl flex">
+                                            <div className="bg-white/5 border border-white/5 p-1 rounded-2xl flex">
                                                 <button
                                                     onClick={() => setIsManualCamera(false)}
                                                     className={cn(
-                                                        "px-4 py-1.5 text-[8px] font-black uppercase tracking-wider rounded-lg transition-all",
-                                                        !isManualCamera ? "bg-white dark:bg-white/10 shadow-sm text-violet-500" : "text-muted-foreground"
+                                                        "px-6 py-2 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all",
+                                                        !isManualCamera ? "bg-white text-black shadow-xl" : "text-zinc-500 hover:text-white"
                                                     )}
                                                 >
                                                     AUTO
@@ -691,8 +706,8 @@ export default function EditorialPage() {
                                                 <button
                                                     onClick={() => setIsManualCamera(true)}
                                                     className={cn(
-                                                        "px-4 py-1.5 text-[8px] font-black uppercase tracking-wider rounded-lg transition-all",
-                                                        isManualCamera ? "bg-white dark:bg-white/10 shadow-sm text-violet-500" : "text-muted-foreground"
+                                                        "px-6 py-2 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all",
+                                                        isManualCamera ? "bg-white text-black shadow-xl" : "text-zinc-500 hover:text-white"
                                                     )}
                                                 >
                                                     MANUAL
@@ -738,17 +753,17 @@ export default function EditorialPage() {
                                         </div>
 
                                         {/* Resolution */}
-                                        <div className="grid grid-cols-2 gap-4 pt-2">
-                                            <div className="space-y-2">
-                                                <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest px-1">{language === "tr" ? "ÇÖZÜNÜRLÜK" : "RESOLUTION"}</label>
-                                                <select className="w-full bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/5 text-[10px] font-black uppercase rounded-xl h-10 px-3 outline-none focus:ring-1 focus:ring-violet-500" value={resolution} onChange={(e) => setResolution(e.target.value)}>
-                                                    <option value="4K">4K Ultra HD</option>
-                                                    <option value="Standard">1.2K Digital</option>
+                                        <div className="grid grid-cols-2 gap-4 pt-4">
+                                            <div className="space-y-3">
+                                                <label className="text-[10px] font-black text-white uppercase tracking-widest px-1">{language === "tr" ? "ÇÖZÜNÜRLÜK" : "RESOLUTION"}</label>
+                                                <select className="w-full bg-white/5 border border-white/5 text-[10px] font-black uppercase tracking-widest rounded-2xl h-11 px-4 outline-none focus:ring-1 focus:ring-white/20 transition-all cursor-pointer" value={resolution} onChange={(e) => setResolution(e.target.value)}>
+                                                    <option value="4K" className="bg-zinc-900">4K Ultra HD</option>
+                                                    <option value="Standard" className="bg-zinc-900">1.2K Digital</option>
                                                 </select>
                                             </div>
-                                            <div className="space-y-2">
-                                                <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest px-1">{language === "tr" ? "MALİYET" : "COST"}</label>
-                                                <div className="h-10 bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/5 rounded-xl flex flex-col items-center justify-center text-[8px] font-black text-violet-500">
+                                            <div className="space-y-3">
+                                                <label className="text-[10px] font-black text-white uppercase tracking-widest px-1">{language === "tr" ? "MALİYET" : "COST"}</label>
+                                                <div className="h-11 bg-white/[0.03] border border-white/5 rounded-2xl flex flex-col items-center justify-center text-[9px] font-black text-white uppercase tracking-tighter">
                                                     <span>ANALİZ: 20 TOKEN</span>
                                                     <span>ÜRETİM: {estimatedCost} TOKEN</span>
                                                 </div>
@@ -758,12 +773,12 @@ export default function EditorialPage() {
                                 </div>
 
                                 {/* Step 2 Footer */}
-                                <div className="flex justify-between pt-4 border-t border-zinc-200 dark:border-white/5">
-                                    <Button variant="ghost" onClick={() => setWizardStep(1)} className="px-8 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                                        <ChevronLeft size={16} /> {language === "tr" ? "GERİ" : "BACK"}
+                                <div className="flex justify-between pt-8 border-t border-white/5">
+                                    <Button variant="ghost" onClick={() => setWizardStep(1)} className="px-10 h-14 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] flex items-center gap-3 border border-white/5 bg-white/5 hover:bg-white hover:text-black transition-all">
+                                        <ChevronLeft size={18} /> {language === "tr" ? "GERİ" : "BACK"}
                                     </Button>
-                                    <Button onClick={handleGenerate} disabled={isProcessing} className="px-12 py-6 rounded-2xl bg-violet-600 hover:bg-violet-700 text-white font-black uppercase tracking-widest shadow-lg shadow-violet-500/20 transition-all hover:scale-[1.05] active:scale-95">
-                                        {isProcessing ? <Loader2 className="animate-spin" /> : <Sparkles className="mr-2 w-5 h-5" />}
+                                    <Button onClick={handleGenerate} disabled={isProcessing} className="px-14 h-14 rounded-2xl bg-white hover:bg-zinc-200 text-black font-black uppercase tracking-[0.2em] shadow-2xl transition-all hover:scale-[1.02] active:scale-[0.98]">
+                                        {isProcessing ? <Loader2 className="animate-spin w-5 h-5" /> : <Sparkles className="mr-3 w-5 h-5" />}
                                         {language === "tr" ? "ÇEKİMİ BAŞLAT" : "START PRODUCTION"}
                                     </Button>
                                 </div>
@@ -833,18 +848,18 @@ export default function EditorialPage() {
                                     {/* Result Info Bar */}
                                     {resultImages.length > 0 && (
                                         <div className="absolute bottom-10 left-10 right-10 p-5 rounded-2xl bg-black/80 backdrop-blur-2xl border border-white/10 flex items-center justify-between text-white shadow-2xl z-20">
-                                            <div className="flex flex-col gap-1">
+                                            <div className="flex flex-col gap-1.5">
                                                 <div className="flex items-center gap-3">
-                                                    <span className="px-2 py-0.5 bg-violet-600 rounded text-[9px] font-bold tracking-widest uppercase">{activeCamera.name}</span>
-                                                    <span className="text-[10px] font-bold tracking-widest uppercase text-white/90">{activeLens.name}</span>
+                                                    <span className="px-2.5 py-1 bg-white rounded text-[9px] font-black tracking-widest uppercase text-black italic">{activeCamera.name}</span>
+                                                    <span className="text-[10px] font-black tracking-widest uppercase text-white tracking-widest">{activeLens.name}</span>
                                                 </div>
-                                                <div className="text-[10px] font-mono text-white/50">{focalLength}MM • {aperture} • ISO 100 • {resolution}</div>
+                                                <div className="text-[10px] font-mono font-bold text-white/50 uppercase tracking-tighter">{focalLength}MM • {aperture} • ISO 100 • {resolution}</div>
                                             </div>
                                             <div className="flex gap-3">
-                                                <button onClick={() => window.open(resultImages[0], '_blank')} className="h-10 px-6 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 transition-colors text-[10px] font-bold uppercase tracking-widest flex items-center gap-2"><Maximize size={14} />{language === "tr" ? "TAM BOYUT" : "FULL SIZE"}</button>
+                                                <button onClick={() => window.open(resultImages[0], '_blank')} className="h-11 px-6 rounded-xl bg-white/5 hover:bg-white hover:text-black border border-white/10 transition-all text-[10px] font-black uppercase tracking-widest flex items-center gap-2"><Maximize size={14} />{language === "tr" ? "TAM BOYUT" : "FULL SIZE"}</button>
                                                 <Button
                                                     onClick={() => downloadImage(resultImages[0], `editorial_${Date.now()}.png`)}
-                                                    className="h-10 px-6 rounded-xl bg-violet-600 hover:bg-violet-500 transition-all text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 shadow-[0_0_20px_rgba(124,58,237,0.3)] active:scale-95 text-white border-none"
+                                                    className="h-11 px-8 rounded-xl bg-white hover:bg-zinc-200 text-black transition-all text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-2xl active:scale-95 border-none"
                                                 >
                                                     <Download size={14} />{language === "tr" ? "İNDİR" : "DOWNLOAD"}
                                                 </Button>
@@ -863,7 +878,7 @@ export default function EditorialPage() {
                                         <div className="flex gap-5 overflow-x-auto pb-6 scrollbar-thin">
                                             {resultImages.map((img, idx) => (
                                                 <div key={idx} className="group/item relative shrink-0">
-                                                    <img src={img} className="h-48 w-36 object-cover rounded-2xl border-2 border-transparent hover:border-violet-500 transition-all cursor-pointer shadow-lg group-hover/item:scale-105" alt="Result" onClick={() => setResultImages([img, ...resultImages.filter(i => i !== img)])} />
+                                                    <img src={img} className="h-48 w-36 object-cover rounded-2xl border-2 border-transparent hover:border-white transition-all cursor-pointer shadow-lg group-hover/item:scale-105" alt="Result" onClick={() => setResultImages([img, ...resultImages.filter(i => i !== img)])} />
                                                 </div>
                                             ))}
                                         </div>
@@ -871,13 +886,13 @@ export default function EditorialPage() {
                                 )}
 
                                 {/* Step 3 Footer */}
-                                <div className="flex justify-between pt-4 border-t border-zinc-200 dark:border-white/5">
-                                    <Button variant="ghost" onClick={() => setWizardStep(2)} className="px-8 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                                        <ChevronLeft size={16} /> {language === "tr" ? "DÜZENLE" : "EDIT"}
+                                <div className="flex justify-between pt-8 border-t border-white/5">
+                                    <Button variant="ghost" onClick={() => setWizardStep(2)} className="px-10 h-14 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] flex items-center gap-3 border border-white/5 bg-white/5 hover:bg-white hover:text-black transition-all">
+                                        <ChevronLeft size={18} /> {language === "tr" ? "DÜZENLE" : "EDIT"}
                                     </Button>
-                                    <Button onClick={() => { setResultImages([]); setWizardStep(1); }} className="px-10 py-6 rounded-2xl bg-white dark:bg-card border-2 border-border hover:border-violet-500 flex items-center gap-3 transition-all">
-                                        <div className="w-8 h-8 bg-violet-500 rounded-full flex items-center justify-center text-white"><Plus size={18} /></div>
-                                        <span className="text-xs font-black uppercase tracking-tight">{language === "tr" ? "YENİ ÇEKİM" : "NEW SHOOT"}</span>
+                                    <Button onClick={() => { setResultImages([]); setWizardStep(1); }} className="px-12 h-14 rounded-2xl bg-white hover:bg-zinc-200 text-black font-black uppercase tracking-[0.2em] shadow-2xl transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center gap-4">
+                                        <Plus className="w-5 h-5" />
+                                        {language === "tr" ? "YENİ ÇEKİM" : "NEW SHOOT"}
                                     </Button>
                                 </div>
                             </div>

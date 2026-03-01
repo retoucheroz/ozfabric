@@ -47,8 +47,8 @@ export function PreviewArea({
             <Button
                 size="lg"
                 className={cn(
-                    "w-full shadow-lg transition-all duration-300",
-                    "bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] shadow-[var(--accent-primary)]/20 text-white"
+                    "w-full shadow-xl transition-all duration-300",
+                    "bg-zinc-100 hover:bg-white text-black font-black uppercase tracking-widest"
                 )}
                 onClick={() => batchMode ? handleBatchGenerate() : handleGenerate()}
                 disabled={isProcessing}
@@ -104,10 +104,10 @@ export function PreviewArea({
             <div className="flex-1 bg-[var(--bg-base)] overflow-y-auto p-4 md:p-8 relative min-h-[400px] flex flex-col items-center justify-center">
                 <div className="h-full flex flex-col items-center justify-center space-y-8 my-auto w-full max-w-md animate-in fade-in duration-700">
                     <div className="relative">
-                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/30 to-pink-500/30 rounded-full blur-xl animate-pulse"></div>
-                        <div className="relative w-24 h-24 bg-gradient-to-br from-[var(--bg-surface)] to-[var(--bg-elevated)] rounded-2xl shadow-2xl flex items-center justify-center border border-[var(--border-subtle)]">
-                            <Camera className="w-10 h-10 text-[var(--accent-primary)]" />
-                            <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full animate-pulse shadow-lg shadow-red-500/50"></div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-zinc-500/10 to-white/10 rounded-full blur-2xl animate-pulse"></div>
+                        <div className="relative w-24 h-24 bg-gradient-to-br from-black to-zinc-900 rounded-3xl shadow-2xl flex items-center justify-center border border-white/10">
+                            <Camera className="w-10 h-10 text-white" />
+                            <div className="absolute -top-1 -right-1 w-4 h-4 bg-zinc-400 rounded-full animate-pulse shadow-lg"></div>
                         </div>
                     </div>
 
@@ -116,7 +116,7 @@ export function PreviewArea({
                     <div className="w-full max-w-xs">
                         <div className="h-1.5 w-full bg-[var(--bg-elevated)] overflow-hidden rounded-full shadow-inner">
                             <div
-                                className="h-full bg-gradient-to-r from-[var(--accent-primary)] via-pink-500 to-[var(--accent-primary)] rounded-full"
+                                className="h-full bg-gradient-to-r from-white/20 via-white/80 to-white/20 rounded-full"
                                 style={{
                                     width: '100%',
                                     animation: 'shimmer 2s linear infinite',
@@ -147,7 +147,7 @@ export function PreviewArea({
                                 <h3 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-wide">
                                     {language === "tr" ? "Üretim Devam Ediyor" : "Production in Progress"}
                                 </h3>
-                                <p className="text-[10px] font-bold text-[var(--accent-primary)] opacity-80 uppercase tracking-tighter">
+                                <p className="text-[10px] font-bold text-zinc-300 opacity-80 uppercase tracking-tighter">
                                     {language === "tr" ? `${resultImages.length} görsel üretildi, devamı geliyor...` : `${resultImages.length} images generated, more coming...`}
                                 </p>
                             </div>
@@ -206,7 +206,7 @@ export function PreviewArea({
                                         {isAdmin && (
                                             <Button
                                                 size="icon"
-                                                className="h-8 w-8 rounded-full bg-blue-600/80 hover:bg-blue-600 text-white backdrop-blur-md shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                                                className="h-8 w-8 rounded-full bg-black/80 hover:bg-black text-white backdrop-blur-md shadow-sm opacity-0 group-hover:opacity-100 transition-opacity border border-white/10"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     setDebugImage(img);
@@ -276,8 +276,8 @@ export function PreviewArea({
                         <div className="bg-[var(--bg-surface)] w-full max-w-2xl rounded-2xl shadow-2xl border border-[var(--border-subtle)] overflow-hidden flex flex-col max-h-[80vh]">
                             <div className="p-4 border-b border-[var(--border-subtle)] bg-[var(--bg-elevated)] flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <Info className="w-4 h-4 text-blue-500" />
-                                    <h3 className="font-black text-sm uppercase tracking-widest">{debugImage.viewName || "DEBUG INFO"}</h3>
+                                    <Info className="w-4 h-4 text-zinc-400" />
+                                    <h3 className="font-black text-sm uppercase tracking-widest text-[#F5F5F5]">{debugImage.viewName || "DEBUG INFO"}</h3>
                                 </div>
                                 <button onClick={() => setDebugImage(null)} className="p-2 hover:bg-black/5 rounded-full transition-colors">
                                     <X className="w-4 h-4" />
@@ -286,7 +286,7 @@ export function PreviewArea({
 
                             <div className="p-6 overflow-y-auto custom-scrollbar space-y-6">
                                 <div>
-                                    <label className="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] block mb-2">Final Prompt</label>
+                                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] block mb-2">Final Prompt</label>
                                     <div className="p-4 bg-[var(--bg-elevated)] rounded-xl border border-[var(--border-subtle)] text-xs font-medium leading-relaxed font-mono whitespace-pre-wrap">
                                         {debugImage.prompt || "No prompt stored"}
                                     </div>

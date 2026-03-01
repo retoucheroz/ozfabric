@@ -23,6 +23,7 @@ interface AssetCardProps {
     description?: string;
     orientation?: 'horizontal' | 'vertical';
     hideLibrary?: boolean;
+    className?: string;
 }
 
 export function AssetCard({
@@ -41,7 +42,8 @@ export function AssetCard({
     variant = 'default',
     orientation = 'horizontal',
     description,
-    hideLibrary = false
+    hideLibrary = false,
+    className
 }: AssetCardProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isDragOver, setIsDragOver] = useState(false);
@@ -133,7 +135,7 @@ export function AssetCard({
                                         <span className="text-[10px] font-black uppercase tracking-[0.15em] text-[var(--text-primary)] truncate">
                                             {label}
                                         </span>
-                                        <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-widest opacity-80">
+                                        <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest opacity-80">
                                             {language === "tr" ? "SEÇİLDİ" : "SELECTED"}
                                         </span>
                                     </div>
@@ -201,7 +203,7 @@ export function AssetCard({
                         )
                     ) : (
                         <div className="flex flex-col items-center gap-2.5 p-3 text-center">
-                            <div className="p-3.5 rounded-2xl bg-[var(--accent-soft)]/50 text-[var(--accent-primary)] shadow-inner">
+                            <div className="p-3.5 rounded-2xl bg-zinc-800/80 text-white border border-white/5 shadow-inner">
                                 {Icon ? <Icon size={24} /> : <Upload size={24} />}
                             </div>
                             <div className="space-y-0.5">
@@ -240,7 +242,7 @@ export function AssetCard({
 
     if (variant === 'square') {
         return (
-            <div className="group/card relative max-w-[135px] mx-auto w-full">
+            <div className={cn("group/card relative mx-auto w-full", className || "max-w-[135px]")}>
                 <input type="file" accept="image/*" ref={fileInputRef} className="hidden" onChange={handleFileChange} />
 
                 {/* Main Card Area: Click to Upload / Drag & Drop */}
@@ -279,21 +281,21 @@ export function AssetCard({
                         </div>
                     ) : assets[id] === "LIGHTING_SET" ? (
                         <div className="flex flex-col items-center gap-2.5 p-3 text-center transition-all group-hover/card:scale-105">
-                            <div className="p-3.5 rounded-2xl bg-[var(--accent-soft)]/50 text-[var(--accent-primary)] shadow-inner">
+                            <div className="p-3.5 rounded-2xl bg-zinc-800/80 text-white border border-white/5 shadow-inner">
                                 {Icon ? <Icon size={24} /> : <Upload size={24} />}
                             </div>
                             <div className="space-y-0.5">
                                 <span className="text-[11px] font-bold uppercase tracking-wide text-[var(--text-primary)] block leading-tight">
                                     {label}
                                 </span>
-                                <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-tighter opacity-80 block">
+                                <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-tighter opacity-80 block">
                                     {language === "tr" ? "PRESET AKTİF" : "PRESET ACTIVE"}
                                 </span>
                             </div>
                         </div>
                     ) : (
                         <div className="flex flex-col items-center gap-2.5 p-3 text-center transition-all group-hover/card:scale-105">
-                            <div className="p-3.5 rounded-2xl bg-[var(--accent-soft)]/50 text-[var(--accent-primary)] shadow-inner">
+                            <div className="p-3.5 rounded-2xl bg-zinc-800/80 text-white border border-white/5 shadow-inner">
                                 {Icon ? <Icon size={24} /> : <Upload size={24} />}
                             </div>
                             <div className="space-y-0.5">
@@ -328,7 +330,7 @@ export function AssetCard({
 
                     {/* Status indicator for selected library asset */}
                     {assets[id] && !isActive && (
-                        <div className="absolute bottom-1 right-1 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white shadow-sm z-30" />
+                        <div className="absolute bottom-1 right-1 w-2 h-2 rounded-full bg-white ring-2 ring-black shadow-sm z-30" />
                     )}
                 </div>
 
@@ -352,12 +354,12 @@ export function AssetCard({
                 className={cn(
                     "relative h-20 rounded-xl border-2 flex items-center overflow-hidden transition-all duration-300",
                     isActive
-                        ? "bg-[var(--accent-soft)] border-[var(--accent-primary)] shadow-[0_0_15px_rgba(139,92,246,0.15)] ring-1 ring-[var(--accent-primary)]/20"
+                        ? "bg-[var(--accent-soft)] border-white shadow-[0_0_20px_rgba(255,255,255,0.1)] ring-1 ring-white/20"
                         : assets[id]
-                            ? "bg-[var(--bg-surface)] border-[var(--border-subtle)] hover:border-[var(--accent-primary)] shadow-sm"
-                            : "bg-[var(--bg-surface)] border-[var(--border-subtle)] hover:border-[var(--accent-primary)] border-dashed",
+                            ? "bg-[var(--bg-surface)] border-[var(--border-subtle)] hover:border-white shadow-sm"
+                            : "bg-[var(--bg-surface)] border-[var(--border-subtle)] hover:border-white border-dashed",
                     required && !assets[id] && "border-red-500/40 bg-red-500/[0.02]",
-                    isDragOver && "ring-2 ring-emerald-500 border-emerald-500 bg-emerald-50/20 scale-[1.02]"
+                    isDragOver && "ring-2 ring-white border-white bg-white/5 scale-[1.02]"
                 )}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}

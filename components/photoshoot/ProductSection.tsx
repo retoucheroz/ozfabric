@@ -49,14 +49,14 @@ export function ProductSection({
                         <TypeIcon className="w-5 h-5 text-[var(--accent-primary)] group-focus-within:scale-110 transition-transform" />
                     </div>
                     <select
-                        className="w-full text-sm pl-12 pr-4 py-4 rounded-2xl bg-[var(--bg-surface)] border-2 border-[var(--border-subtle)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--accent-primary)]/20 focus:border-[var(--accent-primary)] appearance-none transition-all shadow-sm hover:shadow-md font-black uppercase tracking-tight"
+                        className="w-full text-sm pl-12 pr-4 py-4 rounded-2xl bg-zinc-900/50 border-2 border-white/5 text-zinc-100 focus:ring-2 focus:ring-white/10 focus:border-white/20 appearance-none transition-all shadow-sm hover:shadow-md font-black uppercase tracking-tight"
                         value={workflowType}
                         onChange={(e) => setWorkflowType(e.target.value as any)}
                     >
-                        <option value="upper">{language === "tr" ? "Üst Giyim" : "Upper Body"}</option>
-                        <option value="lower">{language === "tr" ? "Alt Giyim" : "Lower Body"}</option>
-                        <option value="dress">{language === "tr" ? "Elbise / Tulum" : "Dress / Jumpsuit"}</option>
-                        <option value="set">{language === "tr" ? "Takım" : "Set"}</option>
+                        <option value="upper" className="bg-zinc-900">{language === "tr" ? "Üst Giyim" : "Upper Body"}</option>
+                        <option value="lower" className="bg-zinc-900">{language === "tr" ? "Alt Giyim" : "Lower Body"}</option>
+                        <option value="dress" className="bg-zinc-900">{language === "tr" ? "Elbise / Tulum" : "Dress / Jumpsuit"}</option>
+                        <option value="set" className="bg-zinc-900">{language === "tr" ? "Takım" : "Set"}</option>
                     </select>
                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none" />
                 </div>
@@ -109,7 +109,7 @@ export function ProductSection({
                             }
                         }}
                         placeholder={language === "tr" ? "Gömlek, Pantolon..." : "Enter name..."}
-                        className="w-full bg-[var(--bg-surface)] border-2 border-[var(--border-subtle)] text-[var(--text-primary)] text-sm font-black placeholder:text-[var(--text-muted)]/50 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-[var(--accent-primary)]/20 focus:border-[var(--accent-primary)] outline-none transition-all shadow-sm hover:shadow-md"
+                        className="w-full bg-zinc-900/50 border-2 border-white/5 text-zinc-100 text-sm font-black placeholder:text-zinc-500 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-white/10 focus:border-white/20 outline-none transition-all shadow-sm hover:shadow-md"
                     />
                 </div>
             </div>
@@ -119,33 +119,6 @@ export function ProductSection({
                 {children}
             </div>
 
-            {/* Manage Products Button — same height as model card */}
-            <div
-                onClick={() => {
-                    setActiveLibraryAsset('product_group' as any);
-                    setActiveGroup('product');
-                    setLibraryTab('assets');
-                }}
-                className="group relative h-[130px] rounded-2xl border-2 border-dashed border-[var(--accent-primary)]/40 bg-[var(--accent-soft)]/20 hover:bg-[var(--accent-soft)]/40 hover:border-[var(--accent-primary)] cursor-pointer flex items-center px-4 gap-4 transition-all duration-300 shadow-sm hover:shadow-lg hover:scale-[1.01] overflow-hidden"
-            >
-                {/* Two stacked icons */}
-                <div className="flex flex-col items-center shrink-0 gap-0">
-                    <div className="p-2 rounded-t-xl bg-[var(--accent-primary)] text-white shadow-md group-hover:scale-105 transition-transform duration-300">
-                        <TbShirt className="w-5 h-5" />
-                    </div>
-                    <div className="p-2 rounded-b-xl bg-[var(--accent-primary)]/70 text-white shadow-md group-hover:scale-105 transition-transform duration-300">
-                        <PiPantsLight className="w-5 h-5" />
-                    </div>
-                </div>
-                {/* Text */}
-                <div className="flex-1 flex flex-col gap-1 min-w-0">
-                    <span className="text-xs font-black text-[var(--text-primary)] uppercase tracking-widest truncate">{language === "tr" ? "Ürün Yönetimi" : "Products"}</span>
-                    <span className="text-[9px] text-[var(--accent-primary)] font-bold uppercase tracking-tight opacity-80 truncate">
-                        {language === "tr" ? "Parçaları ekle & düzenle" : "Add & edit pieces"}
-                    </span>
-                </div>
-                <ChevronRight className="w-4 h-4 text-[var(--accent-primary)] group-hover:translate-x-1 transition-transform shrink-0" />
-            </div>
         </div>
     );
 }

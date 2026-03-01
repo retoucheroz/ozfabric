@@ -35,7 +35,7 @@ export function PhotoshootTutorial({ language }: PhotoshootTutorialProps) {
                 <div className="grid grid-cols-3 gap-6 text-left border-t border-[var(--border-subtle)]/50 pt-4">
                     <div className="space-y-2">
                         <div className="flex items-center gap-2">
-                            <span className="w-5 h-5 rounded-full bg-[var(--accent-primary)] text-white text-[10px] flex items-center justify-center font-black italic shadow-lg shadow-[var(--accent-primary)]/30">1</span>
+                            <span className="w-6 h-6 rounded-full bg-white text-black text-xs flex items-center justify-center font-black italic shadow-xl border border-black/5">1</span>
                             <span className="text-[10px] font-black uppercase tracking-[0.15em] text-[var(--text-primary)]">
                                 {language === "tr" ? "MODEL & ÜRÜN" : "MODEL & PRODUCT"}
                             </span>
@@ -47,7 +47,7 @@ export function PhotoshootTutorial({ language }: PhotoshootTutorialProps) {
 
                     <div className="space-y-2 border-x border-[var(--border-subtle)]/30 px-6">
                         <div className="flex items-center gap-2">
-                            <span className="w-5 h-5 rounded-full bg-[var(--accent-primary)] text-white text-[10px] flex items-center justify-center font-black italic shadow-lg shadow-[var(--accent-primary)]/30">2</span>
+                            <span className="w-6 h-6 rounded-full bg-white text-black text-xs flex items-center justify-center font-black italic shadow-xl border border-black/5">2</span>
                             <span className="text-[10px] font-black uppercase tracking-[0.15em] text-[var(--text-primary)]">
                                 {language === "tr" ? "AYARLAR" : "SETTINGS"}
                             </span>
@@ -59,7 +59,7 @@ export function PhotoshootTutorial({ language }: PhotoshootTutorialProps) {
 
                     <div className="space-y-2">
                         <div className="flex items-center gap-2">
-                            <span className="w-5 h-5 rounded-full bg-[var(--accent-primary)] text-white text-[10px] flex items-center justify-center font-black italic shadow-lg shadow-[var(--accent-primary)]/30">3</span>
+                            <span className="w-6 h-6 rounded-full bg-white text-black text-xs flex items-center justify-center font-black italic shadow-xl border border-black/5">3</span>
                             <span className="text-[10px] font-black uppercase tracking-[0.15em] text-[var(--text-primary)]">
                                 {language === "tr" ? "ÜRETİM" : "PRODUCTION"}
                             </span>

@@ -152,26 +152,26 @@ export function LibrarySidebar({
     return (
         <div
             className={cn(
-                "fixed right-0 top-0 bottom-0 w-full sm:w-80 lg:w-[480px] bg-[var(--bg-sidebar)] border-l border-[var(--border-subtle)] shadow-2xl z-[60] flex flex-col transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1)",
+                "fixed right-0 top-0 bottom-0 w-full sm:w-80 lg:w-[520px] bg-black/90 backdrop-blur-3xl border-l border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] z-[60] flex flex-col transition-all duration-700 cubic-bezier(0.16, 1, 0.3, 1)",
                 activeLibraryAsset ? "translate-x-0 opacity-100" : "translate-x-full opacity-0 pointer-events-none"
             )}
         >
             {/* Header */}
-            <div className="p-4 border-b border-[var(--border-subtle)] flex items-center justify-between bg-[var(--bg-elevated)]">
+            <div className="p-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
                 <div className="flex items-center gap-3">
                     {/* Back Button for Nested Navigation */}
                     {(activeLibraryAsset && !['product_group', 'accessories_group'].includes(activeLibraryAsset) && activeGroup) && (
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 -ml-1 mr-1 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]"
+                            className="h-9 w-9 -ml-1 mr-2 text-white/40 hover:text-white hover:bg-white/5 rounded-xl transition-all"
                             onClick={() => setActiveLibraryAsset(activeGroup === 'product' ? 'product_group' : 'accessories_group')}
                         >
                             <ChevronLeft className="w-5 h-5" />
                         </Button>
                     )}
 
-                    <span className="text-base font-black uppercase tracking-tight text-[var(--text-primary)]">
+                    <span className="text-sm font-black uppercase tracking-[0.2em] text-white">
                         {activeLibraryAsset === 'product_group' ? (language === "tr" ? "ÜRÜN YÖNETİMİ" : "PRODUCT MGMT") :
                             activeLibraryAsset === 'accessories_group' ? (language === "tr" ? "AKSESUARLAR" : "ACCESSORIES") :
                                 (() => {
@@ -213,7 +213,7 @@ export function LibrarySidebar({
                                 })()}
                     </span>
                 </div>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]" onClick={() => { setActiveLibraryAsset(null); setActiveGroup(null); }}>
+                <Button variant="ghost" size="icon" className="h-9 w-9 text-white/40 hover:text-white hover:bg-white/5 rounded-xl transition-all" onClick={() => { setActiveLibraryAsset(null); setActiveGroup(null); }}>
                     <X className="w-5 h-5" />
                 </Button>
             </div>
@@ -224,16 +224,15 @@ export function LibrarySidebar({
                     {activeLibraryAsset === 'product_group' && (
                         <div className="space-y-6">
                             {/* Primary Products */}
-                            <div className="space-y-3">
-                                <h4 className="text-[10px] font-black text-[var(--accent-primary)] uppercase tracking-[0.2em] px-1">{language === "tr" ? "TEMEL ÜRÜNLER" : "PRIMARY PRODUCTS"}</h4>
+                            <div className="space-y-4">
+                                <h4 className="text-[10px] font-black text-white uppercase tracking-[0.2em] px-1 opacity-40">{language === "tr" ? "TEMEL ÜRÜNLER" : "PRIMARY PRODUCTS"}</h4>
                                 <div className="grid grid-cols-2 gap-3">
-                                    <div className="space-y-3">
-                                        <AssetCard id="top_front" label={language === "tr" ? "Üst Ön" : "Top Front"} icon={TbShirtFilled} variant="square" hideLibrary={true} />
-                                        <AssetCard id="top_back" label={language === "tr" ? "Üst Arka" : "Top Back"} icon={TbShirt} variant="square" hideLibrary={true} />
-                                    </div>
-                                    <div className="space-y-3">
-                                        <AssetCard id="bottom_front" label={language === "tr" ? "Alt Ön" : "Bottom Front"} icon={PiPantsFill} variant="square" hideLibrary={true} />
-                                        <AssetCard id="bottom_back" label={language === "tr" ? "Alt Arka" : "Bottom Back"} icon={PiPants} variant="square" hideLibrary={true} />
+                                    <AssetCard id="top_front" label={language === "tr" ? "Üst Ön" : "Top Front"} icon={TbShirtFilled} variant="square" hideLibrary={true} />
+                                    <AssetCard id="top_back" label={language === "tr" ? "Üst Arka" : "Top Back"} icon={TbShirt} variant="square" hideLibrary={true} />
+                                    <AssetCard id="bottom_front" label={language === "tr" ? "Alt Ön" : "Bottom Front"} icon={PiPantsFill} variant="square" hideLibrary={true} />
+                                    <AssetCard id="bottom_back" label={language === "tr" ? "Alt Arka" : "Bottom Back"} icon={PiPants} variant="square" hideLibrary={true} />
+                                    <div className="col-span-2">
+                                        <AssetCard id="inner_wear" label={language === "tr" ? "İÇ GİYİM" : "INNER WEAR"} icon={TbShirt} variant="square" />
                                     </div>
                                 </div>
                             </div>
@@ -306,16 +305,16 @@ export function LibrarySidebar({
 
                     {/* POSE FOCUS TOGGLE (Only for Pose) */}
                     {internalAsset === 'pose' && (
-                        <div className="px-3 py-2 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)] flex items-center justify-between">
-                            <span className="text-xs font-medium text-[var(--text-muted)]">{language === "tr" ? "Odak Alanı" : "Focus Area"}</span>
-                            <div className="flex items-center gap-2 bg-[var(--bg-elevated)] p-1 rounded-lg">
+                        <div className="px-6 py-4 border-b border-white/5 bg-white/[0.01] flex items-center justify-between">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-white/40">{language === "tr" ? "ODAK ALANI" : "FOCUS AREA"}</span>
+                            <div className="flex items-center gap-1.5 bg-black/40 p-1.5 rounded-2xl border border-white/5">
                                 <button
                                     onClick={() => { setPoseFocus('full'); setUpperFraming('full'); }}
                                     className={cn(
-                                        "text-[10px] px-2 py-1 rounded-md transition-all",
+                                        "text-[9px] px-4 py-2 rounded-xl transition-all font-black uppercase tracking-widest",
                                         poseFocus === 'full'
-                                            ? "bg-[var(--bg-surface)] shadow text-[var(--text-primary)] font-bold"
-                                            : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                                            ? "bg-white text-black shadow-xl"
+                                            : "text-white/40 hover:text-white"
                                     )}
                                 >
                                     {language === "tr" ? "Tam Boy" : "Full Body"}
@@ -323,10 +322,10 @@ export function LibrarySidebar({
                                 <button
                                     onClick={() => { setPoseFocus('upper'); setUpperFraming('medium_full'); }}
                                     className={cn(
-                                        "text-[10px] px-2 py-1 rounded-md transition-all",
+                                        "text-[9px] px-4 py-2 rounded-xl transition-all font-black uppercase tracking-widest",
                                         poseFocus === 'upper'
-                                            ? "bg-[var(--bg-surface)] shadow text-[var(--text-primary)] font-bold"
-                                            : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                                            ? "bg-white text-black shadow-xl"
+                                            : "text-white/40 hover:text-white"
                                     )}
                                 >
                                     {language === "tr" ? "Üst Beden" : "Upper Body"}
@@ -336,10 +335,10 @@ export function LibrarySidebar({
                     )}
 
                     <Tabs value={libraryTab} onValueChange={setLibraryTab} className="flex-1 flex flex-col">
-                        <div className="px-3 pt-3">
-                            <TabsList className="w-full grid grid-cols-2">
-                                <TabsTrigger value="library" className="text-xs">{language === "tr" ? "Kütüphane" : "Library"}</TabsTrigger>
-                                <TabsTrigger value="prompt" className="text-[10px] uppercase font-bold tracking-tight">
+                        <div className="px-6 pt-6">
+                            <TabsList className="w-full grid grid-cols-2 h-12 bg-white/5 rounded-2xl p-1.5 border border-white/5">
+                                <TabsTrigger value="library" className="text-[10px] font-black uppercase tracking-widest rounded-xl data-[state=active]:bg-white data-[state=active]:text-black">{language === "tr" ? "Kütüphane" : "Library"}</TabsTrigger>
+                                <TabsTrigger value="prompt" className="text-[10px] font-black uppercase tracking-widest rounded-xl data-[state=active]:bg-white data-[state=active]:text-black">
                                     {language === "tr" ? "PROMPT" : "PROMPT"}
                                 </TabsTrigger>
                             </TabsList>
@@ -388,13 +387,13 @@ export function LibrarySidebar({
                                                     const isProcessing = (pose as any).customPrompt === undefined && (pose as any).stickmanUrl === 'processing';
                                                     return (
                                                         <div key={pose.id} className={cn(
-                                                            "group relative aspect-[2/3] rounded-lg border overflow-hidden transition-all shrink-0",
+                                                            "group relative aspect-[2/3] rounded-2xl border transition-all shrink-0 overflow-hidden",
                                                             isProcessing ? "cursor-wait" : "cursor-pointer",
                                                             isPoseSelected
-                                                                ? "ring-2 ring-green-500 border-green-500 shadow-lg shadow-green-500/20"
-                                                                : "bg-card hover:ring-2 hover:ring-violet-500"
+                                                                ? "border-white ring-2 ring-white/20 shadow-2xl"
+                                                                : "bg-white/5 border-white/5 hover:border-white/20"
                                                         )}>
-                                                            <img src={pose.thumbUrl || pose.originalThumb} className="w-full h-full object-cover" onClick={() => !isProcessing && handleSavedPoseClick(pose)} />
+                                                            <img src={pose.thumbUrl || pose.originalThumb} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onClick={() => !isProcessing && handleSavedPoseClick(pose)} />
                                                             {isProcessing && (
                                                                 <div className="absolute inset-0 bg-black/65 flex flex-col items-center justify-center gap-2 pointer-events-none">
                                                                     <div className="w-5 h-5 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
@@ -416,8 +415,8 @@ export function LibrarySidebar({
                                                             <div className="absolute top-1 right-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                                 {(!pose.isGlobal || isAdmin) && (
                                                                     <>
-                                                                        <button onClick={(e) => { e.stopPropagation(); deleteSavedPose(pose.id); }} className="p-1 bg-red-500 text-white rounded hover:bg-red-600"><X size={10} /></button>
-                                                                        <button onClick={(e) => { e.stopPropagation(); handleEditItemClick('pose', pose.id); }} className="p-1 bg-[var(--accent-primary)] text-white rounded hover:bg-[var(--accent-hover)]"><Edit2 size={10} /></button>
+                                                                        <button onClick={(e) => { e.stopPropagation(); deleteSavedPose(pose.id); }} className="p-1 bg-red-500 text-white rounded shadow-lg hover:bg-red-600 transition-colors"><X size={10} /></button>
+                                                                        <button onClick={(e) => { e.stopPropagation(); handleEditItemClick('pose', pose.id); }} className="p-1 bg-white text-black rounded shadow-lg hover:bg-zinc-200 transition-colors"><Edit2 size={10} /></button>
                                                                     </>
                                                                 )}
                                                                 {!pose.isGlobal && isAdmin && addToGlobalLibrary && (
@@ -494,11 +493,11 @@ export function LibrarySidebar({
                                                                                         const thumbToShow = internalAsset === 'background' && isPreset ? (item.preview || item.color) : (item.thumbUrl || item.url);
 
                                                                                         return (
-                                                                                            <div key={item.id} className="group relative aspect-square rounded-lg border bg-card overflow-hidden cursor-pointer hover:ring-2 hover:ring-violet-500 transition-all">
+                                                                                            <div key={item.id} className="group relative aspect-square rounded-2xl border bg-white/5 border-white/5 overflow-hidden cursor-pointer hover:border-white/20 transition-all shadow-xl">
                                                                                                 {thumbToShow ? (
                                                                                                     (internalAsset === 'background' && isPreset && item.color) ? (
                                                                                                         <div
-                                                                                                            className="w-full h-full"
+                                                                                                            className="w-full h-full transition-transform duration-500 group-hover:scale-110"
                                                                                                             style={{ background: item.color }}
                                                                                                             onClick={() => {
                                                                                                                 setAssets((p: any) => ({ ...p, background: item.color }));
@@ -547,7 +546,7 @@ export function LibrarySidebar({
                                                                                                     )
                                                                                                 ) : (
                                                                                                     <div
-                                                                                                        className="w-full h-full flex flex-col items-center justify-center bg-[var(--bg-elevated)] text-[var(--accent-primary)] font-bold text-[10px] p-2 text-center"
+                                                                                                        className="w-full h-full flex flex-col items-center justify-center bg-white/[0.02] text-white/60 font-black text-[10px] p-3 text-center uppercase tracking-tighter"
                                                                                                         onClick={() => {
                                                                                                             if (internalAsset === 'lighting') {
                                                                                                                 const l = item as SavedLighting;
@@ -584,7 +583,7 @@ export function LibrarySidebar({
                                                                                                             }
                                                                                                         }}
                                                                                                     >
-                                                                                                        <Camera size={20} className="mb-1 opacity-50" />
+                                                                                                        <Camera size={24} className="mb-2 opacity-30" />
                                                                                                         {item.name || item.labelTr || item.label}
                                                                                                     </div>
                                                                                                 )}
@@ -595,8 +594,8 @@ export function LibrarySidebar({
                                                                                                 <div className="absolute top-1 right-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                                                                     {(!isPreset && (isAdmin || !item.isGlobal)) && (
                                                                                                         <>
-                                                                                                            <button onClick={(e) => { e.stopPropagation(); deleteSavedAsset(internalAsset!, item.id); }} className="p-1 bg-red-500 text-white rounded hover:bg-red-600"><X size={10} /></button>
-                                                                                                            <button onClick={(e) => { e.stopPropagation(); handleEditItemClick(internalAsset!, item.id); }} className="p-1 bg-[var(--accent-primary)] text-white rounded hover:bg-[var(--accent-hover)]"><Edit2 size={10} /></button>
+                                                                                                            <button onClick={(e) => { e.stopPropagation(); deleteSavedAsset(internalAsset!, item.id); }} className="p-1 bg-red-500 text-white rounded shadow-lg hover:bg-red-600 transition-colors"><X size={10} /></button>
+                                                                                                            <button onClick={(e) => { e.stopPropagation(); handleEditItemClick(internalAsset!, item.id); }} className="p-1 bg-white text-black rounded shadow-lg hover:bg-zinc-200 transition-colors"><Edit2 size={10} /></button>
                                                                                                         </>
                                                                                                     )}
                                                                                                     {!item.isGlobal && isAdmin && addToGlobalLibrary && !isPreset && (
@@ -651,16 +650,16 @@ export function LibrarySidebar({
                             )}
                         </TabsContent>
 
-                        <TabsContent value="prompt" className="flex-1 p-3">
-                            <div className="space-y-2">
-                                <label className="text-xs font-medium">{language === "tr" ? "Özel Prompt" : "Custom Prompt"}</label>
+                        <TabsContent value="prompt" className="flex-1 p-6 space-y-6">
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">{language === "tr" ? "ÖZEL PROMPT" : "CUSTOM PROMPT"}</label>
                                 <textarea
-                                    className="w-full h-32 p-2 text-xs rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-primary)] resize-none focus:ring-1 focus:ring-[var(--accent-primary)]"
+                                    className="w-full h-40 p-4 text-[11px] rounded-[24px] border border-white/5 bg-white/[0.03] text-white resize-none focus:border-white/20 outline-none transition-all font-bold placeholder:text-white/20"
                                     placeholder={language === "tr" ? "Tam olarak ne istediğinizi tarif edin..." : "Describe exactly what you want..."}
                                 ></textarea>
-                                <Button size="sm" className="w-full text-xs">{language === "tr" ? "Prompt'u Uygula" : "Apply Prompt"}</Button>
-                                <p className="text-[10px] text-muted-foreground mt-2">
-                                    {language === "tr" ? "Bu varlık için özel prompt kullanın." : "Use a custom prompt for this asset slot."}
+                                <Button className="w-full h-12 rounded-2xl bg-white text-black font-black uppercase tracking-widest hover:bg-zinc-200 transition-all">{language === "tr" ? "PROMPT'U UYGULA" : "APPLY PROMPT"}</Button>
+                                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-tight leading-relaxed">
+                                    {language === "tr" ? "Bu slot için yapay zekaya özel bir talimat gönderin. Mevcut kütüphane öğelerini geçersiz kılabilir." : "Send a specific instruction to AI for this slot. It may override current library items."}
                                 </p>
                             </div>
                         </TabsContent>

@@ -50,8 +50,8 @@ export function ModelSection({
             <div className="space-y-4">
                 {['female', 'male'].map(g => (
                     <div key={g} className="space-y-2">
-                        <h4 className="text-[10px] uppercase font-bold text-muted-foreground flex items-center gap-2">
-                            <User size={12} className={g === 'female' ? 'text-pink-500' : 'text-blue-500'} />
+                        <h4 className="text-[10px] uppercase font-bold text-zinc-500 flex items-center gap-2">
+                            <User size={12} className={g === 'female' ? 'text-[#F5F5F5]' : 'text-zinc-400'} />
                             {g === 'female' ? (language === "tr" ? "Kadın Stüdyolar" : "Female Studios") : (language === "tr" ? "Erkek Stüdyolar" : "Male Studios")}
                         </h4>
                         <div className="grid grid-cols-3 gap-2 min-h-[140px] overflow-y-auto custom-scrollbar pr-1">
@@ -77,7 +77,7 @@ export function ModelSection({
                             {[...MODEL_PRESETS, ...savedModels].filter(m => m.gender === g).map(model => {
                                 const isPreset = MODEL_PRESETS.some(p => p.id === model.id);
                                 return (
-                                    <div key={model.id} className="group relative aspect-[2/3] rounded-lg border bg-card overflow-hidden cursor-pointer hover:ring-2 hover:ring-violet-500 transition-all shrink-0">
+                                    <div key={model.id} className="group relative aspect-[2/3] rounded-lg border border-white/5 bg-zinc-900 overflow-hidden cursor-pointer hover:ring-2 hover:ring-white/20 transition-all shrink-0">
                                         <img
                                             src={model.thumbUrl || model.url}
                                             className="w-full h-full object-cover"
@@ -95,8 +95,8 @@ export function ModelSection({
                                         <div className="absolute top-1 right-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                             {(!isPreset && (!model.isGlobal || isAdmin)) && (
                                                 <>
-                                                    {deleteSavedModel && <button onClick={(e) => { e.stopPropagation(); deleteSavedModel(model.id); }} className="p-1 bg-red-500 text-white rounded hover:bg-red-600"><X size={10} /></button>}
-                                                    {handleEditItemClick && <button onClick={(e) => { e.stopPropagation(); handleEditItemClick('model', model.id); }} className="p-1 bg-[var(--accent-primary)] text-white rounded hover:bg-[var(--accent-hover)]"><Edit2 size={10} /></button>}
+                                                    {deleteSavedModel && <button onClick={(e) => { e.stopPropagation(); deleteSavedModel(model.id); }} className="p-1 bg-red-500 text-white rounded shadow-lg hover:bg-red-600 transition-colors"><X size={10} /></button>}
+                                                    {handleEditItemClick && <button onClick={(e) => { e.stopPropagation(); handleEditItemClick('model', model.id); }} className="p-1 bg-white text-black rounded shadow-lg hover:bg-zinc-200 transition-colors"><Edit2 size={10} /></button>}
                                                 </>
                                             )}
                                             {!model.isGlobal && isAdmin && addToGlobalLibrary && (
@@ -126,27 +126,27 @@ export function ModelSection({
             <div className="relative rounded-3xl border-2 overflow-hidden transition-all duration-500 bg-[var(--bg-elevated)] border-[var(--border-subtle)] shadow-sm h-[150px] flex flex-col">
 
                 {/* Gender Toggle Tabs */}
-                <div className="flex border-b border-[var(--border-subtle)]">
+                <div className="flex border-b border-white/5">
                     <button
                         onClick={() => setGender("female")}
                         className={cn(
-                            "flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-black uppercase tracking-[0.2em] transition-all",
+                            "flex-1 flex items-center justify-center gap-2 py-3 text-[10px] font-black uppercase tracking-[0.2em] transition-all",
                             gender === 'female'
-                                ? "bg-pink-500 text-white"
-                                : "bg-transparent text-[var(--text-muted)] hover:bg-pink-500/5 hover:text-pink-500"
+                                ? "bg-white text-black"
+                                : "bg-zinc-900 text-zinc-500 hover:text-white"
                         )}
                     >
                         <TbGenderFemale size={16} />
                         {language === "tr" ? "KADIN" : "FEMALE"}
                     </button>
-                    <div className="w-[1px] bg-[var(--border-subtle)]" />
+                    <div className="w-[1px] bg-white/5" />
                     <button
                         onClick={() => setGender("male")}
                         className={cn(
-                            "flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-black uppercase tracking-[0.2em] transition-all",
+                            "flex-1 flex items-center justify-center gap-2 py-3 text-[10px] font-black uppercase tracking-[0.2em] transition-all",
                             gender === 'male'
-                                ? "bg-blue-500 text-white"
-                                : "bg-transparent text-[var(--text-muted)] hover:bg-blue-500/5 hover:text-blue-500"
+                                ? "bg-white text-black"
+                                : "bg-zinc-900 text-zinc-500 hover:text-white"
                         )}
                     >
                         <TbGenderMale size={16} />

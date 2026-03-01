@@ -9,10 +9,10 @@ import { Switch } from "@/components/ui/switch"
 import { Separator } from "@/components/ui/separator"
 import {
     ChevronRight, ChevronLeft, ChevronDown, Sparkles, User,
-    Image as ImageIcon, Camera, X, FileText, Edit2, Glasses, Check, Shirt
+    Image as ImageIcon, Camera, X, FileText, Edit2, Glasses, Check, Shirt, ScanLine
 } from "lucide-react"
 import { TbSettings2, TbShirtFilled, TbJacket, TbShirt, TbHanger } from "react-icons/tb"
-import { PiHandbag, PiBaseballCap, PiDiamond, PiBelt } from "react-icons/pi"
+import { PiHandbag, PiBaseballCap, PiDiamond, PiBelt, PiPantsLight, PiPants, PiPantsFill } from "react-icons/pi"
 
 import { toast } from "sonner"
 
@@ -27,7 +27,6 @@ import { LibrarySidebar } from "@/components/photoshoot/LibrarySidebar"
 import { WizardProgress } from "@/components/photoshoot/WizardProgress"
 import { PhotoshootTutorial } from "@/components/photoshoot/PhotoshootTutorial"
 import { BehaviorToggles } from "@/components/photoshoot/BehaviorToggles"
-import { ClothingDetails } from "@/components/photoshoot/ClothingDetails"
 
 // Dialogs
 import { SavePoseDialog } from "@/components/photoshoot/dialogs/SavePoseDialog"
@@ -87,6 +86,7 @@ export default function PhotoshootPage() {
     } = usePhotoshootWorkflow();
 
     const [targetPoseShot, setTargetPoseShot] = useState<string | null>(null);
+    const [showProductManager, setShowProductManager] = useState(false);
 
     // Block navigation when generation is in progress
     useEffect(() => {
@@ -138,8 +138,8 @@ export default function PhotoshootPage() {
                 activeLibraryAsset ? "lg:pr-[480px]" : "pr-0"
             )}>
                 <div className={cn(
-                    "p-4 md:p-6 mx-auto space-y-4 transition-all duration-500 flex-1 w-full",
-                    wizardStep === 1 ? "max-w-[1200px]" : (wizardStep === 3 ? "max-w-6xl" : "max-w-4xl")
+                    "p-4 md:p-8 mx-auto space-y-8 transition-all duration-500 flex-1 w-full",
+                    wizardStep === 1 ? "max-w-[1240px]" : (wizardStep === 3 ? "max-w-[1400px]" : "max-w-5xl")
                 )}>
 
                     {/* Header: Progress */}
@@ -147,11 +147,7 @@ export default function PhotoshootPage() {
                         <WizardProgress currentStep={wizardStep} onStepClick={(s) => canMoveToStep(s) && setWizardStep(s as any)} language={language} />
                     </div>
 
-                    {/* Page Title & Reset Button */}
-                    <div className="text-center -mt-2 mb-2 relative flex flex-col items-center justify-center">
-                        <h1 className="text-xl font-black uppercase tracking-tight text-[var(--text-primary)]">📸 {t("home.photoshootTitle")}</h1>
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] opacity-60 mt-0.5">{t("home.photoshootDesc")}</p>
-                    </div>
+
 
                     {/* WIZARD STEP 1: PRODUCT */}
                     {wizardStep === 1 && (
@@ -160,12 +156,12 @@ export default function PhotoshootPage() {
                                 {/* Left: Product Selection */}
                                 <div className="lg:col-span-3 flex flex-col">
                                     <div className="flex items-center gap-3 mb-4">
-                                        <div className="p-2 rounded-xl bg-[var(--accent-soft)] text-[var(--accent-primary)] shadow-sm">
+                                        <div className="p-2 rounded-xl bg-zinc-800 text-white border border-white/10 shadow-lg">
                                             <TbSettings2 className="w-5 h-5" />
                                         </div>
                                         <div className="flex flex-col">
-                                            <label className="text-xs uppercase font-black text-[var(--text-primary)] tracking-[0.2em]">{language === "tr" ? "ÜRÜN SEÇİMİ" : "PRODUCT SELECTION"}</label>
-                                            <span className="text-[10px] text-[var(--text-muted)] font-black uppercase tracking-tighter opacity-60">{language === "tr" ? "ÇEKİLECEK ÜRÜNÜ BELİRLE" : "DEFINE PRODUCT TO SHOOT"}</span>
+                                            <label className="text-xs uppercase font-black text-white tracking-[0.2em]">{language === "tr" ? "ÜRÜN SEÇİMİ" : "PRODUCT SELECTION"}</label>
+                                            <span className="text-[10px] text-zinc-400 font-black uppercase tracking-tighter opacity-100 mt-0.5">{language === "tr" ? "ÇEKİLECEK ÜRÜNÜ BELİRLE" : "DEFINE PRODUCT TO SHOOT"}</span>
                                         </div>
                                     </div>
 
@@ -181,23 +177,166 @@ export default function PhotoshootPage() {
                                             setActiveGroup={setActiveGroup}
                                             setLibraryTab={v => setLibraryTab(v as any)}
                                         >
-                                            <ModelSection
-                                                language={language}
-                                                gender={gender}
-                                                setGender={setGender}
-                                                assets={assets}
-                                                activeLibraryAsset={activeLibraryAsset}
-                                                setActiveLibraryAsset={setActiveLibraryAsset}
-                                                handleAssetUpload={handleAssetUpload}
-                                                handleAssetRemove={handleAssetRemove}
-                                            />
+                                            <div className="space-y-4">
+                                                <ModelSection
+                                                    language={language}
+                                                    gender={gender}
+                                                    setGender={setGender}
+                                                    assets={assets}
+                                                    activeLibraryAsset={activeLibraryAsset}
+                                                    setActiveLibraryAsset={setActiveLibraryAsset}
+                                                    handleAssetUpload={handleAssetUpload}
+                                                    handleAssetRemove={handleAssetRemove}
+                                                />
+
+                                                <div className="grid grid-cols-1 gap-3">
+                                                    {/* Manage Products Button */}
+                                                    <div
+                                                        onClick={() => {
+                                                            setShowProductManager(!showProductManager);
+                                                            if (activeLibraryAsset) setActiveLibraryAsset(null);
+                                                        }}
+                                                        className={cn(
+                                                            "group relative h-[100px] rounded-2xl border-2 border-dashed transition-all duration-300 shadow-sm hover:shadow-lg hover:scale-[1.01] overflow-hidden cursor-pointer flex items-center justify-center px-4 gap-4",
+                                                            showProductManager
+                                                                ? "bg-white/10 border-white/40 ring-2 ring-white/20"
+                                                                : "bg-zinc-900/40 border-white/5 hover:bg-zinc-800/60 hover:border-white/20"
+                                                        )}
+                                                    >
+                                                        <div className="flex items-center gap-1.5 shrink-0">
+                                                            <div className="p-2.5 rounded-xl bg-zinc-800 text-white border border-white/5 shadow-md group-hover:scale-110 transition-transform">
+                                                                <TbShirt className="w-5 h-5" />
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <span className="text-xs font-black text-white uppercase tracking-widest leading-none">{language === "tr" ? "Ürün Yönetimi" : "Products"}</span>
+                                                            <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-tighter mt-1.5 opacity-60">
+                                                                {language === "tr" ? (showProductManager ? "Gizle" : "Yönet ve Düzenle") : (showProductManager ? "Hide" : "Manage & Edit")}
+                                                            </span>
+                                                        </div>
+                                                        <ChevronRight className={cn("w-4 h-4 transition-transform ml-auto", showProductManager ? "rotate-90 text-white" : "text-zinc-600 group-hover:translate-x-1")} />
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </ProductSection>
                                     </div>
                                 </div>
 
-                                {/* Right: Tutorial Area */}
+                                {/* Right: Tutorial Area / Product Manager */}
                                 <div className="lg:col-span-8 hidden lg:block sticky top-6">
-                                    <PhotoshootTutorial language={language} />
+                                    <div className="grid w-full" style={{ gridTemplateAreas: '"stack"' }}>
+                                        {/* Product Manager */}
+                                        <div
+                                            className={cn(
+                                                "transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]",
+                                                showProductManager
+                                                    ? "opacity-100 translate-y-0 scale-100 pointer-events-auto z-10"
+                                                    : "opacity-0 translate-y-12 scale-[0.97] pointer-events-none -unset z-0"
+                                            )}
+                                            style={{ gridArea: 'stack' }}
+                                        >
+                                            <div className="bg-[#111113] border border-white/5 rounded-[32px] p-8 pb-4 shadow-2xl h-fit max-h-[calc(100vh-180px)] overflow-y-auto custom-scrollbar">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="absolute top-6 right-6 h-10 w-10 text-zinc-500 hover:text-white rounded-full hover:bg-white/5 transition-all"
+                                                    onClick={() => setShowProductManager(false)}
+                                                >
+                                                    <X className="w-5 h-5" />
+                                                </Button>
+
+                                                <div className="grid grid-cols-2 gap-x-12 gap-y-10 mt-4">
+                                                    {/* Primary Products Column */}
+                                                    <div className="space-y-6">
+                                                        <div className="flex items-center gap-3 pb-3 border-b border-white/5">
+                                                            <div className="w-8 h-8 rounded-lg bg-zinc-800 flex items-center justify-center border border-white/5 text-white shadow-sm">
+                                                                <TbShirt className="w-4 h-4" />
+                                                            </div>
+                                                            <h4 className="text-[11px] font-black text-white uppercase tracking-[0.2em]">
+                                                                {language === "tr" ? "TEMEL ÜRÜNLER" : "PRIMARY PRODUCTS"}
+                                                            </h4>
+                                                        </div>
+
+                                                        <div className="grid grid-cols-2 gap-4">
+                                                            <AssetCard id="top_front" label={language === "tr" ? "Üst Ön" : "Top Front"} icon={TbShirtFilled} variant="square" hideLibrary={true} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} />
+                                                            <AssetCard id="top_back" label={language === "tr" ? "Üst Arka" : "Top Back"} icon={TbShirt} variant="square" hideLibrary={true} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} />
+                                                            <AssetCard id="bottom_front" label={language === "tr" ? "Alt Ön" : "Bottom Front"} icon={PiPantsFill} variant="square" hideLibrary={true} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} />
+                                                            <AssetCard id="bottom_back" label={language === "tr" ? "Alt Arka" : "Bottom Back"} icon={PiPants} variant="square" hideLibrary={true} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} />
+                                                            <div className="col-span-2 mt-2">
+                                                                <AssetCard
+                                                                    id="inner_wear"
+                                                                    label={language === "tr" ? "İÇ GİYİM MODELİ" : "INNERWEAR MODEL"}
+                                                                    icon={TbShirt}
+                                                                    variant="square"
+                                                                    assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Detailed Views Column */}
+                                                    <div className="space-y-8">
+                                                        {/* Upper details */}
+                                                        <div className="space-y-6">
+                                                            <div className="flex items-center gap-3 pb-3 border-b border-blue-500/20">
+                                                                <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20 text-blue-400">
+                                                                    <ScanLine className="w-4 h-4" />
+                                                                </div>
+                                                                <h4 className="text-[11px] font-black text-blue-400 uppercase tracking-[0.2em]">
+                                                                    {language === "tr" ? "ÜST DETAYLAR" : "UPPER DETAILS"}
+                                                                </h4>
+                                                            </div>
+                                                            <div className="grid grid-cols-2 gap-6">
+                                                                <div className="space-y-3 text-center">
+                                                                    <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest block px-1">{language === "tr" ? "Ön Detay" : "Front Detail"}</span>
+                                                                    <AssetCard id="detail_front_1" label={language === "tr" ? "Detay" : "Detail"} icon={ScanLine} variant="square" hideLibrary={true} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} />
+                                                                </div>
+                                                                <div className="space-y-3 text-center">
+                                                                    <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest block px-1">{language === "tr" ? "Arka Detay" : "Back Detail"}</span>
+                                                                    <AssetCard id="detail_back_1" label={language === "tr" ? "Detay" : "Detail"} icon={ScanLine} variant="square" hideLibrary={true} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Lower details */}
+                                                        <div className="space-y-6">
+                                                            <div className="flex items-center gap-3 pb-3 border-b border-amber-500/20">
+                                                                <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center border border-amber-500/20 text-amber-400">
+                                                                    <ScanLine className="w-4 h-4" />
+                                                                </div>
+                                                                <h4 className="text-[11px] font-black text-amber-400 uppercase tracking-[0.2em]">
+                                                                    {language === "tr" ? "ALT DETAYLAR" : "LOWER DETAILS"}
+                                                                </h4>
+                                                            </div>
+                                                            <div className="grid grid-cols-2 gap-6">
+                                                                <div className="space-y-3 text-center">
+                                                                    <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest block px-1">{language === "tr" ? "Ön Detay" : "Front Detail"}</span>
+                                                                    <AssetCard id="detail_front_3" label={language === "tr" ? "Detay" : "Detail"} icon={ScanLine} variant="square" hideLibrary={true} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} />
+                                                                </div>
+                                                                <div className="space-y-3 text-center">
+                                                                    <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest block px-1">{language === "tr" ? "Arka Detay" : "Back Detail"}</span>
+                                                                    <AssetCard id="detail_back_3" label={language === "tr" ? "Detay" : "Detail"} icon={ScanLine} variant="square" hideLibrary={true} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Tutorial Area */}
+                                        <div
+                                            className={cn(
+                                                "transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]",
+                                                !showProductManager
+                                                    ? "opacity-100 translate-y-0 scale-100 pointer-events-auto z-10 delay-100"
+                                                    : "opacity-0 -translate-y-12 scale-[0.97] pointer-events-none z-0"
+                                            )}
+                                            style={{ gridArea: 'stack' }}
+                                        >
+                                            <PhotoshootTutorial language={language} />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -205,7 +344,7 @@ export default function PhotoshootPage() {
                                 <div />
                                 <Button
                                     onClick={() => canMoveToStep(2) && setWizardStep(2)}
-                                    className="px-10 py-6 rounded-2xl bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-white font-black uppercase tracking-widest shadow-lg shadow-[var(--accent-primary)]/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                    className="px-10 py-6 rounded-2xl bg-zinc-100 text-black hover:bg-white font-black uppercase tracking-widest shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
                                 >
                                     {language === "tr" ? "İLERLE" : "NEXT"} <ChevronRight className="ml-2 w-5 h-5" />
                                 </Button>
@@ -217,74 +356,17 @@ export default function PhotoshootPage() {
                     {wizardStep === 2 && (
                         <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-stretch">
-                                {/* Left Column: Studio Assets (The 3x2 Grid) */}
-                                <div className="lg:col-span-7 flex flex-col space-y-6">
-                                    <h4 className="text-[10px] font-bold text-[var(--accent-primary)] uppercase tracking-[0.15em] px-1">
+                                {/* Left Column: Studio Assets (The 2x2 Grid) */}
+                                <div className="lg:col-span-7 flex flex-col space-y-8">
+                                    <h4 className="text-[10px] font-black text-white uppercase tracking-[0.2em] px-1 opacity-70">
                                         {language === "tr" ? "ÇEKİM AYARLARI" : "SHOOT SETTINGS"}
                                     </h4>
 
-                                    <div className="grid grid-cols-3 gap-4 flex-1">
+                                    <div className="grid grid-cols-2 gap-4 flex-1">
                                         <AssetCard id="background" label={language === "tr" ? "ARKAPLAN" : "BACKGROUND"} icon={ImageIcon} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="portrait" />
                                         <AssetCard id="lighting" label={language === "tr" ? "IŞIK" : "LIGHT"} icon={Camera} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} lightingSendImage={lightingSendImage} setLightingSendImage={setLightingSendImage} variant="portrait" />
-                                        <div
-                                            className="group/card relative w-full h-full min-h-[140px]"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                const moods = ['natural', 'warm', 'powerful', 'relaxed', 'professional', 'subtle'];
-                                                const currentIndex = selectedMoodId ? moods.indexOf(selectedMoodId) : -1;
-                                                const nextIndex = (currentIndex + 1) % moods.length;
-                                                setSelectedMoodId(moods[nextIndex]);
-                                            }}
-                                        >
-                                            <div className={cn(
-                                                "relative h-full rounded-3xl border-2 flex flex-col items-center justify-center overflow-hidden transition-all duration-500 cursor-pointer shadow-sm hover:shadow-md",
-                                                selectedMoodId ? "bg-[var(--bg-elevated)] border-[var(--accent-primary)] ring-2 ring-[var(--accent-primary)]/20" : "bg-[var(--bg-elevated)] border-[var(--border-subtle)] border-dashed hover:border-[var(--accent-primary)]"
-                                            )}>
-                                                <div className="flex flex-col items-center gap-2.5 p-3 text-center transition-all group-hover/card:scale-105">
-                                                    <div className="p-3.5 rounded-2xl bg-[var(--accent-soft)]/50 text-[var(--accent-primary)] shadow-inner">
-                                                        <span className="text-2xl">{
-                                                            [
-                                                                { id: 'natural', icon: '✦' }, { id: 'warm', icon: '☀' },
-                                                                { id: 'powerful', icon: '◆' }, { id: 'relaxed', icon: '~' },
-                                                                { id: 'professional', icon: '👔' }, { id: 'subtle', icon: '🍃' }
-                                                            ].find(m => m.id === selectedMoodId)?.icon || '✦'
-                                                        }</span>
-                                                    </div>
-                                                    <div className="space-y-0.5 pointer-events-none">
-                                                        <span className="text-[11px] font-black uppercase tracking-wide text-[var(--text-primary)] block leading-tight">
-                                                            {language === "tr" ? "MODEL TAVRI" : "MODEL MOOD"}
-                                                        </span>
-                                                        <span className="text-[9px] font-black tracking-tighter text-[var(--accent-primary)] uppercase opacity-90 block transition-colors mt-0.5">
-                                                            {language === "tr"
-                                                                ? [
-                                                                    { id: 'natural', label: 'Doğal' }, { id: 'warm', label: 'Sıcak' },
-                                                                    { id: 'powerful', label: 'Güçlü' }, { id: 'relaxed', label: 'Rahat' },
-                                                                    { id: 'professional', label: 'Profesyonel' }, { id: 'subtle', label: 'Sakin' }
-                                                                ].find(m => m.id === selectedMoodId)?.label || "SEÇİLMEDİ"
-                                                                : [
-                                                                    { id: 'natural', labelEn: 'Natural' }, { id: 'warm', labelEn: 'Warm' },
-                                                                    { id: 'powerful', labelEn: 'Powerful' }, { id: 'relaxed', labelEn: 'Relaxed' },
-                                                                    { id: 'professional', labelEn: 'Professional' }, { id: 'subtle', labelEn: 'Subtle' }
-                                                                ].find(m => m.id === selectedMoodId)?.labelEn || "NOT SELECTED"}
-                                                        </span>
-                                                        <span className="text-[7px] text-[var(--text-muted)] block">
-                                                            {language === "tr" ? "Değiştirmek için tıkla" : "Click to change"}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <div className={cn(
-                                                    "absolute top-3 right-3 p-1.5 rounded-lg border shadow-lg transition-all z-20",
-                                                    selectedMoodId
-                                                        ? "bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white ring-2 ring-[var(--accent-primary)]/30"
-                                                        : "bg-[var(--bg-surface)] border-[var(--border-subtle)] text-[var(--text-muted)] group-hover/card:text-[var(--text-primary)] group-hover/card:border-[var(--accent-primary)]"
-                                                )}>
-                                                    <Sparkles size={14} />
-                                                </div>
-                                            </div>
-                                        </div>
                                         <AssetCard id="fit_pattern" label={language === "tr" ? "KALIP" : "FIT"} icon={TbShirtFilled} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="portrait" />
                                         <AssetCard id="shoes" label={language === "tr" ? "AYAKKABI" : "SHOES"} icon={TbHanger} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="portrait" />
-                                        <AssetCard id="inner_wear" label={language === "tr" ? "İÇ GİYİM" : "INNER WEAR"} icon={TbShirt} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="portrait" />
                                     </div>
                                 </div>
 
@@ -320,26 +402,18 @@ export default function PhotoshootPage() {
                                             socksType={socksType}
                                             setSocksType={setSocksType}
                                             pantLength={pantLength}
+                                            setPantLength={(val: any) => setPantLength(val)}
+                                            canShowLegHem={canShowLegHem}
                                         />
 
-                                        <ClothingDetails
-                                            language={language}
-                                            canShowLegHem={canShowLegHem}
-                                            pantLength={pantLength}
-                                            setPantLength={setPantLength}
-                                            hasFeet={isFullBody}
-                                            socksType={socksType}
-                                            setSocksType={setSocksType}
-                                            showGarmentDetails={showGarmentDetails}
-                                            setShowGarmentDetails={setShowGarmentDetails}
-                                        />
+
                                     </div>
                                 </div>
                             </div>
 
                             {/* Section 3: Accessories */}
-                            <div className="space-y-4 pt-6 border-t border-[var(--border-subtle)]/50">
-                                <h4 className="text-[10px] font-bold text-[var(--accent-primary)] uppercase tracking-[0.15em] px-1">{language === "tr" ? "DİĞER AKSESUARLAR" : "OTHER ACCESSORIES"}</h4>
+                            <div className="space-y-4 pt-6 border-t border-white/5">
+                                <h4 className="text-[10px] font-bold text-white uppercase tracking-[0.2em] px-1 opacity-70">{language === "tr" ? "DİĞER AKSESUARLAR" : "OTHER ACCESSORIES"}</h4>
                                 <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
                                     <AssetCard id="jacket" label={language === "tr" ? "DIŞ GİYİM" : "OUTERWEAR"} icon={TbJacket} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="square" />
                                     <AssetCard id="bag" label={language === "tr" ? "ÇANTA" : "BAG"} icon={PiHandbag} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="square" />
@@ -352,19 +426,19 @@ export default function PhotoshootPage() {
 
 
 
-                            <div className="flex justify-between mt-12 pt-6 border-t border-[var(--border-subtle)]">
+                            <div className="flex justify-between mt-16 pt-8 border-t border-white/5">
                                 <Button
                                     variant="outline"
                                     onClick={() => setWizardStep(1)}
-                                    className="px-8 py-6 rounded-2xl border-2 border-[var(--border-subtle)] font-bold uppercase tracking-wider hover:bg-[var(--bg-elevated)] transition-all"
+                                    className="px-10 py-6 rounded-2xl border border-white/10 bg-white/5 text-white font-black uppercase tracking-widest hover:bg-white/10 transition-all active:scale-[0.98]"
                                 >
-                                    <ChevronLeft className="mr-2 w-5 h-5" /> {language === "tr" ? "GERİ" : "BACK"}
+                                    <ChevronLeft className="mr-3 w-5 h-5 opacity-50" /> {language === "tr" ? "GERİ" : "BACK"}
                                 </Button>
                                 <Button
                                     onClick={() => canMoveToStep(3) && setWizardStep(3)}
-                                    className="px-10 py-6 rounded-2xl bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-white font-bold uppercase tracking-wider shadow-lg shadow-[var(--accent-primary)]/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                    className="px-12 py-6 rounded-2xl bg-white text-black hover:bg-zinc-200 font-black uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-[0.98]"
                                 >
-                                    {language === "tr" ? "İLERLE" : "NEXT"} <ChevronRight className="ml-2 w-5 h-5" />
+                                    {language === "tr" ? "İLERLE" : "NEXT"} <ChevronRight className="ml-3 w-5 h-5" />
                                 </Button>
                             </div>
                         </div>
@@ -380,39 +454,46 @@ export default function PhotoshootPage() {
                                 <div className="max-w-5xl mx-auto px-1 md:px-0 space-y-6">
 
                                     {/* TOP: Horizontal Technical Settings Bar */}
-                                    <div className="py-2 px-3 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-subtle)] shadow-inner">
-                                        <div className="flex flex-col md:flex-row md:items-center gap-4">
-                                            <div className="md:border-r border-[var(--border-subtle)] pr-4 flex-none hidden lg:block">
-                                                <p className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider m-0">{language === "tr" ? "AYARLAR" : "SETTINGS"}</p>
+                                    <div className="py-3 px-6 rounded-[24px] bg-white/5 border border-white/10 shadow-2xl backdrop-blur-xl">
+                                        <div className="flex flex-col md:flex-row md:items-center gap-8">
+                                            <div className="md:border-r border-white/10 pr-6 flex-none hidden lg:block">
+                                                <p className="text-[10px] uppercase font-black text-white/40 tracking-[0.2em] m-0">{language === "tr" ? "AYARLAR" : "SETTINGS"}</p>
                                             </div>
-                                            <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3">
-                                                <div className="flex items-center gap-2">
-                                                    <label className="text-[9px] uppercase font-bold text-[var(--text-muted)] tracking-wide whitespace-nowrap">{language === "tr" ? "ORAN" : "RATIO"}</label>
-                                                    <div className="relative flex-1 min-w-[80px]">
-                                                        <select className="w-full text-xs px-2 py-1.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] transition-all font-bold appearance-none" value={aspectRatio} onChange={(e) => setAspectRatio(e.target.value)}>
+                                            <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-6">
+                                                <div className="flex items-center gap-3">
+                                                    <label className="text-[10px] uppercase font-black text-white/40 tracking-widest whitespace-nowrap">{language === "tr" ? "ORAN" : "RATIO"}</label>
+                                                    <div className="relative flex-1 min-w-[100px]">
+                                                        <select className="w-full text-[11px] px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white transition-all font-black appearance-none focus:border-white/20 outline-none" value={aspectRatio} onChange={(e) => setAspectRatio(e.target.value)}>
                                                             {ASPECT_RATIOS.map(opt => (
-                                                                <option key={opt.id} value={opt.id}>{language === 'tr' ? opt.labelTr : opt.label}</option>
+                                                                <option key={opt.id} value={opt.id} className="bg-zinc-900 border-none">{language === 'tr' ? opt.labelTr : opt.label}</option>
                                                             ))}
                                                         </select>
-                                                        <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--text-muted)] pointer-events-none" />
+                                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none" />
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center gap-2">
-                                                    <label className="text-[9px] uppercase font-bold text-[var(--text-muted)] tracking-wide whitespace-nowrap">{language === "tr" ? "KALİTE" : "QUALITY"}</label>
-                                                    <div className="relative flex-1 min-w-[80px]">
-                                                        <select className="w-full text-xs px-2 py-1.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] transition-all font-bold appearance-none" value={resolution} onChange={(e) => setResolution(e.target.value)}>
+                                                <div className="flex items-center gap-3">
+                                                    <label className="text-[10px] uppercase font-black text-white/40 tracking-widest whitespace-nowrap">{language === "tr" ? "KALİTE" : "QUALITY"}</label>
+                                                    <div className="relative flex-1 min-w-[100px]">
+                                                        <select className="w-full text-[11px] px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white transition-all font-black appearance-none focus:border-white/20 outline-none" value={resolution} onChange={(e) => setResolution(e.target.value)}>
                                                             {RESOLUTION_OPTIONS.map(opt => (
-                                                                <option key={opt.id} value={opt.id}>{language === 'tr' ? opt.labelTr : opt.label}</option>
+                                                                <option key={opt.id} value={opt.id} className="bg-zinc-900 border-none">{language === 'tr' ? opt.labelTr : opt.label}</option>
                                                             ))}
                                                         </select>
-                                                        <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--text-muted)] pointer-events-none" />
+                                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none" />
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center gap-2">
-                                                    <label className="text-[9px] uppercase font-bold text-[var(--text-muted)] tracking-wide whitespace-nowrap">{language === "tr" ? "SEED" : "SEED"}</label>
+                                                <div className="flex items-center gap-3">
+                                                    <label className="text-[10px] uppercase font-black text-white/40 tracking-widest whitespace-nowrap">{language === "tr" ? "SEED" : "SEED"}</label>
                                                     <div className="relative flex-1">
-                                                        <input type="number" className="w-full text-xs px-2 py-1.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] transition-all font-bold placeholder:text-[var(--text-disabled)]" value={seed === "" ? "" : seed} onChange={(e) => setSeed(e.target.value === "" ? "" : Number(e.target.value))} placeholder="RANDOM" />
-                                                        {seed !== "" && <button onClick={() => setSeed("")} className="absolute right-2 top-1/2 -translate-y-1/2 text-red-500"><X size={14} /></button>}
+                                                        <input type="number" className="w-full text-[11px] px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white transition-all font-black placeholder:text-white/20 focus:border-white/20 outline-none" value={seed === "" ? "" : seed} onChange={(e) => setSeed(e.target.value === "" ? "" : Number(e.target.value))} placeholder="RANDOM" />
+                                                        {seed !== "" && <button onClick={() => setSeed("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white"><X size={14} /></button>}
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-center gap-3 pl-4 border-l border-white/5">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[9px] font-black text-white/30 uppercase tracking-widest leading-none mb-1">Estimated Cost</span>
+                                                        <span className="text-[11px] font-black text-white tracking-widest">~{estimatedCost} CREDITS</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -420,9 +501,9 @@ export default function PhotoshootPage() {
                                     </div>
 
                                     {/* Toplu Üretim: Açı ve Kare Seçimleri */}
-                                    <div className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-xl p-6 shadow-sm flex flex-col space-y-6">
-                                        <label className="text-sm font-black text-[var(--text-primary)] uppercase tracking-wider">
-                                            {language === 'tr' ? 'Açı ve Kare Seçimleri' : 'Angle & Shot Selection'}
+                                    <div className="bg-white/[0.02] border border-white/5 rounded-[32px] p-8 shadow-2xl flex flex-col space-y-8">
+                                        <label className="text-[11px] font-black text-white uppercase tracking-[0.3em] opacity-40">
+                                            {language === 'tr' ? 'AÇI VE KARE SEÇİMLERİ' : 'ANGLE & SHOT SELECTION'}
                                         </label>
 
                                         <div className="flex flex-col xl:flex-row gap-8">
@@ -439,7 +520,7 @@ export default function PhotoshootPage() {
                                                                     className={cn(
                                                                         "relative aspect-[3/4] rounded-xl border transition-all duration-300 overflow-hidden group cursor-pointer w-full",
                                                                         isSelected
-                                                                            ? (isMaviActive ? "border-blue-500 ring-2 ring-blue-500/20 shadow-lg" : "border-[var(--accent-primary)] ring-2 ring-[var(--accent-primary)]/20 shadow-lg")
+                                                                            ? (isMaviActive ? "border-zinc-400 ring-2 ring-zinc-400/20 shadow-lg" : "border-white ring-2 ring-white/20 shadow-lg")
                                                                             : "border-[var(--border-subtle)] opacity-40 grayscale bg-[var(--bg-elevated)] hover:opacity-80 transition-opacity"
                                                                     )}
                                                                     onClick={() => setBatchShotSelection(prev => ({ ...prev, [shot.id]: !isSelected }))}
@@ -464,7 +545,7 @@ export default function PhotoshootPage() {
                                                                             <div className={cn(
                                                                                 "w-5 h-5 rounded-md flex items-center justify-center border transition-all",
                                                                                 isSelected
-                                                                                    ? (isMaviActive ? "bg-blue-600 border-blue-400 text-white" : "bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white")
+                                                                                    ? (isMaviActive ? "bg-zinc-100 border-zinc-100 text-black" : "bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white")
                                                                                     : "bg-white/20 border-white/40 text-transparent"
                                                                             )}>
                                                                                 <Check className="w-3.5 h-3.5" />
@@ -478,7 +559,7 @@ export default function PhotoshootPage() {
                                                                             >
                                                                                 <span className="text-[10px] font-bold text-white tracking-widest leading-none">YNC</span>
                                                                                 <Switch
-                                                                                    className="scale-[0.6] origin-right !m-0"
+                                                                                    className="scale-[0.6] origin-right !m-0 data-[state=checked]:bg-zinc-100"
                                                                                     checked={stylingSideOnly[shot.id] || false}
                                                                                     onCheckedChange={(val) => setStylingSideOnly({ ...stylingSideOnly, [shot.id]: val })}
                                                                                 />
@@ -501,8 +582,8 @@ export default function PhotoshootPage() {
                                                                         className={cn(
                                                                             "flex items-center justify-center gap-1.5 w-full py-2.5 rounded-lg border shadow-sm transition-colors cursor-pointer group/pose-btn",
                                                                             assets[`pose_${shot.id}`]
-                                                                                ? "border-green-500/30 bg-green-500/10 text-green-600 dark:text-green-400 hover:bg-green-500 hover:text-white"
-                                                                                : "border-[var(--accent-primary)]/30 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] hover:bg-[var(--accent-primary)] hover:text-white"
+                                                                                ? "border-zinc-500/30 bg-zinc-500/10 text-zinc-300 hover:bg-zinc-500 hover:text-white"
+                                                                                : "border-white/30 bg-white/5 text-white hover:bg-white hover:text-black"
                                                                         )}
                                                                     >
                                                                         {assets[`pose_${shot.id}`] ? (
@@ -540,7 +621,7 @@ export default function PhotoshootPage() {
                                                                         "relative aspect-[3/4] rounded-xl border transition-all duration-300 overflow-hidden group w-full",
                                                                         isDisabled ? "cursor-not-allowed opacity-20 grayscale" : "cursor-pointer",
                                                                         isSelected
-                                                                            ? (isMaviActive ? "border-blue-500 ring-2 ring-blue-500/20 shadow-lg" : "border-[var(--accent-primary)] ring-2 ring-[var(--accent-primary)]/20 shadow-lg")
+                                                                            ? (isMaviActive ? "border-zinc-400 ring-2 ring-zinc-400/20 shadow-lg" : "border-white ring-2 ring-white/20 shadow-lg")
                                                                             : (!isDisabled && "border-[var(--border-subtle)] opacity-40 grayscale bg-[var(--bg-elevated)] hover:opacity-80 transition-opacity")
                                                                     )}
                                                                     onClick={() => {
@@ -589,10 +670,10 @@ export default function PhotoshootPage() {
                                     </div>
 
                                     {/* BOTTOM: Batch Panel + Preview */}
-                                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch pt-4">
                                         {/* Sol Taraf: Batch Ayarları ve Seçimler */}
                                         <div className="col-span-1 lg:col-span-5 flex flex-col">
-                                            <div className="flex-1 bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-xl overflow-hidden shadow-sm flex flex-col p-6">
+                                            <div className="flex-1 bg-white/[0.02] border border-white/5 rounded-[32px] overflow-hidden shadow-2xl flex flex-col p-8">
                                                 <BatchPanel
                                                     productName={productName}
                                                     selectedMoodId={selectedMoodId}
@@ -625,7 +706,7 @@ export default function PhotoshootPage() {
 
                                         {/* Sağ Taraf: Önizleme / Üretim Alanı */}
                                         <div className="col-span-1 lg:col-span-7 flex flex-col">
-                                            <div className="flex-1 bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-xl overflow-hidden shadow-sm flex flex-col">
+                                            <div className="flex-1 bg-white/[0.02] border border-white/5 rounded-[32px] overflow-hidden shadow-2xl flex flex-col">
                                                 <PreviewArea
                                                     language={language}
                                                     isProcessing={isProcessing}
@@ -659,8 +740,8 @@ export default function PhotoshootPage() {
                         {/* Functional Header */}
                         <div className="flex-none px-6 py-4 border-b border-[var(--border-subtle)] bg-[var(--bg-elevated)] flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-blue-600/10 flex items-center justify-center border border-blue-600/20">
-                                    <FileText className="w-5 h-5 text-blue-500" />
+                                <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
+                                    <FileText className="w-5 h-5 text-zinc-400" />
                                 </div>
                                 <DialogTitle className="text-xl font-bold text-[var(--text-primary)]">
                                     {language === "tr" ? "Çekim Önizleme" : "Shoot Preview"}
@@ -676,7 +757,7 @@ export default function PhotoshootPage() {
                                         }}
                                         className={cn(
                                             "px-4 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all",
-                                            previewMode === 'text' ? "bg-blue-600 text-white shadow-sm" : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                                            previewMode === 'text' ? "bg-white text-black shadow-sm" : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                                         )}
                                     >
                                         PROMPT
@@ -688,7 +769,7 @@ export default function PhotoshootPage() {
                                         }}
                                         className={cn(
                                             "px-4 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all",
-                                            previewMode === 'json' ? "bg-blue-600 text-white shadow-sm" : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                                            previewMode === 'json' ? "bg-white text-black shadow-sm" : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                                         )}
                                     >
                                         JSON
@@ -724,7 +805,7 @@ export default function PhotoshootPage() {
                                     {/* Editor Area */}
                                     <div className="flex flex-col h-full min-h-[400px]">
                                         <div className="flex items-center gap-2 mb-2 px-1">
-                                            <Sparkles className="w-3.5 h-3.5 text-blue-500" />
+                                            <Sparkles className="w-3.5 h-3.5 text-zinc-300" />
                                             <span className="text-[10px] font-bold text-[var(--text-primary)] uppercase tracking-widest leading-none">
                                                 {previewMode === 'json' ? "SYSTEM CONTROL" : (language === "tr" ? "ANALİZ SONUCU VE PROMPT" : "ANALYSIS & PROMPT")}
                                             </span>
@@ -733,8 +814,8 @@ export default function PhotoshootPage() {
                                         {user?.role === 'admin' ? (
                                             <textarea
                                                 className={cn(
-                                                    "w-full h-full min-h-[400px] p-5 text-[14px] leading-relaxed bg-[var(--bg-elevated)] text-[var(--text-primary)] border-2 border-[var(--border-subtle)] rounded-xl outline-none focus:border-blue-500/50 transition-all custom-scrollbar",
-                                                    previewMode === 'json' ? "font-mono text-green-500/90" : "font-sans font-medium"
+                                                    "w-full h-full min-h-[400px] p-5 text-[14px] leading-relaxed bg-[var(--bg-elevated)] text-[var(--text-primary)] border-2 border-[var(--border-subtle)] rounded-xl outline-none focus:border-white/20 transition-all custom-scrollbar",
+                                                    previewMode === 'json' ? "font-mono text-zinc-400" : "font-sans font-medium"
                                                 )}
                                                 value={userAddedPrompt}
                                                 onChange={(e) => setUserAddedPrompt(e.target.value)}
@@ -763,7 +844,7 @@ export default function PhotoshootPage() {
                             </Button>
                             <Button
                                 onClick={handleConfirmGeneration}
-                                className="h-12 px-10 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase shadow-lg shadow-blue-600/20 transition-all flex items-center gap-2"
+                                className="h-12 px-10 rounded-xl bg-white hover:bg-zinc-100 text-black font-bold text-xs uppercase shadow-xl transition-all flex items-center gap-2"
                             >
                                 {language === "tr" ? "ONAYLA VE BAŞLAT" : "CONFIRM & START"}
                                 <Sparkles className="w-4 h-4" />

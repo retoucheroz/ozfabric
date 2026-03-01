@@ -53,23 +53,23 @@ export default function MannequinPage() {
       <div className="flex-1 flex flex-col border-r">
 
         {/* Header & Controls */}
-        <div className="p-6 border-b border-[var(--border-subtle)] bg-[var(--bg-sidebar)] space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[var(--accent-soft)] flex items-center justify-center text-[var(--accent-primary)] shadow-lg shadow-[var(--accent-primary)]/10">
+        <div className="p-8 border-b border-white/5 bg-[#0D0D0F] space-y-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-white/10 text-white flex items-center justify-center shadow-xl">
                 <TbUserCircle className="w-6 h-6" />
               </div>
-              <div>
-                <h2 className="text-xl font-black tracking-tight uppercase italic text-[var(--text-primary)]">Select Model</h2>
-                <p className="text-[10px] text-[var(--text-muted)] font-black uppercase tracking-widest -mt-0.5">Choose an AI model for your production</p>
+              <div className="flex flex-col">
+                <h2 className="text-2xl font-black tracking-tighter uppercase italic text-white">Select Model</h2>
+                <p className="text-[10px] text-zinc-500 font-black uppercase tracking-[0.2em] mt-0.5">Professional AI Models for Production</p>
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button variant="ghost" size="sm" className="h-9 gap-2 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]">
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="sm" className="h-10 gap-3 text-zinc-500 hover:text-white hover:bg-white/5 rounded-xl transition-all">
                 <TbHistory className="w-4 h-4" />
                 <span className="text-[10px] font-black uppercase tracking-widest">History</span>
               </Button>
-              <Button variant="ghost" size="sm" className="h-9 gap-2 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]">
+              <Button variant="ghost" size="sm" className="h-10 gap-3 text-zinc-500 hover:text-white hover:bg-white/5 rounded-xl transition-all">
                 <TbHeart className="w-4 h-4" />
                 <span className="text-[10px] font-black uppercase tracking-widest">Favorites</span>
               </Button>
@@ -78,10 +78,10 @@ export default function MannequinPage() {
 
           {/* Tabs */}
           <Tabs defaultValue="templates" className="w-full">
-            <TabsList className="grid w-full max-w-[400px] grid-cols-3 h-10 p-1 bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-xl">
-              <TabsTrigger value="templates" className="text-[10px] font-black uppercase tracking-widest rounded-lg data-[state=active]:bg-[var(--accent-primary)] data-[state=active]:text-white">Templates</TabsTrigger>
-              <TabsTrigger value="prompt" className="text-[10px] font-black uppercase tracking-widest rounded-lg data-[state=active]:bg-[var(--accent-primary)] data-[state=active]:text-white">Prompt</TabsTrigger>
-              <TabsTrigger value="assets" className="text-[10px] font-black uppercase tracking-widest rounded-lg data-[state=active]:bg-[var(--accent-primary)] data-[state=active]:text-white">Assets</TabsTrigger>
+            <TabsList className="bg-white/5 border border-white/5 p-1 h-11 rounded-xl max-w-[400px]">
+              <TabsTrigger value="templates" className="text-[10px] font-black uppercase tracking-[0.2em] rounded-lg data-[state=active]:bg-white data-[state=active]:text-black transition-all">Templates</TabsTrigger>
+              <TabsTrigger value="prompt" className="text-[10px] font-black uppercase tracking-[0.2em] rounded-lg data-[state=active]:bg-white data-[state=active]:text-black transition-all">Prompt</TabsTrigger>
+              <TabsTrigger value="assets" className="text-[10px] font-black uppercase tracking-[0.2em] rounded-lg data-[state=active]:bg-white data-[state=active]:text-black transition-all">Assets</TabsTrigger>
             </TabsList>
           </Tabs>
 
@@ -140,14 +140,15 @@ export default function MannequinPage() {
                   <img
                     src={m.image}
                     alt={m.name}
-                    className="object-cover w-full h-full transition-transform group-hover:scale-105"
+                    className="object-cover w-full h-full grayscale hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
                   />
-                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button size="icon" variant="secondary" className="h-6 w-6 rounded-full"><Heart className="w-3 h-3" /></Button>
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">
+                    <Button size="icon" variant="secondary" className="h-8 w-8 rounded-full bg-white text-black hover:bg-zinc-200 shadow-xl"><Heart className="w-4 h-4" /></Button>
                   </div>
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 pt-8 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <p className="text-white text-xs font-semibold">{m.name}</p>
-                    <p className="text-white/80 text-[10px]">{m.gender}, {m.ethnicity}</p>
+                  <div className="absolute bottom-0 left-0 right-0 p-5 pt-10 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">
+                    <p className="text-white text-xs font-black uppercase tracking-widest">{m.name}</p>
+                    <p className="text-white/60 text-[10px] font-bold uppercase tracking-tight mt-1">{m.gender} • {m.ethnicity}</p>
                   </div>
                 </div>
               </Card>

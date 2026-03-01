@@ -228,20 +228,20 @@ export default function AnalysisPage() {
     return (
         <div className="flex flex-col h-full bg-background overflow-hidden">
             {/* Header Area */}
-            <div className="shrink-0 p-6 border-b bg-card/30 backdrop-blur-md">
+            <div className="shrink-0 p-8 border-b border-white/5 bg-[#0D0D0F]">
                 <div className="max-w-7xl mx-auto w-full flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-[var(--accent-soft)] flex items-center justify-center text-[var(--accent-primary)] shadow-lg shadow-[var(--accent-primary)]/10">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-white/10 text-white flex items-center justify-center shadow-xl">
                             <TbSearch className="w-6 h-6" />
                         </div>
                         <div>
-                            <h1 className="text-xl font-black tracking-tight uppercase italic text-[var(--text-primary)]">
-                                {language === "tr" ? "Analiz" : "Analysis"}
+                            <h1 className="text-3xl font-black tracking-tighter uppercase italic text-white leading-none">
+                                {language === "tr" ? "ANALİZ" : "ANALYSIS"}
                             </h1>
-                            <p className="text-[10px] text-[var(--text-muted)] uppercase font-black tracking-widest -mt-0.5">
+                            <p className="text-[11px] text-zinc-500 uppercase font-black tracking-[0.2em] mt-1.5 grayscale opacity-70">
                                 {language === "tr"
-                                    ? "Ürün, poz ve kalıp analizi için yapay zeka destekli teknik araçlar."
-                                    : "AI-powered technical tools for product, pose, and pattern analysis."}
+                                    ? "YAPAY ZEKA DESTEKLİ TEKNİK ARAÇLAR"
+                                    : "AI-POWERED TECHNICAL TOOLS"}
                             </p>
                         </div>
                     </div>
@@ -255,25 +255,25 @@ export default function AnalysisPage() {
                             if (v === "pose" && images.length > 1) setImages([images[0]]);
                             if (v !== "pose" && images.length > 3) setImages(images.slice(0, 3));
                         }}>
-                            <SelectTrigger className="w-[180px] h-10 border-violet-500/20 bg-background/50 font-bold text-xs ring-0 focus:ring-0">
+                            <SelectTrigger className="w-56 h-12 bg-white/5 border-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest focus:ring-1 focus:ring-white/20 transition-all">
                                 <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className="bg-popover border-border">
-                                <SelectItem value="product">
-                                    <div className="flex items-center gap-2">
-                                        <TbBolt className="w-4 h-4 text-violet-500" />
+                            <SelectContent className="bg-zinc-900 border-white/10">
+                                <SelectItem value="product" className="focus:bg-white focus:text-black text-[10px] font-black uppercase tracking-widest">
+                                    <div className="flex items-center gap-3">
+                                        <TbBolt className="w-4 h-4" />
                                         <span>{language === "tr" ? "Ürün Analizi" : "Product Analysis"}</span>
                                     </div>
                                 </SelectItem>
-                                <SelectItem value="pose">
-                                    <div className="flex items-center gap-2">
-                                        <TbUserCircle className="w-4 h-4 text-emerald-500" />
+                                <SelectItem value="pose" className="focus:bg-white focus:text-black text-[10px] font-black uppercase tracking-widest">
+                                    <div className="flex items-center gap-3">
+                                        <TbUserCircle className="w-4 h-4" />
                                         <span>{language === "tr" ? "Poz Analizi" : "Pose Analysis"}</span>
                                     </div>
                                 </SelectItem>
-                                <SelectItem value="pattern">
-                                    <div className="flex items-center gap-2">
-                                        <TbRuler2 className="w-4 h-4 text-amber-500" />
+                                <SelectItem value="pattern" className="focus:bg-white focus:text-black text-[10px] font-black uppercase tracking-widest">
+                                    <div className="flex items-center gap-3">
+                                        <TbRuler2 className="w-4 h-4" />
                                         <span>{language === "tr" ? "Kalıp Analizi" : "Pattern Analysis"}</span>
                                     </div>
                                 </SelectItem>
@@ -406,7 +406,7 @@ export default function AnalysisPage() {
                         </Card>
 
                         <Button
-                            className="w-full h-14 bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-2xl shadow-xl shadow-violet-500/20 group overflow-hidden relative"
+                            className="w-full h-16 bg-white hover:bg-zinc-200 text-black font-black rounded-2xl shadow-2xl transition-all active:scale-[0.98] group overflow-hidden relative"
                             onClick={handleAnalyze}
                             disabled={isProcessing || images.length === 0}
                         >
@@ -414,13 +414,13 @@ export default function AnalysisPage() {
                                 {isProcessing ? (
                                     <motion.div
                                         key="loading"
-                                        className="flex items-center gap-2"
+                                        className="flex items-center gap-3"
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: -10 }}
                                     >
                                         <Loader2 className="w-5 h-5 animate-spin" />
-                                        <span>{language === "tr" ? "Analiz Ediliyor..." : "Analyzing..."}</span>
+                                        <span className="text-[11px] uppercase tracking-[0.2em]">{language === "tr" ? "Analiz Ediliyor..." : "Analyzing..."}</span>
                                     </motion.div>
                                 ) : (
                                     <motion.div
@@ -430,11 +430,11 @@ export default function AnalysisPage() {
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: -10 }}
                                     >
-                                        <div className="flex items-center gap-2">
-                                            <TbSparkles className="w-5 h-5 fill-current" />
-                                            <span className="uppercase tracking-widest px-1 font-black">{language === "tr" ? "ANALİZİ BAŞLAT" : "START ANALYSIS"}</span>
+                                        <div className="flex items-center gap-3">
+                                            <TbSparkles className="w-5 h-5 opacity-50" />
+                                            <span className="text-[11px] uppercase tracking-[0.2em] font-black">{language === "tr" ? "ANALİZİ BAŞLAT" : "START ANALYSIS"}</span>
                                         </div>
-                                        <span className="text-[10px] font-bold opacity-70 tracking-tighter mt-0.5">20 CREDITS</span>
+                                        <span className="text-[9px] font-black opacity-30 tracking-[0.3em] mt-1 border-t border-black/10 pt-1">20 CREDITS</span>
                                     </motion.div>
                                 )}
                             </AnimatePresence>

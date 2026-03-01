@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
-import { User, Key, CreditCard, Bell, Shield, LogOut, Moon, Sun, Bot, Trash2 } from "lucide-react"
+import { User, Key, CreditCard, Bell, Shield, LogOut, Moon, Sun, Bot, Trash2, Globe } from "lucide-react"
 import { toast } from "sonner"
 import { useProjects } from "@/context/projects-context"
 import { useLanguage } from "@/context/language-context"
@@ -20,7 +20,7 @@ type SettingsSection = "profile" | "billing" | "notifications" | "security";
 
 function SettingsContent() {
     const { credits, addCredits } = useProjects();
-    const { t, language } = useLanguage();
+    const { t, language, setLanguage } = useLanguage();
     const { theme, setTheme } = useTheme();
     const searchParams = useSearchParams();
     const initialSection = (searchParams.get("tab") as SettingsSection) || "profile";
@@ -229,7 +229,7 @@ function SettingsContent() {
                             </Card>
 
                             {/* Appearance & Experience */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 {/* Theme Toggle */}
                                 <Card className="p-6 bg-[var(--bg-sidebar)] border-[var(--border-subtle)] rounded-[32px] overflow-hidden shadow-lg transition-all hover:border-[var(--accent-primary)]/30 group">
                                     <div className="flex items-center justify-between">
@@ -245,6 +245,45 @@ function SettingsContent() {
                                             onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
                                             className="data-[state=checked]:bg-[var(--accent-primary)]"
                                         />
+                                    </div>
+                                </Card>
+
+                                {/* Language Switcher */}
+                                <Card className="p-6 bg-[var(--bg-sidebar)] border-[var(--border-subtle)] rounded-[32px] overflow-hidden shadow-lg transition-all hover:border-[var(--accent-primary)]/30 group">
+                                    <div className="space-y-4">
+                                        <div className="space-y-1">
+                                            <Label className="text-[10px] font-black text-[var(--text-primary)] uppercase tracking-widest flex items-center gap-2">
+                                                <Globe className="w-4 h-4 text-[var(--accent-primary)]" />
+                                                {t("settings.language") || "LANGUAGE"}
+                                            </Label>
+                                            <div className="text-[10px] text-[var(--text-muted)] font-black uppercase tracking-tighter">
+                                                {language === 'tr' ? 'UYGULAMA DİLİNİ SEÇİN' : 'SELECT APP LANGUAGE'}
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className={cn(
+                                                    "flex-1 h-8 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all",
+                                                    language === "tr" ? "bg-[var(--accent-soft)] text-[var(--accent-primary)] border-[var(--accent-primary)]/30" : "border-[var(--border-subtle)] text-[var(--text-muted)]"
+                                                )}
+                                                onClick={() => setLanguage("tr")}
+                                            >
+                                                🇹🇷 TR
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className={cn(
+                                                    "flex-1 h-8 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all",
+                                                    language === "en" ? "bg-[var(--accent-soft)] text-[var(--accent-primary)] border-[var(--accent-primary)]/30" : "border-[var(--border-subtle)] text-[var(--text-muted)]"
+                                                )}
+                                                onClick={() => setLanguage("en")}
+                                            >
+                                                🇬🇧 EN
+                                            </Button>
+                                        </div>
                                     </div>
                                 </Card>
 
@@ -293,26 +332,7 @@ function SettingsContent() {
                             <Card className="p-8 space-y-8 bg-[var(--bg-sidebar)] border-[var(--border-subtle)] rounded-[32px] overflow-hidden relative shadow-xl">
                                 <div className="absolute top-0 right-0 w-48 h-48 bg-[var(--accent-primary)]/5 blur-3xl rounded-full -mr-24 -mt-24" />
 
-                                <div className="flex flex-col sm:flex-row items-center justify-between gap-6 relative z-10 text-center sm:text-left">
-                                    <div className="space-y-2">
-                                        <h3 className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-[0.2em]">{t("settings.currentBalance")}</h3>
-                                        <div className="flex items-baseline gap-2 justify-center sm:justify-start">
-                                            <span className="text-5xl font-black italic tracking-tighter text-[var(--text-primary)]">{credits}</span>
-                                            <span className="text-xs font-black uppercase tracking-widest text-[var(--accent-primary)]">{t("settings.credits")}</span>
-                                        </div>
-                                    </div>
-                                    <Button
-                                        size="lg"
-                                        onClick={handleTopUp}
-                                        className="h-14 px-10 bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-hover)] font-black uppercase tracking-[0.2em] rounded-2xl shadow-2xl shadow-[var(--accent-primary)]/30 transition-all active:scale-95 text-xs w-full sm:w-auto"
-                                    >
-                                        {t("settings.topUp")} (+500)
-                                    </Button>
-                                </div>
-
-                                <Separator className="bg-[var(--border-subtle)]" />
-
-                                <div className="space-y-4">
+                                <div className="space-y-4 relative z-10">
                                     <div className="flex flex-col sm:flex-row justify-between items-center bg-[var(--bg-surface)] p-6 rounded-[24px] border border-[var(--border-subtle)] transition-all hover:border-[var(--accent-primary)]/30 gap-4">
                                         <div className="text-center sm:text-left">
                                             <div className="text-xs font-black uppercase tracking-widest text-[var(--text-primary)]">{t("settings.proPlan")}</div>

@@ -673,29 +673,29 @@ export default function VideoPage() {
     return (
         <div className="flex flex-col h-[calc(100vh-64px)] bg-[var(--bg-surface)] text-foreground overflow-hidden">
             {/* Header Area */}
-            <div className="h-16 border-b border-[var(--border-subtle)] bg-[var(--bg-sidebar)] flex items-center justify-between px-6 shrink-0 z-20">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-8 py-8 border-b border-white/5 bg-[#0D0D0F] shrink-0 z-20">
                 <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-[var(--accent-soft)] flex items-center justify-center text-[var(--accent-primary)] shadow-lg shadow-[var(--accent-primary)]/10">
+                    <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-white/10 text-white flex items-center justify-center shadow-xl">
                         <TbVideo className="w-6 h-6" />
                     </div>
-                    <div className="hidden sm:block">
-                        <h1 className="text-xl font-black tracking-tight uppercase italic text-[var(--text-primary)]">{t("sidebar.video")}</h1>
-                        <p className="text-[10px] text-[var(--text-muted)] font-black uppercase tracking-widest -mt-0.5">
-                            {language === 'tr' ? 'Sinematik Moda Videoları' : 'Cinematic Fashion Videos'}
+                    <div>
+                        <h1 className="text-3xl font-black tracking-tighter text-white uppercase italic">{t("sidebar.video")}</h1>
+                        <p className="text-[11px] text-zinc-500 font-black uppercase tracking-[0.2em] mt-1">
+                            {language === 'tr' ? 'NANO BANANA PRO • SİNEMATİK MODA VİDEOLARI' : 'NANO BANANA PRO • CINEMATIC FASHION VIDEOS'}
                         </p>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2 sm:gap-4">
+                <div className="flex items-center gap-3">
                     <Select value={productionModel} onValueChange={setProductionModel}>
-                        <SelectTrigger className="w-40 sm:w-[200px] bg-[var(--bg-surface)] border-[var(--border-subtle)] rounded-xl text-xs font-bold h-10 ring-0 focus:ring-0">
+                        <SelectTrigger className="w-48 bg-white/5 border-white/5 text-white rounded-xl text-[10px] font-black uppercase tracking-widest h-12 focus:ring-1 focus:ring-white/20 transition-all">
                             <SelectValue placeholder="Model Seçin" />
                         </SelectTrigger>
-                        <SelectContent className="bg-[var(--bg-sidebar)] border-[var(--border-subtle)]">
+                        <SelectContent className="bg-zinc-900 border-white/10">
                             {PRODUCTION_MODELS.map(m => (
-                                <SelectItem key={m.id} value={m.id} className="focus:bg-[var(--accent-soft)] focus:text-[var(--accent-primary)] text-xs">
-                                    <span className="flex items-center gap-2 font-bold">
-                                        <span>{m.icon}</span>
+                                <SelectItem key={m.id} value={m.id} className="focus:bg-white focus:text-black text-[10px] font-black uppercase tracking-widest">
+                                    <span className="flex items-center gap-3">
+                                        <span className="text-base">{m.icon}</span>
                                         <span>{language === 'tr' ? (m.labelTr || m.label) : m.label}</span>
                                     </span>
                                 </SelectItem>
@@ -706,22 +706,19 @@ export default function VideoPage() {
                     <Button
                         onClick={handleGenerate}
                         disabled={isProcessing}
-                        className="bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-white font-black h-10 px-4 sm:px-8 rounded-xl shadow-lg shadow-[var(--accent-primary)]/20 transition-all active:scale-95 text-xs uppercase tracking-widest relative group"
+                        className="bg-white hover:bg-zinc-200 text-black font-black h-12 px-10 rounded-2xl shadow-2xl transition-all active:scale-[0.98] text-[11px] uppercase tracking-[0.2em] flex items-center gap-4"
                     >
                         {isProcessing ? (
-                            <TbLoader2 className="w-4 h-4 animate-spin" />
+                            <TbLoader2 className="w-5 h-5 animate-spin" />
                         ) : (
-                            <div className="flex flex-col items-center leading-none">
-                                <div className="flex items-center gap-2">
-                                    <TbSparkles className="w-4 h-4" />
-                                    <span className="hidden sm:inline">{language === 'tr' ? 'Oluştur' : 'Generate'}</span>
-                                </div>
-                                <span className="text-[9px] opacity-80 font-normal mt-0.5 lowercase group-hover:text-yellow-200 transition-colors">
-                                    {estimatedCost} {language === 'tr' ? 'Kr' : 'Cr'}
+                            <>
+                                <TbSparkles className="w-5 h-5 opacity-50" />
+                                <span>{language === 'tr' ? 'OLUŞTUR' : 'GENERATE'}</span>
+                                <span className="ml-1 opacity-40 font-black border-l border-black/10 pl-4">
+                                    {estimatedCost} {language === 'tr' ? 'KR' : 'CR'}
                                 </span>
-                            </div>
+                            </>
                         )}
-                        {!isProcessing && <span className="sm:hidden ml-1 text-[9px] opacity-70">({estimatedCost})</span>}
                     </Button>
                 </div>
             </div>
@@ -738,15 +735,15 @@ export default function VideoPage() {
                             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     {/* Story Selection */}
-                                    <Card className="md:col-span-2 bg-[var(--bg-sidebar)] border-[var(--border-subtle)] p-4 sm:p-6 backdrop-blur-sm space-y-6 rounded-2xl">
-                                        <div className="flex items-center justify-between">
-                                            <h2 className="text-lg font-black tracking-tight uppercase italic text-[var(--text-primary)] flex items-center gap-2">
-                                                <TbMovie className="w-5 h-5 text-[var(--accent-primary)]" />
+                                    <Card className="md:col-span-2 bg-zinc-900 border border-white/5 p-4 sm:p-6 backdrop-blur-sm space-y-6 rounded-2xl shadow-2xl">
+                                        <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                                            <h2 className="text-lg font-black tracking-tighter uppercase italic text-white flex items-center gap-3">
+                                                <TbMovie className="w-5 h-5 text-white" />
                                                 {language === 'tr' ? 'Hikaye Detayları' : 'Story Details'}
                                             </h2>
-                                            <Badge variant="secondary" className="bg-[var(--accent-soft)] text-[var(--accent-primary)] border-[var(--accent-primary)]/10 text-[10px] font-black uppercase tracking-widest">
+                                            <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white text-[9px] font-black uppercase tracking-widest">
                                                 AI Storyboarding
-                                            </Badge>
+                                            </div>
                                         </div>
 
                                         <div className="space-y-4">
@@ -785,9 +782,9 @@ export default function VideoPage() {
                                     </Card>
 
                                     {/* Model/Subject Selection */}
-                                    <Card className="bg-[var(--bg-sidebar)] border-[var(--border-subtle)] p-6 backdrop-blur-sm space-y-6 rounded-2xl">
-                                        <h2 className="text-lg font-black tracking-tight uppercase italic text-[var(--text-primary)] flex items-center gap-2">
-                                            <TbUserCircle className="w-5 h-5 text-[var(--accent-primary)]" />
+                                    <Card className="bg-zinc-900 border border-white/5 p-6 backdrop-blur-sm space-y-6 rounded-2xl shadow-2xl">
+                                        <h2 className="text-lg font-black tracking-tighter uppercase italic text-white flex items-center gap-3 border-b border-white/5 pb-4">
+                                            <TbUserCircle className="w-5 h-5 text-white" />
                                             {language === 'tr' ? 'Model & Karakter' : 'Model & Character'}
                                         </h2>
 
@@ -1029,11 +1026,11 @@ export default function VideoPage() {
                                             {!multiShot ? (
                                                 <div className="space-y-4">
                                                     <div className="flex items-center justify-between">
-                                                        <label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest flex items-center gap-2">
-                                                            <TbPlayerPlay className="w-4 h-4 text-[var(--accent-primary)]" />
+                                                        <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+                                                            <TbPlayerPlay className="w-4 h-4 text-white" />
                                                             {language === 'tr' ? 'Süre' : 'Dur'}
                                                         </label>
-                                                        <span className="text-xs font-black italic text-[var(--accent-primary)]">{duration}s</span>
+                                                        <span className="text-xs font-black italic text-white">{duration}s</span>
                                                     </div>
                                                     <Slider
                                                         value={[duration]}
@@ -1045,11 +1042,11 @@ export default function VideoPage() {
                                                     />
                                                 </div>
                                             ) : (
-                                                <div className="flex flex-col justify-center items-center text-center px-4 bg-[var(--accent-soft)] rounded-xl py-4 border border-[var(--accent-primary)]/10">
-                                                    <div className="w-10 h-10 rounded-full bg-[var(--accent-primary)] text-white flex items-center justify-center mb-2 shadow-lg shadow-[var(--accent-primary)]/20">
-                                                        <TbBolt className="w-5 h-5" />
+                                                <div className="flex flex-col justify-center items-center text-center px-4 bg-white/5 rounded-2xl py-6 border border-white/10 shadow-xl">
+                                                    <div className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center mb-3 shadow-2xl">
+                                                        <TbBolt className="w-6 h-6" />
                                                     </div>
-                                                    <span className="text-[10px] font-black text-[var(--accent-primary)] uppercase leading-tight tracking-widest">
+                                                    <span className="text-[10px] font-black text-white uppercase leading-tight tracking-[0.2em]">
                                                         {language === 'tr' ? 'ÇOKLU SAHNE AKTİF' : 'MULTI-SHOT ACTIVE'}
                                                     </span>
                                                 </div>
@@ -1103,9 +1100,9 @@ export default function VideoPage() {
                                             <TooltipProvider>
                                                 <Tooltip>
                                                     <TooltipTrigger asChild>
-                                                        <Info className="w-4 h-4 text-[var(--text-muted)] cursor-help hover:text-[var(--accent-primary)] transition-colors" />
+                                                        <Info className="w-4 h-4 text-zinc-500 cursor-help hover:text-white transition-colors" />
                                                     </TooltipTrigger>
-                                                    <TooltipContent className="bg-[var(--bg-sidebar)] border-[var(--border-subtle)] text-[var(--text-primary)] text-[11px] max-w-[200px]">
+                                                    <TooltipContent className="bg-zinc-900 border-white/10 text-white text-[11px] max-w-[200px]">
                                                         {multiShot
                                                             ? (language === 'tr' ? 'Birden fazla sahne oluşturarak hikayenizi detaylandırın.' : 'Detail your story by creating multiple shots.')
                                                             : (language === 'tr' ? 'Videonuzun içeriğini ve tarzını buradan tarif edin.' : 'Describe the content and style of your video here.')}
@@ -1115,10 +1112,10 @@ export default function VideoPage() {
                                         </div>
 
                                         <div className="flex items-center justify-between sm:justify-end gap-4 px-1">
-                                            <span className="text-[10px] font-black text-[var(--accent-primary)] uppercase tracking-widest">
+                                            <span className="text-[10px] font-black text-white uppercase tracking-widest">
                                                 {language === 'tr' ? 'ÇOKLU SAHNE' : 'MULTI-SHOT'}
                                             </span>
-                                            <Switch checked={multiShot} onCheckedChange={setMultiShot} className="data-[state=checked]:bg-[var(--accent-primary)]" />
+                                            <Switch checked={multiShot} onCheckedChange={setMultiShot} className="data-[state=checked]:bg-white" />
                                         </div>
                                     </div>
 
@@ -1131,13 +1128,13 @@ export default function VideoPage() {
                                                         <div key={shot.id} className="relative p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] animate-in slide-in-from-right-2">
                                                             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
                                                                 <h4 className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest flex items-center gap-3">
-                                                                    <div className="w-6 h-6 rounded-full bg-[var(--accent-primary)] text-white flex items-center justify-center text-[10px] shadow-lg shadow-[var(--accent-primary)]/10">{index + 1}</div>
+                                                                    <div className="w-7 h-7 rounded-full bg-white text-black flex items-center justify-center text-[11px] font-black italic shadow-xl">{index + 1}</div>
                                                                     {language === 'tr' ? 'SAHNE' : 'SHOT'} {index + 1}
                                                                 </h4>
                                                                 <div className="flex items-center justify-between sm:justify-end gap-4 overflow-hidden">
-                                                                    <div className="flex items-center gap-3 bg-[var(--bg-sidebar)] px-4 py-2 rounded-xl border border-[var(--border-subtle)] group/dur cursor-pointer hover:border-[var(--accent-primary)]/30 transition-all flex-1 sm:flex-none">
-                                                                        <TbPlayerPlay className="w-3.5 h-3.5 text-[var(--accent-primary)] shrink-0" />
-                                                                        <span className="text-[10px] font-black text-[var(--text-primary)] pr-3 border-r border-[var(--border-subtle)] select-none shrink-0 whitespace-nowrap">
+                                                                    <div className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/5 group/dur cursor-pointer hover:border-white/20 transition-all flex-1 sm:flex-none">
+                                                                        <TbPlayerPlay className="w-3.5 h-3.5 text-white shrink-0" />
+                                                                        <span className="text-[10px] font-black text-white pr-3 border-r border-white/5 select-none shrink-0 whitespace-nowrap">
                                                                             {shot.duration}s
                                                                         </span>
                                                                         <Slider
@@ -1186,10 +1183,10 @@ export default function VideoPage() {
                                                         <Button
                                                             onClick={addShot}
                                                             disabled={shots.length >= 5 || totalDuration >= 15}
-                                                            className="h-12 px-8 rounded-xl bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-white shadow-lg shadow-[var(--accent-primary)]/20 font-black uppercase tracking-widest gap-2 text-xs transition-all active:scale-95"
+                                                            className="h-12 px-10 rounded-2xl bg-white hover:bg-zinc-200 text-black shadow-2xl font-black uppercase tracking-[0.2em] gap-3 text-[10px] transition-all active:scale-[0.98]"
                                                         >
                                                             <TbPlus className="w-4 h-4" />
-                                                            {language === 'tr' ? 'Yeni Sahne' : 'New Shot'}
+                                                            {language === 'tr' ? 'YENİ SAHNE' : 'NEW SHOT'}
                                                         </Button>
                                                         <div className="flex items-center gap-3 px-4 py-2 bg-[var(--bg-surface)] rounded-xl border border-[var(--border-subtle)]">
                                                             <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest whitespace-nowrap">
@@ -1262,25 +1259,25 @@ export default function VideoPage() {
 
                                 {/* Video Generation Progress */}
                                 {isProcessing && generationProgress && (
-                                    <Card className="bg-[var(--bg-sidebar)] border-[var(--border-subtle)] overflow-hidden rounded-2xl">
+                                    <Card className="bg-zinc-900 border border-white/5 overflow-hidden rounded-2xl shadow-2xl mt-8">
                                         <div className="p-10 flex flex-col items-center justify-center gap-6">
                                             <div className="relative w-20 h-20">
-                                                <div className="absolute inset-0 rounded-full border-4 border-[var(--border-subtle)]" />
-                                                <div className="absolute inset-0 rounded-full border-4 border-[var(--accent-primary)] border-t-transparent animate-spin" />
-                                                <div className="absolute inset-2 rounded-full bg-[var(--accent-soft)] flex items-center justify-center">
-                                                    <TbVideo className="w-8 h-8 text-[var(--accent-primary)]" />
+                                                <div className="absolute inset-0 rounded-full border-4 border-white/5" />
+                                                <div className="absolute inset-0 rounded-full border-4 border-white border-t-transparent animate-spin" />
+                                                <div className="absolute inset-2 rounded-full bg-white/5 flex items-center justify-center">
+                                                    <TbVideo className="w-8 h-8 text-white" />
                                                 </div>
                                             </div>
                                             <div className="text-center space-y-2">
-                                                <p className="text-lg font-black uppercase italic tracking-tight text-[var(--text-primary)]">
+                                                <p className="text-lg font-black uppercase italic tracking-tighter text-white">
                                                     {language === 'tr' ? 'Video Üretiliyor' : 'Generating Video'}
                                                 </p>
-                                                <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] max-w-sm">
+                                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 max-w-sm">
                                                     {generationProgress}
                                                 </p>
                                             </div>
-                                            <div className="w-full max-w-xs h-2 bg-[var(--bg-surface)] rounded-full overflow-hidden border border-[var(--border-subtle)]">
-                                                <div className="h-full bg-[var(--accent-primary)] rounded-full animate-pulse shadow-lg shadow-[var(--accent-primary)]/40" style={{ width: '60%' }} />
+                                            <div className="w-full max-w-xs h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/5">
+                                                <div className="h-full bg-white rounded-full animate-pulse shadow-[0_0_20px_rgba(255,255,255,0.3)]" style={{ width: '60%' }} />
                                             </div>
                                         </div>
                                     </Card>
@@ -1288,13 +1285,13 @@ export default function VideoPage() {
 
                                 {/* Generated Video Result */}
                                 {generatedVideoUrl && !isProcessing && (
-                                    <Card className="bg-[var(--bg-sidebar)] border-[var(--border-subtle)] overflow-hidden rounded-2xl shadow-2xl">
-                                        <div className="px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]/50 gap-4">
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-8 h-8 bg-[var(--accent-soft)] text-[var(--accent-primary)] rounded-xl flex items-center justify-center shadow-lg shadow-[var(--accent-primary)]/10">
-                                                    <TbMovie className="w-5 h-5" />
+                                    <Card className="bg-zinc-900 border border-white/5 overflow-hidden rounded-2xl shadow-2xl mt-8">
+                                        <div className="px-6 py-5 flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/5 bg-white/[0.02] gap-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 bg-white text-black rounded-xl flex items-center justify-center shadow-xl">
+                                                    <TbMovie className="w-6 h-6" />
                                                 </div>
-                                                <span className="text-xs font-black uppercase tracking-widest text-[var(--text-primary)] italic">
+                                                <span className="text-xs font-black uppercase tracking-[0.2em] text-white italic">
                                                     {language === 'tr' ? 'Tamamlanan Video' : 'Completed Video'}
                                                 </span>
                                             </div>
@@ -1303,18 +1300,18 @@ export default function VideoPage() {
                                                     variant="ghost"
                                                     size="sm"
                                                     onClick={handleDownloadVideo}
-                                                    className="h-9 gap-2 text-[10px] font-black uppercase tracking-widest text-[var(--accent-primary)] hover:bg-[var(--accent-soft)] rounded-xl px-5 border border-[var(--accent-primary)]/20"
+                                                    className="h-11 gap-3 text-[10px] font-black uppercase tracking-widest text-white border border-white/5 bg-white/5 hover:bg-white hover:text-black rounded-xl px-6 transition-all"
                                                 >
                                                     <TbDownload className="w-4 h-4" />
-                                                    {language === 'tr' ? 'İndir' : 'Download'}
+                                                    {language === 'tr' ? 'İNDİR' : 'DOWNLOAD'}
                                                 </Button>
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
                                                     onClick={() => setGeneratedVideoUrl(null)}
-                                                    className="h-9 w-9 text-[var(--text-muted)] hover:text-red-500 hover:bg-red-500/10 rounded-xl"
+                                                    className="h-11 w-11 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
                                                 >
-                                                    <TbTrash className="w-4 h-4" />
+                                                    <TbTrash className="w-5 h-5" />
                                                 </Button>
                                             </div>
                                         </div>
