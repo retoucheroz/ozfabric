@@ -105,7 +105,7 @@ const ShowcaseSection = ({ isModeOn, translate }: { isModeOn: boolean, translate
     });
 
     // Sequential staggered values
-    const textOpacity = useTransform(smoothProgress, [0.35, 0.5], [0, 1]);
+    const textOpacity = useTransform(smoothProgress, [0.15, 0.3], [0, 1]);
     const plusOpacity = useTransform(smoothProgress, [0.12, 0.2], [0, 1]);
 
     return (
@@ -119,7 +119,7 @@ const ShowcaseSection = ({ isModeOn, translate }: { isModeOn: boolean, translate
                     src="/lp/p2/lp2_bg.webp"
                     alt="Background"
                     fill
-                    className="object-cover object-top opacity-20 blur-[1px]"
+                    className="object-cover object-top opacity-20"
                 />
                 {/* Seamless Blend Gradient */}
                 <div className="absolute inset-x-0 top-0 h-96 bg-gradient-to-b from-[#0D0D0F] via-[#0D0D0F]/80 to-transparent" />
@@ -127,88 +127,111 @@ const ShowcaseSection = ({ isModeOn, translate }: { isModeOn: boolean, translate
                 <div className="absolute inset-x-0 bottom-0 h-96 bg-gradient-to-t from-[#0D0D0F] via-[#0D0D0F]/80 to-transparent" />
             </div>
 
-            <div className="sticky top-[15vh] w-full max-w-6xl mx-auto z-10">
+            <div className="sticky top-[18vh] w-full max-w-6xl mx-auto z-10">
                 <div className="relative">
-                    <div className="flex flex-col lg:flex-row items-center justify-center lg:justify-center gap-12 lg:gap-0 relative">
-                        <div className="flex flex-col lg:flex-row items-center justify-center w-full lg:w-[76%] relative">
-                            {/* LEFT GROUP: INPUT/BASE (Images 1 & 2) */}
-                            <div className="grid grid-cols-1 gap-4 md:gap-8 w-full lg:w-[24/76*100%] lg:w-[31.5%] relative z-30">
-                                {/* Animated Plus Icon Center-Aligned in the Gap */}
-                                <motion.div
-                                    style={{ opacity: plusOpacity, scale: plusOpacity }}
-                                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-40 flex items-center justify-center pointer-events-none"
-                                >
-                                    <Plus className="w-8 h-8 text-white/60" strokeWidth={2.5} />
-                                </motion.div>
-
-                                {[
-                                    { src: "/lp/p2/1.webp", label: translate("MODEL GÖRSELİ", "MODEL VISUAL"), isOutput: false, startPos: { x: 150, y: 100, r: -5 }, blurStrength: 0 },
-                                    { src: "/lp/p2/2.webp", label: translate("ÜRÜN GÖRSELİ", "PRODUCT VISUAL"), isOutput: false, startPos: { x: 150, y: -100, r: 5 }, blurStrength: 0 },
-                                ].map((item, idx) => (
-                                    <InteractiveShowcaseCard
-                                        key={idx}
-                                        item={item}
-                                        index={idx} // 0, 1
-                                        baseProgress={smoothProgress}
-                                        isModeOn={isModeOn}
-                                    />
-                                ))}
+                    <div className="flex flex-col lg:flex-row items-center justify-between gap-16 relative w-full">
+                        {/* LEFT: STEPS (3 rows) */}
+                        <motion.div
+                            style={{ opacity: textOpacity }}
+                            className="w-full lg:w-[32%] flex flex-col gap-6 py-12"
+                        >
+                            <h2 className="text-2xl md:text-3xl font-bodoni text-[#F5F5F5] leading-tight mb-4 tracking-tight">
+                                <span className="block">{translate("Koleksiyonunuz Hazır,", "Your Collection Is Ready,")}</span>
+                                <span className="italic block mt-1">{translate("Stüdyo Sizin.", "The Studio Is Yours.")}</span>
+                            </h2>
+                            <p className="text-base text-zinc-400 mb-8 leading-relaxed font-medium">
+                                {translate(
+                                    "Stüdyo kirası, model ajansı, lokasyon — bunların hiçbirine gerek kalmadan profesyonel kampanya içerikleri oluşturun.",
+                                    "Create professional campaign content without the need for studio rentals, model agencies, or locations."
+                                )}
+                            </p>
+                            <div className="flex items-center gap-3">
+                                <div className="w-6 h-6 rounded-full bg-[#F5F5F5]/20 flex items-center justify-center shrink-0">
+                                    <div className="w-2 h-2 bg-[#F5F5F5] rounded-full" />
+                                </div>
+                                <span className="font-medium text-sm text-zinc-300">
+                                    {translate("Model fotoğrafı yükle", "Upload model photo")}
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="w-6 h-6 rounded-full bg-[#F5F5F5]/20 flex items-center justify-center shrink-0">
+                                    <div className="w-2 h-2 bg-[#F5F5F5] rounded-full" />
+                                </div>
+                                <span className="font-medium text-sm text-zinc-300">
+                                    {translate("Kombinini ekle", "Add your outfit")}
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="w-6 h-6 rounded-full bg-[#F5F5F5]/20 flex items-center justify-center shrink-0">
+                                    <div className="w-2 h-2 bg-[#F5F5F5] rounded-full" />
+                                </div>
+                                <span className="font-medium text-sm text-zinc-300">
+                                    {translate("Sahneyi seç ve oluştur.", "Select scene and generate.")}
+                                </span>
                             </div>
 
-                            {/* GAP / SEPARATOR (Middle part starts here) */}
-                            <div className="w-full lg:w-[8/76*100%] lg:w-[10.5%] flex items-center justify-center py-8 lg:py-0 relative z-20">
-                                <div className="hidden lg:block h-[500px] w-[2.5px] bg-gradient-to-b from-transparent via-white/30 to-transparent" />
-                            </div>
+                            <Link href="/login" className="mt-8">
+                                <Button className="h-12 px-8 rounded-xl bg-[#F5F5F5] text-black hover:bg-zinc-200 text-xs font-black uppercase tracking-widest transition-all">
+                                    {translate("KENDİN DENE", "TRY IT YOURSELF")}
+                                </Button>
+                            </Link>
+                        </motion.div>
 
-                            {/* RIGHT GROUP: OUTPUTS (Images 3, 5, 4, 6) */}
-                            <div className="grid grid-cols-2 gap-4 md:gap-8 w-full lg:w-[44/76*100%] lg:w-[58%] relative z-10">
-                                {[
-                                    { src: "/lp/p2/3.webp", label: translate("EDİTORİAL", "EDITORIAL"), isOutput: true, startPos: { x: -100, y: 120, r: -8 }, blurStrength: 8 },
-                                    { src: "/lp/p2/5.webp", label: translate("İMAJ GÖRSELİ", "IMAGE VISUAL"), isOutput: true, startPos: { x: -250, y: 120, r: 12 }, blurStrength: 4 },
-                                    { src: "/lp/p2/4.webp", label: translate("EDİTORİAL", "EDITORIAL"), isOutput: true, startPos: { x: -100, y: -120, r: -4 }, blurStrength: 8 },
-                                    { src: "/lp/p2/6.webp", label: translate("ECOM GÖRSELİ", "ECOM VISUAL"), isOutput: true, startPos: { x: -250, y: -120, r: 6 }, blurStrength: 4 },
-                                ].map((item, idx) => (
-                                    <InteractiveShowcaseCard
-                                        key={idx}
-                                        item={item}
-                                        index={idx + 2} // 2, 3, 4, 5
-                                        baseProgress={smoothProgress}
-                                        isModeOn={isModeOn}
-                                    />
-                                ))}
+                        {/* RIGHT: IMAGE GRID - Now shifted right */}
+                        <div className="flex flex-col lg:flex-row items-center justify-end w-full lg:w-[68%] relative">
+                            <div className="flex flex-col lg:flex-row items-center justify-between w-full relative">
+                                {/* LEFT GROUP: INPUT/BASE (Images 1 & 2) */}
+                                <div className="grid grid-cols-1 gap-4 md:gap-8 w-full lg:w-[15/76*100%] lg:w-[22%] relative z-30">
+                                    {/* Animated Plus Icon Center-Aligned in the Gap */}
+                                    <motion.div
+                                        style={{ opacity: plusOpacity, scale: plusOpacity }}
+                                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-40 flex items-center justify-center pointer-events-none"
+                                    >
+                                        <Plus className="w-8 h-8 text-white/60" strokeWidth={2.5} />
+                                    </motion.div>
+
+                                    {[
+                                        { src: "/lp/p2/1.webp", label: translate("MODEL GÖRSELİ", "MODEL VISUAL"), isOutput: false, startPos: { x: 150, y: 100, r: -5 }, blurStrength: 0 },
+                                        { src: "/lp/p2/2.webp", label: translate("ÜRÜN GÖRSELİ", "PRODUCT VISUAL"), isOutput: false, startPos: { x: 150, y: -100, r: 5 }, blurStrength: 0 },
+                                    ].map((item, idx) => (
+                                        <InteractiveShowcaseCard
+                                            key={idx}
+                                            item={item}
+                                            index={idx} // 0, 1
+                                            baseProgress={smoothProgress}
+                                            isModeOn={isModeOn}
+                                        />
+                                    ))}
+                                </div>
+
+                                {/* GAP / SEPARATOR (Middle part starts here) */}
+                                <div className="w-full lg:w-[5/76*100%] lg:w-[7%] flex items-center justify-center py-8 lg:py-0 relative z-20">
+                                    <div className="hidden lg:block h-[500px] w-[2.5px] bg-gradient-to-b from-transparent via-white/30 to-transparent" />
+                                </div>
+
+                                {/* RIGHT GROUP: OUTPUTS (Images 3, 5, 4, 6) */}
+                                <div className="grid grid-cols-2 gap-4 md:gap-8 w-full lg:w-[51/76*100%] lg:w-[68%] relative z-10">
+                                    {[
+                                        { src: "/lp/p2/3.webp", label: translate("EDİTORİAL", "EDITORIAL"), isOutput: true, startPos: { x: -100, y: 120, r: -8 }, blurStrength: 8 },
+                                        { src: "/lp/p2/5.webp", label: translate("İMAJ GÖRSELİ", "IMAGE VISUAL"), isOutput: true, startPos: { x: -250, y: 120, r: 12 }, blurStrength: 4 },
+                                        { src: "/lp/p2/4.webp", label: translate("EDİTORİAL", "EDITORIAL"), isOutput: true, startPos: { x: -100, y: -120, r: -4 }, blurStrength: 8 },
+                                        { src: "/lp/p2/6.webp", label: translate("ECOM GÖRSELİ", "ECOM VISUAL"), isOutput: true, startPos: { x: -250, y: -120, r: 6 }, blurStrength: 4 },
+                                    ].map((item, idx) => (
+                                        <InteractiveShowcaseCard
+                                            key={idx}
+                                            item={item}
+                                            index={idx + 2} // 2, 3, 4, 5
+                                            baseProgress={smoothProgress}
+                                            isModeOn={isModeOn}
+                                        />
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                {/* STEPS RECTIFIED UNDER MIDDLE & RIGHT */}
-                <motion.div
-                    style={{ opacity: textOpacity }}
-                    className="-mt-[26px] w-full flex justify-center relative z-20"
-                >
-                    <div className="w-full lg:w-[76%] flex">
-                        {/* 42% spacer ensures the text starts exactly under the middle (Editorial) images (31.5% left + 10.5% gap) */}
-                        <div className="hidden lg:block lg:w-[42%]" />
-
-                        {/* This container covers exactly the Right (Editorial/Output) columns */}
-                        <div className="w-full lg:w-[58%] flex flex-wrap justify-between items-center text-[#F5F5F5] font-bold text-[13px] md:text-[15px] tracking-tight">
-                            <span className="flex items-center gap-3 opacity-95">
-                                <div className="w-4 h-4 rounded-full bg-[#f5f5f5] flex items-center justify-center shadow-sm"></div>
-                                {translate("Model fotoğrafı yükle", "Upload model photo")}
-                            </span>
-                            <span className="flex items-center gap-3 opacity-95">
-                                <div className="w-4 h-4 rounded-full bg-[#f5f5f5] flex items-center justify-center shadow-sm"></div>
-                                {translate("Kombinini ekle", "Add your outfit")}
-                            </span>
-                            <span className="flex items-center gap-3 opacity-95">
-                                <div className="w-4 h-4 rounded-full bg-[#f5f5f5] flex items-center justify-center shadow-sm"></div>
-                                {translate("Sahneyi seç ve oluştur.", "Select scene and generate.")}
-                            </span>
-                        </div>
-                    </div>
-                </motion.div>
             </div>
-            <ScrollDownIcon targetId="showcase" className="!bottom-37" />
+            <ScrollDownIcon targetId="showcase" className="!bottom-34" />
         </section>
     );
 };
@@ -463,7 +486,7 @@ export default function LandingPage() {
             <ShowcaseSection isModeOn={isModeOn} translate={translate} />
 
             {/* BEFORE / AFTER HIGHLIGHT SECTION (Page 3) */}
-            <section id="showcase" className="py-32 px-6 relative overflow-hidden bg-[#0D0D0F]">
+            <section id="showcase" className="pt-32 pb-48 px-6 relative overflow-hidden bg-[#0D0D0F]">
                 <div className="max-w-6xl mx-auto relative z-10">
                     <div className="grid lg:grid-cols-2 gap-16 items-center">
                         <motion.div
@@ -478,16 +501,16 @@ export default function LandingPage() {
                             </h2>
                             <p className="text-base text-zinc-400 mb-8 leading-relaxed font-medium">
                                 {translate(
-                                    "Basit ürün çekimlerinizi, global marka standartlarında kampanya görsellerine dönüştürün. Kumaş dokusu, doğal ışıklandırma ve anatomik doğrulukla kusursuz sonuçlar elde edin.",
-                                    "Transform your simple product shots into campaign visuals at global brand standards. Achieve flawless results with perfect fabric texture, natural lighting, and anatomical accuracy."
+                                    "Dekupe, ghost, askıda çekilmiş ürünlerinizi, bütçeyi düşünmeden yaratıcılığınıza odaklanıp, tüm detayları koruyarak etkileyici sonuçlar elde edin.",
+                                    "Achieve impressive results while preserving every detail of your cut-out, ghost, or flat-lay product shots by focusing on your creativity regardless of budget."
                                 )}
                             </p>
 
                             <ul className="space-y-4 mb-10">
                                 {[
-                                    translate("Fiziksel ışık simülasyonu", "Physical light simulation"),
-                                    translate("Kumaş dokusu ve gölge koruması", "Fabric texture and shadow preservation"),
-                                    translate("Sınırsız model ve lokasyon", "Unlimited models and locations"),
+                                    translate("Işık gerçek hissettirir", "Light feels real"),
+                                    translate("Kumaş gerçek görünür", "Fabric looks real"),
+                                    translate("Sahne gerçek olur - Tam istediğiniz gibi.", "The scene becomes real - Just as you desired."),
                                 ].map((feature, idx) => (
                                     <li key={idx} className="flex items-center gap-3">
                                         <div className="w-6 h-6 rounded-full bg-[#F5F5F5]/20 flex items-center justify-center">
@@ -509,7 +532,7 @@ export default function LandingPage() {
                         <BeforeAfterSlider translate={translate} />
                     </div>
                 </div>
-                <ScrollDownIcon targetId="features" />
+                <ScrollDownIcon targetId="features" className="!bottom-1" />
             </section>
 
             {/* FEATURES GRID (Page 4) */}
@@ -517,13 +540,10 @@ export default function LandingPage() {
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-20">
                         <h2 className="text-xl md:text-3xl font-playfair tracking-tight mb-4 text-[#F5F5F5]">
-                            <span className="font-normal">{translate("Moda Prodüksiyonu,", "Fashion Production,")}</span>
+                            <span className="font-normal">{translate("Bir koleksiyonu kampanyaya taşımak için", "Everything you need to take")}</span>
                             <br />
-                            <span className="italic">{translate("Yeniden Tanımlandı.", "Redefined.")}</span>
+                            <span className="italic">{translate("ihtiyacınız olan her şey.", "a collection to a campaign.")}</span>
                         </h2>
-                        <p className="text-zinc-500 text-sm md:text-base font-medium max-w-2xl mx-auto uppercase tracking-[0.2em] opacity-80">
-                            {translate("GELECEĞİN MODA TEKNOLOJİSİ", "THE FUTURE OF FASHION TECH")}
-                        </p>
                     </div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -532,37 +552,55 @@ export default function LandingPage() {
                                 title: translate("Stüdyo Çekimi", "Studio Shoot"),
                                 icon: Camera,
                                 color: "text-blue-400",
-                                desc: translate("Teknik detayları ve kumaş dokusunu vurgulayan, yüksek çözünürlüklü dijital stüdyo analizleri.", "High-resolution digital studio analysis highlighting technical details and fabric textures.")
+                                desc: translate(
+                                    "Ürününüzü giydirin, sahneyi seçin. Modeon, e-com'dan imaj görsellerine her formatı AI ile üretir — tek bir çekim olmadan.",
+                                    "Dress your product, pick the scene. Modeon generates everything from e-com to campaign imagery via AI — without a single shutter click."
+                                )
                             },
                             {
                                 title: translate("Editoryal Kampanya", "Editorial Campaign"),
                                 icon: ImageIcon,
                                 color: "text-[#F5F5F5]",
-                                desc: translate("İkonik lokasyonlar ve profesyonel ışık kurgularıyla markanızı global moda standartlarına taşıyın.", "Carry your brand to global fashion standards with iconic locations and professional lighting.")
+                                desc: translate(
+                                    "Paris, Milano, Tokyo — koleksiyonunuz için doğru sahneyi seçin, biz kurguyu halledelim.",
+                                    "Paris, Milan, Tokyo — choose the right stage for your collection; let us handle the composition."
+                                )
                             },
                             {
-                                title: translate("Video Jeneratörü", "Video Generator"),
+                                title: translate("Video", "Video"),
                                 icon: Video,
                                 color: "text-rose-400",
-                                desc: translate("Statik görselleri dinamik videolara dönüştürün; gerçekçi kumaş hareketiyle kampanya videoları hazırlayın.", "Transform static images into dynamic videos with realistic fabric movement for campaign videos.")
+                                desc: translate(
+                                    "Görselinizi videoya taşıyın. Kumaş dalgalanır, saçlar uçuşur — sahne canlanır, kamera gerekmez.",
+                                    "Move your visual into video. Fabric ripples, hair flows — the scene comes alive, no camera required."
+                                )
                             },
                             {
                                 title: translate("Yüz Değiştirme", "Face Swap"),
                                 icon: Wand2,
                                 color: "text-amber-400",
-                                desc: translate("Marka yüzünüzü kişiselleştirin; yüksek hassasiyetli teknolojiyle her karede mükemmel estetiği yakalayın.", "Personalize your brand face and catch the perfect aesthetic with high-precision face swap technology.")
+                                desc: translate(
+                                    "Beğendiğiniz o kareye kendi yüzünüzü ya da modelinizi taşıyın. Işık, açı, ifade — her şey korunur, sadece yüz değişir.",
+                                    "Bring your own face or model into that favorite frame. Light, angle, expression — everything is preserved, only the face changes."
+                                )
                             },
                             {
                                 title: translate("Toplu İşlem", "Batch Processing"),
                                 icon: Layers,
                                 color: "text-emerald-400",
-                                desc: translate("Binlerce ürünü dakikalar içinde işleyin; e-ticaret kataloglarınızda görsel bütünlük ve hız kazanın.", "Process thousands of products in minutes; gain flawless visual consistency and speed for your catalogs.")
+                                desc: translate(
+                                    "Tüm koleksiyonu tek seferde işleyin. Kataloglarınız tutarlı, hızlı ve hazır.",
+                                    "Process the entire collection at once. Your catalogs consistent, fast, and ready."
+                                )
                             },
                             {
                                 title: translate("Özel AI Modelleri", "Custom AI Models"),
                                 icon: Zap,
                                 color: "text-cyan-400",
-                                desc: translate("Kendi AI modelinizi yaratın; markanıza özel eğitilmiş zeka ile telif hakları size ait görseller üretin.", "Create your own AI model; produce unique, copyright-owned visuals with specifically trained intelligence.")
+                                desc: translate(
+                                    "Kendi modelinizi, stilinizi, ürününüzü eğitin. Ürettiğiniz her görsel markanızın dilini konuşur — tutarlı, hatasız ve size özel.",
+                                    "Train your own model, style, or product. Every image generated speaks your brand's language — consistent, flawless, and exclusive to you."
+                                )
                             }
                         ].map((feat, i) => (
                             <motion.div
@@ -579,38 +617,28 @@ export default function LandingPage() {
                             </motion.div>
                         ))}
                     </div>
-                </div>
-                <ScrollDownIcon targetId="cta" />
-            </section>
 
-            {/* CALL TO ACTION */}
-            <section id="cta" className="py-32 px-6 relative overflow-hidden flex justify-center text-center bg-[#0D0D0F]">
-                <div className="absolute inset-0 bg-gradient-to-t from-[#F5F5F5]/[0.03] to-transparent" />
-                <motion.div
-                    initial={{ opacity: 0, y: 50 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="relative z-10 max-w-3xl text-[#F5F5F5]"
-                >
-                    <h2 className="text-xl md:text-3xl font-playfair tracking-tight mb-8 leading-[0.9] text-[#F5F5F5]">
-                        <span className="font-normal">{translate("Geleceğe", "Step Into")}</span>
-                        <br />
-                        <span className="italic">{translate("Adım At.", "The Future.")}</span>
-                    </h2>
-                    <p className="text-lg text-zinc-400 mb-8 font-medium">
-                        {translate("Moda markanızın görsel kimliğini saniyeler içinde baştan yaratmak için hemen başlayın.", "Start now to recreate your fashion brand's visual identity in seconds.")}
-                    </p>
-                    <Link href="/login">
-                        <Button className="h-14 px-8 rounded-xl bg-[#F5F5F5] text-black hover:bg-zinc-200 text-xs font-black uppercase tracking-widest transition-all hover:scale-105">
-                            {translate("ÜCRETSİZ BAŞLA", "START FOR FREE")} <ArrowRight className="ml-2 w-4 h-4" />
-                        </Button>
-                    </Link>
-                </motion.div>
+                    <motion.div
+                        initial={{ opacity: 0, y: 50 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="relative z-10 max-w-3xl mx-auto text-center mt-24 text-[#F5F5F5]"
+                    >
+                        <p className="text-lg text-zinc-400 mb-8 font-medium">
+                            {translate("Moda markanızın görsel kimliğini saniyeler içinde baştan yaratmak için hemen başlayın.", "Start now to recreate your fashion brand's visual identity in seconds.")}
+                        </p>
+                        <Link href="/login">
+                            <Button className="h-14 px-8 rounded-xl bg-[#F5F5F5] text-black hover:bg-zinc-200 text-xs font-black uppercase tracking-widest transition-all hover:scale-105">
+                                {translate("ÜCRETSİZ BAŞLA", "START FOR FREE")} <ArrowRight className="ml-2 w-4 h-4" />
+                            </Button>
+                        </Link>
+                    </motion.div>
+                </div>
             </section>
 
             {/* FOOTER */}
-            < footer className="border-t border-white/5 bg-[#0D0D0F] py-12 text-center text-sm font-medium text-zinc-500 font-mono" >
-                <p>&copy; {new Date().getFullYear()} ModeOn.ai. All rights reserved.</p>
+            <footer className="border-t border-white/5 bg-[#0D0D0F] py-8 text-center text-[10px] font-medium text-zinc-500 font-mono tracking-widest opacity-30" >
+                <p>{new Date().getFullYear()} ModeOn.ai. {translate("Tüm hakları saklıdır.", "All rights reserved.")}</p>
             </footer >
 
             {/* Global Keyframes for Animations */}
