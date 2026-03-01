@@ -41,6 +41,7 @@ const ScrollDownIcon = ({ targetId, className }: { targetId?: string, className?
 };
 
 const InteractiveShowcaseCard = ({ item, baseProgress, index, isModeOn }: any) => {
+    const [isHovered, setIsHovered] = useState(false);
     // Tighter sequential stagger: each card starts 0.025 later and animates for 0.12
     const start = 0.15 + index * 0.025;
     const end = start + 0.12;
@@ -65,6 +66,8 @@ const InteractiveShowcaseCard = ({ item, baseProgress, index, isModeOn }: any) =
                 isModeOn && item.isOutput && "grayscale-0 opacity-100 scale-100",
                 !item.isOutput && "border-white/20 ring-1 ring-white/10 shadow-white/5"
             )}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
         >
             <Image
                 src={item.src}
@@ -73,6 +76,16 @@ const InteractiveShowcaseCard = ({ item, baseProgress, index, isModeOn }: any) =
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
                 sizes="(max-width: 768px) 100vw, 33vw"
             />
+            {item.videoSrc && isHovered && (
+                <video
+                    src={item.videoSrc}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 scale-105 animate-in fade-in duration-500"
+                />
+            )}
             {isModeOn && item.isOutput && (
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
             )}
@@ -166,6 +179,14 @@ const ShowcaseSection = ({ isModeOn, translate }: { isModeOn: boolean, translate
                                     <div className="w-2 h-2 bg-[#F5F5F5] rounded-full" />
                                 </div>
                                 <span className="font-medium text-sm text-zinc-300">
+                                    {translate("İster fotoğraf, ister video", "Whether photo or video")}
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="w-6 h-6 rounded-full bg-[#F5F5F5]/20 flex items-center justify-center shrink-0">
+                                    <div className="w-2 h-2 bg-[#F5F5F5] rounded-full" />
+                                </div>
+                                <span className="font-medium text-sm text-zinc-300">
                                     {translate("Sahneyi seç ve oluştur.", "Select scene and generate.")}
                                 </span>
                             </div>
@@ -212,10 +233,10 @@ const ShowcaseSection = ({ isModeOn, translate }: { isModeOn: boolean, translate
                                 {/* RIGHT GROUP: OUTPUTS (Images 3, 5, 4, 6) */}
                                 <div className="grid grid-cols-2 gap-4 md:gap-8 w-full lg:w-[51/76*100%] lg:w-[68%] relative z-10">
                                     {[
-                                        { src: "/lp/p2/3.webp", label: translate("EDİTORİAL", "EDITORIAL"), isOutput: true, startPos: { x: -100, y: 120, r: -8 }, blurStrength: 8 },
-                                        { src: "/lp/p2/5.webp", label: translate("İMAJ GÖRSELİ", "IMAGE VISUAL"), isOutput: true, startPos: { x: -250, y: 120, r: 12 }, blurStrength: 4 },
-                                        { src: "/lp/p2/4.webp", label: translate("EDİTORİAL", "EDITORIAL"), isOutput: true, startPos: { x: -100, y: -120, r: -4 }, blurStrength: 8 },
-                                        { src: "/lp/p2/6.webp", label: translate("ECOM GÖRSELİ", "ECOM VISUAL"), isOutput: true, startPos: { x: -250, y: -120, r: 6 }, blurStrength: 4 },
+                                        { src: "/lp/p2/3.webp", label: translate("EDİTORİAL", "EDITORIAL"), isOutput: true, startPos: { x: -100, y: 120, r: -8 }, blurStrength: 8, videoSrc: "/lp/vids/edito_1.mp4" },
+                                        { src: "/lp/p2/5.webp", label: translate("İMAJ GÖRSELİ", "IMAGE VISUAL"), isOutput: true, startPos: { x: -250, y: 120, r: 12 }, blurStrength: 4, videoSrc: "/lp/vids/imaj_1.mp4" },
+                                        { src: "/lp/p2/4.webp", label: translate("EDİTORİAL", "EDITORIAL"), isOutput: true, startPos: { x: -100, y: -120, r: -4 }, blurStrength: 8, videoSrc: "/lp/vids/edito_2.mp4" },
+                                        { src: "/lp/p2/6.webp", label: translate("ECOM GÖRSELİ", "ECOM VISUAL"), isOutput: true, startPos: { x: -250, y: -120, r: 6 }, blurStrength: 4, videoSrc: "/lp/vids/ecom_1.mp4" },
                                     ].map((item, idx) => (
                                         <InteractiveShowcaseCard
                                             key={idx}
@@ -342,15 +363,6 @@ export default function LandingPage() {
     const [isModeOn, setIsModeOn] = useState(true);
     // For general scroll progress
     const { scrollY } = useScroll();
-    const [showNavCTA, setShowNavCTA] = useState(false);
-
-    useMotionValueEvent(scrollY, "change", (latest) => {
-        if (latest > 600) {
-            setShowNavCTA(true);
-        } else {
-            setShowNavCTA(false);
-        }
-    });
 
     useEffect(() => {
         setMounted(true);
@@ -390,22 +402,6 @@ export default function LandingPage() {
                                 {translate("Giriş Yap", "Sign In")}
                             </Button>
                         </Link>
-                        <AnimatePresence>
-                            {showNavCTA && (
-                                <motion.div
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.9 }}
-                                    transition={{ duration: 0.2 }}
-                                >
-                                    <Link href="/login">
-                                        <Button className="h-9 px-5 rounded-md bg-white text-black hover:bg-zinc-200 text-[10px] font-black uppercase tracking-widest transition-all">
-                                            {translate("Hemen Başla", "Start Now")}
-                                        </Button>
-                                    </Link>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
                     </div>
                 </div>
             </nav>
