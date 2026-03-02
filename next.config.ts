@@ -15,7 +15,7 @@ const nextConfig = {
     ],
   },
   outputFileTracingExcludes: {
-    '*': [
+    '**/*': [
       'node_modules/@swc/core-linux-x64-gnu',
       'node_modules/@swc/core-linux-x64-musl',
       'node_modules/@swc/wasm',
@@ -23,6 +23,7 @@ const nextConfig = {
       'node_modules/@prisma/client/libquery_engine-*',
     ],
   },
+  output: 'standalone',
 };
 
 export default nextConfig;
