@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
-import { getMailer } from "@/lib/mailer";
+import { mailer } from "@/lib/mailer";
 
 const sha256 = (s: string) => crypto.createHash("sha256").update(s).digest("hex");
 
@@ -24,7 +24,6 @@ export async function sendActivationEmail(email: string) {
     `${process.env.APP_URL}/verify?token=${encodeURIComponent(token)}` +
     `&email=${encodeURIComponent(email)}`;
 
-  const mailer = getMailer();
   await mailer.sendMail({
     from: process.env.MAIL_FROM,
     to: email,

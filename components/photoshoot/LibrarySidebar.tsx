@@ -50,7 +50,7 @@ interface LibrarySidebarProps {
     gender: string;
     setGender: (gender: string) => void;
     assets: any;
-    handleAssetUpload: (key: string, file: File | File[]) => void;
+    handleAssetUpload: (key: string, file: File) => void;
     handleAssetRemove: (key: string, e?: React.MouseEvent) => void;
     savedModels: SavedModel[];
     deleteSavedModel: (id: string) => void;

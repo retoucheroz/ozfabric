@@ -176,7 +176,9 @@ export default function EditorialPage() {
 
     const estimatedCost = resolution === "4K"
         ? SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_4K
-        : SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_1_2K;
+        : resolution === "2K"
+            ? SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_2K
+            : SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_1K;
 
     // Library States
     const [savedModels, setSavedModels] = useState<SavedModel[]>([]);
@@ -579,13 +581,6 @@ export default function EditorialPage() {
                                                 description={language === "tr" ? "(OPSİYONEL)" : "(OPTIONAL)"}
                                                 hideLibrary
                                             />
-
-                                            <Button
-                                                onClick={() => canMoveToStep(2) && setWizardStep(2)}
-                                                className="w-full h-auto py-2 rounded-md bg-[#F5F5F5] hover:bg-white text-black font-black text-[10px] uppercase tracking-widest shadow-none transition-all hover:scale-[1.02] active:scale-[0.98] group flex justify-center items-center gap-2"
-                                            >
-                                                {language === "tr" ? "İLERLE" : "NEXT"} <ChevronRight className="w-3.5 h-3.5" />
-                                            </Button>
                                         </div>
 
                                         <div className="mt-auto p-3 rounded-2xl border flex gap-3 bg-blue-50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-900/30 text-blue-700 dark:text-blue-400 trasition-colors">
@@ -685,7 +680,12 @@ export default function EditorialPage() {
                                     </div>
                                 </div>
 
-
+                                {/* Step 1 Footer */}
+                                <div className="flex justify-end pt-6 border-t border-white/5">
+                                    <Button onClick={() => canMoveToStep(2) && setWizardStep(2)} className="px-4 py-2 h-auto rounded-md bg-[#F5F5F5] hover:bg-white text-black font-black text-[10px] uppercase tracking-widest shadow-none transition-all hover:scale-[1.02] active:scale-[0.98] group">
+                                        {language === "tr" ? "İLERLE" : "NEXT"} <ChevronRight className="ml-2 w-3.5 h-3.5" />
+                                    </Button>
+                                </div>
                             </div>
                         )}
 
@@ -899,8 +899,9 @@ export default function EditorialPage() {
                                                         <div className="space-y-3">
                                                             <label className="text-[10px] font-black text-white uppercase tracking-widest px-1">{language === "tr" ? "ÇÖZÜNÜRLÜK" : "RESOLUTION"}</label>
                                                             <select className="w-full bg-white/5 border border-white/5 text-[10px] font-black uppercase tracking-widest rounded-md h-11 px-4 outline-none focus:ring-1 focus:ring-white/20 transition-all cursor-pointer" value={resolution} onChange={(e) => setResolution(e.target.value)}>
-                                                                <option value="4K" className="bg-zinc-900">4K Ultra HD ({SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_4K} Kredi)</option>
-                                                                <option value="1K" className="bg-zinc-900">1-2K Digital ({SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_1_2K} Kredi)</option>
+                                                                <option value="4K" className="bg-zinc-900">4K Ultra HD (100 Kredi)</option>
+                                                                <option value="2K" className="bg-zinc-900">2K Digital (60 Kredi)</option>
+                                                                <option value="1K" className="bg-zinc-900">1K Standard (40 Kredi)</option>
                                                             </select>
                                                         </div>
                                                     </div>

@@ -374,7 +374,7 @@ function StudioPageContent() {
                 </div>
               </div>
             ) : data ? (
-              <div id="tech-pack-content" className="max-w-4xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 bg-white text-black p-12 shadow-2xl rounded-md border border-gray-100">
+              <div id="tech-pack-content" className="max-w-4xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 bg-white text-black p-12 shadow-2xl rounded-3xl border border-gray-100">
                 {/* Title Block */}
                 <div className="border-b-4 border-black pb-8">
                   <h1 className="text-5xl font-black tracking-tighter uppercase italic mb-2 text-black">{data.productName}</h1>
@@ -383,12 +383,12 @@ function StudioPageContent() {
 
                 <section>
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-8 h-8 rounded-md bg-black flex items-center justify-center text-white">
+                    <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white">
                       <FileText className="w-4 h-4" />
                     </div>
                     <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-black">{language === 'tr' ? 'KUMAŞ & YAPI' : 'FABRIC & CONSTRUCTION'}</h3>
                   </div>
-                  <Card className="bg-transparent border-gray-200 shadow-none rounded-md overflow-hidden">
+                  <Card className="bg-transparent border-gray-200 shadow-none rounded-2xl overflow-hidden">
                     <Table>
                       <TableBody>
                         <TableRow className="border-gray-100 hover:bg-gray-50/50">
@@ -438,12 +438,12 @@ function StudioPageContent() {
 
                 <section>
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-8 h-8 rounded-md bg-black flex items-center justify-center text-white">
+                    <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white">
                       <Ruler className="w-4 h-4" />
                     </div>
                     <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-black">{language === 'tr' ? 'ÖLÇÜ TABLOSU (36 BEDEN)' : 'KEY MEASUREMENTS (SAMPLE 36)'}</h3>
                   </div>
-                  <Card className="bg-transparent border-gray-200 shadow-none rounded-md overflow-hidden">
+                  <Card className="bg-transparent border-gray-200 shadow-none rounded-2xl overflow-hidden">
                     <Table>
                       <TableHeader className="bg-gray-50/50">
                         <TableRow className="border-gray-100 hover:bg-transparent">
@@ -575,7 +575,7 @@ function StudioPageContent() {
             {/* Main Grid */}
             <div className="grid grid-cols-2 gap-8 mb-8">
               {/* Left Column: Image */}
-              <div className="aspect-[3/4] relative border border-gray-200 bg-gray-50 rounded-md overflow-hidden">
+              <div className="aspect-[3/4] relative border border-gray-200 bg-gray-50 rounded-lg overflow-hidden">
                 {preview ? (
                   <img src={preview} className="w-full h-full object-contain mix-blend-multiply" alt="Product" />
                 ) : (

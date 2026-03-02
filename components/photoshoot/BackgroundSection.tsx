@@ -9,7 +9,7 @@ interface BackgroundSectionProps {
     assets: { [key: string]: string | null };
     activeLibraryAsset: string | null;
     setActiveLibraryAsset: (id: any) => void;
-    handleAssetUpload: (id: string, file: File | File[]) => void;
+    handleAssetUpload: (id: string, file: File) => void;
     handleAssetRemove: (id: string, e: React.MouseEvent) => void;
     variant?: "default" | "square";
 }
