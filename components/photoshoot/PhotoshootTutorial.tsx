@@ -8,11 +8,7 @@ interface PhotoshootTutorialProps {
 
 export function PhotoshootTutorial({ language }: PhotoshootTutorialProps) {
     return (
-        <div className="w-full h-full flex flex-col items-center justify-center pt-10 pb-[51px] px-6 text-center relative overflow-hidden bg-white/40 dark:bg-black/20 backdrop-blur-md rounded-[32px] border border-white/20 dark:border-white/5 shadow-2xl">
-            <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.1] pointer-events-none">
-                <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_20px,currentColor_20px,currentColor_21px)]" />
-            </div>
-
+        <div className="w-full h-full flex flex-col items-center justify-center pt-10 pb-[51px] px-6 text-center relative overflow-hidden">
             <div className="z-10 w-full max-w-4xl space-y-4">
                 {/* Tutorial Visual Area */}
                 <div className="relative aspect-[16/7] flex items-center justify-center">
@@ -37,10 +33,10 @@ export function PhotoshootTutorial({ language }: PhotoshootTutorialProps) {
                         <div className="flex items-center gap-2">
                             <span className="w-6 h-6 rounded-full bg-white text-black text-xs flex items-center justify-center font-black italic shadow-xl border border-black/5">1</span>
                             <span className="text-[10px] font-black uppercase tracking-[0.15em] text-[var(--text-primary)]">
-                                {language === "tr" ? "MODEL & ÜRÜN" : "MODEL & PRODUCT"}
+                                {language === "tr" ? "MODEL & ÜRÜN SEÇİMİ" : "MODEL & PRODUCT SELECTION"}
                             </span>
                         </div>
-                        <p className="text-[9px] text-[var(--text-muted)] leading-relaxed font-bold uppercase tracking-tight opacity-70">
+                        <p className="text-[9px] text-[var(--text-muted)] leading-relaxed font-bold">
                             {language === "tr" ? "Model seçimi ve ürün seçimlerinizi yapın." : "Select your model and products."}
                         </p>
                     </div>
@@ -49,10 +45,10 @@ export function PhotoshootTutorial({ language }: PhotoshootTutorialProps) {
                         <div className="flex items-center gap-2">
                             <span className="w-6 h-6 rounded-full bg-white text-black text-xs flex items-center justify-center font-black italic shadow-xl border border-black/5">2</span>
                             <span className="text-[10px] font-black uppercase tracking-[0.15em] text-[var(--text-primary)]">
-                                {language === "tr" ? "AYARLAR" : "SETTINGS"}
+                                {language === "tr" ? "STÜDYO AYARLARI" : "STUDIO SETTINGS"}
                             </span>
                         </div>
-                        <p className="text-[9px] text-[var(--text-muted)] leading-relaxed font-bold uppercase tracking-tight opacity-70">
+                        <p className="text-[9px] text-[var(--text-muted)] leading-relaxed font-bold">
                             {language === "tr" ? "Stüdyo, poz, ışık ve gelişmiş diğer ayarlarınızı seçin." : "Choose studio, pose, lighting and advanced settings."}
                         </p>
                     </div>
@@ -61,10 +57,10 @@ export function PhotoshootTutorial({ language }: PhotoshootTutorialProps) {
                         <div className="flex items-center gap-2">
                             <span className="w-6 h-6 rounded-full bg-white text-black text-xs flex items-center justify-center font-black italic shadow-xl border border-black/5">3</span>
                             <span className="text-[10px] font-black uppercase tracking-[0.15em] text-[var(--text-primary)]">
-                                {language === "tr" ? "ÜRETİM" : "PRODUCTION"}
+                                {language === "tr" ? "SONUÇ" : "RESULT"}
                             </span>
                         </div>
-                        <p className="text-[9px] text-[var(--text-muted)] leading-relaxed font-bold uppercase tracking-tight opacity-70">
+                        <p className="text-[9px] text-[var(--text-muted)] leading-relaxed font-bold">
                             {language === "tr" ? "Tek görsel veya çoklu üretim seçeneklerinden birini seçin." : "Choose between single or batch production options."}
                         </p>
                     </div>

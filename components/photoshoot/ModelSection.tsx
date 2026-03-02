@@ -57,7 +57,7 @@ export function ModelSection({
                             {g === 'female' ? (language === "tr" ? "Kadın Stüdyolar" : "Female Studios") : (language === "tr" ? "Erkek Stüdyolar" : "Male Studios")}
                         </h4>
                         <div className={cn(
-                            "grid gap-3 min-h-[140px] overflow-y-auto custom-scrollbar pr-1",
+                            "grid gap-3 min-h-[140px] scrollbar-none pr-1",
                             gridCols === 3 ? "grid-cols-3" :
                                 gridCols === 4 ? "grid-cols-4" :
                                     gridCols === 5 ? "grid-cols-5" :
@@ -85,22 +85,26 @@ export function ModelSection({
                             {[...MODEL_PRESETS, ...savedModels].filter(m => m.gender === g).map(model => {
                                 const isPreset = MODEL_PRESETS.some(p => p.id === model.id);
                                 return (
-                                    <div key={model.id} className="group relative aspect-[2/3] rounded-lg border border-white/5 bg-zinc-900 overflow-hidden cursor-pointer hover:ring-2 hover:ring-white/20 transition-all shrink-0">
+                                    <div
+                                        key={model.id}
+                                        className="group relative aspect-[2/3] rounded-lg border border-white/5 bg-zinc-900 overflow-hidden cursor-pointer hover:ring-2 hover:ring-white/20 transition-all shrink-0"
+                                        onClick={() => {
+                                            if (setAssets) setAssets(p => ({ ...p, model: model.thumbUrl || model.url }));
+                                            if (setAssetsHighRes) setAssetsHighRes(p => ({ ...p, model: model.url }));
+                                            setGender(model.gender as any);
+                                            setActiveLibraryAsset(null);
+                                        }}
+                                    >
                                         <img
                                             src={model.thumbUrl || model.url}
                                             className="w-full h-full object-cover"
-                                            onClick={() => {
-                                                if (setAssets) setAssets(p => ({ ...p, model: model.thumbUrl || model.url }));
-                                                if (setAssetsHighRes) setAssetsHighRes(p => ({ ...p, model: model.url }));
-                                                setGender(model.gender as any);
-                                                setActiveLibraryAsset(null);
-                                            }}
+                                            alt={model.name}
                                         />
-                                        <div className="absolute bottom-0 inset-x-0 p-1 bg-black/60 text-[9px] text-white truncate flex items-center gap-1">
+                                        <div className="absolute bottom-0 inset-x-0 p-1 bg-black/60 text-[9px] text-white truncate flex items-center gap-1 pointer-events-none">
                                             {model.isGlobal && <Sparkles size={8} className="text-amber-400" />}
                                             {model.name}
                                         </div>
-                                        <div className="absolute top-1 right-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div className="absolute top-1 right-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                                             {(!isPreset && (!model.isGlobal || isAdmin)) && (
                                                 <>
                                                     {deleteSavedModel && <button onClick={(e) => { e.stopPropagation(); deleteSavedModel(model.id); }} className="p-1 bg-red-500 text-white rounded shadow-lg hover:bg-red-600 transition-colors"><X size={10} /></button>}

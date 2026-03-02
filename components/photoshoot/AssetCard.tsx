@@ -115,38 +115,50 @@ export function AssetCard({
     );
 
     const renderMultipleThumbnails = (itemImages: string[]) => (
-        <div className="relative w-full h-full p-2 bg-[var(--bg-elevated)] min-h-[140px] flex flex-col gap-2">
-            <div className="grid grid-cols-3 gap-1.5 overflow-y-auto max-h-[120px] scrollbar-none pr-1">
+        <div className="relative w-full h-full bg-[var(--bg-elevated)] flex flex-col min-h-[220px]">
+            <div className="grid grid-cols-3 gap-3 overflow-y-auto flex-1 scrollbar-none p-3 pb-16">
                 {itemImages.map((img, idx) => (
-                    <div key={idx} className="relative aspect-square rounded-lg border border-white/10 overflow-hidden group/thumb">
-                        <img src={img} className="w-full h-full object-cover" />
-                        <button
-                            onClick={(e) => { e.stopPropagation(); handleAssetRemove(id, e, idx); }}
-                            className="absolute inset-0 bg-red-500/80 flex items-center justify-center opacity-0 group-hover/thumb:opacity-100 transition-opacity"
-                        >
-                            <Trash2 size={12} className="text-white" />
-                        </button>
+                    <div key={idx} className="relative aspect-square rounded-2xl border border-white/5 overflow-hidden group/thumb bg-zinc-900 shadow-inner">
+                        <img src={img} className="w-full h-full object-cover transition-all duration-700 group-hover/thumb:scale-110 group-hover/thumb:rotate-1" />
+                        <div className="absolute inset-x-0 bottom-0 top-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center">
+                            <button
+                                onClick={(e) => { e.stopPropagation(); handleAssetRemove(id, e, idx); }}
+                                className="w-10 h-10 rounded-full bg-red-500 text-white shadow-2xl flex items-center justify-center scale-50 group-hover/thumb:scale-100 transition-all duration-300 hover:bg-red-600"
+                            >
+                                <Trash2 size={18} />
+                            </button>
+                        </div>
                     </div>
                 ))}
                 {itemImages.length < 10 && (
                     <button
                         onClick={handleDirectUploadClick}
-                        className="relative aspect-square rounded-lg border border-dashed border-white/20 flex items-center justify-center hover:bg-white/5 transition-colors"
+                        className="relative aspect-square rounded-2xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center hover:bg-white/5 hover:border-[var(--accent-primary)]/40 transition-all group/add hover:scale-[0.98] active:scale-95"
                     >
-                        <Plus size={16} className="text-zinc-500" />
+                        <div className="p-3 rounded-full bg-white/5 group-hover/add:bg-[var(--accent-primary)]/10 transition-colors">
+                            <Plus size={24} className="text-zinc-600 group-hover/add:text-[var(--accent-primary)] transition-colors" />
+                        </div>
                     </button>
                 )}
             </div>
 
-            <div className="absolute bottom-0 inset-x-0 bg-black/60 backdrop-blur-sm px-2 py-1 border-t border-white/10 z-20 flex justify-between items-center">
-                <span className="text-[9px] font-bold uppercase tracking-wider text-white/90 truncate">
-                    {itemImages.length}/10 {label}
-                </span>
+            <div className="absolute bottom-3 inset-x-3 bg-zinc-900/95 backdrop-blur-2xl px-4 py-3 rounded-2xl border border-white/10 z-20 flex justify-between items-center shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
+                <div className="flex flex-col gap-0.5">
+                    <div className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">
+                            {itemImages.length}/10 {label}
+                        </span>
+                    </div>
+                    <span className="text-[8px] font-bold text-zinc-500 uppercase tracking-tighter">
+                        {language === "tr" ? "YÜKLENEN KOMBİNLER" : "UPLOADED OUTFITS"}
+                    </span>
+                </div>
                 <button
                     onClick={(e) => { e.stopPropagation(); handleAssetRemove(id, e); }}
-                    className="text-red-400 hover:text-red-500 transition-colors"
+                    className="p-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-all border border-red-500/20"
                 >
-                    <Trash2 size={10} />
+                    <Trash2 size={14} />
                 </button>
             </div>
         </div>

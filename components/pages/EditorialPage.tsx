@@ -168,7 +168,7 @@ export default function EditorialPage() {
     const [modelDescription, setModelDescription] = useState<string>("");
 
     // Camera States
-    const [isManualCamera, setIsManualCamera] = useState(false);
+    const [isManualCamera, setIsManualCamera] = useState(true);
     const [activeCameraIndex, setActiveCameraIndex] = useState(0);
     const [activeLensIndex, setActiveLensIndex] = useState(0);
     const [focalLength, setFocalLength] = useState<number>(35);
@@ -561,7 +561,7 @@ export default function EditorialPage() {
                                                 language={language}
                                                 variant="portrait"
                                                 orientation="vertical"
-                                                description={language === "tr" ? "KOMBİNLİ BOY FOTOĞRAFI" : "FULL BODY WITH OUTFIT"}
+                                                description={language === "tr" ? "MODEL YÜKLEYİN VEYA SEÇİN" : "UPLOAD OR SELECT MODEL"}
                                             />
                                             <AssetCard
                                                 id="outfit"
@@ -579,13 +579,13 @@ export default function EditorialPage() {
                                                 description={language === "tr" ? "(OPSİYONEL)" : "(OPTIONAL)"}
                                                 hideLibrary
                                             />
-                                        </div>
-
-                                        <div className="mt-auto p-3 rounded-2xl border flex gap-3 bg-blue-50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-900/30 text-blue-700 dark:text-blue-400 trasition-colors">
-                                            <Info size={16} className="shrink-0 mt-0.5" />
-                                            <p className="text-[10px] font-bold leading-relaxed uppercase tracking-tight">
-                                                {language === "tr" ? "KOMBİNLİ GÖRSEL SEÇTİNİZ. MODEL ÜZERİNDEKİ KIYAFET KORUNACAKTIR." : "OUTFIT INCLUDED SELECTED. THE CLOTHING ON THE MODEL WILL BE PRESERVED."}
-                                            </p>
+                                            <Button
+                                                onClick={() => canMoveToStep(2) && setWizardStep(2)}
+                                                className="w-full mt-2 py-4 h-auto rounded-2xl bg-[#F5F5F5] hover:bg-white text-black font-black text-[11px] uppercase tracking-[0.2em] shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] border border-white/20 flex items-center justify-center gap-3 group"
+                                            >
+                                                {language === "tr" ? "İLERLE" : "NEXT"}
+                                                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                            </Button>
                                         </div>
                                     </div>
 
@@ -640,9 +640,9 @@ export default function EditorialPage() {
                                                             <div className="space-y-2">
                                                                 <div className="flex items-center gap-2">
                                                                     <span className="w-6 h-6 rounded-full bg-white text-black text-[11px] flex items-center justify-center font-black italic shadow-lg">1</span>
-                                                                    <span className="text-[10px] font-black uppercase tracking-widest text-white">{language === "tr" ? "VARLIK YÜKLEME" : "ASSET UPLOAD"}</span>
+                                                                    <span className="text-[10px] font-black uppercase tracking-widest text-white">{language === "tr" ? "MODEL SEÇİMİ" : "MODEL SELECTION"}</span>
                                                                 </div>
-                                                                <p className="text-[10px] text-zinc-500 font-bold leading-relaxed uppercase tracking-tighter">
+                                                                <p className="text-[10px] text-zinc-500 font-bold leading-relaxed">
                                                                     {language === "tr"
                                                                         ? "Model portrenizi yükleyin; çekim moduna göre mevcut kıyafeti koruyabilir veya tamamen yeni bir stil kurgulayabilirsiniz."
                                                                         : "Upload your model portrait; depending on the mode, preserve the existing outfit or curate a completely new style."}
@@ -651,20 +651,20 @@ export default function EditorialPage() {
                                                             <div className="space-y-2 border-x border-white/5 px-8">
                                                                 <div className="flex items-center gap-2">
                                                                     <span className="w-6 h-6 rounded-full bg-white text-black text-[11px] flex items-center justify-center font-black italic shadow-lg">2</span>
-                                                                    <span className="text-[10px] font-black uppercase tracking-widest text-white">{language === "tr" ? "EDİTORYAL KURGU" : "EDITORIAL CURATION"}</span>
+                                                                    <span className="text-[10px] font-black uppercase tracking-widest text-white">{language === "tr" ? "KOMBİN SEÇİMİ" : "OUTFIT SELECTION"}</span>
                                                                 </div>
-                                                                <p className="text-[10px] text-zinc-500 font-bold leading-relaxed uppercase tracking-tighter">
+                                                                <p className="text-[10px] text-zinc-500 font-bold leading-relaxed">
                                                                     {language === "tr"
-                                                                        ? "Dünya çapındaki ikonik lokasyonlar arasından seçim yapın, gelişmiş kamera ve ışık ayarlarıyla çekim atmosferinizi tasarlayın."
-                                                                        : "Choose from iconic global locations and design your shoot atmosphere with professional camera and lighting controls."}
+                                                                        ? "İster tek görselden oluşan kombin karenizi yükleyin, isterseniz ürün görsellerinizi yükleyin AI robotumuz kombinlesin."
+                                                                        : "Select your single-image outfit visual, or upload product images and let our AI robot curate the look."}
                                                                 </p>
                                                             </div>
                                                             <div className="space-y-2">
                                                                 <div className="flex items-center gap-2">
                                                                     <span className="w-6 h-6 rounded-full bg-white text-black text-[11px] flex items-center justify-center font-black italic shadow-lg">3</span>
-                                                                    <span className="text-[10px] font-black uppercase tracking-widest text-white">{language === "tr" ? "PROFESYONEL ÜRETİM" : "PRODUCTION"}</span>
+                                                                    <span className="text-[10px] font-black uppercase tracking-widest text-white">{language === "tr" ? "SONUÇ" : "RESULT"}</span>
                                                                 </div>
-                                                                <p className="text-[10px] text-zinc-500 font-bold leading-relaxed uppercase tracking-tighter">
+                                                                <p className="text-[10px] text-zinc-500 font-bold leading-relaxed">
                                                                     {language === "tr"
                                                                         ? "Gelişmiş sahne analizi teknolojisi ile yüksek moda standartlarında, gerçekçi ve estetik editoryal karelerinizi oluşturun."
                                                                         : "Generate high-fashion, realistic editorial imagery through advanced scene analysis and aesthetic processing."}
@@ -678,12 +678,7 @@ export default function EditorialPage() {
                                     </div>
                                 </div>
 
-                                {/* Step 1 Footer */}
-                                <div className="flex justify-end pt-6 border-t border-white/5">
-                                    <Button onClick={() => canMoveToStep(2) && setWizardStep(2)} className="px-4 py-2 h-auto rounded-md bg-[#F5F5F5] hover:bg-white text-black font-black text-[10px] uppercase tracking-widest shadow-none transition-all hover:scale-[1.02] active:scale-[0.98] group">
-                                        {language === "tr" ? "İLERLE" : "NEXT"} <ChevronRight className="ml-2 w-3.5 h-3.5" />
-                                    </Button>
-                                </div>
+
                             </div>
                         )}
 
@@ -813,33 +808,10 @@ export default function EditorialPage() {
                                                             </div>
                                                         </div>
 
-                                                        {/* Camera Mode Toggle */}
-                                                        <div className="bg-white/5 border border-white/5 p-1 rounded-md flex">
-                                                            <button
-                                                                onClick={() => setIsManualCamera(false)}
-                                                                className={cn(
-                                                                    "px-6 py-2 text-[9px] font-black uppercase tracking-widest rounded-md transition-all",
-                                                                    !isManualCamera ? "bg-white text-black shadow-xl" : "text-zinc-500 hover:text-white"
-                                                                )}
-                                                            >
-                                                                AUTO
-                                                            </button>
-                                                            <button
-                                                                onClick={() => setIsManualCamera(true)}
-                                                                className={cn(
-                                                                    "px-6 py-2 text-[9px] font-black uppercase tracking-widest rounded-md transition-all",
-                                                                    isManualCamera ? "bg-white text-black shadow-xl" : "text-zinc-500 hover:text-white"
-                                                                )}
-                                                            >
-                                                                MANUAL
-                                                            </button>
-                                                        </div>
+
                                                     </div>
 
-                                                    <div className={cn(
-                                                        "relative transition-all duration-500",
-                                                        !isManualCamera ? "opacity-40 grayscale pointer-events-none scale-[0.98]" : "opacity-100"
-                                                    )}>
+                                                    <div className="relative transition-all duration-500 opacity-100">
                                                         <div className="relative h-[210px] bg-muted/40 dark:bg-background rounded-[30px] border border-border dark:border-white/5 overflow-hidden shadow-inner">
                                                             <div className="absolute top-1/2 left-0 -translate-y-1/2 w-full h-[110px] bg-white/[0.03] border-y border-white/10 z-10 pointer-events-none" />
                                                             <div className="grid grid-cols-6 h-full relative z-40">
@@ -864,13 +836,7 @@ export default function EditorialPage() {
                                                             </div>
                                                         </div>
 
-                                                        {!isManualCamera && (
-                                                            <div className="absolute inset-0 flex items-center justify-center z-50">
-                                                                <div className="px-4 py-2 bg-black/60 backdrop-blur-md rounded-full border border-white/10">
-                                                                    <span className="text-[9px] font-black uppercase tracking-widest text-white/80">AI OPTIMIZED FOR SCENE</span>
-                                                                </div>
-                                                            </div>
-                                                        )}
+
                                                     </div>
 
                                                     {/* Hair Style Selection */}

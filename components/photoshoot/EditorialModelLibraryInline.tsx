@@ -75,7 +75,7 @@ export function EditorialModelLibraryInline({
                     </Button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-6 scrollbar-thin">
+                <div className="flex-1 overflow-y-auto p-6 scrollbar-none">
                     <TabsContent value="library" className="m-0 h-full outline-none max-w-5xl mx-auto w-full">
                         <ModelSection
                             view="library"

@@ -1,6 +1,7 @@
 "use client"
 import React, { useRef, useState, useEffect } from "react"
 import { useLanguage } from "@/context/language-context"
+import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -26,6 +27,7 @@ import { StudioSteps } from "@/components/photoshoot/StudioSteps"
 import { LibrarySidebar } from "@/components/photoshoot/LibrarySidebar"
 import { WizardProgress } from "@/components/photoshoot/WizardProgress"
 import { PhotoshootTutorial } from "@/components/photoshoot/PhotoshootTutorial"
+import { EditorialModelLibraryInline } from "@/components/photoshoot/EditorialModelLibraryInline"
 import { BehaviorToggles } from "@/components/photoshoot/BehaviorToggles"
 
 // Dialogs
@@ -82,7 +84,7 @@ export default function PhotoshootPage() {
         editedBatchPrompts, setEditedBatchPrompts, showBatchPreview, setShowBatchPreview,
         selectedBatchImages, setSelectedBatchImages, isStoppingBatch, handleStopBatch, estimatedCost,
         handleAssetRemove, canMoveToStep, handleLibrarySelect, models, setLightingPositive, setLightingNegative,
-        productDescription, setProductDescription, addToGlobalLibrary
+        productDescription, setProductDescription, modelDescription, setModelDescription, addToGlobalLibrary
     } = usePhotoshootWorkflow();
 
     const [targetPoseShot, setTargetPoseShot] = useState<string | null>(null);
@@ -135,7 +137,7 @@ export default function PhotoshootPage() {
             {/* LEFT COLUMN: Wizard Content */}
             <div className={cn(
                 "flex-1 overflow-y-auto bg-[var(--bg-sidebar)] custom-scrollbar flex flex-col transition-all duration-500",
-                activeLibraryAsset ? "lg:pr-[480px]" : "pr-0"
+                (activeLibraryAsset && !(activeLibraryAsset === 'model' && wizardStep === 1)) ? "lg:pr-[480px]" : "pr-0"
             )}>
                 <div className={cn(
                     "p-4 md:p-8 mx-auto space-y-8 transition-all duration-500 flex-1 w-full",
@@ -153,200 +155,229 @@ export default function PhotoshootPage() {
                     {wizardStep === 1 && (
                         <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <div className="grid grid-cols-1 lg:grid-cols-11 gap-6 items-stretch">
-                                {/* Left: Product Selection */}
-                                <div className="lg:col-span-3 flex flex-col">
-                                    <div className="flex items-center gap-3 mb-4">
-                                        <div className="p-2 rounded-md bg-zinc-800 text-white border border-white/10 shadow-lg">
-                                            <TbSettings2 className="w-5 h-5" />
+                                <div className="lg:col-span-3">
+                                    <div className="flex flex-col h-full">
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <div className="p-2 rounded-md bg-zinc-800 text-white border border-white/10 shadow-lg">
+                                                <TbSettings2 className="w-5 h-5" />
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <label className="text-xs uppercase font-black text-white tracking-[0.2em]">{language === "tr" ? "ÜRÜN SEÇİMİ" : "PRODUCT SELECTION"}</label>
+                                                <span className="text-[10px] text-zinc-400 font-black uppercase tracking-tighter opacity-100 mt-0.5">{language === "tr" ? "ÇEKİLECEK ÜRÜNÜ BELİRLE" : "DEFINE PRODUCT TO SHOOT"}</span>
+                                            </div>
                                         </div>
-                                        <div className="flex flex-col">
-                                            <label className="text-xs uppercase font-black text-white tracking-[0.2em]">{language === "tr" ? "ÜRÜN SEÇİMİ" : "PRODUCT SELECTION"}</label>
-                                            <span className="text-[10px] text-zinc-400 font-black uppercase tracking-tighter opacity-100 mt-0.5">{language === "tr" ? "ÇEKİLECEK ÜRÜNÜ BELİRLE" : "DEFINE PRODUCT TO SHOOT"}</span>
+
+                                        <div className="flex-1 flex flex-col min-h-0">
+                                            <ProductSection
+                                                language={language}
+                                                workflowType={workflowType}
+                                                setWorkflowType={setWorkflowType}
+                                                productName={productName}
+                                                setProductName={setProductName}
+                                                setIsManualProductName={() => { }}
+                                                setActiveLibraryAsset={setActiveLibraryAsset}
+                                                setActiveGroup={setActiveGroup}
+                                                setLibraryTab={v => setLibraryTab(v as any)}
+                                            >
+                                                <div className="space-y-4 h-full flex flex-col">
+                                                    <div className="flex-1 overflow-y-auto custom-scrollbar pr-1 -mr-1">
+                                                        <ModelSection
+                                                            language={language}
+                                                            gender={gender}
+                                                            setGender={setGender}
+                                                            assets={assets}
+                                                            activeLibraryAsset={activeLibraryAsset}
+                                                            setActiveLibraryAsset={setActiveLibraryAsset}
+                                                            handleAssetUpload={handleAssetUpload}
+                                                            handleAssetRemove={handleAssetRemove}
+                                                        />
+                                                    </div>
+
+                                                    <div className="grid grid-cols-1 gap-3 pt-2">
+                                                        {/* Manage Products Button */}
+                                                        <div
+                                                            onClick={() => {
+                                                                setShowProductManager(!showProductManager);
+                                                                if (activeLibraryAsset) setActiveLibraryAsset(null);
+                                                            }}
+                                                            className={cn(
+                                                                "group relative h-[100px] rounded-md border-2 border-dashed transition-all duration-300 shadow-sm hover:shadow-lg hover:scale-[1.01] overflow-hidden cursor-pointer flex items-center justify-center px-4 gap-4",
+                                                                showProductManager
+                                                                    ? "bg-white/10 border-white/40 ring-2 ring-white/20"
+                                                                    : "bg-zinc-900/40 border-white/5 hover:bg-zinc-800/60 hover:border-white/20"
+                                                            )}
+                                                        >
+                                                            <div className="flex items-center gap-1.5 shrink-0">
+                                                                <div className="p-2.5 rounded-md bg-zinc-800 text-white border border-white/5 shadow-md group-hover:scale-110 transition-transform">
+                                                                    <TbShirt className="w-5 h-5" />
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex flex-col">
+                                                                <span className="text-xs font-black text-white uppercase tracking-widest leading-none">{language === "tr" ? "Ürün Yönetimi" : "Products"}</span>
+                                                                <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-tighter mt-1.5 opacity-60">
+                                                                    {language === "tr" ? (showProductManager ? "Gizle" : "Yönet ve Düzenle") : (showProductManager ? "Hide" : "Manage & Edit")}
+                                                                </span>
+                                                            </div>
+                                                            <ChevronRight className={cn("w-4 h-4 transition-transform ml-auto", showProductManager ? "rotate-90 text-white" : "text-zinc-600 group-hover:translate-x-1")} />
+                                                        </div>
+
+                                                        <Button
+                                                            onClick={() => canMoveToStep(2) && setWizardStep(2)}
+                                                            className="w-full h-auto py-2 rounded-md bg-[#F5F5F5] hover:bg-white text-black font-black text-[10px] uppercase tracking-widest shadow-none transition-all hover:scale-[1.01] active:scale-[0.99] group flex justify-center items-center gap-2"
+                                                        >
+                                                            {language === "tr" ? "İLERLE" : "NEXT"} <ChevronRight className="w-4 h-4" />
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </ProductSection>
                                         </div>
                                     </div>
+                                </div>
 
-                                    <div>
-                                        <ProductSection
-                                            language={language}
-                                            workflowType={workflowType}
-                                            setWorkflowType={setWorkflowType}
-                                            productName={productName}
-                                            setProductName={setProductName}
-                                            setIsManualProductName={() => { }}
-                                            setActiveLibraryAsset={setActiveLibraryAsset}
-                                            setActiveGroup={setActiveGroup}
-                                            setLibraryTab={v => setLibraryTab(v as any)}
-                                        >
-                                            <div className="space-y-4">
-                                                <ModelSection
+                                {/* Right: Tutorial Area / Product Manager / Model Library */}
+                                <div className="lg:col-span-8 hidden lg:grid flex-col relative overflow-hidden grid-cols-1 grid-rows-1 h-[540px] bg-white/40 dark:bg-black/20 backdrop-blur-md rounded-[32px] border border-white/20 dark:border-white/5 shadow-2xl">
+                                    <AnimatePresence>
+                                        {activeLibraryAsset === 'model' ? (
+                                            <motion.div
+                                                key="studio-model-library"
+                                                initial={{ opacity: 0, y: 48, scale: 0.97 }}
+                                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                exit={{ opacity: 0, y: -48, scale: 0.97 }}
+                                                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                                                className="h-full"
+                                                style={{ gridArea: '1 / 1 / 2 / 2' }}
+                                            >
+                                                <EditorialModelLibraryInline
                                                     language={language}
                                                     gender={gender}
                                                     setGender={setGender}
-                                                    assets={assets}
-                                                    activeLibraryAsset={activeLibraryAsset}
-                                                    setActiveLibraryAsset={setActiveLibraryAsset}
+                                                    modelImage={assets.model as string | null}
+                                                    modelImageHighRes={assetsHighRes.model as string | null}
+                                                    setModelImage={(val) => setAssets(prev => ({ ...prev, model: val }))}
+                                                    setModelImageHighRes={(val) => setAssetsHighRes(prev => ({ ...prev, model: val }))}
                                                     handleAssetUpload={handleAssetUpload}
                                                     handleAssetRemove={handleAssetRemove}
+                                                    savedModels={savedModels}
+                                                    modelDescription={modelDescription}
+                                                    setModelDescription={setModelDescription}
+                                                    onClose={() => setActiveLibraryAsset(null)}
+                                                    gridCols={4}
                                                 />
-
-                                                <div className="grid grid-cols-1 gap-3">
-                                                    {/* Manage Products Button */}
-                                                    <div
-                                                        onClick={() => {
-                                                            setShowProductManager(!showProductManager);
-                                                            if (activeLibraryAsset) setActiveLibraryAsset(null);
-                                                        }}
-                                                        className={cn(
-                                                            "group relative h-[100px] rounded-md border-2 border-dashed transition-all duration-300 shadow-sm hover:shadow-lg hover:scale-[1.01] overflow-hidden cursor-pointer flex items-center justify-center px-4 gap-4",
-                                                            showProductManager
-                                                                ? "bg-white/10 border-white/40 ring-2 ring-white/20"
-                                                                : "bg-zinc-900/40 border-white/5 hover:bg-zinc-800/60 hover:border-white/20"
-                                                        )}
-                                                    >
-                                                        <div className="flex items-center gap-1.5 shrink-0">
-                                                            <div className="p-2.5 rounded-md bg-zinc-800 text-white border border-white/5 shadow-md group-hover:scale-110 transition-transform">
-                                                                <TbShirt className="w-5 h-5" />
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex flex-col">
-                                                            <span className="text-xs font-black text-white uppercase tracking-widest leading-none">{language === "tr" ? "Ürün Yönetimi" : "Products"}</span>
-                                                            <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-tighter mt-1.5 opacity-60">
-                                                                {language === "tr" ? (showProductManager ? "Gizle" : "Yönet ve Düzenle") : (showProductManager ? "Hide" : "Manage & Edit")}
-                                                            </span>
-                                                        </div>
-                                                        <ChevronRight className={cn("w-4 h-4 transition-transform ml-auto", showProductManager ? "rotate-90 text-white" : "text-zinc-600 group-hover:translate-x-1")} />
-                                                    </div>
-
+                                            </motion.div>
+                                        ) : showProductManager ? (
+                                            <motion.div
+                                                key="studio-product-manager"
+                                                initial={{ opacity: 0, y: 48, scale: 0.97 }}
+                                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                exit={{ opacity: 0, y: -48, scale: 0.97 }}
+                                                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                                                className="h-full"
+                                                style={{ gridArea: '1 / 1 / 2 / 2' }}
+                                            >
+                                                <div className="p-6 pb-2 h-full overflow-y-auto scrollbar-none relative">
                                                     <Button
-                                                        onClick={() => canMoveToStep(2) && setWizardStep(2)}
-                                                        className="w-full h-auto py-2 rounded-md bg-[#F5F5F5] hover:bg-white text-black font-black text-[10px] uppercase tracking-widest shadow-none transition-all hover:scale-[1.01] active:scale-[0.99] group flex justify-center items-center gap-2"
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="absolute top-6 right-6 h-10 w-10 text-zinc-500 hover:text-white rounded-full hover:bg-white/5 transition-all z-30"
+                                                        onClick={() => setShowProductManager(false)}
                                                     >
-                                                        {language === "tr" ? "İLERLE" : "NEXT"} <ChevronRight className="w-4 h-4" />
+                                                        <X className="w-5 h-5" />
                                                     </Button>
-                                                </div>
-                                            </div>
-                                        </ProductSection>
-                                    </div>
-                                </div>
 
-                                {/* Right: Tutorial Area / Product Manager */}
-                                <div className="lg:col-span-8 hidden lg:block sticky top-6">
-                                    <div className="grid w-full" style={{ gridTemplateAreas: '"stack"' }}>
-                                        {/* Product Manager */}
-                                        <div
-                                            className={cn(
-                                                "transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]",
-                                                showProductManager
-                                                    ? "opacity-100 translate-y-0 scale-100 pointer-events-auto z-10"
-                                                    : "opacity-0 translate-y-12 scale-[0.97] pointer-events-none -unset z-0"
-                                            )}
-                                            style={{ gridArea: 'stack' }}
-                                        >
-                                            <div className="bg-[#111113] border border-white/5 rounded-[32px] p-8 pb-4 shadow-2xl h-fit max-h-[calc(100vh-180px)] overflow-y-auto custom-scrollbar">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="absolute top-6 right-6 h-10 w-10 text-zinc-500 hover:text-white rounded-full hover:bg-white/5 transition-all"
-                                                    onClick={() => setShowProductManager(false)}
-                                                >
-                                                    <X className="w-5 h-5" />
-                                                </Button>
-
-                                                <div className="grid grid-cols-2 gap-x-12 gap-y-10 mt-4">
-                                                    {/* Primary Products Column */}
-                                                    <div className="space-y-6">
-                                                        <div className="flex items-center gap-3 pb-3 border-b border-white/5">
-                                                            <div className="w-8 h-8 rounded-md bg-zinc-800 flex items-center justify-center border border-white/5 text-white shadow-sm">
-                                                                <TbShirt className="w-4 h-4" />
-                                                            </div>
-                                                            <h4 className="text-[11px] font-black text-white uppercase tracking-[0.2em]">
-                                                                {language === "tr" ? "TEMEL ÜRÜNLER" : "PRIMARY PRODUCTS"}
-                                                            </h4>
-                                                        </div>
-
-                                                        <div className="grid grid-cols-2 gap-4">
-                                                            <AssetCard id="top_front" label={language === "tr" ? "Üst Ön" : "Top Front"} icon={TbShirtFilled} variant="square" hideLibrary={true} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} />
-                                                            <AssetCard id="top_back" label={language === "tr" ? "Üst Arka" : "Top Back"} icon={TbShirt} variant="square" hideLibrary={true} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} />
-                                                            <AssetCard id="bottom_front" label={language === "tr" ? "Alt Ön" : "Bottom Front"} icon={PiPantsFill} variant="square" hideLibrary={true} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} />
-                                                            <AssetCard id="bottom_back" label={language === "tr" ? "Alt Arka" : "Bottom Back"} icon={PiPants} variant="square" hideLibrary={true} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} />
-                                                            <div className="col-span-2 mt-2">
-                                                                <AssetCard
-                                                                    id="inner_wear"
-                                                                    label={language === "tr" ? "İÇ GİYİM MODELİ" : "INNERWEAR MODEL"}
-                                                                    icon={TbShirt}
-                                                                    variant="square"
-                                                                    assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Detailed Views Column */}
-                                                    <div className="space-y-8">
-                                                        {/* Upper details */}
-                                                        <div className="space-y-6">
-                                                            <div className="flex items-center gap-3 pb-3 border-b border-blue-500/20">
-                                                                <div className="w-8 h-8 rounded-md bg-blue-500/10 flex items-center justify-center border border-blue-500/20 text-blue-400">
-                                                                    <ScanLine className="w-4 h-4" />
+                                                    <div className="grid grid-cols-2 gap-x-12 gap-y-2 mt-2">
+                                                        {/* Primary Products Column */}
+                                                        <div className="space-y-4">
+                                                            <div className="flex items-center gap-3 pb-3 border-b border-white/5">
+                                                                <div className="w-8 h-8 rounded-md bg-zinc-800 flex items-center justify-center border border-white/5 text-white shadow-sm">
+                                                                    <TbShirt className="w-4 h-4" />
                                                                 </div>
-                                                                <h4 className="text-[11px] font-black text-blue-400 uppercase tracking-[0.2em]">
-                                                                    {language === "tr" ? "ÜST DETAYLAR" : "UPPER DETAILS"}
+                                                                <h4 className="text-[10px] font-black text-white uppercase tracking-[0.2em]">
+                                                                    {language === "tr" ? "TEMEL ÜRÜNLER" : "PRIMARY PRODUCTS"}
                                                                 </h4>
                                                             </div>
-                                                            <div className="grid grid-cols-2 gap-6">
-                                                                <div className="space-y-3 text-center">
-                                                                    <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest block px-1">{language === "tr" ? "Ön Detay" : "Front Detail"}</span>
-                                                                    <AssetCard id="detail_front_1" label={language === "tr" ? "Detay" : "Detail"} icon={ScanLine} variant="square" hideLibrary={true} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} />
-                                                                </div>
-                                                                <div className="space-y-3 text-center">
-                                                                    <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest block px-1">{language === "tr" ? "Arka Detay" : "Back Detail"}</span>
-                                                                    <AssetCard id="detail_back_1" label={language === "tr" ? "Detay" : "Detail"} icon={ScanLine} variant="square" hideLibrary={true} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} />
+
+                                                            <div className="grid grid-cols-2 gap-3">
+                                                                <AssetCard id="top_front" label={language === "tr" ? "Üst Ön" : "Top Front"} icon={TbShirtFilled} variant="square" hideLibrary={true} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} />
+                                                                <AssetCard id="top_back" label={language === "tr" ? "Üst Arka" : "Top Back"} icon={TbShirt} variant="square" hideLibrary={true} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} />
+                                                                <AssetCard id="bottom_front" label={language === "tr" ? "Alt Ön" : "Bottom Front"} icon={PiPantsFill} variant="square" hideLibrary={true} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} />
+                                                                <AssetCard id="bottom_back" label={language === "tr" ? "Alt Arka" : "Bottom Back"} icon={PiPants} variant="square" hideLibrary={true} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} />
+                                                                <div className="col-span-2 mt-2">
+                                                                    <AssetCard
+                                                                        id="inner_wear"
+                                                                        label={language === "tr" ? "İÇ GİYİM MODELİ" : "INNERWEAR MODEL"}
+                                                                        icon={TbShirt}
+                                                                        variant="square"
+                                                                        assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language}
+                                                                    />
                                                                 </div>
                                                             </div>
                                                         </div>
 
-                                                        {/* Lower details */}
-                                                        <div className="space-y-6">
-                                                            <div className="flex items-center gap-3 pb-3 border-b border-amber-500/20">
-                                                                <div className="w-8 h-8 rounded-md bg-amber-500/10 flex items-center justify-center border border-amber-500/20 text-amber-400">
-                                                                    <ScanLine className="w-4 h-4" />
+                                                        {/* Detailed Views Column */}
+                                                        <div className="space-y-4">
+                                                            {/* Upper details */}
+                                                            <div className="space-y-3">
+                                                                <div className="flex items-center gap-3 pb-2 border-b border-blue-500/20">
+                                                                    <div className="w-7 h-7 rounded-md bg-blue-500/10 flex items-center justify-center border border-blue-500/20 text-blue-400">
+                                                                        <ScanLine className="w-3.5 h-3.5" />
+                                                                    </div>
+                                                                    <h4 className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">
+                                                                        {language === "tr" ? "ÜST DETAYLAR" : "UPPER DETAILS"}
+                                                                    </h4>
                                                                 </div>
-                                                                <h4 className="text-[11px] font-black text-amber-400 uppercase tracking-[0.2em]">
-                                                                    {language === "tr" ? "ALT DETAYLAR" : "LOWER DETAILS"}
-                                                                </h4>
+                                                                <div className="grid grid-cols-2 gap-4">
+                                                                    <div className="space-y-3 text-center">
+                                                                        <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest block px-1">{language === "tr" ? "Ön Detay" : "Front Detail"}</span>
+                                                                        <AssetCard id="detail_front_1" label={language === "tr" ? "Detay" : "Detail"} icon={ScanLine} variant="square" hideLibrary={true} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} />
+                                                                    </div>
+                                                                    <div className="space-y-3 text-center">
+                                                                        <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest block px-1">{language === "tr" ? "Arka Detay" : "Back Detail"}</span>
+                                                                        <AssetCard id="detail_front_2" label={language === "tr" ? "Detay" : "Detail"} icon={ScanLine} variant="square" hideLibrary={true} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} />
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                            <div className="grid grid-cols-2 gap-6">
-                                                                <div className="space-y-3 text-center">
-                                                                    <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest block px-1">{language === "tr" ? "Ön Detay" : "Front Detail"}</span>
-                                                                    <AssetCard id="detail_front_3" label={language === "tr" ? "Detay" : "Detail"} icon={ScanLine} variant="square" hideLibrary={true} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} />
+
+                                                            {/* Lower details */}
+                                                            <div className="space-y-3">
+                                                                <div className="flex items-center gap-3 pb-2 border-b border-amber-500/20">
+                                                                    <div className="w-7 h-7 rounded-md bg-amber-500/10 flex items-center justify-center border border-amber-500/20 text-amber-400">
+                                                                        <ScanLine className="w-3.5 h-3.5" />
+                                                                    </div>
+                                                                    <h4 className="text-[10px] font-black text-amber-400 uppercase tracking-[0.2em]">
+                                                                        {language === "tr" ? "ALT DETAYLAR" : "LOWER DETAILS"}
+                                                                    </h4>
                                                                 </div>
-                                                                <div className="space-y-3 text-center">
-                                                                    <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest block px-1">{language === "tr" ? "Arka Detay" : "Back Detail"}</span>
-                                                                    <AssetCard id="detail_back_3" label={language === "tr" ? "Detay" : "Detail"} icon={ScanLine} variant="square" hideLibrary={true} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} />
+                                                                <div className="grid grid-cols-2 gap-4">
+                                                                    <div className="space-y-3 text-center">
+                                                                        <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest block px-1">{language === "tr" ? "Ön Detay" : "Front Detail"}</span>
+                                                                        <AssetCard id="detail_front_3" label={language === "tr" ? "Detay" : "Detail"} icon={ScanLine} variant="square" hideLibrary={true} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} />
+                                                                    </div>
+                                                                    <div className="space-y-3 text-center">
+                                                                        <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest block px-1">{language === "tr" ? "Arka Detay" : "Back Detail"}</span>
+                                                                        <AssetCard id="detail_back_3" label={language === "tr" ? "Detay" : "Detail"} icon={ScanLine} variant="square" hideLibrary={true} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} />
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Tutorial Area */}
-                                        <div
-                                            className={cn(
-                                                "transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]",
-                                                !showProductManager
-                                                    ? "opacity-100 translate-y-0 scale-100 pointer-events-auto z-10 delay-100"
-                                                    : "opacity-0 -translate-y-12 scale-[0.97] pointer-events-none z-0"
-                                            )}
-                                            style={{ gridArea: 'stack' }}
-                                        >
-                                            <PhotoshootTutorial language={language} />
-                                        </div>
-                                    </div>
+                                            </motion.div>
+                                        ) : (
+                                            <motion.div
+                                                key="studio-tutorial"
+                                                initial={{ opacity: 0, y: -48, scale: 0.97 }}
+                                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                exit={{ opacity: 0, y: 48, scale: 0.97 }}
+                                                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                                                className="h-full"
+                                                style={{ gridArea: '1 / 1 / 2 / 2' }}
+                                            >
+                                                <PhotoshootTutorial language={language} />
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                 </div>
                             </div>
-
                         </div>
                     )}
 
@@ -937,7 +968,7 @@ export default function PhotoshootPage() {
                 />
 
                 {/* Library Backdrop (Click outside to close) */}
-                {activeLibraryAsset && (
+                {activeLibraryAsset && !(activeLibraryAsset === 'model' && wizardStep === 1) && (
                     <div
                         className="fixed inset-0 bg-black/5 z-[55] animate-in fade-in duration-300"
                         onClick={() => {
@@ -950,7 +981,7 @@ export default function PhotoshootPage() {
 
             <LibrarySidebar
                 language={language}
-                activeLibraryAsset={activeLibraryAsset}
+                activeLibraryAsset={(activeLibraryAsset === 'model' && wizardStep === 1) ? null : activeLibraryAsset}
                 setActiveLibraryAsset={setActiveLibraryAsset}
                 activeGroup={activeGroup}
                 setActiveGroup={setActiveGroup}
