@@ -258,8 +258,12 @@ export default function PricingPage() {
                                 </h3>
                                 <div className="space-y-3 text-sm">
                                     <div className="flex justify-between py-1 border-b border-[var(--border-subtle)] border-dashed">
-                                        <span>Nano Banana 2 (1-2K)</span>
-                                        <span className="font-bold">{SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_1_2K}</span>
+                                        <span>Nano Banana 2 (1K)</span>
+                                        <span className="font-bold">{SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_1K}</span>
+                                    </div>
+                                    <div className="flex justify-between py-1 border-b border-[var(--border-subtle)] border-dashed">
+                                        <span>Nano Banana 2 (2K)</span>
+                                        <span className="font-bold">{SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_2K}</span>
                                     </div>
                                     <div className="flex justify-between py-1 border-b border-[var(--border-subtle)] border-dashed">
                                         <span>Nano Banana 2 (4K)</span>
