@@ -11,7 +11,7 @@ interface AdvancedSettingsProps {
     assets: { [key: string]: string | null };
     activeLibraryAsset: string | null;
     setActiveLibraryAsset: (val: any) => void;
-    handleAssetUpload: (id: string, file: File) => void;
+    handleAssetUpload: (id: string, file: File | File[]) => void;
     handleAssetRemove: (id: string, e: React.MouseEvent) => void;
     lightingSendImage?: boolean;
     setLightingSendImage?: (val: boolean) => void;
