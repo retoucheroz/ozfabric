@@ -176,9 +176,7 @@ export default function EditorialPage() {
 
     const estimatedCost = resolution === "4K"
         ? SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_4K
-        : resolution === "2K"
-            ? SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_2K
-            : SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_1K;
+        : SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_1_2K;
 
     // Library States
     const [savedModels, setSavedModels] = useState<SavedModel[]>([]);
