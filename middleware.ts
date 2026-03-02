@@ -36,6 +36,14 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(loginUrl);
     }
 
+    // Role-based protection for /admin
+    if (pathname.startsWith('/admin')) {
+        if (token.role !== 'admin') {
+            const homeUrl = new URL('/home', request.url);
+            return NextResponse.redirect(homeUrl);
+        }
+    }
+
     return NextResponse.next();
 }
 

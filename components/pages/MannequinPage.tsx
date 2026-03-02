@@ -161,7 +161,7 @@ export default function MannequinPage() {
       {selectedMannequin ? (
         <div className="w-[300px] border-l bg-background p-6 flex flex-col animate-in slide-in-from-right duration-300">
           <h3 className="font-semibold mb-4">Selected Mannequin</h3>
-          <div className="rounded-lg overflow-hidden border shadow-sm mb-6">
+          <div className="rounded-md overflow-hidden border shadow-sm mb-6">
             <img
               src={MANNEQUINS.find(m => m.id === selectedMannequin)?.image}
               className="w-full aspect-[3/4] object-cover"

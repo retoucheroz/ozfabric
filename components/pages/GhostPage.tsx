@@ -279,7 +279,7 @@ function GhostPageContent() {
                 <TbShirt className="w-4 h-4 text-white" />
                 {language === "tr" ? "ANA GİYSİ GÖRSELİ" : "MAIN GARMENT IMAGE"} *
               </label>
-              <div className="h-40 border-2 border-dashed border-white/5 rounded-2xl bg-white/[0.02] relative group hover:border-white transition-all cursor-pointer overflow-hidden">
+              <div className="h-40 border-2 border-dashed border-white/5 rounded-md bg-white/[0.02] relative group hover:border-white transition-all cursor-pointer overflow-hidden">
                 <input
                   type="file"
                   accept="image/*"
@@ -313,7 +313,7 @@ function GhostPageContent() {
                   <TbSignature className="w-3.5 h-3.5 text-white" />
                   {language === "tr" ? "LOGO / DETAY" : "LOGO / DETAIL"}
                 </label>
-                <div className="h-32 border-2 border-dashed border-white/5 rounded-2xl bg-white/[0.02] relative group hover:bg-white/[0.05] transition-all cursor-pointer overflow-hidden">
+                <div className="h-32 border-2 border-dashed border-white/5 rounded-md bg-white/[0.02] relative group hover:bg-white/[0.05] transition-all cursor-pointer overflow-hidden">
                   <input
                     type="file"
                     accept="image/*"
@@ -345,7 +345,7 @@ function GhostPageContent() {
                   <TbPalette className="w-3.5 h-3.5 text-white" />
                   {language === "tr" ? "KUMAŞ / DOKU" : "FABRIC / TEXTURE"}
                 </label>
-                <div className="h-32 border-2 border-dashed border-white/5 rounded-2xl bg-white/[0.02] relative group hover:bg-white/[0.05] transition-all cursor-pointer overflow-hidden">
+                <div className="h-32 border-2 border-dashed border-white/5 rounded-md bg-white/[0.02] relative group hover:bg-white/[0.05] transition-all cursor-pointer overflow-hidden">
                   <input
                     type="file"
                     accept="image/*"
@@ -452,7 +452,7 @@ function GhostPageContent() {
                 <DialogTrigger asChild>
                   <Card className="p-3 cursor-pointer hover:bg-[var(--bg-elevated)] transition-all border border-[var(--border-subtle)] hover:border-[var(--accent-primary)] group">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-[var(--bg-sidebar)] border border-[var(--border-subtle)] flex items-center justify-center shrink-0">
+                      <div className="w-9 h-9 rounded-md bg-[var(--bg-sidebar)] border border-[var(--border-subtle)] flex items-center justify-center shrink-0">
                         <TbSquareRotated className="w-5 h-5 text-[var(--text-muted)] group-hover:text-[var(--accent-primary)]" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -561,7 +561,7 @@ function GhostPageContent() {
               </div>
             ) : resultImage ? (
               <Card className="max-w-xl w-full aspect-[2/3] p-3 bg-zinc-900 border border-white/10 shadow-2xl animate-in zoom-in-95 duration-500 relative group rounded-md">
-                <img src={resultImage} className="w-full h-full object-contain rounded-xl" />
+                <img src={resultImage} className="w-full h-full object-contain rounded-md" />
                 <div className="absolute top-6 right-6 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
                   <Button variant="secondary" className="bg-white text-black hover:bg-zinc-200 font-black h-10 px-5 rounded-md uppercase tracking-widest text-[10px]" onClick={() => router.push(`/studio?image=${encodeURIComponent(resultImage)}`)}>{t("common.getSpecs")}</Button>
                   <Button variant="secondary" size="icon" className="bg-white text-black hover:bg-zinc-200 h-10 w-10 rounded-md" onClick={handleDownload}><Download className="w-5 h-5" /></Button>

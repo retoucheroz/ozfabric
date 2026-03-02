@@ -49,7 +49,7 @@ export function ProductSection({
                         <TypeIcon className="w-5 h-5 text-[var(--accent-primary)] group-focus-within:scale-110 transition-transform" />
                     </div>
                     <select
-                        className="w-full text-sm pl-12 pr-4 py-4 rounded-2xl bg-zinc-900/50 border-2 border-white/5 text-zinc-100 focus:ring-2 focus:ring-white/10 focus:border-white/20 appearance-none transition-all shadow-sm hover:shadow-md font-black uppercase tracking-tight"
+                        className="w-full text-sm pl-12 pr-4 py-4 rounded-md bg-zinc-900/50 border-2 border-white/5 text-zinc-100 focus:ring-2 focus:ring-white/10 focus:border-white/20 appearance-none transition-all shadow-sm hover:shadow-md font-black uppercase tracking-tight"
                         value={workflowType}
                         onChange={(e) => setWorkflowType(e.target.value as any)}
                     >
@@ -109,7 +109,7 @@ export function ProductSection({
                             }
                         }}
                         placeholder={language === "tr" ? "Gömlek, Pantolon..." : "Enter name..."}
-                        className="w-full bg-zinc-900/50 border-2 border-white/5 text-zinc-100 text-sm font-black placeholder:text-zinc-500 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-white/10 focus:border-white/20 outline-none transition-all shadow-sm hover:shadow-md"
+                        className="w-full bg-zinc-900/50 border-2 border-white/5 text-zinc-100 text-sm font-black placeholder:text-zinc-500 rounded-md pl-12 pr-4 py-4 focus:ring-2 focus:ring-white/10 focus:border-white/20 outline-none transition-all shadow-sm hover:shadow-md"
                     />
                 </div>
             </div>

@@ -242,7 +242,7 @@ export default function PhotoshootPage() {
                                             )}
                                             style={{ gridArea: 'stack' }}
                                         >
-                                            <div className="bg-[#111113] border border-white/5 rounded-[32px] p-8 pb-4 shadow-2xl h-fit max-h-[calc(100vh-180px)] overflow-y-auto custom-scrollbar">
+                                            <div className="bg-[#111113] border border-white/5 rounded-md p-8 pb-4 shadow-2xl h-fit max-h-[calc(100vh-180px)] overflow-y-auto custom-scrollbar">
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
@@ -499,7 +499,7 @@ export default function PhotoshootPage() {
                                     </div>
 
                                     {/* Toplu Üretim: Açı ve Kare Seçimleri */}
-                                    <div className="bg-white/[0.02] border border-white/5 rounded-[32px] p-8 shadow-2xl flex flex-col space-y-8">
+                                    <div className="bg-white/[0.02] border border-white/5 rounded-md p-8 shadow-2xl flex flex-col space-y-8">
                                         <label className="text-[11px] font-black text-white uppercase tracking-[0.3em] opacity-40">
                                             {language === 'tr' ? 'AÇI VE KARE SEÇİMLERİ' : 'ANGLE & SHOT SELECTION'}
                                         </label>
@@ -616,7 +616,7 @@ export default function PhotoshootPage() {
                                                             <div key={shot.id} className="flex flex-col gap-2">
                                                                 <div
                                                                     className={cn(
-                                                                        "relative aspect-[3/4] rounded-xl border transition-all duration-300 overflow-hidden group w-full",
+                                                                        "relative aspect-[3/4] rounded-md border transition-all duration-300 overflow-hidden group w-full",
                                                                         isDisabled ? "cursor-not-allowed opacity-20 grayscale" : "cursor-pointer",
                                                                         isSelected
                                                                             ? (isMaviActive ? "border-zinc-400 ring-2 ring-zinc-400/20 shadow-lg" : "border-white ring-2 ring-white/20 shadow-lg")
@@ -671,7 +671,7 @@ export default function PhotoshootPage() {
                                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch pt-4">
                                         {/* Sol Taraf: Batch Ayarları ve Seçimler */}
                                         <div className="col-span-1 lg:col-span-5 flex flex-col">
-                                            <div className="flex-1 bg-white/[0.02] border border-white/5 rounded-[32px] overflow-hidden shadow-2xl flex flex-col p-8">
+                                            <div className="flex-1 bg-white/[0.02] border border-white/5 rounded-md overflow-hidden shadow-2xl flex flex-col p-8">
                                                 <BatchPanel
                                                     productName={productName}
                                                     selectedMoodId={selectedMoodId}
@@ -704,7 +704,7 @@ export default function PhotoshootPage() {
 
                                         {/* Sağ Taraf: Önizleme / Üretim Alanı */}
                                         <div className="col-span-1 lg:col-span-7 flex flex-col">
-                                            <div className="flex-1 bg-white/[0.02] border border-white/5 rounded-[32px] overflow-hidden shadow-2xl flex flex-col">
+                                            <div className="flex-1 bg-white/[0.02] border border-white/5 rounded-md overflow-hidden shadow-2xl flex flex-col">
                                                 <PreviewArea
                                                     language={language}
                                                     isProcessing={isProcessing}
@@ -734,11 +734,11 @@ export default function PhotoshootPage() {
 
                 {/* Preview Dialog */}
                 <Dialog open={showPreview} onOpenChange={setShowPreview}>
-                    <DialogContent className="max-w-6xl w-[95vw] max-h-[90vh] p-0 flex flex-col bg-[var(--bg-surface)] border-[var(--border-subtle)] shadow-2xl rounded-2xl overflow-hidden">
+                    <DialogContent className="max-w-6xl w-[95vw] max-h-[90vh] p-0 flex flex-col bg-[var(--bg-surface)] border-[var(--border-subtle)] shadow-2xl rounded-md overflow-hidden">
                         {/* Functional Header */}
                         <div className="flex-none px-6 py-4 border-b border-[var(--border-subtle)] bg-[var(--bg-elevated)] flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
+                                <div className="w-10 h-10 rounded-md bg-white/5 flex items-center justify-center border border-white/10">
                                     <FileText className="w-5 h-5 text-zinc-400" />
                                 </div>
                                 <DialogTitle className="text-xl font-bold text-[var(--text-primary)]">
@@ -747,7 +747,7 @@ export default function PhotoshootPage() {
                             </div>
 
                             {user?.role === 'admin' && (
-                                <div className="flex bg-[var(--bg-surface)] p-1 rounded-lg border border-[var(--border-subtle)]">
+                                <div className="flex bg-[var(--bg-surface)] p-1 rounded-md border border-[var(--border-subtle)]">
                                     <button
                                         onClick={() => {
                                             setPreviewMode('text');
@@ -782,19 +782,19 @@ export default function PhotoshootPage() {
                                 <div key={idx} className="space-y-4">
                                     {/* Shot Info Grid */}
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                        <div className="p-4 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-subtle)]">
+                                        <div className="p-4 rounded-md bg-[var(--bg-elevated)] border border-[var(--border-subtle)]">
                                             <span className="block text-[10px] font-bold text-[var(--text-muted)] uppercase mb-1">{language === "tr" ? "ÇEKİM" : "SHOT"}</span>
                                             <span className="text-sm font-bold">{item.title || (language === "tr" ? "Ana Çekim" : "Main Shot")}</span>
                                         </div>
-                                        <div className="p-4 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-subtle)]">
+                                        <div className="p-4 rounded-md bg-[var(--bg-elevated)] border border-[var(--border-subtle)]">
                                             <span className="block text-[10px] font-bold text-[var(--text-muted)] uppercase mb-1">{language === "tr" ? "MODEL" : "MODEL"}</span>
                                             <span className="text-sm font-bold uppercase">{gender || "DEFAULT"}</span>
                                         </div>
-                                        <div className="p-4 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-subtle)]">
+                                        <div className="p-4 rounded-md bg-[var(--bg-elevated)] border border-[var(--border-subtle)]">
                                             <span className="block text-[10px] font-bold text-[var(--text-muted)] uppercase mb-1">{language === "tr" ? "ÇÖZÜNÜRLÜK" : "RES"}</span>
                                             <span className="text-sm font-bold">{item.settings?.resolution}</span>
                                         </div>
-                                        <div className="p-4 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-subtle)]">
+                                        <div className="p-4 rounded-md bg-[var(--bg-elevated)] border border-[var(--border-subtle)]">
                                             <span className="block text-[10px] font-bold text-[var(--text-muted)] uppercase mb-1">{language === "tr" ? "ORAN" : "RATIO"}</span>
                                             <span className="text-sm font-bold">{item.settings?.aspect_ratio}</span>
                                         </div>
@@ -812,7 +812,7 @@ export default function PhotoshootPage() {
                                         {user?.role === 'admin' ? (
                                             <textarea
                                                 className={cn(
-                                                    "w-full h-full min-h-[400px] p-5 text-[14px] leading-relaxed bg-[var(--bg-elevated)] text-[var(--text-primary)] border-2 border-[var(--border-subtle)] rounded-xl outline-none focus:border-white/20 transition-all custom-scrollbar",
+                                                    "w-full h-full min-h-[400px] p-5 text-[14px] leading-relaxed bg-[var(--bg-elevated)] text-[var(--text-primary)] border-2 border-[var(--border-subtle)] rounded-md outline-none focus:border-white/20 transition-all custom-scrollbar",
                                                     previewMode === 'json' ? "font-mono text-zinc-400" : "font-sans font-medium"
                                                 )}
                                                 value={userAddedPrompt}
@@ -820,7 +820,7 @@ export default function PhotoshootPage() {
                                                 spellCheck={false}
                                             />
                                         ) : (
-                                            <div className="p-10 text-center bg-[var(--bg-elevated)] border border-dashed border-[var(--border-subtle)] rounded-xl">
+                                            <div className="p-10 text-center bg-[var(--bg-elevated)] border border-dashed border-[var(--border-subtle)] rounded-md">
                                                 <p className="text-sm font-medium text-[var(--text-muted)]">
                                                     {language === "tr" ? "Çekim parametreleri optimize edildi. Onaylayıp devam edebilirsiniz." : "Shoot parameters optimized. You can confirm and proceed."}
                                                 </p>

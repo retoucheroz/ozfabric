@@ -234,11 +234,11 @@ export default function FaceHeadSwapPage() {
                                 <TbUserCircle className="w-4 h-4 text-[var(--accent-primary)]" />
                                 {t("faceSwap.identitySource")}
                             </Label>
-                            <Card className="relative h-[240px] overflow-hidden border-2 border-dashed border-white/5 hover:border-white/20 hover:bg-white/[0.02] transition-all bg-zinc-900/40 p-2 flex items-center justify-center group cursor-pointer rounded-2xl" onClick={() => identityInputRef.current?.click()}>
+                            <Card className="relative h-[240px] overflow-hidden border-2 border-dashed border-white/5 hover:border-white/20 hover:bg-white/[0.02] transition-all bg-zinc-900/40 p-2 flex items-center justify-center group cursor-pointer rounded-md" onClick={() => identityInputRef.current?.click()}>
                                 <input type="file" ref={identityInputRef} className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'identity')} />
                                 {identityImage ? (
                                     <div className="relative w-full h-full">
-                                        <img src={identityImage} className="w-full h-full object-cover rounded-xl" alt="Identity" />
+                                        <img src={identityImage} className="w-full h-full object-cover rounded-md" alt="Identity" />
                                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
                                             <RefreshCw className="w-6 h-6 text-white animate-spin-slow" />
                                         </div>
@@ -259,11 +259,11 @@ export default function FaceHeadSwapPage() {
                                 <TbPhoto className="w-4 h-4 text-[var(--accent-primary)]" />
                                 {t("faceSwap.baseImage")}
                             </Label>
-                            <Card className="relative h-[240px] overflow-hidden border-2 border-dashed border-white/5 hover:border-white/20 hover:bg-white/[0.02] transition-all bg-zinc-900/40 p-2 flex items-center justify-center group cursor-pointer rounded-2xl" onClick={() => baseInputRef.current?.click()}>
+                            <Card className="relative h-[240px] overflow-hidden border-2 border-dashed border-white/5 hover:border-white/20 hover:bg-white/[0.02] transition-all bg-zinc-900/40 p-2 flex items-center justify-center group cursor-pointer rounded-md" onClick={() => baseInputRef.current?.click()}>
                                 <input type="file" ref={baseInputRef} className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'base')} />
                                 {baseImage ? (
                                     <div className="relative w-full h-full">
-                                        <img src={baseImage} className="w-full h-full object-cover rounded-xl" alt="Base" />
+                                        <img src={baseImage} className="w-full h-full object-cover rounded-md" alt="Base" />
                                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
                                             <RefreshCw className="w-6 h-6 text-white animate-spin-slow" />
                                         </div>
@@ -281,7 +281,7 @@ export default function FaceHeadSwapPage() {
                     </div>
 
                     {/* 2. Mode & Parameters Panel */}
-                    <Card className="p-5 space-y-6 bg-card border shadow-sm rounded-2xl">
+                    <Card className="p-5 space-y-6 bg-card border shadow-sm rounded-md">
                         <div className="space-y-3">
                             <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 mb-1">
                                 <TbAdjustmentsHorizontal className="w-4 h-4 text-[var(--accent-primary)]" />
@@ -371,7 +371,7 @@ export default function FaceHeadSwapPage() {
                         </Button>
                     </Card>
 
-                    <div className="p-5 bg-white/[0.03] rounded-2xl border border-white/5 hidden lg:block">
+                    <div className="p-5 bg-white/[0.03] rounded-md border border-white/5 hidden lg:block">
                         <p className="text-[10px] text-zinc-500 font-bold leading-relaxed uppercase tracking-tighter">
                             <strong className="text-white mr-2">{language === 'tr' ? 'PRO İPUCU:' : 'PRO TIP:'}</strong>
                             {language === 'tr'
@@ -383,7 +383,7 @@ export default function FaceHeadSwapPage() {
 
                 {/* Right Side: Result Section */}
                 <div className="lg:col-span-7 flex flex-col h-full">
-                    <Card className="relative flex-1 min-h-[500px] lg:min-h-0 bg-card dark:bg-[#12121a] border-2 border-dashed border-border dark:border-white/10 overflow-hidden flex items-center justify-center group rounded-3xl shadow-none hover:border-border/80 dark:hover:border-white/20 transition-colors">
+                    <Card className="relative flex-1 min-h-[500px] lg:min-h-0 bg-card dark:bg-[#12121a] border-2 border-dashed border-border dark:border-white/10 overflow-hidden flex items-center justify-center group rounded-md shadow-none hover:border-border/80 dark:hover:border-white/20 transition-colors">
                         {isGenerating ? (
                             <div className="absolute inset-0 bg-black/80 backdrop-blur-xl z-20 flex flex-col items-center justify-center p-8 text-center space-y-6">
                                 <div className="relative">
@@ -401,7 +401,7 @@ export default function FaceHeadSwapPage() {
 
                         {resultImage ? (
                             <div className="w-full h-full flex flex-col p-4 space-y-4 animate-in fade-in zoom-in duration-500">
-                                <div className="relative flex-1 overflow-hidden rounded-2xl shadow-inner bg-black/5">
+                                <div className="relative flex-1 overflow-hidden rounded-md shadow-inner bg-black/5">
                                     <img src={resultImage} className="w-full h-full object-contain" alt="Result" />
                                     <Button
                                         variant="secondary"
