@@ -15,8 +15,14 @@ const nextConfig = {
     ],
   },
   experimental: {
-    serverActions: {
-      bodySizeLimit: '50mb',
+    outputFileTracingExcludes: {
+      '*': [
+        'node_modules/@swc/core-linux-x64-gnu',
+        'node_modules/@swc/core-linux-x64-musl',
+        'node_modules/@swc/wasm',
+        'node_modules/@prisma/engines/**',
+        'node_modules/@prisma/client/libquery_engine-*',
+      ],
     },
   },
 };
