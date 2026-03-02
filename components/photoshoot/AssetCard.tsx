@@ -14,7 +14,7 @@ interface AssetCardProps {
     activeLibraryAsset: string | null;
     setActiveLibraryAsset: (id: any) => void;
     assets: { [key: string]: string | string[] | null };
-    handleAssetUpload: (id: string, file: File | File[]) => void;
+    handleAssetUpload: (id: string, file: File) => void;
     handleAssetRemove: (id: string, e: React.MouseEvent, index?: number) => void;
     language: string;
     lightingSendImage?: boolean;
@@ -59,7 +59,7 @@ export function AssetCard({
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             if (allowMultiple) {
-                handleAssetUpload(id, Array.from(e.target.files));
+                (handleAssetUpload as any)(id, Array.from(e.target.files));
             } else {
                 handleAssetUpload(id, e.target.files[0]);
             }
@@ -88,7 +88,7 @@ export function AssetCard({
             const imageFiles = files.filter(f => f.type.startsWith('image/'));
             if (imageFiles.length > 0) {
                 if (allowMultiple) {
-                    handleAssetUpload(id, imageFiles);
+                    (handleAssetUpload as any)(id, imageFiles);
                 } else {
                     handleAssetUpload(id, imageFiles[0]);
                 }

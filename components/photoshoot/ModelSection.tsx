@@ -14,7 +14,7 @@ interface ModelSectionProps {
     assets: { [key: string]: string | string[] | null };
     activeLibraryAsset: string | null;
     setActiveLibraryAsset: (val: any) => void;
-    handleAssetUpload: (id: string, file: File | File[]) => void;
+    handleAssetUpload: (id: string, file: File) => void;
     handleAssetRemove: (id: string, e: React.MouseEvent) => void;
     // For grid view (optional) - these are used in the Library view
     view?: "sidebar" | "library";
