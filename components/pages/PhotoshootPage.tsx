@@ -156,7 +156,7 @@ export default function PhotoshootPage() {
                                 {/* Left: Product Selection */}
                                 <div className="lg:col-span-3 flex flex-col">
                                     <div className="flex items-center gap-3 mb-4">
-                                        <div className="p-2 rounded-xl bg-zinc-800 text-white border border-white/10 shadow-lg">
+                                        <div className="p-2 rounded-md bg-zinc-800 text-white border border-white/10 shadow-lg">
                                             <TbSettings2 className="w-5 h-5" />
                                         </div>
                                         <div className="flex flex-col">
@@ -197,14 +197,14 @@ export default function PhotoshootPage() {
                                                             if (activeLibraryAsset) setActiveLibraryAsset(null);
                                                         }}
                                                         className={cn(
-                                                            "group relative h-[100px] rounded-2xl border-2 border-dashed transition-all duration-300 shadow-sm hover:shadow-lg hover:scale-[1.01] overflow-hidden cursor-pointer flex items-center justify-center px-4 gap-4",
+                                                            "group relative h-[100px] rounded-md border-2 border-dashed transition-all duration-300 shadow-sm hover:shadow-lg hover:scale-[1.01] overflow-hidden cursor-pointer flex items-center justify-center px-4 gap-4",
                                                             showProductManager
                                                                 ? "bg-white/10 border-white/40 ring-2 ring-white/20"
                                                                 : "bg-zinc-900/40 border-white/5 hover:bg-zinc-800/60 hover:border-white/20"
                                                         )}
                                                     >
                                                         <div className="flex items-center gap-1.5 shrink-0">
-                                                            <div className="p-2.5 rounded-xl bg-zinc-800 text-white border border-white/5 shadow-md group-hover:scale-110 transition-transform">
+                                                            <div className="p-2.5 rounded-md bg-zinc-800 text-white border border-white/5 shadow-md group-hover:scale-110 transition-transform">
                                                                 <TbShirt className="w-5 h-5" />
                                                             </div>
                                                         </div>
@@ -216,6 +216,13 @@ export default function PhotoshootPage() {
                                                         </div>
                                                         <ChevronRight className={cn("w-4 h-4 transition-transform ml-auto", showProductManager ? "rotate-90 text-white" : "text-zinc-600 group-hover:translate-x-1")} />
                                                     </div>
+
+                                                    <Button
+                                                        onClick={() => canMoveToStep(2) && setWizardStep(2)}
+                                                        className="w-full h-auto py-2 rounded-md bg-[#F5F5F5] hover:bg-white text-black font-black text-[10px] uppercase tracking-widest shadow-none transition-all hover:scale-[1.01] active:scale-[0.99] group flex justify-center items-center gap-2"
+                                                    >
+                                                        {language === "tr" ? "İLERLE" : "NEXT"} <ChevronRight className="w-4 h-4" />
+                                                    </Button>
                                                 </div>
                                             </div>
                                         </ProductSection>
@@ -249,7 +256,7 @@ export default function PhotoshootPage() {
                                                     {/* Primary Products Column */}
                                                     <div className="space-y-6">
                                                         <div className="flex items-center gap-3 pb-3 border-b border-white/5">
-                                                            <div className="w-8 h-8 rounded-lg bg-zinc-800 flex items-center justify-center border border-white/5 text-white shadow-sm">
+                                                            <div className="w-8 h-8 rounded-md bg-zinc-800 flex items-center justify-center border border-white/5 text-white shadow-sm">
                                                                 <TbShirt className="w-4 h-4" />
                                                             </div>
                                                             <h4 className="text-[11px] font-black text-white uppercase tracking-[0.2em]">
@@ -279,7 +286,7 @@ export default function PhotoshootPage() {
                                                         {/* Upper details */}
                                                         <div className="space-y-6">
                                                             <div className="flex items-center gap-3 pb-3 border-b border-blue-500/20">
-                                                                <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20 text-blue-400">
+                                                                <div className="w-8 h-8 rounded-md bg-blue-500/10 flex items-center justify-center border border-blue-500/20 text-blue-400">
                                                                     <ScanLine className="w-4 h-4" />
                                                                 </div>
                                                                 <h4 className="text-[11px] font-black text-blue-400 uppercase tracking-[0.2em]">
@@ -301,7 +308,7 @@ export default function PhotoshootPage() {
                                                         {/* Lower details */}
                                                         <div className="space-y-6">
                                                             <div className="flex items-center gap-3 pb-3 border-b border-amber-500/20">
-                                                                <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center border border-amber-500/20 text-amber-400">
+                                                                <div className="w-8 h-8 rounded-md bg-amber-500/10 flex items-center justify-center border border-amber-500/20 text-amber-400">
                                                                     <ScanLine className="w-4 h-4" />
                                                                 </div>
                                                                 <h4 className="text-[11px] font-black text-amber-400 uppercase tracking-[0.2em]">
@@ -340,15 +347,6 @@ export default function PhotoshootPage() {
                                 </div>
                             </div>
 
-                            <div className="flex justify-between mt-6 pt-4 border-t border-[var(--border-subtle)]/50">
-                                <div />
-                                <Button
-                                    onClick={() => canMoveToStep(2) && setWizardStep(2)}
-                                    className="px-10 py-6 rounded-2xl bg-zinc-100 text-black hover:bg-white font-black uppercase tracking-widest shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
-                                >
-                                    {language === "tr" ? "İLERLE" : "NEXT"} <ChevronRight className="ml-2 w-5 h-5" />
-                                </Button>
-                            </div>
                         </div>
                     )}
 
@@ -430,15 +428,15 @@ export default function PhotoshootPage() {
                                 <Button
                                     variant="outline"
                                     onClick={() => setWizardStep(1)}
-                                    className="px-10 py-6 rounded-2xl border border-white/10 bg-white/5 text-white font-black uppercase tracking-widest hover:bg-white/10 transition-all active:scale-[0.98]"
+                                    className="px-4 py-2 h-auto rounded-md border border-white/10 bg-white/5 text-white font-black text-[10px] uppercase tracking-widest hover:bg-white hover:text-black transition-all active:scale-[0.98] group"
                                 >
-                                    <ChevronLeft className="mr-3 w-5 h-5 opacity-50" /> {language === "tr" ? "GERİ" : "BACK"}
+                                    <ChevronLeft className="mr-2 w-3.5 h-3.5 opacity-50" /> {language === "tr" ? "GERİ" : "BACK"}
                                 </Button>
                                 <Button
                                     onClick={() => canMoveToStep(3) && setWizardStep(3)}
-                                    className="px-12 py-6 rounded-2xl bg-white text-black hover:bg-zinc-200 font-black uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-[0.98]"
+                                    className="px-4 py-2 h-auto rounded-md bg-[#F5F5F5] hover:bg-white text-black font-black text-[10px] uppercase tracking-widest shadow-none transition-all hover:scale-[1.02] active:scale-[0.98] group"
                                 >
-                                    {language === "tr" ? "İLERLE" : "NEXT"} <ChevronRight className="ml-3 w-5 h-5" />
+                                    {language === "tr" ? "İLERLE" : "NEXT"} <ChevronRight className="ml-2 w-3.5 h-3.5" />
                                 </Button>
                             </div>
                         </div>
@@ -454,7 +452,7 @@ export default function PhotoshootPage() {
                                 <div className="max-w-5xl mx-auto px-1 md:px-0 space-y-6">
 
                                     {/* TOP: Horizontal Technical Settings Bar */}
-                                    <div className="py-3 px-6 rounded-[24px] bg-white/5 border border-white/10 shadow-2xl backdrop-blur-xl">
+                                    <div className="py-3 px-6 rounded-md bg-white/5 border border-white/10 shadow-2xl backdrop-blur-xl">
                                         <div className="flex flex-col md:flex-row md:items-center gap-8">
                                             <div className="md:border-r border-white/10 pr-6 flex-none hidden lg:block">
                                                 <p className="text-[10px] uppercase font-black text-white/40 tracking-[0.2em] m-0">{language === "tr" ? "AYARLAR" : "SETTINGS"}</p>
@@ -463,7 +461,7 @@ export default function PhotoshootPage() {
                                                 <div className="flex items-center gap-3">
                                                     <label className="text-[10px] uppercase font-black text-white/40 tracking-widest whitespace-nowrap">{language === "tr" ? "ORAN" : "RATIO"}</label>
                                                     <div className="relative flex-1 min-w-[100px]">
-                                                        <select className="w-full text-[11px] px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white transition-all font-black appearance-none focus:border-white/20 outline-none" value={aspectRatio} onChange={(e) => setAspectRatio(e.target.value)}>
+                                                        <select className="w-full text-[11px] px-3 py-2 rounded-md bg-white/5 border border-white/10 text-white transition-all font-black appearance-none focus:border-white/20 outline-none" value={aspectRatio} onChange={(e) => setAspectRatio(e.target.value)}>
                                                             {ASPECT_RATIOS.map(opt => (
                                                                 <option key={opt.id} value={opt.id} className="bg-zinc-900 border-none">{language === 'tr' ? opt.labelTr : opt.label}</option>
                                                             ))}
@@ -474,7 +472,7 @@ export default function PhotoshootPage() {
                                                 <div className="flex items-center gap-3">
                                                     <label className="text-[10px] uppercase font-black text-white/40 tracking-widest whitespace-nowrap">{language === "tr" ? "KALİTE" : "QUALITY"}</label>
                                                     <div className="relative flex-1 min-w-[100px]">
-                                                        <select className="w-full text-[11px] px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white transition-all font-black appearance-none focus:border-white/20 outline-none" value={resolution} onChange={(e) => setResolution(e.target.value)}>
+                                                        <select className="w-full text-[11px] px-3 py-2 rounded-md bg-white/5 border border-white/10 text-white transition-all font-black appearance-none focus:border-white/20 outline-none" value={resolution} onChange={(e) => setResolution(e.target.value)}>
                                                             {RESOLUTION_OPTIONS.map(opt => (
                                                                 <option key={opt.id} value={opt.id} className="bg-zinc-900 border-none">{language === 'tr' ? opt.labelTr : opt.label}</option>
                                                             ))}
@@ -485,7 +483,7 @@ export default function PhotoshootPage() {
                                                 <div className="flex items-center gap-3">
                                                     <label className="text-[10px] uppercase font-black text-white/40 tracking-widest whitespace-nowrap">{language === "tr" ? "SEED" : "SEED"}</label>
                                                     <div className="relative flex-1">
-                                                        <input type="number" className="w-full text-[11px] px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white transition-all font-black placeholder:text-white/20 focus:border-white/20 outline-none" value={seed === "" ? "" : seed} onChange={(e) => setSeed(e.target.value === "" ? "" : Number(e.target.value))} placeholder="RANDOM" />
+                                                        <input type="number" className="w-full text-[11px] px-3 py-2 rounded-md bg-white/5 border border-white/10 text-white transition-all font-black placeholder:text-white/20 focus:border-white/20 outline-none" value={seed === "" ? "" : seed} onChange={(e) => setSeed(e.target.value === "" ? "" : Number(e.target.value))} placeholder="RANDOM" />
                                                         {seed !== "" && <button onClick={() => setSeed("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white"><X size={14} /></button>}
                                                     </div>
                                                 </div>
@@ -518,7 +516,7 @@ export default function PhotoshootPage() {
                                                             <div key={shot.id} className="flex flex-col gap-3">
                                                                 <div
                                                                     className={cn(
-                                                                        "relative aspect-[3/4] rounded-xl border transition-all duration-300 overflow-hidden group cursor-pointer w-full",
+                                                                        "relative aspect-[3/4] rounded-md border transition-all duration-300 overflow-hidden group cursor-pointer w-full",
                                                                         isSelected
                                                                             ? (isMaviActive ? "border-zinc-400 ring-2 ring-zinc-400/20 shadow-lg" : "border-white ring-2 ring-white/20 shadow-lg")
                                                                             : "border-[var(--border-subtle)] opacity-40 grayscale bg-[var(--bg-elevated)] hover:opacity-80 transition-opacity"
@@ -554,7 +552,7 @@ export default function PhotoshootPage() {
 
                                                                         {isSelected && (
                                                                             <div
-                                                                                className="absolute top-2 right-2 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10"
+                                                                                className="absolute top-2 right-2 flex items-center gap-1.5 px-2 py-1 rounded-md bg-black/60 backdrop-blur-md border border-white/10"
                                                                                 onClick={(e) => e.stopPropagation()}
                                                                             >
                                                                                 <span className="text-[10px] font-bold text-white tracking-widest leading-none">YNC</span>
@@ -580,7 +578,7 @@ export default function PhotoshootPage() {
                                                                             setPoseFocus(isUpperFocus ? 'upper' : 'full');
                                                                         }}
                                                                         className={cn(
-                                                                            "flex items-center justify-center gap-1.5 w-full py-2.5 rounded-lg border shadow-sm transition-colors cursor-pointer group/pose-btn",
+                                                                            "flex items-center justify-center gap-1.5 w-full py-2.5 rounded-md border shadow-sm transition-colors cursor-pointer group/pose-btn",
                                                                             assets[`pose_${shot.id}`]
                                                                                 ? "border-zinc-500/30 bg-zinc-500/10 text-zinc-300 hover:bg-zinc-500 hover:text-white"
                                                                                 : "border-white/30 bg-white/5 text-white hover:bg-white hover:text-black"
@@ -838,16 +836,16 @@ export default function PhotoshootPage() {
                             <Button
                                 variant="outline"
                                 onClick={() => setShowPreview(false)}
-                                className="h-12 px-8 rounded-xl font-bold text-xs uppercase"
+                                className="h-10 px-6 rounded-md font-black text-[10px] uppercase tracking-widest border border-white/10 bg-white/5 text-white hover:bg-white hover:text-black transition-all"
                             >
                                 {language === "tr" ? "DÜZENLE" : "EDIT"}
                             </Button>
                             <Button
                                 onClick={handleConfirmGeneration}
-                                className="h-12 px-10 rounded-xl bg-white hover:bg-zinc-100 text-black font-bold text-xs uppercase shadow-xl transition-all flex items-center gap-2"
+                                className="h-10 px-8 rounded-md bg-[#F5F5F5] hover:bg-white text-black font-black text-[10px] uppercase tracking-widest shadow-none transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2"
                             >
                                 {language === "tr" ? "ONAYLA VE BAŞLAT" : "CONFIRM & START"}
-                                <Sparkles className="w-4 h-4" />
+                                <Sparkles className="w-3.5 h-3.5 text-black" />
                             </Button>
                         </div>
                     </DialogContent>

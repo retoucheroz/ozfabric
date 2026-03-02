@@ -161,7 +161,7 @@ function GhostPageContent() {
     const Icon = angle.icon;
     return (
       <span className="flex items-center gap-2">
-        <Icon className="w-4 h-4 text-violet-500" />
+        <Icon className="w-4 h-4 text-white" />
         {language === "tr" ? angle.labelTr : angle.label}
       </span>
     );
@@ -264,7 +264,7 @@ function GhostPageContent() {
           {/* Left: Input */}
           <div className="w-full lg:w-[420px] lg:border-r border-b lg:border-b-0 border-white/5 bg-background p-4 md:p-8 lg:overflow-y-auto space-y-4 shrink-0">
             <div className="flex items-center gap-4 mb-8">
-              <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-white/10 text-white flex items-center justify-center shadow-xl">
+              <div className="w-12 h-12 rounded-md bg-zinc-900 border border-white/10 text-white flex items-center justify-center shadow-xl">
                 <TbHanger className="w-6 h-6" />
               </div>
               <div className="flex flex-col">
@@ -390,7 +390,7 @@ function GhostPageContent() {
                     key={angle.id}
                     variant={selectedAngle === angle.id ? "default" : "outline"}
                     className={cn(
-                      "h-24 flex-col gap-2 transition-all duration-300 rounded-2xl border-white/5",
+                      "h-24 flex-col gap-2 transition-all duration-300 rounded-md border-white/5",
                       selectedAngle === angle.id
                         ? "bg-white text-black shadow-2xl border-white ring-2 ring-white/20"
                         : "bg-white/[0.02] hover:border-white/20 text-zinc-500 hover:text-white"
@@ -410,7 +410,7 @@ function GhostPageContent() {
                 <DialogTrigger asChild>
                   <Card className="p-3 cursor-pointer hover:bg-[var(--bg-elevated)] transition-all border border-[var(--border-subtle)] hover:border-[var(--accent-primary)] group">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-[var(--bg-sidebar)] border border-[var(--border-subtle)] flex items-center justify-center shrink-0">
+                      <div className="w-9 h-9 rounded-md bg-[var(--bg-sidebar)] border border-[var(--border-subtle)] flex items-center justify-center shrink-0">
                         <TbHdr className="w-5 h-5 text-[var(--text-muted)] group-hover:text-[var(--accent-primary)]" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -430,7 +430,7 @@ function GhostPageContent() {
                       <Button
                         key={res.id}
                         variant={selectedResolution === res.id ? "default" : "outline"}
-                        className={`justify-between h-14 px-4 ${selectedResolution === res.id ? 'bg-violet-500 text-white hover:bg-violet-600' : ''}`}
+                        className={`justify-between h-14 px-4 ${selectedResolution === res.id ? 'bg-white text-black hover:bg-zinc-200' : ''}`}
                         onClick={() => { setSelectedResolution(res.id); setResolutionDialogOpen(false); }}
                       >
                         <span className="font-medium">{language === "tr" ? res.labelTr : res.label}</span>
@@ -472,7 +472,7 @@ function GhostPageContent() {
                       <Button
                         key={ratio.id}
                         variant={selectedAspectRatio === ratio.id ? "default" : "outline"}
-                        className={`justify-between h-14 px-4 ${selectedAspectRatio === ratio.id ? 'bg-violet-500 text-white hover:bg-violet-600' : ''}`}
+                        className={`justify-between h-14 px-4 ${selectedAspectRatio === ratio.id ? 'bg-white text-black hover:bg-zinc-200' : ''}`}
                         onClick={() => { setSelectedAspectRatio(ratio.id); setAspectRatioDialogOpen(false); }}
                       >
                         <span className="font-medium">{language === "tr" ? ratio.labelTr : ratio.label}</span>
@@ -493,12 +493,12 @@ function GhostPageContent() {
 
             {/* Active Model Indicator */}
             {activeModel && (
-              <div className="bg-violet-100 dark:bg-violet-900/30 border border-violet-200 dark:border-violet-800 rounded-lg p-3 flex items-center justify-between mb-4">
+              <div className="bg-zinc-100 dark:bg-zinc-900/30 border border-zinc-200 dark:border-zinc-800 rounded-md p-3 flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-violet-600 dark:text-violet-400" />
+                  <Sparkles className="w-4 h-4 text-white dark:text-zinc-400" />
                   <div>
-                    <p className="text-xs font-semibold text-violet-900 dark:text-violet-100">{t("train.usingModel") || "Using Model"}</p>
-                    <p className="text-xs text-violet-700 dark:text-violet-300">{activeModel.name}</p>
+                    <p className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">{t("train.usingModel") || "Using Model"}</p>
+                    <p className="text-xs text-zinc-700 dark:text-zinc-300">{activeModel.name}</p>
                   </div>
                 </div>
                 <Button variant="ghost" size="sm" className="h-6 w-6 p-0 rounded-full" onClick={() => router.push('/photoshoot/ghost')}>
@@ -510,7 +510,7 @@ function GhostPageContent() {
             {/* Generate Button */}
             <div className="space-y-2 pt-6">
               <Button
-                className="w-full py-8 rounded-2xl bg-white hover:bg-zinc-200 text-black font-black text-[11px] shadow-2xl transition-all active:scale-[0.98] flex items-center gap-4 uppercase tracking-[0.2em]"
+                className="w-full py-8 rounded-md bg-white hover:bg-zinc-200 text-black font-black text-[11px] shadow-2xl transition-all active:scale-[0.98] flex items-center gap-4 uppercase tracking-[0.2em]"
                 disabled={!mainImage || isProcessing}
                 onClick={handleGenerate}
               >
@@ -560,11 +560,11 @@ function GhostPageContent() {
                 </div>
               </div>
             ) : resultImage ? (
-              <Card className="max-w-xl w-full aspect-[2/3] p-3 bg-zinc-900 border border-white/10 shadow-2xl animate-in zoom-in-95 duration-500 relative group rounded-2xl">
+              <Card className="max-w-xl w-full aspect-[2/3] p-3 bg-zinc-900 border border-white/10 shadow-2xl animate-in zoom-in-95 duration-500 relative group rounded-md">
                 <img src={resultImage} className="w-full h-full object-contain rounded-xl" />
                 <div className="absolute top-6 right-6 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Button variant="secondary" className="bg-white text-black hover:bg-zinc-200 font-black h-10 px-5 rounded-xl uppercase tracking-widest text-[10px]" onClick={() => router.push(`/studio?image=${encodeURIComponent(resultImage)}`)}>{t("common.getSpecs")}</Button>
-                  <Button variant="secondary" size="icon" className="bg-white text-black hover:bg-zinc-200 h-10 w-10 rounded-xl" onClick={handleDownload}><Download className="w-5 h-5" /></Button>
+                  <Button variant="secondary" className="bg-white text-black hover:bg-zinc-200 font-black h-10 px-5 rounded-md uppercase tracking-widest text-[10px]" onClick={() => router.push(`/studio?image=${encodeURIComponent(resultImage)}`)}>{t("common.getSpecs")}</Button>
+                  <Button variant="secondary" size="icon" className="bg-white text-black hover:bg-zinc-200 h-10 w-10 rounded-md" onClick={handleDownload}><Download className="w-5 h-5" /></Button>
                 </div>
               </Card>
             ) : (

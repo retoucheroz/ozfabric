@@ -46,8 +46,9 @@ export const CREDIT_PACKS = [
 
 export const SERVICE_COSTS = {
     IMAGE_GENERATION: {
-        NANO_BANANA_PRO_1_2K: 50, // 1024x1024 to 2048x2048 (implied)
-        NANO_BANANA_PRO_4K: 100,  // 2160x3840
+        NANO_BANANA_PRO_1K: 40,
+        NANO_BANANA_PRO_2K: 60,
+        NANO_BANANA_PRO_4K: 100,
         FACE_SWAP_1_2K: 70,
         FACE_SWAP_4K: 140,
         GHOST_MODEL_1_2K: 75,

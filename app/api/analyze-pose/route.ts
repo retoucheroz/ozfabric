@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
         }
 
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
         // Fetch the image and convert to base64
         const imageResp = await fetch(imageUrl);

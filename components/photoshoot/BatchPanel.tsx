@@ -91,7 +91,7 @@ export function BatchPanel({
                         {language === 'tr' ? 'Üretim' : 'Production'}
                     </h3>
                     {isAdmin && setIsMaviBatch && (
-                        <div className="flex items-center gap-2 px-2 py-1 rounded-full bg-blue-500/10 border border-blue-500/20">
+                        <div className="flex items-center gap-2 px-2 py-1 rounded-md bg-blue-500/10 border border-blue-500/20">
                             <span className="text-[9px] font-bold text-blue-600 uppercase">MAVI</span>
                             <Switch checked={isMaviBatch} onCheckedChange={setIsMaviBatch} className="scale-75" />
                         </div>
@@ -108,7 +108,7 @@ export function BatchPanel({
                     <input
                         type="text"
                         className={cn(
-                            "w-full text-xs p-3 rounded-xl border transition-all duration-200 outline-none",
+                            "w-full text-xs p-3 rounded-md border transition-all duration-200 outline-none",
                             isMaviActive
                                 ? "border-blue-200 dark:border-blue-800 bg-white dark:bg-background focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                                 : "bg-[var(--bg-elevated)] border-[var(--border-subtle)] focus:border-[var(--accent-primary)] focus:ring-2 focus:ring-[var(--accent-primary)]/10"
@@ -124,7 +124,7 @@ export function BatchPanel({
                     <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase flex items-center gap-2">
                         {language === 'tr' ? 'Düzenlenebilir Çekim Seçenekleri' : 'Editable Shoot Options'}
                     </label>
-                    <div className="w-full flex flex-col gap-2 p-4 rounded-xl border transition-all duration-200 bg-[var(--bg-elevated)] border-[var(--border-subtle)] overflow-hidden">
+                    <div className="w-full flex flex-col gap-2 p-4 rounded-md border transition-all duration-200 bg-[var(--bg-elevated)] border-[var(--border-subtle)] overflow-hidden">
                         {(() => {
                             const unselectedItems: { key: string; labelTr: string; labelEn: string; group: string }[] = [];
 
@@ -205,7 +205,7 @@ export function BatchPanel({
                                     <div key={acc.id} className="space-y-2">
                                         <div
                                             className={cn(
-                                                "flex items-center justify-between p-2 rounded-xl border transition-all cursor-pointer",
+                                                "flex items-center justify-between p-2 rounded-md border transition-all cursor-pointer",
                                                 isActive
                                                     ? "bg-[var(--accent-primary)]/5 border-[var(--accent-primary)]/30 shadow-sm"
                                                     : "bg-[var(--bg-elevated)] border-[var(--border-subtle)] hover:border-[var(--text-muted)]/30"
@@ -214,7 +214,7 @@ export function BatchPanel({
                                         >
                                             <div className="flex items-center gap-2">
                                                 <div className={cn(
-                                                    "w-6 h-6 rounded-lg flex items-center justify-center",
+                                                    "w-6 h-6 rounded-md flex items-center justify-center",
                                                     isActive ? "bg-[var(--accent-primary)] text-white" : "bg-muted text-muted-foreground"
                                                 )}>
                                                     <Icon size={12} />
@@ -235,7 +235,7 @@ export function BatchPanel({
                                             <div className="px-1 animate-in slide-in-from-top-1 duration-200">
                                                 <input
                                                     type="text"
-                                                    className="w-full text-[10px] p-2.5 rounded-lg border bg-white dark:bg-background border-[var(--border-subtle)] focus:border-[var(--accent-primary)] outline-none transition-all"
+                                                    className="w-full text-[10px] p-2.5 rounded-md border bg-white dark:bg-background border-[var(--border-subtle)] focus:border-[var(--accent-primary)] outline-none transition-all"
                                                     value={description}
                                                     onChange={(e) => setTechAccessoryDescriptions({
                                                         ...techAccessoryDescriptions,

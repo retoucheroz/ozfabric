@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
         }
 
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
         const prompt = `Translate the following fashion-related product name or term to ${targetLanguage === 'en' ? 'English' : 'Turkish'}. 
         Provide ONLY the translated text, no explanation.

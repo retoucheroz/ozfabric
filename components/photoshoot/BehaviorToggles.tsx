@@ -125,7 +125,7 @@ export function BehaviorToggles({
                 <TooltipTrigger asChild>
                     <div
                         className={cn(
-                            "flex flex-col items-center justify-between p-2.5 h-[130px] rounded-2xl border-2 transition-all cursor-pointer group select-none",
+                            "flex flex-col items-center justify-between p-2.5 h-[130px] rounded-md border-2 transition-all cursor-pointer group select-none",
                             active
                                 ? "bg-zinc-800 border-white shadow-xl"
                                 : "bg-zinc-900/40 border-white/5 hover:border-white/20"
@@ -149,7 +149,7 @@ export function BehaviorToggles({
                         </div>
                     </div>
                 </TooltipTrigger>
-                <TooltipContent side="top" className="max-w-[200px] text-center p-3 bg-zinc-900 border border-white/10 shadow-2xl rounded-xl">
+                <TooltipContent side="top" className="max-w-[200px] text-center p-3 bg-zinc-900 border border-white/10 shadow-2xl rounded-md">
                     <p className="text-[10px] leading-relaxed text-zinc-300 font-bold uppercase tracking-tight">{detailed}</p>
                 </TooltipContent>
             </Tooltip>
@@ -236,7 +236,7 @@ export function BehaviorToggles({
                 {/* 7. Model Mood (Box 7) */}
                 <div
                     className={cn(
-                        "flex flex-col items-center justify-between p-3.5 h-[140px] rounded-2xl border-2 transition-all cursor-pointer group select-none shadow-sm",
+                        "flex flex-col items-center justify-between p-3.5 h-[140px] rounded-md border-2 transition-all cursor-pointer group select-none shadow-sm",
                         selectedMoodId
                             ? "bg-zinc-800 border-white shadow-xl"
                             : "bg-zinc-900/40 border-white/5 hover:border-white/20"
@@ -286,7 +286,7 @@ export function BehaviorToggles({
                 {/* 8. Pant Length (Box 8) */}
                 <div
                     className={cn(
-                        "flex flex-col items-center justify-between p-2.5 h-[130px] rounded-2xl border-2 transition-all cursor-pointer group select-none shadow-sm",
+                        "flex flex-col items-center justify-between p-2.5 h-[130px] rounded-md border-2 transition-all cursor-pointer group select-none shadow-sm",
                         !canShowLegHem ? "opacity-30 cursor-not-allowed bg-zinc-900/10 grayscale" :
                             (pantLength !== 'none'
                                 ? "bg-zinc-800 border-white shadow-xl"
@@ -330,7 +330,7 @@ export function BehaviorToggles({
                         <TooltipTrigger asChild>
                             <div
                                 className={cn(
-                                    "flex flex-col items-center justify-between p-3.5 h-[140px] rounded-2xl border-2 transition-all group select-none shadow-sm",
+                                    "flex flex-col items-center justify-between p-3.5 h-[140px] rounded-md border-2 transition-all group select-none shadow-sm",
                                     isSocksDisabled ? "opacity-30 cursor-not-allowed bg-zinc-900/10 border-white/5 grayscale"
                                         : (socksType !== 'none'
                                             ? "cursor-pointer bg-zinc-800 border-white shadow-xl"
@@ -395,7 +395,7 @@ export function BehaviorToggles({
                             </div>
                         </TooltipTrigger>
                         {isSocksDisabled && (
-                            <TooltipContent side="top" className="text-[10px] max-w-[200px] text-center bg-zinc-900 text-zinc-300 border border-white/10 font-bold uppercase p-3 rounded-xl tracking-tight">
+                            <TooltipContent side="top" className="text-[10px] max-w-[200px] text-center bg-zinc-900 text-zinc-300 border border-white/10 font-bold uppercase p-3 rounded-md tracking-tight">
                                 {language === "tr"
                                     ? "Uzun paça kullanıldığında çoraplar görünmez."
                                     : "Socks are not visible when using long length pants."}

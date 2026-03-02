@@ -20,7 +20,7 @@ export function WizardProgress({ currentStep, onStepClick, language }: WizardPro
                         <button
                             onClick={() => onStepClick(step.num as 1 | 2 | 3)}
                             disabled={step.num > currentStep && step.num !== currentStep} // Optional: Disable future steps if desired, but user didn't ask. Let's keep existing behavior but fix style.
-                            className={`flex items-center gap-2 px-2.5 py-1 md:px-3 md:py-1.5 rounded-lg transition-all whitespace-nowrap ${currentStep === step.num
+                            className={`flex items-center gap-2 px-2.5 py-1 md:px-3 md:py-1.5 rounded-md transition-all whitespace-nowrap ${currentStep === step.num
                                 ? "bg-white text-black shadow-xl"
                                 : currentStep > step.num
                                     ? "bg-white/10 text-zinc-300 border border-white/10 cursor-pointer hover:bg-white/20"

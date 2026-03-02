@@ -86,3 +86,77 @@ export async function optimizeImageForApi(dataUrl: string, maxSize = 3000, quali
     img.onerror = (e) => reject(e);
   });
 }
+
+export async function mergeImages(imageUrls: string[], maxWidth = 2048): Promise<string> {
+  if (imageUrls.length === 0) return "";
+  if (imageUrls.length === 1) return imageUrls[0];
+
+  return new Promise((resolve, reject) => {
+    const images: HTMLImageElement[] = [];
+    let loadedCount = 0;
+
+    imageUrls.forEach((url, index) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = url;
+      img.onload = () => {
+        images[index] = img;
+        loadedCount++;
+        if (loadedCount === imageUrls.length) {
+          const margin = 20;
+          const cols = images.length <= 4 ? 2 : 3;
+          const rows = Math.ceil(images.length / cols);
+
+          const itemWidth = Math.floor((maxWidth - (cols + 1) * margin) / cols);
+
+          const canvas = document.createElement("canvas");
+          canvas.width = maxWidth;
+
+          let totalHeight = 0;
+          const rowHeights: number[] = [];
+          for (let r = 0; r < rows; r++) {
+            let maxHeightInRow = 0;
+            for (let c = 0; c < cols; c++) {
+              const idx = r * cols + c;
+              if (images[idx]) {
+                const h = (images[idx].height * itemWidth) / images[idx].width;
+                if (h > maxHeightInRow) maxHeightInRow = h;
+              }
+            }
+            rowHeights[r] = maxHeightInRow;
+            totalHeight += maxHeightInRow + margin;
+          }
+          canvas.height = totalHeight + margin;
+
+          const ctx = canvas.getContext("2d");
+          if (!ctx) { reject("No context"); return; }
+
+          ctx.fillStyle = "white";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          let currentY = margin;
+          for (let r = 0; r < rows; r++) {
+            let currentX = margin;
+            for (let c = 0; c < cols; c++) {
+              const idx = r * cols + c;
+              if (images[idx]) {
+                const imgWidth = itemWidth;
+                const imgHeight = (images[idx].height * itemWidth) / images[idx].width;
+                ctx.drawImage(images[idx], currentX, currentY, imgWidth, imgHeight);
+              }
+              currentX += itemWidth + margin;
+            }
+            currentY += rowHeights[r] + margin;
+          }
+          resolve(canvas.toDataURL("image/jpeg", 0.9));
+        }
+      };
+      img.onerror = (e) => {
+        console.error("Image load error for merge:", url, e);
+        // Fill with a placeholder blank or just skip
+        loadedCount++;
+        if (loadedCount === imageUrls.length) resolve(""); // Should ideally handle partial success
+      };
+    });
+  });
+}

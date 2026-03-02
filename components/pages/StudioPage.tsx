@@ -282,7 +282,7 @@ function StudioPageContent() {
         {/* Header Area */}
         <div className="h-20 border-b border-white/5 bg-[#0D0D0F] flex items-center justify-between px-8 shrink-0 z-30">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-white/10 text-white flex items-center justify-center shadow-xl">
+            <div className="w-12 h-12 rounded-md bg-zinc-900 border border-white/10 text-white flex items-center justify-center shadow-xl">
               <TbChartBar className="w-6 h-6" />
             </div>
             <div>
@@ -313,7 +313,7 @@ function StudioPageContent() {
                 <TbPhoto className="w-4 h-4" />
                 {language === "tr" ? "ÜRÜN GÖRÜNÜMÜ" : "PRODUCT VIEW"}
               </Label>
-              <div className="border-2 border-dashed rounded-2xl h-56 border-white/5 hover:border-white/20 transition-all relative group overflow-hidden cursor-pointer bg-white/[0.02]">
+              <div className="border-2 border-dashed rounded-md h-56 border-white/5 hover:border-white/20 transition-all relative group overflow-hidden cursor-pointer bg-white/[0.02]">
                 <input
                   type="file"
                   accept="image/*"
@@ -324,7 +324,7 @@ function StudioPageContent() {
                   <img src={preview} className="w-full h-full object-contain p-4 grayscale group-hover:grayscale-0 transition-all" />
                 ) : (
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-zinc-500 gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
+                    <div className="w-12 h-12 rounded-md bg-white/5 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
                       <TbPhoto className="w-6 h-6 opacity-30" />
                     </div>
                     <span className="text-[10px] font-black uppercase tracking-widest">{t("studio.uploadRef") || "Upload Product Image"}</span>

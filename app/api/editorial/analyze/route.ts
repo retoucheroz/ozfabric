@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
@@ -32,132 +32,161 @@ export async function POST(req: NextRequest) {
             posePrompt,
             modelType = "full_body",
             modelDescription,
+            modelImage,
+            useReferencePose,
+            resolution = "1K",
+            aspectRatio = "3:4",
+            hairStyle = "original",
             language = "tr"
         } = await req.json();
+
+        // Find hair style prompt
+        const hairStyleObj = [
+            { id: "original", prompt: "" },
+            { id: "slicked_back", prompt: "hair slicked back, sleek swept-back hair, polished and tight" },
+            { id: "straight_silky", prompt: "straight silky hair, smooth glossy hair, pin-straight" },
+            { id: "glamour_waves", prompt: "glamorous Hollywood waves, soft voluminous curls, old Hollywood style" },
+            { id: "messy_bun", prompt: "messy bun with bangs, loose updo with face-framing bangs, casual bun" },
+            { id: "long_layered", prompt: "long layered hair with bangs, layered haircut with curtain bangs" },
+            { id: "high_bun", prompt: "elegant high bun, sleek top knot, polished updo" },
+            { id: "voluminous", prompt: "voluminous highlighted hair, balayage highlights, full-bodied layered hair" },
+            { id: "textured_bob", prompt: "textured bob haircut, choppy bob, edgy bob with layers" },
+            { id: "natural_afro", prompt: "natural afro hair, big fluffy afro, coily natural hair" },
+            { id: "hijab", prompt: "wearing hijab, modest headscarf, colorful hijab style" }
+        ].find(h => h.id === hairStyle);
+
+        const hairPrompt = hairStyleObj?.prompt || "";
 
         // Deduct credits
         await deductCredits(user.id, ANALYZE_COST, "Editorial Analyze");
 
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
-        // 1. SUBJECT SOURCE BLOCK
-        let subjectSourceBlock = "";
-
-        if (modelDescription) {
-            subjectSourceBlock = `SUBJECT SOURCE LOGIC:
-The user has provided a custom subject description:
-"${modelDescription}"
-Ignore any uploaded model image for identity reference. Generate a subject matching this exact description.
-Ensure natural integration with the environment and clothing.
-        `;
-        } else if (modelType === "full_body") {
-            subjectSourceBlock = `SUBJECT SOURCE LOGIC:
-The user has selected "Outfit Included". 
-Use the uploaded model image as base identity reference. 
-Lock exactly: face, hair, body proportions, bone structure, skin tone.
-Preserve the existing clothing and pose direction from the base image.
-Ignore any combination/outfit cards. Do not change the wardrobe.`;
-        } else {
-            subjectSourceBlock = `SUBJECT SOURCE LOGIC:
-The user has selected "Face Only / Replace Outfit".
-Lock identity from the uploaded model image, specifically: bone structure, facial proportions, skin tone, hair structure, eye distance, jawline.
-Replace clothing entirely using the analyzed outfit details provided below.
-Ensure the outfit integrates naturally onto the subject's body anatomy and natural fabric gravity.`;
-        }
-
-        // 2. OUTFIT ANALYSIS (Gemini)
-        let outfitBlock = "";
-        if (outfitImage) {
-            try {
-                // Strip prefix if exists
-                const base64Data = outfitImage.split(",")[1] || outfitImage;
-
-                const result = await model.generateContent([
-                    {
-                        inlineData: {
-                            data: base64Data,
-                            mimeType: "image/jpeg"
-                        }
-                    },
-                    `As a professional fashion editor, analyze this outfit image. 
-                    Describe: garment types, fabric textures, cuts, tailoring details, colors, layering, accessories, and fit type.
-                    Output ONLY the structured description following this format:
-                    The subject is wearing: [breakdown]
-                    Garments must respect natural fabric physics, follow anatomical tension points, show realistic weight and seam direction.`
-                ]);
-                const analysis = result.response.text().trim();
-                outfitBlock = `OUTFIT STRUCTURE:\n${analysis}\nNo floating fabric. No texture mismatch. No compositing look.`;
-            } catch (err) {
-                console.error("Outfit Analysis Exception:", err);
-                outfitBlock = "OUTFIT STRUCTURE:\n(Fabric and garment details to be matched from reference image accurately)";
+        // Helper to get image parts (Base64 or URL)
+        const getImagePart = async (input: string) => {
+            if (input.startsWith("data:")) {
+                const parts = input.split(",");
+                return {
+                    inlineData: {
+                        data: parts[1],
+                        mimeType: parts[0].match(/:(.*?);/)?.[1] || "image/jpeg"
+                    }
+                };
+            } else if (input.startsWith("http")) {
+                const response = await fetch(input);
+                const buffer = await response.arrayBuffer();
+                return {
+                    inlineData: {
+                        data: Buffer.from(buffer).toString("base64"),
+                        mimeType: response.headers.get("content-type") || "image/jpeg"
+                    }
+                };
             }
-        }
+            return null;
+        };
 
-        const locationBlock = `ENVIRONMENT STRUCTURE:
-${locationPrompt || "Clean professional studio setting."}
-Must ensure spatial depth consistency, perspective alignment, coherent ground contact, and realistic light interaction. 
-environmental color bounce affecting subject subtly. No green-screen look.`;
+        // Build the Super Prompt
+        const superPrompt = `
+            You are a Master Performance Fashion Director. 
+            Your task is to analyze the provided components and generate a "MASTER PRODUCTION PROMPT".
 
-        // POSE BLOCK
-        let poseBlock = "";
-        if (posePrompt) {
-            poseBlock = `POSE STRUCTURE:
-${posePrompt}
-Match anatomical tensions and limb placement. Subject must express micro-movements associated with this pose.
-`;
-        }
+            ### INPUT SOURCE DEFINITIONS (STRICT HIERARCHY):
+            1. "IMAGE FOR IDENTITY": This is the Model Image. Use it ONLY for the face, bone structure, skin tone, and hair.
+            2. "IMAGE FOR OUTFIT": This is the EXCLUSIVE source for the entire look. 
+               - NOTE: This image may be a COMPOSITE/COLLAGE of multiple separate items. 
+               - MISSION: CAREFULLY SCAN the entire outfit image area to identify every single garment, pair of shoes, and ACCESSORY (glasses, hats, jewelry, bags, etc.). DO NOT MISS SMALL ITEMS.
+            3. "IMAGE FOR SCENE": This is the Background/Reference Image. Use it ONLY for the physical environment and the POSE/FRAMING.
 
-        // 4. CAMERA BLOCK
-        let cameraBlock = "";
-        if (!camera || camera === "Auto") {
-            // Auto Equipment Generation
-            const equipmentResult = await model.generateContent(`
-                Analyze this location prompt: "${locationPrompt}".
-                As a pro cinematographer, select the perfect camera system, focal length, and aperture for this scene.
-                Output ONLY a paragraph starting with "Shot using: [Camera + Lens + Focal + Aperture]" 
-                followed by "Visual characteristics: [Depth compression, highlight rolloff, contrast curve]".
-            `);
-            cameraBlock = `CAMERA LOGIC (AUTO):\n${equipmentResult.response.text().trim()}`;
-        } else {
-            // User Selected Equipment Analysis
-            const cameraSpecs = `Camera: ${camera}, Lens: ${lens}, Focal Length: ${focalLength}mm, Aperture: ${aperture}`;
-            const effectResult = await model.generateContent(`
-                Analyze this camera setup: ${cameraSpecs}.
-                Describe the specific depth rendering, bokeh structure, background compression, and contrast curve of this system.
-                Output ONLY a paragraph starting with "This equipment combination results in:"
-            `);
-            cameraBlock = `CAMERA LOGIC (USER SELECTION):\nShot using: ${cameraSpecs}\n${effectResult.response.text().trim()}\nDo NOT override user selection.`;
-        }
+            ### COMPONENT 1: SUBJECT & IDENTITY
+            - SOURCE: Use the "IMAGE FOR IDENTITY".
+            - ${hairStyle !== "original" ? `- HAIR STYLE OVERRIDE: ${hairPrompt}. (MISSION: Replicate the EXACT hair color, highlights, and texture from the "IMAGE FOR IDENTITY" portrait, but apply this NEW style).` : "- Preserve the hair from the image."}
+            - RULE: ABSOLUTELY IGNORE the identity/face and hair color of any person in the "IMAGE FOR SCENE".
 
-        // 5. EDITORIAL REALISM & PHYSICAL INTEGRATION (Static rules)
-        const realismBlock = `EDITORIAL REALISM BLOCK:
-Subject must interact naturally with gravity, show micro body balance shifts, and feel captured mid-moment. 
-Clothing must respond to environment factors like wind or body angle. preservative skin realism.
-No AI smoothness. No hyper-sharp skin. No synthetic HDR look.`;
+            ### COMPONENT 1.5: OUTFIT & ACCESSORIES (CRITICAL)
+            ${outfitImage
+                ? `- SOURCE: Use the "IMAGE FOR OUTFIT" collage. 
+                   - MISSION: You MUST describe the EXACT clothing AND every accessory (eyewear, hats, etc.) found in the collage.
+                   - INTEGRATION: Accessories must be realistically styled on the model: 
+                      * GLASSES/SUNGLASSES MUST BE ON THE FACE.
+                      * HATS MUST BE ON THE HEAD.
+                      * JEWELRY must be on ears/neck/wrists.
+                   - MICRO-DETAIL REPLICATION: Map the PRECISE features, frame shapes, and distress patterns.
+                   - RULE: COMPLETELY REPLACE any clothing/accessories seen in the Model Image or Background Image with THIS specific ensemble from the collage.`
+                : `- SOURCE: Use the garments visible in the "IMAGE FOR IDENTITY".`
+            }
+            - MANDATORY: ABSOLUTELY IGNORE any clothing/accessories worn by the person in the "IMAGE FOR SCENE".
 
-        const integrationBlock = `PHYSICAL INTEGRATION RULES:
-Accurate ground shadow, correct light direction on face, environmental color reflection on skin.
-no lighting mismatch. no cutout look. 
-Subject must feel photographed on location.`;
+            ### COMPONENT 2: LOCATION & SCENE
+            - SOURCE: Use the "IMAGE FOR SCENE".
+            - MISSION: REPLICATE the environment, architecture, and lighting (direction, intensity, color) EXACTLY.
+            
+            ### COMPONENT 3: POSE & COMPOSITION
+            - SOURCE: Use the "IMAGE FOR SCENE".
+            - Mirror the body position and shot type exactly. 
 
-        // Assemble FINAL MASTER PROMPT
-        const finalPrompt = `
-${subjectSourceBlock}
+            ### COMPONENT 4: CAMERA & OPTICS
+            ${!camera || camera === "Auto"
+                ? "Camera Mode: AUTO"
+                : `Camera Mode: MANUAL (Camera: ${camera}, Lens: ${lens}, Focal: ${focalLength}mm, Aperture: ${aperture})`
+            }
 
-${outfitBlock}
+            ### YOUR TASK:
+            1. Identify the subject from "IMAGE FOR IDENTITY".
+            2. Meticulously analyze the "IMAGE FOR OUTFIT" collage for ALL items including CLOTHING and ACCESSORIES (glasses, etc.).
+            3. Identify the SCENE & POSE from "IMAGE FOR SCENE".
+            4. Synthesize into a cohesive [MASTER PROMPT].
+            5. CRITICAL: Ensure accessories like glasses are specifically described as being worn by the subject.
 
-${locationBlock}
-
-${cameraBlock}
-
-${poseBlock}
-
-${realismBlock}
-
-${integrationBlock}
-
-FINAL STYLE: Photorealistic, high-end editorial fashion photography. Maintain framing integrity. Do not distort anatomy.
+            ### OUTPUT FORMAT:
+            Generate a single cohesive paragraph. 
+            Include the following bracketed headers internally: [SUBJECT SOURCE], [OUTFIT], [ENVIRONMENT], [CAMERA LOGIC], [PHYSICAL INTEGRATION].
         `.trim();
+
+        let finalPrompt = "";
+        try {
+            const parts: any[] = [{ text: superPrompt }];
+
+            // 1. OUTFIT (Send if exists, regardless of modelType)
+            if (outfitImage) {
+                const part = await getImagePart(outfitImage);
+                if (part) {
+                    parts.push({ text: "--- IMAGE FOR OUTFIT FOLLOWS ---" });
+                    parts.push(part);
+                }
+            }
+
+            // 2. IDENTITY (Model)
+            if (modelImage && modelType !== 'prompt') {
+                const part = await getImagePart(modelImage);
+                if (part) {
+                    parts.push({ text: "--- IMAGE FOR IDENTITY FOLLOWS ---" });
+                    parts.push(part);
+                }
+            }
+
+            // 3. SCENE (Background)
+            if (backgroundImage) {
+                const part = await getImagePart(backgroundImage);
+                if (part) {
+                    parts.push({ text: "--- IMAGE FOR SCENE FOLLOWS ---" });
+                    parts.push(part);
+                }
+            }
+
+            const result = await model.generateContent({
+                contents: [{ role: "user", parts }],
+                safetySettings: [
+                    { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                    { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+                    { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                    { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                ],
+            });
+            finalPrompt = result.response.text().trim();
+        } catch (err: any) {
+            console.error("Super Analysis Error:", err);
+            return NextResponse.json({ error: `Analysis failed: ${err.message}` }, { status: 500 });
+        }
 
         return NextResponse.json({ analysis: finalPrompt });
     } catch (error: any) {

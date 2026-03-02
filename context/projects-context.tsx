@@ -1,6 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useEffect, useState } from "react"
+import { dbOperations, STORES } from "@/lib/db"
 
 export type Project = {
     id: string;
@@ -64,39 +65,54 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
     const [models, setModels] = useState<TrainedModel[]>([]);
     const [credits, setCredits] = useState(0);
 
-    // Load from LocalStorage on mount
+    // Load and Migrate on mount
     useEffect(() => {
-        const savedProjects = localStorage.getItem("modeon_projects");
-        const savedCollections = localStorage.getItem("modeon_collections");
-        const savedModels = localStorage.getItem("modeon_models");
+        const initData = async () => {
+            try {
+                // 1. Check for legacy LocalStorage data
+                const lsProjects = localStorage.getItem("modeon_projects");
+                const lsCollections = localStorage.getItem("modeon_collections");
+                const lsModels = localStorage.getItem("modeon_models");
 
-        if (savedProjects) {
-            try { setProjects(JSON.parse(savedProjects)); } catch (e) { console.error(e); }
-        } else {
-            // Seed Data
-            setProjects([
-                { id: "1", title: "Summer Silk Dress", type: "Style", imageUrl: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80", createdAt: Date.now() - 10000000 },
-                { id: "2", title: "Floral Pattern V2", type: "Pattern", imageUrl: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=400&q=80", createdAt: Date.now() - 20000000 },
-            ]);
-        }
+                // 2. Load from IndexedDB
+                const idbProjects = await dbOperations.getAll<Project>(STORES.PROJECTS);
+                const idbCollections = await dbOperations.getAll<Collection>(STORES.COLLECTIONS);
+                const idbModels = await dbOperations.getAll<TrainedModel>(STORES.MODELS);
 
-        if (savedCollections) {
-            try { setCollections(JSON.parse(savedCollections)); } catch (e) { console.error(e); }
-        } else {
-            setCollections([{ id: "c1", title: "Summer 2026", projectIds: ["1"], createdAt: Date.now(), description: "Main Collection" }]);
-        }
+                // 3. Simple Migration Strategy: If IDB is empty but LS has data, use LS and sync to IDB
+                if (idbProjects.length === 0 && lsProjects) {
+                    const parsed = JSON.parse(lsProjects);
+                    setProjects(parsed);
+                    // Sync to IDB in background
+                    parsed.forEach((p: any) => dbOperations.add(STORES.PROJECTS, p));
+                    localStorage.removeItem("modeon_projects"); // Clear to prevent loops
+                } else {
+                    setProjects(idbProjects);
+                }
 
-        if (savedModels) {
-            try { setModels(JSON.parse(savedModels)); } catch (e) { console.error(e); }
-        } else {
-            setModels([
-                { id: "m1", name: "Summer 2024 Style", type: "brand", status: "ready", images: 25, createdAt: Date.now() - 86400000, triggerWord: "OHWX style", thumbnailUrl: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=200&h=300&fit=crop" },
-                { id: "m2", name: "Studio Poses Set", type: "pose", status: "ready", images: 40, createdAt: Date.now() - 172800000, triggerWord: "pose", thumbnailUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=300&fit=crop" },
-                { id: "m3", name: "Denim Collection", type: "garment", status: "training", progress: 67, images: 30, createdAt: Date.now(), triggerWord: "denim", thumbnailUrl: "https://images.unsplash.com/photo-1542272454315-4c01d7abdf4a?w=200&h=300&fit=crop" },
-            ]);
-        }
+                if (idbCollections.length === 0 && lsCollections) {
+                    const parsed = JSON.parse(lsCollections);
+                    setCollections(parsed);
+                    parsed.forEach((c: any) => dbOperations.add(STORES.COLLECTIONS, c));
+                    localStorage.removeItem("modeon_collections");
+                } else {
+                    setCollections(idbCollections);
+                }
 
-        // Fetch credits from session
+                if (idbModels.length === 0 && lsModels) {
+                    const parsed = JSON.parse(lsModels);
+                    setModels(parsed);
+                    parsed.forEach((m: any) => dbOperations.add(STORES.MODELS, m));
+                    localStorage.removeItem("modeon_models");
+                } else {
+                    setModels(idbModels);
+                }
+            } catch (err) {
+                console.error("Failed to initialize projects data from DB:", err);
+            }
+        };
+
+        initData();
         refreshCredits();
     }, []);
 
@@ -115,21 +131,17 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    // Auto-refresh when window gains focus (user comes back to tab)
+    // Auto-refresh credits on focus
     useEffect(() => {
-        const handleFocus = () => {
-            refreshCredits();
-        };
+        const handleFocus = () => refreshCredits();
         window.addEventListener('focus', handleFocus);
         return () => window.removeEventListener('focus', handleFocus);
     }, []);
 
-    // Save to LocalStorage on change
-    useEffect(() => {
-        if (projects.length > 0) localStorage.setItem("modeon_projects", JSON.stringify(projects));
-        if (collections.length > 0) localStorage.setItem("modeon_collections", JSON.stringify(collections));
-        if (models.length > 0) localStorage.setItem("modeon_models", JSON.stringify(models));
-    }, [projects, collections, models]);
+    // Individual persistence helpers (don't save entire arrays on every tiny update)
+    const persistProject = (p: Project) => dbOperations.add(STORES.PROJECTS, p);
+    const persistCollection = (c: Collection) => dbOperations.add(STORES.COLLECTIONS, c);
+    const persistModel = (m: TrainedModel) => dbOperations.add(STORES.MODELS, m);
 
     const addProject = (project: Omit<Project, "id" | "createdAt">): string => {
         const id = crypto.randomUUID();
@@ -139,6 +151,7 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
             createdAt: Date.now(),
         };
         setProjects((prev) => [newProject, ...prev]);
+        persistProject(newProject);
         return id;
     };
 
@@ -150,6 +163,7 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
             createdAt: Date.now(),
         };
         setCollections((prev) => [newCollection, ...prev]);
+        persistCollection(newCollection);
         return id;
     };
 
@@ -161,13 +175,16 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
             createdAt: Date.now(),
         };
         setModels((prev) => [newModel, ...prev]);
+        persistModel(newModel);
         return id;
     };
 
     const addToCollection = (collectionId: string, projectId: string) => {
         setCollections(prev => prev.map(c => {
             if (c.id === collectionId && !c.projectIds.includes(projectId)) {
-                return { ...c, projectIds: [...c.projectIds, projectId] };
+                const updated = { ...c, projectIds: [...c.projectIds, projectId] };
+                persistCollection(updated);
+                return updated;
             }
             return c;
         }));
@@ -176,7 +193,9 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
     const removeFromCollection = (collectionId: string, projectId: string) => {
         setCollections(prev => prev.map(c => {
             if (c.id === collectionId) {
-                return { ...c, projectIds: c.projectIds.filter(id => id !== projectId) };
+                const updated = { ...c, projectIds: c.projectIds.filter(id => id !== projectId) };
+                persistCollection(updated);
+                return updated;
             }
             return c;
         }));
@@ -184,22 +203,39 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
 
     const deleteCollection = (id: string) => {
         setCollections(prev => prev.filter(c => c.id !== id));
+        dbOperations.delete(STORES.COLLECTIONS, id);
     };
 
     const updateCollection = (id: string, updates: Partial<Collection>) => {
-        setCollections(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c));
+        setCollections(prev => prev.map(c => {
+            if (c.id === id) {
+                const updated = { ...c, ...updates };
+                persistCollection(updated);
+                return updated;
+            }
+            return c;
+        }));
     };
 
     const deleteProject = (id: string) => {
         setProjects((prev) => prev.filter((p) => p.id !== id));
+        dbOperations.delete(STORES.PROJECTS, id);
     };
 
     const deleteModel = (id: string) => {
         setModels((prev) => prev.filter((m) => m.id !== id));
+        dbOperations.delete(STORES.MODELS, id);
     };
 
     const updateProject = (id: string, updates: Partial<Project>) => {
-        setProjects((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
+        setProjects((prev) => prev.map((p) => {
+            if (p.id === id) {
+                const updated = { ...p, ...updates };
+                persistProject(updated);
+                return updated;
+            }
+            return p;
+        }));
     };
 
     const deductCredits = async (amount: number): Promise<boolean> => {

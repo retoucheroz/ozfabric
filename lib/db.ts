@@ -1,6 +1,6 @@
 
 const DB_NAME = 'ModeOnDB';
-const DB_VERSION = 5;
+const DB_VERSION = 6;
 
 // Store names
 export const STORES = {
@@ -17,7 +17,9 @@ export const STORES = {
     JEWELRY: 'jewelry',
     BELTS: 'belts',
     INNER_WEAR: 'inner_wear',
-    PHOTOSHOOT_STATE: 'photoshoot_state'
+    PHOTOSHOOT_STATE: 'photoshoot_state',
+    PROJECTS: 'projects',
+    COLLECTIONS: 'collections'
 } as const;
 
 type StoreName = typeof STORES[keyof typeof STORES];

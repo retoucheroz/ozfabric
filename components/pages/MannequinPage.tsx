@@ -56,7 +56,7 @@ export default function MannequinPage() {
         <div className="p-8 border-b border-white/5 bg-[#0D0D0F] space-y-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-white/10 text-white flex items-center justify-center shadow-xl">
+              <div className="w-12 h-12 rounded-md bg-zinc-900 border border-white/10 text-white flex items-center justify-center shadow-xl">
                 <TbUserCircle className="w-6 h-6" />
               </div>
               <div className="flex flex-col">
@@ -65,11 +65,11 @@ export default function MannequinPage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="sm" className="h-10 gap-3 text-zinc-500 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+              <Button variant="ghost" size="sm" className="h-10 gap-3 text-zinc-500 hover:text-white hover:bg-white/5 rounded-md transition-all">
                 <TbHistory className="w-4 h-4" />
                 <span className="text-[10px] font-black uppercase tracking-widest">History</span>
               </Button>
-              <Button variant="ghost" size="sm" className="h-10 gap-3 text-zinc-500 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+              <Button variant="ghost" size="sm" className="h-10 gap-3 text-zinc-500 hover:text-white hover:bg-white/5 rounded-md transition-all">
                 <TbHeart className="w-4 h-4" />
                 <span className="text-[10px] font-black uppercase tracking-widest">Favorites</span>
               </Button>
@@ -78,10 +78,10 @@ export default function MannequinPage() {
 
           {/* Tabs */}
           <Tabs defaultValue="templates" className="w-full">
-            <TabsList className="bg-white/5 border border-white/5 p-1 h-11 rounded-xl max-w-[400px]">
-              <TabsTrigger value="templates" className="text-[10px] font-black uppercase tracking-[0.2em] rounded-lg data-[state=active]:bg-white data-[state=active]:text-black transition-all">Templates</TabsTrigger>
-              <TabsTrigger value="prompt" className="text-[10px] font-black uppercase tracking-[0.2em] rounded-lg data-[state=active]:bg-white data-[state=active]:text-black transition-all">Prompt</TabsTrigger>
-              <TabsTrigger value="assets" className="text-[10px] font-black uppercase tracking-[0.2em] rounded-lg data-[state=active]:bg-white data-[state=active]:text-black transition-all">Assets</TabsTrigger>
+            <TabsList className="bg-white/5 border border-white/5 p-1 h-11 rounded-md max-w-[400px]">
+              <TabsTrigger value="templates" className="text-[10px] font-black uppercase tracking-[0.2em] rounded-md data-[state=active]:bg-white data-[state=active]:text-black transition-all">Templates</TabsTrigger>
+              <TabsTrigger value="prompt" className="text-[10px] font-black uppercase tracking-[0.2em] rounded-md data-[state=active]:bg-white data-[state=active]:text-black transition-all">Prompt</TabsTrigger>
+              <TabsTrigger value="assets" className="text-[10px] font-black uppercase tracking-[0.2em] rounded-md data-[state=active]:bg-white data-[state=active]:text-black transition-all">Assets</TabsTrigger>
             </TabsList>
           </Tabs>
 

@@ -485,7 +485,7 @@ export async function extractDominantColor(imageUrl: string): Promise<string> {
 
         const { GoogleGenerativeAI } = await import("@google/generative-ai");
         const genAI = new GoogleGenerativeAI(geminiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
         const result = await model.generateContent([
             "Analyze this garment image and extract the DOMINANT color of the main product (not background, not model skin). Return ONLY a hex color code in format #RRGGBB. Example: #2E5C8A",

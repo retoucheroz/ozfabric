@@ -229,7 +229,7 @@ export function PreviewArea({
                                             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
                                                 <Button
                                                     onClick={() => handleRegenerateShot(i)}
-                                                    className="bg-white/90 hover:bg-white text-black text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full shadow-xl transform hover:scale-105 transition-all"
+                                                    className="bg-white/90 hover:bg-white text-black text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-md shadow-xl transform hover:scale-105 transition-all"
                                                 >
                                                     <Zap className="w-4 h-4 mr-2" />
                                                     {language === 'tr' ? 'Tekrar Üret' : 'Regenerate'}

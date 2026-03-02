@@ -25,7 +25,7 @@ import {
 import { useProjects } from "@/context/projects-context"
 import { useLanguage } from "@/context/language-context"
 import { toast } from "sonner"
-import { downloadImage, resizeImageToThumbnail, optimizeImageForApi, cn } from "@/lib/utils"
+import { downloadImage, resizeImageToThumbnail, optimizeImageForApi, mergeImages, cn } from "@/lib/utils"
 import { CAMERAS, LOCATIONS, type CameraSpec, type LensSpec, type EditorialLocation } from "@/lib/editorial-data"
 import { motion, AnimatePresence } from "framer-motion"
 import { Separator } from "@/components/ui/separator"
@@ -38,6 +38,22 @@ import { AssetCard } from "@/components/photoshoot/AssetCard"
 import { WizardProgress } from "@/components/photoshoot/WizardProgress"
 import { EditorialLibraryModal } from "@/components/photoshoot/EditorialLibraryModal"
 import { User } from "lucide-react"
+import { EditorialLibraryInline } from "@/components/photoshoot/EditorialLibraryInline"
+import { EditorialModelLibraryInline } from "@/components/photoshoot/EditorialModelLibraryInline";
+
+const HAIR_STYLES = [
+    { id: "original", name: "Orijinal", nameEn: "Original", prompt: "" },
+    { id: "slicked_back", name: "Geriye Taranmış", nameEn: "Slicked Back", prompt: "hair slicked back, sleek swept-back hair, polished and tight" },
+    { id: "straight_silky", name: "Düz & İpeksi", nameEn: "Straight & Silky", prompt: "straight silky hair, smooth glossy hair, pin-straight" },
+    { id: "glamour_waves", name: "Glamour Dalgalar", nameEn: "Glamour Waves", prompt: "glamorous Hollywood waves, soft voluminous curls, old Hollywood style" },
+    { id: "messy_bun", name: "Dağınık Topuz + Kahkül", nameEn: "Messy Bun + Bangs", prompt: "messy bun with bangs, loose updo with face-framing bangs, casual bun" },
+    { id: "long_layered", name: "Uzun Katmanlı Kahkül", nameEn: "Long Layered + Bangs", prompt: "long layered hair with bangs, layered haircut with curtain bangs" },
+    { id: "high_bun", name: "Şık Yüksek Topuz", nameEn: "Elegant High Bun", prompt: "elegant high bun, sleek top knot, polished updo" },
+    { id: "voluminous", name: "Hacimli Röfleli", nameEn: "Voluminous Highlighted", prompt: "voluminous highlighted hair, balayage highlights, full-bodied layered hair" },
+    { id: "textured_bob", name: "Dokulu Bob", nameEn: "Textured Bob", prompt: "textured bob haircut, choppy bob, edgy bob with layers" },
+    { id: "natural_afro", name: "Doğal Afro", nameEn: "Natural Afro", prompt: "natural afro hair, big fluffy afro, coily natural hair" },
+    { id: "hijab", name: "Tesettür / Hijab", nameEn: "Hijab", prompt: "wearing hijab, modest headscarf, colorful hijab style" }
+];
 
 function DrumColumn({ items, activeIndex, onChange, render }: { items: any[], activeIndex: number, onChange: (idx: number) => void, render: (item: any, active: boolean) => React.ReactNode }) {
     const scrollRef = useRef<HTMLDivElement>(null);
@@ -132,21 +148,22 @@ export default function EditorialPage() {
     // States
     const [modelImage, setModelImage] = useState<string | null>(null);
     const [modelImageHighRes, setModelImageHighRes] = useState<string | null>(null);
-    const [outfitImage, setOutfitImage] = useState<string | null>(null);
+    const [outfitImages, setOutfitImages] = useState<string[]>([]);
 
-    const [resolution, setResolution] = useState("4K");
+    const [resolution, setResolution] = useState("1K");
     const [aspectRatio, setAspectRatio] = useState("3:4");
     const [wizardStep, setWizardStep] = useState<1 | 2 | 3>(1);
     const [seed, setSeed] = useState<string>("");
+    const [useReferencePose, setUseReferencePose] = useState(false);
     const [prompt, setPrompt] = useState<string>("");
-    const [modelType, setModelType] = useState<'full_body' | 'face_only'>('full_body');
+    const [hairStyle, setHairStyle] = useState<string>("original");
 
     // Shared assets state
     const [assets, setAssets] = useState<{ [key: string]: string | null }>({ background: null, pose: null, fit_pattern: null });
     const [poseStickman, setPoseStickman] = useState<string | null>(null);
     const [selectedBackgroundPrompt, setSelectedBackgroundPrompt] = useState<string | null>(null);
     const [selectedPosePrompt, setSelectedPosePrompt] = useState<string | null>(null);
-    const [activeLibraryAsset, setActiveLibraryAsset] = useState<'model' | 'background' | 'outfit' | 'pose' | null>(null);
+    const [activeLibraryAsset, setActiveLibraryAsset] = useState<'model' | 'background' | 'outfit' | null>(null);
     const [modelLibraryTab, setModelLibraryTab] = useState<string>("library");
     const [modelDescription, setModelDescription] = useState<string>("");
 
@@ -159,7 +176,9 @@ export default function EditorialPage() {
 
     const estimatedCost = resolution === "4K"
         ? SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_4K
-        : SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_1_2K;
+        : resolution === "2K"
+            ? SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_2K
+            : SERVICE_COSTS.IMAGE_GENERATION.NANO_BANANA_PRO_1K;
 
     // Library States
     const [savedModels, setSavedModels] = useState<SavedModel[]>([]);
@@ -290,10 +309,6 @@ export default function EditorialPage() {
                 toast.error(language === "tr" ? "Lütfen bir model görseli yükleyin veya kütüphaneden açıklama yazın" : "Please upload a model image or write a description from library");
                 return false;
             }
-            if (modelType === 'face_only' && !outfitImage) {
-                toast.error(language === "tr" ? "Yüz seçeneği için bir kombin görseli yüklemelisiniz" : "You must upload an outfit image for face-only option");
-                return false;
-            }
         }
 
         if (targetStep >= 3) {
@@ -319,6 +334,16 @@ export default function EditorialPage() {
 
         setIsAnalyzing(true);
         try {
+            // Optimize images to 720px for analysis to save tokens (Free Tier Quota Protection)
+            let analysisModel = modelImageHighRes || modelImage;
+            let analysisOutfit: string | null = null;
+
+            if (outfitImages.length > 0) {
+                analysisOutfit = await mergeImages(outfitImages, 2048);
+            }
+
+            if (analysisModel) analysisModel = await resizeImageToThumbnail(analysisModel, 2048);
+
             const response = await fetch("/api/editorial/analyze", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -331,9 +356,14 @@ export default function EditorialPage() {
                     backgroundImage: assets.background,
                     poseStickman: poseStickman,
                     posePrompt: selectedPosePrompt,
-                    outfitImage: outfitImage,
-                    modelType,
+                    outfitImage: analysisOutfit,
+                    useReferencePose,
+                    modelType: 'full_body',
                     modelDescription,
+                    modelImage: analysisModel,
+                    resolution,
+                    aspectRatio,
+                    hairStyle,
                     language
                 })
             });
@@ -359,12 +389,17 @@ export default function EditorialPage() {
         setShowApprovalDialog(false);
         setIsProcessing(true);
         try {
+            let finalOutfit: string | null = null;
+            if (outfitImages.length > 0) {
+                finalOutfit = await mergeImages(outfitImages, 2048);
+            }
+
             const response = await fetch("/api/editorial", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     image: modelImageHighRes || modelImage,
-                    outfitImage: outfitImage,
+                    outfitImage: finalOutfit,
                     backgroundImage: assets.background,
                     backgroundPrompt: selectedBackgroundPrompt,
                     poseStickman: poseStickman,
@@ -375,7 +410,7 @@ export default function EditorialPage() {
                     aperture: isManualCamera ? aperture : "Auto",
                     resolution,
                     aspectRatio,
-                    modelType,
+                    modelType: 'full_body',
                     modelDescription,
                     prompt: analyzedAesthetic, // Use the structured prompt from analyze
                     seed: seed || null
@@ -411,44 +446,77 @@ export default function EditorialPage() {
         }
     };
 
-    const handleAssetUpload = async (id: string, file: File) => {
-        const reader = new FileReader();
-        reader.onload = async (ev) => {
-            const dataUrl = ev.target?.result as string;
+    const handleAssetUpload = async (id: string, file: File | File[]) => {
+        const processFile = async (f: File) => {
+            return new Promise<string>((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (ev) => resolve(ev.target?.result as string);
+                reader.readAsDataURL(f);
+            });
+        };
 
-            if (id === 'model') {
+        if (Array.isArray(file)) {
+            if (id === 'outfit') {
                 try {
-                    // Generate High-Res (3000px) for API
-                    const highRes = await optimizeImageForApi(dataUrl, 3000, 0.90);
-                    setModelImageHighRes(highRes);
-
-                    // Generate Display Thumbnail (512px) for UI
-                    const displayThumb = await resizeImageToThumbnail(dataUrl, 512);
-                    setModelImage(displayThumb);
+                    const newImages = await Promise.all(file.slice(0, 10 - outfitImages.length).map(async f => {
+                        const dataUrl = await processFile(f);
+                        return await optimizeImageForApi(dataUrl, 2048, 0.90);
+                    }));
+                    setOutfitImages(prev => [...prev, ...newImages]);
                 } catch (err) {
-                    console.error("Image optimization failed", err);
-                    setModelImage(dataUrl);
-                    setModelImageHighRes(dataUrl);
-                }
-            } else if (id === 'outfit') {
-                try {
-                    const optimizedOutfit = await optimizeImageForApi(dataUrl, 3000, 0.90);
-                    setOutfitImage(optimizedOutfit);
-                } catch (err) {
-                    console.error("Outfit image optimization failed", err);
-                    setOutfitImage(dataUrl);
+                    console.error("Multi-outfit upload failed", err);
+                    toast.error(language === "tr" ? "Görseller yüklenirken hata oluştu" : "Error uploading images");
                 }
             }
-        };
-        reader.readAsDataURL(file);
+            return;
+        }
+
+        const dataUrl = await processFile(file);
+        if (id === 'model') {
+            try {
+                const highRes = await optimizeImageForApi(dataUrl, 3000, 0.90);
+                setModelImageHighRes(highRes);
+                const displayThumb = await resizeImageToThumbnail(dataUrl, 512);
+                setModelImage(displayThumb);
+            } catch (err) {
+                setModelImage(dataUrl);
+                setModelImageHighRes(dataUrl);
+            }
+        } else if (id === 'outfit') {
+            try {
+                const optimized = await optimizeImageForApi(dataUrl, 2048, 0.90);
+                setOutfitImages(prev => [...prev, optimized]);
+            } catch (err) {
+                setOutfitImages(prev => [...prev, dataUrl]);
+            }
+        } else if (id === 'background') {
+            try {
+                const optimized = await optimizeImageForApi(dataUrl, 2048, 0.85);
+                setAssets(prev => ({ ...prev, background: optimized }));
+                setSelectedBackgroundPrompt(null);
+            } catch (err) {
+                setAssets(prev => ({ ...prev, background: dataUrl }));
+            }
+        }
     };
 
-    const handleAssetRemove = (id: string) => {
+    const handleAssetRemove = (id: string, e?: React.MouseEvent, index?: number) => {
+        if (e) e.stopPropagation();
         if (id === 'model') {
             setModelImage(null);
             setModelImageHighRes(null);
         }
-        if (id === 'outfit') setOutfitImage(null);
+        if (id === 'outfit') {
+            if (typeof index === 'number') {
+                setOutfitImages(prev => prev.filter((_, i) => i !== index));
+            } else {
+                setOutfitImages([]);
+            }
+        }
+        if (id === 'background') {
+            setAssets(prev => ({ ...prev, background: null }));
+            setSelectedBackgroundPrompt(null);
+        }
     };
 
     return (
@@ -474,41 +542,20 @@ export default function EditorialPage() {
                                     {/* Left: Asset Cards */}
                                     <div className="lg:col-span-3 flex flex-col">
                                         <div className="flex items-center gap-3 mb-4 px-1">
-                                            <div className="p-2.5 rounded-xl bg-white/5 text-white border border-white/10 shadow-lg"><TbUserCircle className="w-5 h-5" /></div>
+                                            <div className="p-2.5 rounded-md bg-white/5 text-white border border-white/10 shadow-lg"><TbUserCircle className="w-5 h-5" /></div>
                                             <div className="flex flex-col">
                                                 <label className="text-xs uppercase font-black text-white tracking-[0.2em]">{language === "tr" ? "MODEL SEÇİMİ" : "MODEL SELECTION"}</label>
                                                 <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter opacity-80">{language === "tr" ? "ÜRETİM İÇİN MODEL BELİRLE" : "DEFINE MODEL FOR PRODUCTION"}</span>
                                             </div>
                                         </div>
 
-                                        {/* Model Type Toggle */}
-                                        <div className="mb-4 bg-white/5 border border-white/5 p-1 rounded-2xl flex">
-                                            <button
-                                                onClick={() => setModelType('full_body')}
-                                                className={cn(
-                                                    "flex-1 py-2.5 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all",
-                                                    modelType === 'full_body' ? "bg-white text-black shadow-xl" : "text-zinc-500 hover:text-white"
-                                                )}
-                                            >
-                                                {language === "tr" ? "KOMBİN DAHİL" : "OUTFIT INCLUDED"}
-                                            </button>
-                                            <button
-                                                onClick={() => setModelType('face_only')}
-                                                className={cn(
-                                                    "flex-1 py-2.5 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all",
-                                                    modelType === 'face_only' ? "bg-white text-black shadow-xl" : "text-zinc-500 hover:text-white"
-                                                )}
-                                            >
-                                                {language === "tr" ? "SADECE YÜZ / YENİ KOMBİN" : "FACE ONLY / NEW OUTFIT"}
-                                            </button>
-                                        </div>
                                         <div className="flex-1 flex flex-col gap-4">
                                             <AssetCard
                                                 id="model"
                                                 label={language === "tr" ? "MODEL" : "MODEL"}
                                                 icon={TbUserCircle}
                                                 required
-                                                assets={{ model: modelImage, outfit: outfitImage }}
+                                                assets={{ model: modelImage, outfit: outfitImages }}
                                                 activeLibraryAsset={activeLibraryAsset}
                                                 setActiveLibraryAsset={(val) => setActiveLibraryAsset(val as any)}
                                                 handleAssetUpload={handleAssetUpload}
@@ -516,96 +563,127 @@ export default function EditorialPage() {
                                                 language={language}
                                                 variant="portrait"
                                                 orientation="vertical"
-                                                description={modelType === 'full_body' ? (language === "tr" ? "KOMBİNLİ BOY FOTOĞRAFI" : "FULL BODY WITH OUTFIT") : (language === "tr" ? "SADECE YÜZ FOTOĞRAFI" : "FACE ONLY IMAGE")}
+                                                description={language === "tr" ? "KOMBİNLİ BOY FOTOĞRAFI" : "FULL BODY WITH OUTFIT"}
                                             />
                                             <AssetCard
                                                 id="outfit"
                                                 label={language === "tr" ? "KOMBİN" : "OUTFIT"}
                                                 icon={Layers}
-                                                required={modelType === 'face_only'}
-                                                assets={{ model: modelImage, outfit: outfitImage }}
+                                                required={false}
+                                                assets={{ model: modelImage, outfit: outfitImages }}
                                                 activeLibraryAsset={null}
                                                 setActiveLibraryAsset={() => { }}
                                                 handleAssetUpload={handleAssetUpload}
                                                 handleAssetRemove={handleAssetRemove}
                                                 language={language}
                                                 variant="portrait"
-                                                description={modelType === 'full_body' ? (language === "tr" ? "(OPSİYONEL)" : "(OPTIONAL)") : (language === "tr" ? "(ZORUNLU)" : "(REQUIRED)")}
+                                                allowMultiple
+                                                description={language === "tr" ? "(OPSİYONEL)" : "(OPTIONAL)"}
                                                 hideLibrary
                                             />
                                         </div>
 
-                                        {/* Info Alert */}
-                                        <div className={cn(
-                                            "mt-auto p-3 rounded-2xl border flex gap-3 transition-colors",
-                                            modelType === 'face_only' && !outfitImage
-                                                ? "bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-900/30 text-amber-700 dark:text-amber-400"
-                                                : "bg-blue-50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-900/30 text-blue-700 dark:text-blue-400"
-                                        )}>
+                                        <div className="mt-auto p-3 rounded-2xl border flex gap-3 bg-blue-50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-900/30 text-blue-700 dark:text-blue-400 trasition-colors">
                                             <Info size={16} className="shrink-0 mt-0.5" />
                                             <p className="text-[10px] font-bold leading-relaxed uppercase tracking-tight">
-                                                {modelType === 'face_only'
-                                                    ? (language === "tr" ? "SADECE YÜZ SEÇTİNİZ. ÜRETİM İÇİN KOMBİN KARTINA BİR KIYAFET YÜKLEMELİSİNİZ." : "FACE ONLY SELECTED. YOU MUST UPLOAD A GARMENT TO THE OUTFIT CARD.")
-                                                    : (language === "tr" ? "KOMBİNLİ GÖRSEL SEÇTİNİZ. MODEL ÜZERİNDEKİ KIYAFET KORUNACAKTIR." : "OUTFIT INCLUDED SELECTED. THE CLOTHING ON THE MODEL WILL BE PRESERVED.")
-                                                }
+                                                {language === "tr" ? "KOMBİNLİ GÖRSEL SEÇTİNİZ. MODEL ÜZERİNDEKİ KIYAFET KORUNACAKTIR." : "OUTFIT INCLUDED SELECTED. THE CLOTHING ON THE MODEL WILL BE PRESERVED."}
                                             </p>
                                         </div>
                                     </div>
 
-                                    {/* Right: Tutorial */}
-                                    <div className="lg:col-span-8 hidden lg:flex flex-col">
-                                        <div className="w-full h-full flex flex-col items-center justify-center pt-10 pb-[51px] px-6 text-center relative overflow-hidden bg-white/40 dark:bg-black/20 backdrop-blur-md rounded-[32px] border border-white/20 dark:border-white/5 shadow-2xl">
-                                            <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none">
-                                                <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_20px,currentColor_20px,currentColor_21px)]" />
-                                            </div>
-                                            <div className="z-10 w-full max-w-4xl space-y-4">
-                                                <div className="relative aspect-[16/7] flex items-center justify-center">
-                                                    <img src="/editorial_tutorial.webp" className="w-full h-full object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.25)]" alt="Tutorial" onError={(e) => { (e.target as any).style.display = 'none'; }} />
-                                                </div>
-                                                <div className="grid grid-cols-3 gap-6 text-left border-t border-border/50 pt-4">
-                                                    <div className="space-y-2">
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="w-6 h-6 rounded-full bg-white text-black text-[11px] flex items-center justify-center font-black italic shadow-lg">1</span>
-                                                            <span className="text-[10px] font-black uppercase tracking-widest text-white">{language === "tr" ? "VARLIK YÜKLEME" : "ASSET UPLOAD"}</span>
-                                                        </div>
-                                                        <p className="text-[10px] text-zinc-500 font-bold leading-relaxed uppercase tracking-tighter">
-                                                            {language === "tr"
-                                                                ? "Model portrenizi yükleyin; çekim moduna göre mevcut kıyafeti koruyabilir veya tamamen yeni bir stil kurgulayabilirsiniz."
-                                                                : "Upload your model portrait; depending on the mode, preserve the existing outfit or curate a completely new style."}
-                                                        </p>
+                                    {/* Right: Tutorial / Model Library */}
+                                    <div className="lg:col-span-8 hidden lg:grid flex-col relative overflow-hidden grid-cols-1 grid-rows-1 h-[540px] bg-white/40 dark:bg-black/20 backdrop-blur-md rounded-[32px] border border-white/20 dark:border-white/5 shadow-2xl">
+                                        <AnimatePresence>
+                                            {activeLibraryAsset === 'model' ? (
+                                                <motion.div
+                                                    key="library-inline-model"
+                                                    initial={{ opacity: 0, y: 48, scale: 0.97 }}
+                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                    exit={{ opacity: 0, y: -48, scale: 0.97 }}
+                                                    transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                                                    className="h-full"
+                                                    style={{ gridArea: '1 / 1 / 2 / 2' }}
+                                                >
+                                                    <EditorialModelLibraryInline
+                                                        language={language}
+                                                        gender={gender}
+                                                        setGender={(val) => setGender(val as "male" | "female")}
+                                                        modelImage={modelImage}
+                                                        modelImageHighRes={modelImageHighRes}
+                                                        setModelImage={setModelImage}
+                                                        setModelImageHighRes={setModelImageHighRes}
+                                                        handleAssetUpload={handleAssetUpload}
+                                                        handleAssetRemove={handleAssetRemove}
+                                                        savedModels={savedModels}
+                                                        modelDescription={modelDescription}
+                                                        setModelDescription={setModelDescription}
+                                                        onClose={() => setActiveLibraryAsset(null)}
+                                                        gridCols={6}
+                                                    />
+                                                </motion.div>
+                                            ) : (
+                                                <motion.div
+                                                    key="tutorial-step1"
+                                                    initial={{ opacity: 0, y: -48, scale: 0.97 }}
+                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                    exit={{ opacity: 0, y: 48, scale: 0.97 }}
+                                                    transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                                                    className="w-full h-full flex flex-col items-center justify-center pt-10 pb-[51px] px-6 text-center relative overflow-hidden"
+                                                    style={{ gridArea: '1 / 1 / 2 / 2' }}
+                                                >
+                                                    <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none">
+                                                        <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_20px,currentColor_20px,currentColor_21px)]" />
                                                     </div>
-                                                    <div className="space-y-2 border-x border-white/5 px-8">
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="w-6 h-6 rounded-full bg-white text-black text-[11px] flex items-center justify-center font-black italic shadow-lg">2</span>
-                                                            <span className="text-[10px] font-black uppercase tracking-widest text-white">{language === "tr" ? "EDİTORYAL KURGU" : "EDITORIAL CURATION"}</span>
+                                                    <div className="z-10 w-full max-w-4xl space-y-4">
+                                                        <div className="relative aspect-[16/7] flex items-center justify-center">
+                                                            <img src="/editorial_tutorial.webp" className="w-full h-full object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.25)]" alt="Tutorial" onError={(e) => { (e.target as any).style.display = 'none'; }} />
                                                         </div>
-                                                        <p className="text-[10px] text-zinc-500 font-bold leading-relaxed uppercase tracking-tighter">
-                                                            {language === "tr"
-                                                                ? "Dünya çapındaki ikonik lokasyonlar arasından seçim yapın, gelişmiş kamera ve ışık ayarlarıyla çekim atmosferinizi tasarlayın."
-                                                                : "Choose from iconic global locations and design your shoot atmosphere with professional camera and lighting controls."}
-                                                        </p>
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="w-6 h-6 rounded-full bg-white text-black text-[11px] flex items-center justify-center font-black italic shadow-lg">3</span>
-                                                            <span className="text-[10px] font-black uppercase tracking-widest text-white">{language === "tr" ? "PROFESYONEL ÜRETİM" : "PRODUCTION"}</span>
+                                                        <div className="grid grid-cols-3 gap-6 text-left border-t border-border/50 pt-4">
+                                                            <div className="space-y-2">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="w-6 h-6 rounded-full bg-white text-black text-[11px] flex items-center justify-center font-black italic shadow-lg">1</span>
+                                                                    <span className="text-[10px] font-black uppercase tracking-widest text-white">{language === "tr" ? "VARLIK YÜKLEME" : "ASSET UPLOAD"}</span>
+                                                                </div>
+                                                                <p className="text-[10px] text-zinc-500 font-bold leading-relaxed uppercase tracking-tighter">
+                                                                    {language === "tr"
+                                                                        ? "Model portrenizi yükleyin; çekim moduna göre mevcut kıyafeti koruyabilir veya tamamen yeni bir stil kurgulayabilirsiniz."
+                                                                        : "Upload your model portrait; depending on the mode, preserve the existing outfit or curate a completely new style."}
+                                                                </p>
+                                                            </div>
+                                                            <div className="space-y-2 border-x border-white/5 px-8">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="w-6 h-6 rounded-full bg-white text-black text-[11px] flex items-center justify-center font-black italic shadow-lg">2</span>
+                                                                    <span className="text-[10px] font-black uppercase tracking-widest text-white">{language === "tr" ? "EDİTORYAL KURGU" : "EDITORIAL CURATION"}</span>
+                                                                </div>
+                                                                <p className="text-[10px] text-zinc-500 font-bold leading-relaxed uppercase tracking-tighter">
+                                                                    {language === "tr"
+                                                                        ? "Dünya çapındaki ikonik lokasyonlar arasından seçim yapın, gelişmiş kamera ve ışık ayarlarıyla çekim atmosferinizi tasarlayın."
+                                                                        : "Choose from iconic global locations and design your shoot atmosphere with professional camera and lighting controls."}
+                                                                </p>
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="w-6 h-6 rounded-full bg-white text-black text-[11px] flex items-center justify-center font-black italic shadow-lg">3</span>
+                                                                    <span className="text-[10px] font-black uppercase tracking-widest text-white">{language === "tr" ? "PROFESYONEL ÜRETİM" : "PRODUCTION"}</span>
+                                                                </div>
+                                                                <p className="text-[10px] text-zinc-500 font-bold leading-relaxed uppercase tracking-tighter">
+                                                                    {language === "tr"
+                                                                        ? "Gelişmiş sahne analizi teknolojisi ile yüksek moda standartlarında, gerçekçi ve estetik editoryal karelerinizi oluşturun."
+                                                                        : "Generate high-fashion, realistic editorial imagery through advanced scene analysis and aesthetic processing."}
+                                                                </p>
+                                                            </div>
                                                         </div>
-                                                        <p className="text-[10px] text-zinc-500 font-bold leading-relaxed uppercase tracking-tighter">
-                                                            {language === "tr"
-                                                                ? "Gelişmiş sahne analizi teknolojisi ile yüksek moda standartlarında, gerçekçi ve estetik editoryal karelerinizi oluşturun."
-                                                                : "Generate high-fashion, realistic editorial imagery through advanced scene analysis and aesthetic processing."}
-                                                        </p>
                                                     </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
                                     </div>
                                 </div>
 
                                 {/* Step 1 Footer */}
                                 <div className="flex justify-end pt-6 border-t border-white/5">
-                                    <Button onClick={() => canMoveToStep(2) && setWizardStep(2)} className="px-12 py-7 rounded-2xl bg-white hover:bg-zinc-200 text-black font-black uppercase tracking-[0.2em] shadow-2xl transition-all hover:scale-[1.02] active:scale-[0.98]">
-                                        {language === "tr" ? "İLERLE" : "NEXT"} <ChevronRight className="ml-3 w-5 h-5" />
+                                    <Button onClick={() => canMoveToStep(2) && setWizardStep(2)} className="px-4 py-2 h-auto rounded-md bg-[#F5F5F5] hover:bg-white text-black font-black text-[10px] uppercase tracking-widest shadow-none transition-all hover:scale-[1.02] active:scale-[0.98] group">
+                                        {language === "tr" ? "İLERLE" : "NEXT"} <ChevronRight className="ml-2 w-3.5 h-3.5" />
                                     </Button>
                                 </div>
                             </div>
@@ -618,13 +696,13 @@ export default function EditorialPage() {
                                     {/* Left: Background & Pose */}
                                     <div className="lg:col-span-5 space-y-4">
                                         <div className="flex items-center gap-3 mb-4 px-1">
-                                            <div className="p-2.5 rounded-xl bg-white/5 text-white border border-white/10 shadow-lg"><TbGlobe className="w-5 h-5" /></div>
+                                            <div className="p-2.5 rounded-md bg-white/5 text-white border border-white/10 shadow-lg"><TbGlobe className="w-5 h-5" /></div>
                                             <div className="flex flex-col">
                                                 <label className="text-xs uppercase font-black text-white tracking-[0.2em]">{language === "tr" ? "KÜTÜPHANE ÖĞELERİ" : "LIBRARY ASSETS"}</label>
                                                 <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter opacity-80">{language === "tr" ? "ARKAPLAN VE POZ SEÇİN" : "CHOOSE BACKGROUND & POSE"}</span>
                                             </div>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-4 h-[400px]">
+                                        <div className="flex flex-col gap-3">
                                             <AssetCard
                                                 id="background"
                                                 label={language === "tr" ? "ARKAPLAN" : "BACKGROUND"}
@@ -637,130 +715,213 @@ export default function EditorialPage() {
                                                 language={language}
                                                 variant="portrait"
                                             />
-                                            <AssetCard
-                                                id="pose"
-                                                label={language === "tr" ? "POZ" : "POSE"}
-                                                icon={User}
-                                                assets={{ ...assets, pose: poseStickman || assets.pose }}
-                                                activeLibraryAsset={activeLibraryAsset}
-                                                setActiveLibraryAsset={setActiveLibraryAsset as any}
-                                                handleAssetUpload={(id, file) => handleAssetUpload(id, file)}
-                                                handleAssetRemove={handleAssetRemove}
-                                                language={language}
-                                                variant="portrait"
-                                            />
+
+                                            {/* Reference Pose Toggle */}
+                                            <div className="group/pose">
+                                                <button
+                                                    onClick={() => setUseReferencePose(!useReferencePose)}
+                                                    className={cn(
+                                                        "w-full p-2.5 rounded-md border flex items-center justify-between transition-all duration-300",
+                                                        useReferencePose
+                                                            ? "bg-white/10 border-white/20 ring-1 ring-white/10"
+                                                            : "bg-white/5 border-white/5 hover:border-white/10"
+                                                    )}
+                                                >
+                                                    <div className="flex items-center gap-2.5">
+                                                        <div className={cn(
+                                                            "w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-500",
+                                                            useReferencePose ? "bg-white text-black shadow-lg shadow-white/10 rotate-[360deg]" : "bg-white/5 text-zinc-500"
+                                                        )}>
+                                                            <TbUserCircle className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="flex flex-col items-start translate-y-[1px]">
+                                                            <span className={cn(
+                                                                "text-[9px] font-black uppercase tracking-wider transition-colors",
+                                                                useReferencePose ? "text-white" : "text-zinc-500"
+                                                            )}>
+                                                                {language === "tr" ? "POZ REFERANSI OLARAK KULLAN" : "USE AS POSE REFERENCE"}
+                                                            </span>
+                                                            <span className="text-[7px] font-bold text-zinc-600 uppercase tracking-tight">
+                                                                {language === "tr" ? "GÖRSELDEKİ POZU VE KADRAJI ANALİZ EDER" : "ANALYZES POSE AND FRAMING FROM IMAGE"}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div className={cn(
+                                                        "w-7 h-4 rounded-full relative transition-all duration-300",
+                                                        useReferencePose ? "bg-white" : "bg-white/10"
+                                                    )}>
+                                                        <div className={cn(
+                                                            "absolute top-1 w-2 h-2 rounded-full transition-all duration-300",
+                                                            useReferencePose ? "right-1 bg-black" : "left-1 bg-zinc-600"
+                                                        )} />
+                                                    </div>
+                                                </button>
+                                            </div>
                                         </div>
 
                                         {/* Aspect Ratio */}
-                                        <section className="space-y-4 pt-4">
+                                        <section className="space-y-4">
                                             <label className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-2"><TbAspectRatio className="w-4 h-4 text-white" />{language === "tr" ? "GÖRÜNTÜ ORANI" : "ASPECT RATIO"}</label>
                                             <div className="grid grid-cols-4 gap-2">
                                                 {["1:1", "3:4", "4:3", "9:16", "16:9", "2:3", "3:2", "21:9"].map((ratio) => (
-                                                    <button key={ratio} onClick={() => setAspectRatio(ratio)} className={`h-11 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${aspectRatio === ratio ? 'bg-white border-white text-black shadow-xl ring-2 ring-white/20' : 'bg-white/5 border-white/5 hover:border-white/20 text-zinc-500 hover:text-white'}`}>{ratio}</button>
+                                                    <button key={ratio} onClick={() => setAspectRatio(ratio)} className={`h-11 rounded-md text-[10px] font-black uppercase tracking-widest border transition-all ${aspectRatio === ratio ? 'bg-white border-white text-black shadow-xl ring-2 ring-white/20' : 'bg-white/5 border-white/5 hover:border-white/20 text-zinc-500 hover:text-white'}`}>{ratio}</button>
                                                 ))}
                                             </div>
                                         </section>
                                     </div>
 
-                                    {/* Right: Camera Settings */}
-                                    <div className="lg:col-span-7 space-y-4">
-                                        <div className="flex items-center justify-between gap-3 mb-4 px-1">
-                                            <div className="flex items-center gap-3">
-                                                <div className="p-2.5 rounded-xl bg-white/5 text-white border border-white/10 shadow-lg"><TbSettings2 className="w-5 h-5" /></div>
-                                                <div className="flex flex-col">
-                                                    <label className="text-xs uppercase font-black text-white tracking-[0.2em]">{language === "tr" ? "KAMERA KONTROL" : "CAMERA CONTROL"}</label>
-                                                    <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter opacity-80">{language === "tr" ? "PROFESYONEL KAMERA AYARLARI" : "PROFESSIONAL CAMERA SETTINGS"}</span>
-                                                </div>
-                                            </div>
-
-                                            {/* Camera Mode Toggle */}
-                                            <div className="bg-white/5 border border-white/5 p-1 rounded-2xl flex">
-                                                <button
-                                                    onClick={() => setIsManualCamera(false)}
-                                                    className={cn(
-                                                        "px-6 py-2 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all",
-                                                        !isManualCamera ? "bg-white text-black shadow-xl" : "text-zinc-500 hover:text-white"
-                                                    )}
+                                    {/* Right: Camera Settings or Library */}
+                                    <div className="lg:col-span-7 h-full min-h-[500px] relative overflow-hidden grid grid-cols-1 grid-rows-1">
+                                        <AnimatePresence>
+                                            {activeLibraryAsset === 'background' ? (
+                                                <motion.div
+                                                    key="library-inline"
+                                                    initial={{ opacity: 0, y: 48, scale: 0.97 }}
+                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                    exit={{ opacity: 0, y: -48, scale: 0.97 }}
+                                                    transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                                                    className="h-full"
+                                                    style={{ gridArea: '1 / 1 / 2 / 2' }}
                                                 >
-                                                    AUTO
-                                                </button>
-                                                <button
-                                                    onClick={() => setIsManualCamera(true)}
-                                                    className={cn(
-                                                        "px-6 py-2 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all",
-                                                        isManualCamera ? "bg-white text-black shadow-xl" : "text-zinc-500 hover:text-white"
-                                                    )}
+                                                    <EditorialLibraryInline
+                                                        activeType="background"
+                                                        language={language}
+                                                        onClose={() => setActiveLibraryAsset(null)}
+                                                        onSelect={(item) => {
+                                                            setAssets(prev => ({ ...prev, background: item.url }));
+                                                            if (item.customPrompt) {
+                                                                setSelectedBackgroundPrompt(item.customPrompt);
+                                                            }
+                                                            setActiveLibraryAsset(null);
+                                                        }}
+                                                    />
+                                                </motion.div>
+                                            ) : (
+                                                <motion.div
+                                                    key="camera-settings"
+                                                    initial={{ opacity: 0, y: -48, scale: 0.97 }}
+                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                    exit={{ opacity: 0, y: 48, scale: 0.97 }}
+                                                    transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                                                    className="space-y-4"
+                                                    style={{ gridArea: '1 / 1 / 2 / 2' }}
                                                 >
-                                                    MANUAL
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <div className={cn(
-                                            "relative transition-all duration-500",
-                                            !isManualCamera ? "opacity-40 grayscale pointer-events-none scale-[0.98]" : "opacity-100"
-                                        )}>
-                                            <div className="relative h-[210px] bg-muted/40 dark:bg-background rounded-[30px] border border-border dark:border-white/5 overflow-hidden shadow-inner">
-                                                <div className="absolute top-1/2 left-0 -translate-y-1/2 w-full h-[110px] bg-white/[0.03] border-y border-white/10 z-10 pointer-events-none" />
-                                                <div className="grid grid-cols-4 h-full relative z-40">
-                                                    <DrumColumn items={CAMERAS} activeIndex={activeCameraIndex} onChange={(idx) => { setActiveCameraIndex(idx); setActiveLensIndex(0); }} render={(cam, active) => (
-                                                        <div className="flex flex-col items-center justify-center p-2">
-                                                            <img src={cam.image} className={`transition-all ${active ? 'w-12 h-9' : 'w-8 h-6 opacity-30'}`} alt={cam.name} />
-                                                            <span className={`mt-2 text-[7px] font-bold uppercase ${active ? 'text-white' : 'text-white/20'}`}>{cam.name.split(' ')[0]}</span>
+                                                    <div className="flex items-center justify-between gap-3 mb-4 px-1">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="p-2.5 rounded-md bg-white/5 text-white border border-white/10 shadow-lg"><TbSettings2 className="w-5 h-5" /></div>
+                                                            <div className="flex flex-col">
+                                                                <label className="text-xs uppercase font-black text-white tracking-[0.2em]">{language === "tr" ? "KAMERA KONTROL" : "CAMERA CONTROL"}</label>
+                                                                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter opacity-80">{language === "tr" ? "PROFESYONEL KAMERA AYARLARI" : "PROFESSIONAL CAMERA SETTINGS"}</span>
+                                                            </div>
                                                         </div>
-                                                    )} />
-                                                    <DrumColumn items={activeCamera.lenses} activeIndex={activeLensIndex} onChange={setActiveLensIndex} render={(lens, active) => (
-                                                        <div className="flex flex-col items-center justify-center p-2">
-                                                            <img src={lens.image} className={`transition-all ${active ? 'w-10 h-10' : 'w-7 h-7 opacity-30'}`} alt={lens.name} />
-                                                            <span className={`mt-2 text-[7px] font-bold uppercase text-center line-clamp-1 ${active ? 'text-white' : 'text-white/20'}`}>{lens.name.split(' ')[0]}</span>
-                                                        </div>
-                                                    )} />
-                                                    <DrumColumn items={[14, 24, 35, 50, 85, 100]} activeIndex={[14, 24, 35, 50, 85, 100].indexOf(focalLength)} onChange={(idx) => setFocalLength([14, 24, 35, 50, 85, 100][idx])} render={(f, active) => (
-                                                        <span className={`font-black font-mono tracking-tighter transition-all ${active ? 'text-2xl text-white' : 'text-lg text-white/20'}`}>{f}</span>
-                                                    )} />
-                                                    <DrumColumn items={["f/2", "f/4", "f/11"]} activeIndex={["f/2", "f/4", "f/11"].indexOf(aperture)} onChange={(idx) => setAperture(["f/2", "f/4", "f/11"][idx])} render={(f, active) => (
-                                                        <div className={`w-8 h-8 rounded-full border border-white/20 flex items-center justify-center transition-all ${active ? 'bg-white/10 scale-110' : 'opacity-20 scale-90'}`}><span className="text-[10px] font-bold text-white">{f}</span></div>
-                                                    )} />
-                                                </div>
-                                            </div>
 
-                                            {!isManualCamera && (
-                                                <div className="absolute inset-0 flex items-center justify-center z-50">
-                                                    <div className="px-4 py-2 bg-black/60 backdrop-blur-md rounded-full border border-white/10">
-                                                        <span className="text-[9px] font-black uppercase tracking-widest text-white/80">AI OPTIMIZED FOR SCENE</span>
+                                                        {/* Camera Mode Toggle */}
+                                                        <div className="bg-white/5 border border-white/5 p-1 rounded-md flex">
+                                                            <button
+                                                                onClick={() => setIsManualCamera(false)}
+                                                                className={cn(
+                                                                    "px-6 py-2 text-[9px] font-black uppercase tracking-widest rounded-md transition-all",
+                                                                    !isManualCamera ? "bg-white text-black shadow-xl" : "text-zinc-500 hover:text-white"
+                                                                )}
+                                                            >
+                                                                AUTO
+                                                            </button>
+                                                            <button
+                                                                onClick={() => setIsManualCamera(true)}
+                                                                className={cn(
+                                                                    "px-6 py-2 text-[9px] font-black uppercase tracking-widest rounded-md transition-all",
+                                                                    isManualCamera ? "bg-white text-black shadow-xl" : "text-zinc-500 hover:text-white"
+                                                                )}
+                                                            >
+                                                                MANUAL
+                                                            </button>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            )}
-                                        </div>
 
-                                        {/* Resolution */}
-                                        <div className="grid grid-cols-2 gap-4 pt-4">
-                                            <div className="space-y-3">
-                                                <label className="text-[10px] font-black text-white uppercase tracking-widest px-1">{language === "tr" ? "ÇÖZÜNÜRLÜK" : "RESOLUTION"}</label>
-                                                <select className="w-full bg-white/5 border border-white/5 text-[10px] font-black uppercase tracking-widest rounded-2xl h-11 px-4 outline-none focus:ring-1 focus:ring-white/20 transition-all cursor-pointer" value={resolution} onChange={(e) => setResolution(e.target.value)}>
-                                                    <option value="4K" className="bg-zinc-900">4K Ultra HD</option>
-                                                    <option value="Standard" className="bg-zinc-900">1.2K Digital</option>
-                                                </select>
-                                            </div>
-                                            <div className="space-y-3">
-                                                <label className="text-[10px] font-black text-white uppercase tracking-widest px-1">{language === "tr" ? "MALİYET" : "COST"}</label>
-                                                <div className="h-11 bg-white/[0.03] border border-white/5 rounded-2xl flex flex-col items-center justify-center text-[9px] font-black text-white uppercase tracking-tighter">
-                                                    <span>ANALİZ: 20 TOKEN</span>
-                                                    <span>ÜRETİM: {estimatedCost} TOKEN</span>
-                                                </div>
-                                            </div>
-                                        </div>
+                                                    <div className={cn(
+                                                        "relative transition-all duration-500",
+                                                        !isManualCamera ? "opacity-40 grayscale pointer-events-none scale-[0.98]" : "opacity-100"
+                                                    )}>
+                                                        <div className="relative h-[210px] bg-muted/40 dark:bg-background rounded-[30px] border border-border dark:border-white/5 overflow-hidden shadow-inner">
+                                                            <div className="absolute top-1/2 left-0 -translate-y-1/2 w-full h-[110px] bg-white/[0.03] border-y border-white/10 z-10 pointer-events-none" />
+                                                            <div className="grid grid-cols-6 h-full relative z-40">
+                                                                <DrumColumn items={CAMERAS} activeIndex={activeCameraIndex} onChange={(idx) => { setActiveCameraIndex(idx); setActiveLensIndex(0); }} render={(cam, active) => (
+                                                                    <div className="flex flex-col items-center justify-center p-2">
+                                                                        <img src={cam.image} className={`transition-all ${active ? 'w-12 h-9' : 'w-8 h-6 opacity-30'}`} alt={cam.name} />
+                                                                        <span className={`mt-2 text-[7px] font-bold uppercase ${active ? 'text-white' : 'text-white/20'}`}>{cam.name.split(' ')[0]}</span>
+                                                                    </div>
+                                                                )} />
+                                                                <DrumColumn items={activeCamera.lenses} activeIndex={activeLensIndex} onChange={setActiveLensIndex} render={(lens, active) => (
+                                                                    <div className="flex flex-col items-center justify-center p-2">
+                                                                        <img src={lens.image} className={`transition-all ${active ? 'w-10 h-10' : 'w-7 h-7 opacity-30'}`} alt={lens.name} />
+                                                                        <span className={`mt-2 text-[7px] font-bold uppercase text-center line-clamp-1 ${active ? 'text-white' : 'text-white/20'}`}>{lens.name.split(' ')[0]}</span>
+                                                                    </div>
+                                                                )} />
+                                                                <DrumColumn items={[14, 24, 35, 50, 85, 100]} activeIndex={[14, 24, 35, 50, 85, 100].indexOf(focalLength)} onChange={(idx) => setFocalLength([14, 24, 35, 50, 85, 100][idx])} render={(f, active) => (
+                                                                    <span className={`font-black font-mono tracking-tighter transition-all ${active ? 'text-2xl text-white' : 'text-lg text-white/20'}`}>{f}</span>
+                                                                )} />
+                                                                <DrumColumn items={["f/2", "f/4", "f/11"]} activeIndex={["f/2", "f/4", "f/11"].indexOf(aperture)} onChange={(idx) => setAperture(["f/2", "f/4", "f/11"][idx])} render={(f, active) => (
+                                                                    <div className={`w-8 h-8 rounded-full border border-white/20 flex items-center justify-center transition-all ${active ? 'bg-white/10 scale-110' : 'opacity-20 scale-90'}`}><span className="text-[10px] font-bold text-white">{f}</span></div>
+                                                                )} />
+                                                            </div>
+                                                        </div>
+
+                                                        {!isManualCamera && (
+                                                            <div className="absolute inset-0 flex items-center justify-center z-50">
+                                                                <div className="px-4 py-2 bg-black/60 backdrop-blur-md rounded-full border border-white/10">
+                                                                    <span className="text-[9px] font-black uppercase tracking-widest text-white/80">AI OPTIMIZED FOR SCENE</span>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Hair Style Selection */}
+                                                    <div className="space-y-4 mb-6">
+                                                        <div className="flex items-center gap-2 mb-2 px-1">
+                                                            <div className="p-1 rounded-md bg-white/5 text-zinc-400 border border-white/5"><TbSignature className="w-3 h-3" /></div>
+                                                            <label className="text-[10px] font-black text-white/50 uppercase tracking-widest leading-none mt-1">{language === "tr" ? "SAÇ STİLİ" : "HAIR STYLE"}</label>
+                                                        </div>
+                                                        <select
+                                                            value={hairStyle}
+                                                            onChange={(e) => setHairStyle(e.target.value)}
+                                                            className="w-full h-11 bg-white/5 border border-white/10 rounded-md px-4 text-[10px] font-bold text-white uppercase tracking-tight focus:outline-none focus:ring-1 focus:ring-white/20 transition-all cursor-pointer"
+                                                        >
+                                                            {HAIR_STYLES.map((style) => (
+                                                                <option key={style.id} value={style.id} className="bg-[#0e0e0e] text-white py-2">
+                                                                    {language === "tr" ? style.name.toUpperCase() : style.nameEn.toUpperCase()}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
+
+                                                    {/* Resolution */}
+                                                    <div className="grid grid-cols-1 gap-4 pt-4">
+                                                        <div className="space-y-3">
+                                                            <label className="text-[10px] font-black text-white uppercase tracking-widest px-1">{language === "tr" ? "ÇÖZÜNÜRLÜK" : "RESOLUTION"}</label>
+                                                            <select className="w-full bg-white/5 border border-white/5 text-[10px] font-black uppercase tracking-widest rounded-md h-11 px-4 outline-none focus:ring-1 focus:ring-white/20 transition-all cursor-pointer" value={resolution} onChange={(e) => setResolution(e.target.value)}>
+                                                                <option value="4K" className="bg-zinc-900">4K Ultra HD (100 Kredi)</option>
+                                                                <option value="2K" className="bg-zinc-900">2K Digital (60 Kredi)</option>
+                                                                <option value="1K" className="bg-zinc-900">1K Standard (40 Kredi)</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
                                     </div>
                                 </div>
 
                                 {/* Step 2 Footer */}
                                 <div className="flex justify-between pt-8 border-t border-white/5">
-                                    <Button variant="ghost" onClick={() => setWizardStep(1)} className="px-10 h-14 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] flex items-center gap-3 border border-white/5 bg-white/5 hover:bg-white hover:text-black transition-all">
-                                        <ChevronLeft size={18} /> {language === "tr" ? "GERİ" : "BACK"}
+                                    <Button variant="ghost" onClick={() => setWizardStep(1)} className="px-4 py-2 h-auto rounded-md text-[10px] font-black uppercase tracking-widest flex items-center gap-2 border border-white/10 bg-white/5 hover:bg-white hover:text-black transition-all group">
+                                        <ChevronLeft size={14} /> {language === "tr" ? "GERİ" : "BACK"}
                                     </Button>
-                                    <Button onClick={handleGenerate} disabled={isProcessing} className="px-14 h-14 rounded-2xl bg-white hover:bg-zinc-200 text-black font-black uppercase tracking-[0.2em] shadow-2xl transition-all hover:scale-[1.02] active:scale-[0.98]">
-                                        {isProcessing ? <Loader2 className="animate-spin w-5 h-5" /> : <Sparkles className="mr-3 w-5 h-5" />}
-                                        {language === "tr" ? "ÇEKİMİ BAŞLAT" : "START PRODUCTION"}
+                                    <Button onClick={handleGenerate} disabled={isProcessing} className="px-5 py-2 h-auto rounded-md bg-[#F5F5F5] hover:bg-white text-black font-black uppercase tracking-widest shadow-none transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2 group">
+                                        {isProcessing ? <Loader2 className="animate-spin w-3.5 h-3.5" /> : <Sparkles className="w-3.5 h-3.5" />}
+                                        <div className="flex flex-col items-center leading-tight">
+                                            <span className="text-[10px]">{language === "tr" ? "ÇEKİMİ BAŞLAT" : "START PRODUCTION"}</span>
+                                            <span className="text-[8px] opacity-60 font-mono tracking-tighter">{estimatedCost + 20} {language === "tr" ? "KREDİ" : "CREDITS"}</span>
+                                        </div>
                                     </Button>
                                 </div>
                             </div>
@@ -780,7 +941,7 @@ export default function EditorialPage() {
                                             </div>
                                             <div className="text-right">
                                                 <p className="text-[10px] font-mono font-bold text-background dark:text-white mb-1">RAW • PRORES 422</p>
-                                                <div className="w-12 h-0.5 bg-zinc-200 dark:bg-card overflow-hidden rounded-full"><div className="h-full bg-violet-500 w-[60%]" /></div>
+                                                <div className="w-12 h-0.5 bg-zinc-200 dark:bg-card overflow-hidden rounded-full"><div className="h-full bg-white w-[60%]" /></div>
                                             </div>
                                         </div>
                                         <div className="absolute inset-0 flex items-center justify-center opacity-20">
@@ -808,10 +969,10 @@ export default function EditorialPage() {
 
                                     {isProcessing ? (
                                         <div className="absolute inset-0 z-30 bg-white/90 dark:bg-background/90 backdrop-blur-xl flex flex-col items-center justify-center p-10 text-center">
-                                            <div className="relative"><div className="w-24 h-24 rounded-full border-t-4 border-violet-600 animate-spin" /><div className="absolute inset-0 flex items-center justify-center"><Monitor className="w-8 h-8 text-violet-600 animate-pulse" /></div></div>
+                                            <div className="relative"><div className="w-24 h-24 rounded-full border-t-4 border-white animate-spin" /><div className="absolute inset-0 flex items-center justify-center"><Monitor className="w-8 h-8 text-white animate-pulse" /></div></div>
                                             <h3 className="text-2xl font-black mt-8 tracking-tighter uppercase italic">{language === "tr" ? "İŞLENİYOR" : "PROCESSING"}</h3>
                                             <div className="mt-4 flex flex-col items-center gap-2">
-                                                <div className="flex gap-1"><div className="w-1 h-1 bg-violet-600 rounded-full animate-bounce [animation-delay:-0.3s]" /><div className="w-1 h-1 bg-violet-600 rounded-full animate-bounce [animation-delay:-0.15s]" /><div className="w-1 h-1 bg-violet-600 rounded-full animate-bounce" /></div>
+                                                <div className="flex gap-1"><div className="w-1 h-1 bg-white rounded-full animate-bounce [animation-delay:-0.3s]\" /><div className="w-1 h-1 bg-white rounded-full animate-bounce [animation-delay:-0.15s]\" /><div className="w-1 h-1 bg-white rounded-full animate-bounce\" /></div>
                                                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{activeCamera.name} // {activeLens.name} // {focalLength}MM // {aperture}</p>
                                             </div>
                                         </div>
@@ -828,7 +989,7 @@ export default function EditorialPage() {
 
                                     {/* Result Info Bar */}
                                     {resultImages.length > 0 && (
-                                        <div className="absolute bottom-10 left-10 right-10 p-5 rounded-2xl bg-black/80 backdrop-blur-2xl border border-white/10 flex items-center justify-between text-white shadow-2xl z-20">
+                                        <div className="absolute bottom-10 left-10 right-10 p-5 rounded-md bg-black/80 backdrop-blur-2xl border border-white/10 flex items-center justify-between text-white shadow-2xl z-20">
                                             <div className="flex flex-col gap-1.5">
                                                 <div className="flex items-center gap-3">
                                                     <span className="px-2.5 py-1 bg-white rounded text-[9px] font-black tracking-widest uppercase text-black italic">{activeCamera.name}</span>
@@ -837,10 +998,10 @@ export default function EditorialPage() {
                                                 <div className="text-[10px] font-mono font-bold text-white/50 uppercase tracking-tighter">{focalLength}MM • {aperture} • ISO 100 • {resolution}</div>
                                             </div>
                                             <div className="flex gap-3">
-                                                <button onClick={() => window.open(resultImages[0], '_blank')} className="h-11 px-6 rounded-xl bg-white/5 hover:bg-white hover:text-black border border-white/10 transition-all text-[10px] font-black uppercase tracking-widest flex items-center gap-2"><Maximize size={14} />{language === "tr" ? "TAM BOYUT" : "FULL SIZE"}</button>
+                                                <button onClick={() => window.open(resultImages[0], '_blank')} className="h-11 px-6 rounded-md bg-white/5 hover:bg-white hover:text-black border border-white/10 transition-all text-[10px] font-black uppercase tracking-widest flex items-center gap-2"><Maximize size={14} />{language === "tr" ? "TAM BOYUT" : "FULL SIZE"}</button>
                                                 <Button
                                                     onClick={() => downloadImage(resultImages[0], `editorial_${Date.now()}.png`)}
-                                                    className="h-11 px-8 rounded-xl bg-white hover:bg-zinc-200 text-black transition-all text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-2xl active:scale-95 border-none"
+                                                    className="h-11 px-8 rounded-md bg-white hover:bg-zinc-200 text-black transition-all text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-2xl active:scale-95 border-none"
                                                 >
                                                     <Download size={14} />{language === "tr" ? "İNDİR" : "DOWNLOAD"}
                                                 </Button>
@@ -868,11 +1029,11 @@ export default function EditorialPage() {
 
                                 {/* Step 3 Footer */}
                                 <div className="flex justify-between pt-8 border-t border-white/5">
-                                    <Button variant="ghost" onClick={() => setWizardStep(2)} className="px-10 h-14 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] flex items-center gap-3 border border-white/5 bg-white/5 hover:bg-white hover:text-black transition-all">
-                                        <ChevronLeft size={18} /> {language === "tr" ? "DÜZENLE" : "EDIT"}
+                                    <Button variant="ghost" onClick={() => setWizardStep(2)} className="px-4 py-2 h-auto rounded-md text-[10px] font-black uppercase tracking-widest flex items-center gap-2 border border-white/10 bg-white/5 hover:bg-white hover:text-black transition-all group">
+                                        <ChevronLeft size={14} /> {language === "tr" ? "DÜZENLE" : "EDIT"}
                                     </Button>
-                                    <Button onClick={() => { setResultImages([]); setWizardStep(1); }} className="px-12 h-14 rounded-2xl bg-white hover:bg-zinc-200 text-black font-black uppercase tracking-[0.2em] shadow-2xl transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center gap-4">
-                                        <Plus className="w-5 h-5" />
+                                    <Button onClick={() => { setResultImages([]); setWizardStep(1); }} className="px-4 py-2 h-auto rounded-md bg-[#F5F5F5] hover:bg-white text-black font-black text-[10px] uppercase tracking-widest shadow-none transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2 group">
+                                        <Plus className="w-4 h-4" />
                                         {language === "tr" ? "YENİ ÇEKİM" : "NEW SHOOT"}
                                     </Button>
                                 </div>
@@ -881,120 +1042,56 @@ export default function EditorialPage() {
                     </div>
                 </div>
 
-                {/* Library Drawer for Models */}
-                <AnimatePresence>
-                    {activeLibraryAsset === 'model' && (
-                        <>
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/50 z-40" onClick={() => setActiveLibraryAsset(null)} />
-                            <motion.div key="library-drawer" initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: "spring", stiffness: 300, damping: 30 }} className="fixed right-0 top-0 h-full w-full lg:w-[450px] bg-zinc-50 dark:bg-background flex flex-col shrink-0 relative z-50 shadow-xl">
-                                <div className="p-4 border-b border-zinc-200 dark:border-white/10 flex items-center justify-between bg-white dark:bg-card shrink-0">
-                                    <div className="flex items-center gap-3">
-                                        <button onClick={() => setActiveLibraryAsset(null)} className="p-2 hover:bg-zinc-100 dark:hover:bg-white/5 rounded-full transition-colors"><ChevronLeft size={20} /></button>
-                                        <div>
-                                            <h3 className="text-sm font-bold tracking-tight">{language === "tr" ? "Model Kütüphanesi" : "Model Library"}</h3>
-                                        </div>
-                                    </div>
-                                    <button onClick={() => setActiveLibraryAsset(null)} className="text-zinc-400 hover:text-foreground p-2"><X size={18} /></button>
+                {/* PROMPT APPROVAL DIALOG */}
+                <Dialog open={showApprovalDialog} onOpenChange={setShowApprovalDialog}>
+                    <DialogContent className="max-w-2xl bg-background border-white/5 text-white overflow-hidden p-0 rounded-[30px]">
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
+                        <DialogHeader className="p-8 pb-0 relative">
+                            <DialogTitle className="flex items-center gap-3">
+                                <div className="p-2 bg-zinc-800 rounded-md shadow-[0_0_20px_rgba(255,255,255,0.15)]"><Sparkles size={20} className="text-white" /></div>
+                                <div className="flex flex-col">
+                                    <span className="text-xl font-black tracking-tighter uppercase italic">{language === "tr" ? "ÜRETİM ANALİZİ" : "PRODUCTION ANALYSIS"}</span>
+                                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">PRO OPTICS ENGINE</span>
                                 </div>
-
-                                <Tabs value={modelLibraryTab} onValueChange={setModelLibraryTab} className="flex-1 flex flex-col overflow-hidden">
-                                    <div className="px-4 pt-4 shrink-0">
-                                        <TabsList className="w-full grid grid-cols-2">
-                                            <TabsTrigger value="library" className="text-xs">{language === "tr" ? "Kütüphane" : "Library"}</TabsTrigger>
-                                            <TabsTrigger value="prompt" className="text-[10px] uppercase font-bold tracking-tight">
-                                                {language === "tr" ? "PROMPT" : "PROMPT"}
-                                            </TabsTrigger>
-                                        </TabsList>
-                                    </div>
-
-                                    <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-                                        <TabsContent value="library" className="m-0 h-full">
-                                            <ModelSection
-                                                view="library" language={language} gender={gender} setGender={setGender}
-                                                assets={{ model: modelImage }} activeLibraryAsset="model"
-                                                setActiveLibraryAsset={() => setActiveLibraryAsset(null)}
-                                                handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove}
-                                                savedModels={savedModels}
-                                                setAssets={(updater: any) => { const newVal = typeof updater === 'function' ? updater({ model: modelImage }).model : updater.model; setModelImage(newVal); }}
-                                                setAssetsHighRes={(updater: any) => { const newVal = typeof updater === 'function' ? updater({ model: modelImageHighRes }).model : updater.model; setModelImageHighRes(newVal); }}
-                                            />
-                                        </TabsContent>
-
-                                        <TabsContent value="prompt" className="m-0 h-full p-2">
-                                            <div className="space-y-4">
-                                                <div className="space-y-2">
-                                                    <label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest block px-1">{language === "tr" ? "ÖZEL MODEL TANIMI" : "CUSTOM MODEL DESCRIPTION"}</label>
-                                                    <textarea
-                                                        value={modelDescription}
-                                                        onChange={(e) => setModelDescription(e.target.value)}
-                                                        className="w-full h-48 p-4 text-xs rounded-2xl border border-[var(--border-subtle)] bg-white dark:bg-card text-[var(--text-primary)] resize-none focus:ring-2 focus:ring-violet-500 outline-none shadow-inner"
-                                                        placeholder={language === "tr" ? "Modelin görünümünü, yaşını, etnik kökenini ve stilini tarif edin..." : "Describe the model's appearance, age, ethnicity, and style..."}
-                                                    ></textarea>
-                                                </div>
-                                                <Button
-                                                    onClick={() => {
-                                                        setActiveLibraryAsset(null);
-                                                        toast.success(language === "tr" ? "Model tanımı güncellendi" : "Model description updated");
-                                                    }}
-                                                    className="w-full h-12 bg-violet-600 hover:bg-violet-700 text-white font-black uppercase tracking-widest rounded-2xl shadow-lg transition-all"
-                                                >
-                                                    {language === "tr" ? "TANIMI UYGULA" : "APPLY DESCRIPTION"}
-                                                </Button>
-                                                <p className="text-[10px] text-muted-foreground leading-relaxed px-1">
-                                                    {language === "tr" ? "Not: Görsel yüklemek yerine sadece metin ile model tarif edebilirsiniz. Bu durumda kütüphanedeki görseller yoksayılır." : "Note: You can describe the model with text instead of uploading an image. In this case, library images will be ignored."}
-                                                </p>
-                                            </div>
-                                        </TabsContent>
-                                    </div>
-                                </Tabs>
-                            </motion.div>
-                        </>
-                    )}
-                </AnimatePresence>
-            </div>
-
-            {/* PROMPT APPROVAL DIALOG */}
-            <Dialog open={showApprovalDialog} onOpenChange={setShowApprovalDialog}>
-                <DialogContent className="max-w-2xl bg-background border-white/5 text-white overflow-hidden p-0 rounded-[30px]">
-                    <div className="absolute inset-0 bg-gradient-to-br from-violet-600/10 via-transparent to-transparent pointer-events-none" />
-                    <DialogHeader className="p-8 pb-0 relative">
-                        <DialogTitle className="flex items-center gap-3">
-                            <div className="p-2 bg-violet-600 rounded-lg shadow-[0_0_20px_rgba(124,58,237,0.4)]"><Sparkles size={20} className="text-white" /></div>
-                            <div className="flex flex-col">
-                                <span className="text-xl font-black tracking-tighter uppercase italic">{language === "tr" ? "ÜRETİM ANALİZİ" : "PRODUCTION ANALYSIS"}</span>
-                                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">PRO OPTICS ENGINE</span>
+                            </DialogTitle>
+                        </DialogHeader>
+                        <div className="p-8 space-y-6 relative">
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2"><Monitor size={14} />{language === "tr" ? "OPTİK KARAKTERİSTİK" : "OPTICAL CHARACTERISTICS"}</label>
+                                <div className="p-4 bg-white/5 rounded-md border border-white/5 text-xs text-zinc-300 leading-relaxed italic">{analyzedAesthetic}</div>
                             </div>
-                        </DialogTitle>
-                    </DialogHeader>
-                    <div className="p-8 space-y-6 relative">
-                        <div className="space-y-3">
-                            <label className="text-[10px] font-bold text-violet-500 uppercase tracking-widest flex items-center gap-2"><Monitor size={14} />{language === "tr" ? "OPTİK KARAKTERİSTİK" : "OPTICAL CHARACTERISTICS"}</label>
-                            <div className="p-4 bg-white/5 rounded-2xl border border-white/5 text-xs text-zinc-300 leading-relaxed italic">{analyzedAesthetic}</div>
-                        </div>
-                        <div className="space-y-3">
-                            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2"><FileText size={14} />{language === "tr" ? "BİRLEŞTİRİLMİŞ PROMPT" : "COMBINED PROMPT"}</label>
-                            <div className="p-4 bg-black/40 rounded-2xl border border-white/5 font-mono text-[10px] text-zinc-400 h-32 overflow-y-auto scrollbar-thin">
-                                <div className="space-y-2"><p><span className="text-violet-500">SCENE:</span> {selectedBackgroundPrompt || "Custom"}</p><p><span className="text-violet-500">STYLE:</span> {prompt || "None"}</p><p><span className="text-violet-500">OPTICS:</span> {analyzedAesthetic}</p></div>
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2"><FileText size={14} />{language === "tr" ? "BİRLEŞTİRİLMİŞ PROMPT" : "COMBINED PROMPT"}</label>
+                                <div className="p-4 bg-black/40 rounded-md border border-white/5 font-mono text-[10px] text-zinc-400 h-32 overflow-y-auto scrollbar-thin">
+                                    <div className="space-y-2">
+                                        <p><span className="text-zinc-400">SCENE:</span> {selectedBackgroundPrompt || "Custom"}</p>
+                                        <p><span className="text-zinc-400">STYLE:</span> {prompt || "None"}</p>
+                                        <p><span className="text-zinc-400">OPTICS:</span> {analyzedAesthetic}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex gap-3 pt-2">
+                                <Button variant="ghost" className="flex-1 h-12 rounded-md border border-white/5 hover:bg-white/5 text-xs font-bold uppercase tracking-widest" onClick={() => setShowApprovalDialog(false)}>{language === "tr" ? "İPTAL" : "CANCEL"}</Button>
+                                <Button className="flex-[2] h-12 rounded-md bg-white text-black hover:bg-zinc-200 text-xs font-bold uppercase tracking-widest shadow-[0_0_30px_rgba(255,255,255,0.2)]" onClick={() => { setShowApprovalDialog(false); setWizardStep(3); executeGeneration(); }}>{language === "tr" ? "ÜRETİMİ BAŞLAT" : "START PRODUCTION"}</Button>
                             </div>
                         </div>
-                        <div className="flex gap-3 pt-2">
-                            <Button variant="ghost" className="flex-1 h-12 rounded-2xl border border-white/5 hover:bg-white/5 text-xs font-bold uppercase tracking-widest" onClick={() => setShowApprovalDialog(false)}>{language === "tr" ? "İPTAL" : "CANCEL"}</Button>
-                            <Button className="flex-[2] h-12 rounded-2xl bg-white text-black hover:bg-zinc-200 text-xs font-bold uppercase tracking-widest shadow-[0_0_30px_rgba(255,255,255,0.2)]" onClick={() => { setShowApprovalDialog(false); setWizardStep(3); executeGeneration(); }}>{language === "tr" ? "ÜRETİMİ BAŞLAT" : "START PRODUCTION"}</Button>
-                        </div>
-                    </div>
-                </DialogContent>
-            </Dialog>
+                    </DialogContent>
+                </Dialog>
 
-            {/* PROCESSING OVERLAY */}
-            {
-                isAnalyzing && (
+                {/* PROCESSING OVERLAY */}
+                {isAnalyzing && (
                     <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-xl flex flex-col items-center justify-center p-10 text-center">
-                        <div className="relative"><div className="w-24 h-24 rounded-full border-t-4 border-violet-600 animate-spin" /><div className="absolute inset-0 flex items-center justify-center"><Zap className="w-8 h-8 text-violet-600 animate-pulse" /></div></div>
+                        <div className="relative">
+                            <div className="w-24 h-24 rounded-full border-t-4 border-white animate-spin" />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <Zap className="w-8 h-8 text-white animate-pulse" />
+                            </div>
+                        </div>
                         <h3 className="text-2xl font-black mt-8 tracking-tighter uppercase italic">{language === "tr" ? "TEKNİK ANALİZ" : "TECHNICAL ANALYSIS"}</h3>
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-2">{activeCamera.name} // {activeLens.name} // {focalLength}MM</p>
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-2">{activeCamera?.name} // {activeLens?.name} // {focalLength}MM</p>
                     </div>
-                )
-            }
-        </div >
+                )}
+            </div>
+        </div>
     );
 }

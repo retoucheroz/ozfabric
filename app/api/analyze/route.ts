@@ -37,6 +37,7 @@ export async function POST(req: NextRequest) {
 
         // Prioritize Gemini 2.5/2.0 for all analysis tasks
         let modelsToTry = [
+            "gemini-2.5-flash-lite",
             "gemini-2.5-flash",
             "gemini-2.0-flash",
             "gemini-flash-latest"
@@ -44,6 +45,7 @@ export async function POST(req: NextRequest) {
 
         if (type === 'techPack' || type === 'fabric' || type === 'fit' || type === 'pose') {
             modelsToTry = [
+                "gemini-2.5-flash-lite",
                 "gemini-2.5-flash",
                 "gemini-2.0-flash",
                 "gemini-flash-latest"
@@ -444,6 +446,24 @@ The output of this robot is designed to be **plugged into the [POSE], [CAMERA], 
                     JSON Response Format:
                     {
                         "prompt": "[Your highly detailed background prompt]"
+                    }`;
+                } else if (type === 'editorial_robot') {
+                    prompt = `${langInstruction} ${multiImageContext}
+                    You are an expert Editorial Art Director and Cinematographer. 
+                    Analyze the provided reference image (which may contain a person/model).
+                    Your task is to extract the POSE, CAMERA, and FRAMING details to be used for a NEW fashion generation.
+                    
+                    STRICT RULES:
+                    1. Describe ONLY the physical pose (limbs, torso rotation, weight distribution).
+                    2. Describe the CAMERA angle (height, lateral position, lens compression).
+                    3. Describe the FRAMING (shot type, crop points).
+                    4. Ignore clothing, identity, and background.
+                    
+                    OUTPUT FORMAT (JSON):
+                    {
+                        "pose": "Narrative paragraph describing the body position",
+                        "camera": "Description of camera angle and lens behavior",
+                        "framing": "Shot type and crop boundaries"
                     }`;
                 } else {
                     // TECH PACK MODE - Comprehensive Technical Analysis

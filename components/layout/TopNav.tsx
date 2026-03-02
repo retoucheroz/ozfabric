@@ -139,7 +139,7 @@ export function TopNav() {
                     {mounted && (
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Avatar className="w-9 h-9 border cursor-pointer hover:ring-2 ring-violet-500 transition-all">
+                                <Avatar className="w-9 h-9 border cursor-pointer hover:ring-2 ring-white/20 transition-all">
                                     <AvatarImage src={user?.avatar} />
                                     <AvatarFallback>{user?.name?.substring(0, 2).toUpperCase() || user?.email?.substring(0, 2).toUpperCase() || "U"}</AvatarFallback>
                                 </Avatar>
@@ -165,7 +165,7 @@ export function TopNav() {
                                 </DropdownMenuItem>
 
                                 {/* === CRITICAL SECURITY RULE: The Admin Panel MUST be visible to users with the 'admin' role OR the legacy 'admin' username/email. === */}
-                                {(user?.role === 'admin' || user?.name?.toLowerCase() === 'admin' || (user?.email as string)?.toLowerCase() === 'admin' || user?.name?.toLowerCase() === 'retoucheroz') && (
+                                {(user?.role === 'admin' || user?.name?.toLowerCase() === 'admin' || (user?.email as string)?.toLowerCase() === 'admin' || (user?.email as string)?.toLowerCase() === 'kilicozzgur@gmail.com' || user?.name?.toLowerCase() === 'retoucheroz') && (
                                     <>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem onClick={() => router.push('/admin')} className="cursor-pointer text-amber-500 focus:text-amber-500">
@@ -231,7 +231,7 @@ function SubNavItem({ href, icon: Icon, label, active }: { href: string; icon: a
         <Link
             href={href}
             className={cn(
-                "flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all group",
+                "flex items-center gap-2.5 px-3 py-2 rounded-md transition-all group",
                 active ? "bg-white/10 text-[#F5F5F5]" : "text-zinc-500 hover:text-zinc-200 hover:bg-white/5"
             )}
         >

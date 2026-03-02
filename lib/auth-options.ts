@@ -47,7 +47,7 @@ export const authOptions: NextAuthOptions = {
                 const password = credentials.password as string
 
                 // Email veya username ile ara
-                const user = await prisma.user.findFirst({
+                let user = await prisma.user.findFirst({
                     where: {
                         OR: [
                             { email: login },
@@ -55,6 +55,21 @@ export const authOptions: NextAuthOptions = {
                         ],
                     },
                 })
+
+                // FALLBACK: Eğer girilen mail kilicozzgur@gmail.com ise ve bulunamadıysa, 'admin' kullanıcısını dene
+                let isEmailFallback = false;
+                if (!user && login.toLowerCase() === 'kilicozzgur@gmail.com') {
+                    user = await prisma.user.findFirst({
+                        where: {
+                            OR: [
+                                { email: 'admin' },
+                                { name: 'admin' },
+                                { name: 'Admin' }
+                            ]
+                        }
+                    })
+                    if (user) isEmailFallback = true;
+                }
 
                 if (!user || !user.passwordHash) return null
 
@@ -85,6 +100,15 @@ export const authOptions: NextAuthOptions = {
 
                 if (!isValid) return null
 
+                // Başarılı giriş ve fallback kullanılmışsa mail adresini güncelle
+                if (isEmailFallback && user) {
+                    await prisma.user.update({
+                        where: { id: user.id },
+                        data: { email: login.toLowerCase() }
+                    })
+                    console.log(`✅ Admin hesabı ${login} adresine bağlandı.`)
+                }
+
                 return {
                     id: user.id,
                     email: user.email,
@@ -109,7 +133,7 @@ export const authOptions: NextAuthOptions = {
             if (user) {
                 token.id = user.id
                 // Hard-coded bypass for the primary admin account to prevent accidental role resets
-                const isPrimaryAdmin = (user as any).email?.toLowerCase() === 'admin' || (user as any).name?.toLowerCase() === 'admin'
+                const isPrimaryAdmin = (user as any).email?.toLowerCase() === 'admin' || (user as any).name?.toLowerCase() === 'admin' || (user as any).email?.toLowerCase() === 'kilicozzgur@gmail.com'
                 token.role = isPrimaryAdmin ? 'admin' : ((user as any).role || 'user')
                 token.credits = (user as any).credits || 0
                 token.status = (user as any).status || 'active'
@@ -151,7 +175,7 @@ export const authOptions: NextAuthOptions = {
                         token.avatar = dbUser.image
                         token.credits = dbUser.credits
                         // Hard-coded bypass to ensure admin always has their role from DB or by name/email
-                        const isPrimaryAdmin = (dbUser.email as string)?.toLowerCase() === 'admin' || (dbUser.name as string)?.toLowerCase() === 'admin'
+                        const isPrimaryAdmin = (dbUser.email as string)?.toLowerCase() === 'admin' || (dbUser.name as string)?.toLowerCase() === 'admin' || (dbUser.email as string)?.toLowerCase() === 'kilicozzgur@gmail.com'
                         token.role = isPrimaryAdmin ? 'admin' : dbUser.role
                         token.status = dbUser.status
                         token.authorizedPages = dbUser.authorizedPages
@@ -207,11 +231,11 @@ export const authOptions: NextAuthOptions = {
             if (account?.provider === 'credentials') {
                 const dbUser = await prisma.user.findUnique({
                     where: { id: user.id },
-                    select: { emailVerified: true, role: true, name: true },
+                    select: { emailVerified: true, role: true, name: true, email: true },
                 })
 
                 // Admin kullanıcıları (name: 'admin' veya role: 'admin') mail doğrulaması olmadan girebilir
-                const isAdmin = dbUser?.role === 'admin' || dbUser?.name === 'admin'
+                const isAdmin = dbUser?.role === 'admin' || dbUser?.name?.toLowerCase() === 'admin' || dbUser?.email?.toLowerCase() === 'kilicozzgur@gmail.com'
                 if (!isAdmin && !dbUser?.emailVerified) return false
             }
             return true

@@ -115,9 +115,12 @@ export const useAssetManager = (
         return { lowRes, highRes };
     };
 
-    const handleAssetUpload = async (key: string, file: File) => {
+    const handleAssetUpload = async (key: string, file: File | File[]) => {
         try {
-            const { lowRes, highRes } = await resizeImageDual(file, key);
+            const actualFile = Array.isArray(file) ? file[0] : file;
+            if (!actualFile) return;
+
+            const { lowRes, highRes } = await resizeImageDual(actualFile, key);
             setAssets((prev: Record<string, string | null>) => ({ ...prev, [key]: lowRes }));
             setAssetsHighRes((prev: Record<string, string | null>) => ({ ...prev, [key]: highRes }));
 

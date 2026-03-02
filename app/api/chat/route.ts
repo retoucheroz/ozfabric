@@ -48,6 +48,7 @@ Respond to the user's latest message based on the conversation history.
 
         // Robust model list - synchronized with analyze/route.ts
         const modelsToTry = [
+            "gemini-2.5-flash-lite",
             "gemini-2.5-flash",
             "gemini-2.0-flash",
             "gemini-2.0-flash-exp",

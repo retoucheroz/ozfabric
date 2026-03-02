@@ -203,7 +203,7 @@ export default function FaceHeadSwapPage() {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-8 mb-10">
                 <div className="space-y-1.5">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-white/10 text-white flex items-center justify-center shadow-xl">
+                        <div className="w-12 h-12 rounded-md bg-zinc-900 border border-white/10 text-white flex items-center justify-center shadow-xl">
                             <TbRefresh className="w-6 h-6" />
                         </div>
                         <div>
@@ -215,7 +215,7 @@ export default function FaceHeadSwapPage() {
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
-                    <div className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 flex items-center gap-2">
+                    <div className="px-4 py-1.5 rounded-md bg-white/5 border border-white/10 flex items-center gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                         <span className="text-[10px] font-black text-white uppercase tracking-widest">
                             Quantum Engine v4.2
@@ -245,7 +245,7 @@ export default function FaceHeadSwapPage() {
                                     </div>
                                 ) : (
                                     <div className="flex flex-col items-center gap-3 text-center p-4">
-                                        <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-white text-zinc-500 group-hover:text-black transition-all">
+                                        <div className="w-12 h-12 rounded-md bg-white/5 flex items-center justify-center group-hover:bg-white text-zinc-500 group-hover:text-black transition-all">
                                             <UserCircle2 className="w-6 h-6" />
                                         </div>
                                         <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">{t("faceSwap.uploadReference")}</span>
@@ -270,7 +270,7 @@ export default function FaceHeadSwapPage() {
                                     </div>
                                 ) : (
                                     <div className="flex flex-col items-center gap-3 text-center p-4">
-                                        <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-white text-zinc-500 group-hover:text-black transition-all">
+                                        <div className="w-12 h-12 rounded-md bg-white/5 flex items-center justify-center group-hover:bg-white text-zinc-500 group-hover:text-black transition-all">
                                             <ImageIcon className="w-6 h-6" />
                                         </div>
                                         <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">{t("faceSwap.uploadBase")}</span>
@@ -288,11 +288,11 @@ export default function FaceHeadSwapPage() {
                                 {t("faceSwap.mode")}
                             </Label>
                             <Tabs value={swapMode} onValueChange={(v) => setSwapMode(v as any)} className="w-full">
-                                <TabsList className="grid grid-cols-2 w-full h-11 p-1 bg-white/5 rounded-2xl border border-white/5">
-                                    <TabsTrigger value="head_swap" className="text-[11px] font-black uppercase tracking-widest rounded-xl data-[state=active]:bg-white data-[state=active]:text-black transition-all duration-300">
+                                <TabsList className="grid grid-cols-2 w-full h-11 p-1 bg-white/5 rounded-md border border-white/5">
+                                    <TabsTrigger value="head_swap" className="text-[11px] font-black uppercase tracking-widest rounded-md data-[state=active]:bg-white data-[state=active]:text-black transition-all duration-300">
                                         {t("faceSwap.headSwap")}
                                     </TabsTrigger>
-                                    <TabsTrigger value="face_swap" className="text-[11px] font-black uppercase tracking-widest rounded-xl data-[state=active]:bg-white data-[state=active]:text-black transition-all duration-300">
+                                    <TabsTrigger value="face_swap" className="text-[11px] font-black uppercase tracking-widest rounded-md data-[state=active]:bg-white data-[state=active]:text-black transition-all duration-300">
                                         {t("faceSwap.faceSwap")}
                                     </TabsTrigger>
                                 </TabsList>
@@ -306,7 +306,7 @@ export default function FaceHeadSwapPage() {
                                     {language === 'tr' ? 'EN BOY' : 'RATIO'}
                                 </Label>
                                 <Select value={aspectRatio} onValueChange={setAspectRatio}>
-                                    <SelectTrigger className="h-10 text-[11px] font-black uppercase bg-white/5 border-white/5 rounded-xl focus:ring-1 focus:ring-white/20">
+                                    <SelectTrigger className="h-10 text-[11px] font-black uppercase bg-white/5 border-white/5 rounded-md focus:ring-1 focus:ring-white/20">
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent className="bg-zinc-900 border-white/10">
@@ -323,7 +323,7 @@ export default function FaceHeadSwapPage() {
                                     {language === 'tr' ? 'KALİTE' : 'QUALITY'}
                                 </Label>
                                 <Select value={resolution} onValueChange={setResolution}>
-                                    <SelectTrigger className="h-10 text-[11px] font-black uppercase bg-white/5 border-white/5 rounded-xl focus:ring-1 focus:ring-white/20">
+                                    <SelectTrigger className="h-10 text-[11px] font-black uppercase bg-white/5 border-white/5 rounded-md focus:ring-1 focus:ring-white/20">
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent className="bg-zinc-900 border-white/10">
@@ -345,14 +345,14 @@ export default function FaceHeadSwapPage() {
                                 value={seed}
                                 onChange={(e) => setSeed(e.target.value)}
                                 placeholder={language === 'tr' ? 'Rastgele için boş bırakın' : 'Leave empty for random'}
-                                className="w-full h-9 bg-muted/50 border border-border/50 rounded-lg px-3 text-[11px] font-medium focus:ring-1 focus:ring-violet-500 outline-none transition-all"
+                                className="w-full h-11 bg-muted/50 border border-border/50 rounded-md px-4 text-[11px] font-medium focus:ring-1 focus:ring-white/20 outline-none transition-all"
                             />
                         </div>
 
                         <Button
                             disabled={!identityImage || !baseImage || isGenerating}
                             onClick={handleGenerate}
-                            className="w-full h-14 rounded-2xl bg-white hover:bg-zinc-200 text-black font-black uppercase tracking-widest shadow-xl shadow-white/5 transition-all active:scale-[0.98] mt-4"
+                            className="w-full h-14 rounded-md bg-white hover:bg-zinc-200 text-black font-black uppercase tracking-widest shadow-xl shadow-white/5 transition-all active:scale-[0.98] mt-4"
                         >
                             {isGenerating ? (
                                 <>
@@ -423,11 +423,11 @@ export default function FaceHeadSwapPage() {
                                         )}
                                     </div>
                                     <div className="flex gap-3">
-                                        <Button variant="ghost" size="sm" onClick={() => setResultImage(null)} className="h-10 text-[11px] font-black uppercase tracking-widest rounded-xl px-5 border border-white/5 bg-white/5 hover:bg-white hover:text-black transition-all">
+                                        <Button variant="ghost" size="sm" onClick={() => setResultImage(null)} className="h-10 text-[11px] font-black uppercase tracking-widest rounded-md px-5 border border-white/5 bg-white/5 hover:bg-white hover:text-black transition-all">
                                             <RefreshCw className="w-4 h-4 mr-2" />
                                             {language === 'tr' ? 'YENİ' : 'NEW'}
                                         </Button>
-                                        <Button size="sm" onClick={handleDownload} className="h-10 bg-white text-black text-[11px] font-black uppercase tracking-widest rounded-xl px-5 hover:bg-zinc-200 shadow-xl transition-all">
+                                        <Button size="sm" onClick={handleDownload} className="h-10 bg-white text-black text-[11px] font-black uppercase tracking-widest rounded-md px-5 hover:bg-zinc-200 shadow-xl transition-all">
                                             <Download className="w-4 h-4 mr-2" />
                                             {language === 'tr' ? 'İNDİR' : 'DOWNLOAD'}
                                         </Button>

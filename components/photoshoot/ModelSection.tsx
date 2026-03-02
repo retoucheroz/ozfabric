@@ -11,10 +11,10 @@ interface ModelSectionProps {
     language: string;
     gender: string;
     setGender: (val: "male" | "female") => void;
-    assets: { [key: string]: string | null };
+    assets: { [key: string]: string | string[] | null };
     activeLibraryAsset: string | null;
     setActiveLibraryAsset: (val: any) => void;
-    handleAssetUpload: (id: string, file: File) => void;
+    handleAssetUpload: (id: string, file: File | File[]) => void;
     handleAssetRemove: (id: string, e: React.MouseEvent) => void;
     // For grid view (optional) - these are used in the Library view
     view?: "sidebar" | "library";
@@ -25,6 +25,7 @@ interface ModelSectionProps {
     setAssetsHighRes?: React.Dispatch<React.SetStateAction<{ [key: string]: string | null }>>;
     isAdmin?: boolean;
     addToGlobalLibrary?: (category: string, data: any) => void;
+    gridCols?: number;
 }
 
 export function ModelSection({
@@ -43,7 +44,8 @@ export function ModelSection({
     setAssets,
     setAssetsHighRes,
     isAdmin,
-    addToGlobalLibrary
+    addToGlobalLibrary,
+    gridCols = 3
 }: ModelSectionProps) {
     if (view === "library") {
         return (
@@ -54,7 +56,13 @@ export function ModelSection({
                             <User size={12} className={g === 'female' ? 'text-[#F5F5F5]' : 'text-zinc-400'} />
                             {g === 'female' ? (language === "tr" ? "Kadın Stüdyolar" : "Female Studios") : (language === "tr" ? "Erkek Stüdyolar" : "Male Studios")}
                         </h4>
-                        <div className="grid grid-cols-3 gap-2 min-h-[140px] overflow-y-auto custom-scrollbar pr-1">
+                        <div className={cn(
+                            "grid gap-3 min-h-[140px] overflow-y-auto custom-scrollbar pr-1",
+                            gridCols === 3 ? "grid-cols-3" :
+                                gridCols === 4 ? "grid-cols-4" :
+                                    gridCols === 5 ? "grid-cols-5" :
+                                        gridCols === 6 ? "grid-cols-6" : "grid-cols-3"
+                        )}>
                             <div className="aspect-[2/3] shrink-0">
                                 <AssetCard
                                     id="model"
@@ -123,7 +131,7 @@ export function ModelSection({
 
     return (
         <div className="w-full">
-            <div className="relative rounded-3xl border-2 overflow-hidden transition-all duration-500 bg-[var(--bg-elevated)] border-[var(--border-subtle)] shadow-sm h-[150px] flex flex-col">
+            <div className="relative rounded-md border-2 overflow-hidden transition-all duration-500 bg-[var(--bg-elevated)] border-[var(--border-subtle)] shadow-sm h-[150px] flex flex-col">
 
                 {/* Gender Toggle Tabs */}
                 <div className="flex border-b border-white/5">
