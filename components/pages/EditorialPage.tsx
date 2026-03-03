@@ -581,7 +581,7 @@ export default function EditorialPage() {
                                             />
                                             <Button
                                                 onClick={() => canMoveToStep(2) && setWizardStep(2)}
-                                                className="w-full mt-2 py-4 h-auto rounded-2xl bg-[#F5F5F5] hover:bg-white text-black font-black text-[11px] uppercase tracking-[0.2em] shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] border border-white/20 flex items-center justify-center gap-3 group"
+                                                className="w-full mt-2 h-12 rounded-md bg-[#F5F5F5] hover:bg-white text-black font-black text-[11px] uppercase tracking-widest shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] border border-white/20 flex items-center justify-center gap-3 group"
                                             >
                                                 {language === "tr" ? "İLERLE" : "NEXT"}
                                                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -880,11 +880,11 @@ export default function EditorialPage() {
                                     <Button variant="ghost" onClick={() => setWizardStep(1)} className="px-4 py-2 h-auto rounded-md text-[10px] font-black uppercase tracking-widest flex items-center gap-2 border border-white/10 bg-white/5 hover:bg-white hover:text-black transition-all group">
                                         <ChevronLeft size={14} /> {language === "tr" ? "GERİ" : "BACK"}
                                     </Button>
-                                    <Button onClick={handleGenerate} disabled={isProcessing} className="px-5 py-2 h-auto rounded-md bg-[#F5F5F5] hover:bg-white text-black font-black uppercase tracking-widest shadow-none transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2 group">
-                                        {isProcessing ? <Loader2 className="animate-spin w-3.5 h-3.5" /> : <Sparkles className="w-3.5 h-3.5" />}
+                                    <Button onClick={handleGenerate} disabled={isProcessing} className="px-8 h-12 rounded-md bg-[#F5F5F5] hover:bg-white text-black font-black uppercase tracking-widest shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 group">
+                                        {isProcessing ? <Loader2 className="animate-spin w-4 h-4" /> : <Sparkles className="w-4 h-4" />}
                                         <div className="flex flex-col items-center leading-tight">
-                                            <span className="text-[10px]">{language === "tr" ? "ÇEKİMİ BAŞLAT" : "START PRODUCTION"}</span>
-                                            <span className="text-[8px] opacity-60 font-mono tracking-tighter">{estimatedCost + 20} {language === "tr" ? "KREDİ" : "CREDITS"}</span>
+                                            <span className="text-[11px]">{language === "tr" ? "ÇEKİMİ BAŞLAT" : "START PRODUCTION"}</span>
+                                            <span className="text-[9px] opacity-60 font-mono tracking-tighter">{estimatedCost + 20} {language === "tr" ? "KREDİ" : "CREDITS"}</span>
                                         </div>
                                     </Button>
                                 </div>

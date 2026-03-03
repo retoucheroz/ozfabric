@@ -423,7 +423,7 @@ export default function LandingPage() {
                             alt="Hero Background"
                             fill
                             priority
-                            className="object-cover object-top opacity-30"
+                            className="object-cover object-top opacity-50"
                             sizes="100vw"
                         />
                     </motion.div>
@@ -437,7 +437,7 @@ export default function LandingPage() {
                     className="relative z-10 flex flex-col items-center text-center max-w-5xl mx-auto"
                 >
 
-                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-black tracking-[-0.02em] leading-[0.9] text-[#F5F5F5] mb-6 flex flex-col items-center">
+                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-black tracking-[-0.02em] leading-[0.9] text-[#F5F5F5] mb-6 flex flex-col items-center drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">
                         <motion.span
                             initial={{ opacity: 0, x: -40 }}
                             animate={{ opacity: 1, x: 0 }}

@@ -146,7 +146,7 @@ export const useAssetManager = (
                 setShowSaveLightingDialog(true);
             }
 
-            if (['background', 'fit_pattern', 'shoes', 'jacket', 'bag', 'glasses', 'hat', 'jewelry', 'belt', 'inner_wear'].includes(key)) {
+            if (['background', 'fit_pattern', 'shoes', 'jacket', 'bag', 'glasses', 'hat', 'jewelry', 'belt', 'inner_wear', 'socks'].includes(key)) {
                 setTempAssetData({ key, url: lowRes, name: "" });
                 setShowSaveAssetDialog(true);
             }

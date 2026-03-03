@@ -170,7 +170,7 @@ export function BehaviorToggles({
             <h4 className="text-[10px] font-bold text-[var(--accent-primary)] uppercase tracking-[0.15em] px-1">
                 {language === "tr" ? "DETAY AYARLARI" : "DETAIL SETTINGS"}
             </h4>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 {/* 1. Hair */}
                 <ToggleItem
                     label={language === "tr" ? "SAÇ ARKADA" : "HAIR BACK"}
@@ -231,12 +231,10 @@ export function BehaviorToggles({
                     onClick={() => setEnableWind(!enableWind)}
                 />
 
-
-
                 {/* 7. Model Mood (Box 7) */}
                 <div
                     className={cn(
-                        "flex flex-col items-center justify-between p-3.5 h-[140px] rounded-md border-2 transition-all cursor-pointer group select-none shadow-sm",
+                        "flex flex-col items-center justify-between p-3.5 h-[130px] rounded-md border-2 transition-all cursor-pointer group select-none shadow-sm",
                         selectedMoodId
                             ? "bg-zinc-800 border-white shadow-xl"
                             : "bg-zinc-900/40 border-white/5 hover:border-white/20"
@@ -323,86 +321,6 @@ export function BehaviorToggles({
                         </div>
                     </div>
                 </div>
-
-                {/* 9. Socks (Box 9) */}
-                <TooltipProvider delayDuration={300}>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <div
-                                className={cn(
-                                    "flex flex-col items-center justify-between p-3.5 h-[140px] rounded-md border-2 transition-all group select-none shadow-sm",
-                                    isSocksDisabled ? "opacity-30 cursor-not-allowed bg-zinc-900/10 border-white/5 grayscale"
-                                        : (socksType !== 'none'
-                                            ? "cursor-pointer bg-zinc-800 border-white shadow-xl"
-                                            : "cursor-pointer bg-zinc-900/40 border-white/5 hover:border-white/20")
-                                )}
-                                onClick={() => {
-                                    if (isSocksDisabled) return;
-                                    const colors: ('none' | 'white' | 'black' | 'grey' | 'navy' | 'beige' | 'brown' | 'red' | 'green' | 'blue' | 'anthracite')[] = ['none', 'white', 'black', 'grey', 'navy', 'beige', 'brown', 'red', 'green', 'blue', 'anthracite'];
-                                    const currentIndex = colors.indexOf(socksType);
-                                    const nextIndex = (currentIndex + 1) % colors.length;
-                                    setSocksType(colors[nextIndex]);
-                                }}
-                            >
-                                <div className="flex flex-col items-center gap-3 pt-2">
-                                    <PiSock
-                                        className={cn(
-                                            "w-10 h-10 transition-all duration-300",
-                                            !isSocksDisabled && "group-hover:scale-110",
-                                            socksType === 'none' ? "text-zinc-500" : (
-                                                socksType === 'white' ? "text-white" :
-                                                    socksType === 'black' ? "text-zinc-950 shadow-[0_0_15px_rgba(255,255,255,0.4)]" :
-                                                        socksType === 'grey' ? "text-zinc-400" :
-                                                            socksType === 'navy' ? "text-blue-900" :
-                                                                socksType === 'beige' ? "text-[#D2B48C]" :
-                                                                    socksType === 'brown' ? "text-[#8B4513]" :
-                                                                        socksType === 'red' ? "text-red-600" :
-                                                                            socksType === 'green' ? "text-green-600" :
-                                                                                socksType === 'blue' ? "text-blue-600" :
-                                                                                    socksType === 'anthracite' ? "text-zinc-600" : "text-white"
-                                            )
-                                        )}
-                                        style={socksType !== 'none' && socksType !== 'white' && socksType !== 'black' ? {
-                                            color: ({
-                                                grey: '#94a3b8', navy: '#1e3a8a', beige: '#f5f5dc', brown: '#78350f',
-                                                red: '#dc2626', green: '#16a34a', blue: '#2563eb', anthracite: '#334155'
-                                            } as Record<string, string>)[socksType]
-                                        } : {}}
-                                    />
-                                    <span className={cn(
-                                        "text-[10px] font-black uppercase tracking-[0.2em] text-center leading-tight transition-colors mt-2",
-                                        socksType !== 'none' ? "text-white" : cn("text-zinc-400", !isSocksDisabled && "group-hover:text-white")
-                                    )}>
-                                        {language === "tr" ? "ÇORAP" : "SOCKS"}
-                                    </span>
-                                </div>
-
-                                <div className="flex flex-col items-center gap-1.5 pb-1 w-full text-center">
-                                    <span className={cn(
-                                        "text-[8px] font-black uppercase tracking-widest opacity-60",
-                                        socksType !== 'none' ? "text-white" : "text-zinc-500"
-                                    )}>
-                                        {language === "tr"
-                                            ? (socksType === 'black' ? "SİYAH" : socksType === 'white' ? "BEYAZ" : socksType === 'grey' ? "GRİ" : socksType === 'navy' ? "LACİVERT" : socksType === 'beige' ? "BEJ" : socksType === 'brown' ? "KAHVERENGİ" : socksType === 'red' ? "KIRMIZI" : socksType === 'green' ? "YEŞİL" : socksType === 'blue' ? "MAVİ" : socksType === 'anthracite' ? "ANTRASİT" : "YOK")
-                                            : (socksType === 'black' ? "BLACK" : socksType === 'white' ? "WHITE" : socksType === 'grey' ? "GREY" : socksType === 'navy' ? "NAVY" : socksType === 'beige' ? "BEIGE" : socksType === 'brown' ? "BROWN" : socksType === 'red' ? "RED" : socksType === 'green' ? "GREEN" : socksType === 'blue' ? "BLUE" : socksType === 'anthracite' ? "ANTHRACITE" : "NONE")}
-                                    </span>
-                                    <div className="flex flex-wrap justify-center gap-1 max-w-[60px]">
-                                        {['none', 'white', 'black', 'grey', 'navy', 'beige', 'brown', 'red', 'green', 'blue', 'anthracite'].map(c => (
-                                            <div key={c} className={cn("w-1 h-1 rounded-full transition-all", socksType === c ? "bg-white scale-125 shadow-[0_0_5px_white]" : "bg-zinc-700")} />
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        </TooltipTrigger>
-                        {isSocksDisabled && (
-                            <TooltipContent side="top" className="text-[10px] max-w-[200px] text-center bg-zinc-900 text-zinc-300 border border-white/10 font-bold uppercase p-3 rounded-md tracking-tight">
-                                {language === "tr"
-                                    ? "Uzun paça kullanıldığında çoraplar görünmez."
-                                    : "Socks are not visible when using long length pants."}
-                            </TooltipContent>
-                        )}
-                    </Tooltip>
-                </TooltipProvider>
             </div>
 
 

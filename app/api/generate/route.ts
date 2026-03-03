@@ -340,6 +340,7 @@ export async function POST(req: NextRequest) {
             if (imgs.bag && !isCloseupView) assets.push(imgs.bag);
             if (imgs.glasses) assets.push(imgs.glasses);
             if (imgs.jewelry) assets.push(imgs.jewelry);
+            if (imgs.socks) assets.push(imgs.socks);
             if (imgs.lighting) assets.push(imgs.lighting);
 
             // Note: We exclude original 'imgs.pose' to avoid leakage. Skip stickman entirely.
@@ -1037,10 +1038,14 @@ export async function POST(req: NextRequest) {
                 if (sp.styling.sleeves_rolled) stylingBlock.push("sleeves are rolled up to the elbows");
                 else if (wf !== 'lower') stylingBlock.push("sleeves are straight down to the wrists");
             }
-            if (canShowLegHem && sp.styling.socks && sp.styling.socks !== 'none') {
+            if (canShowLegHem && ((sp.styling.socks && sp.styling.socks !== 'none') || uploadedImages.socks)) {
                 const len = sp.garment.details?.pant_length;
                 if (len !== 'covering' && len !== 'flare') {
-                    stylingBlock.push(`style accessory: wearing ${sp.styling.socks} colored socks.`);
+                    if (uploadedImages.socks) {
+                        stylingBlock.push(`style accessory: model is wearing the reference socks from the provided image.`);
+                    } else {
+                        stylingBlock.push(`style accessory: wearing ${sp.styling.socks} colored socks.`);
+                    }
                 }
             }
             const technicalAccessoryItems = Object.entries(techAccessories || {}).filter(([_, v]) => !!v).map(([k]) => {

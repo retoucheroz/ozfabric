@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useState } from "react";
-import { Upload, Trash2, Eye, EyeOff, Library, Plus } from "lucide-react";
+import { Upload, Trash2, Eye, EyeOff, Library, Plus, Image as ImageIcon, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -343,19 +343,25 @@ export function AssetCard({
                             <img src={currentAsset as string} className="absolute inset-0 w-full h-full object-contain transition-transform duration-700 group-hover/image:scale-105" alt={label} />
 
                             {/* Persistent Label Overlay when image is loaded */}
-                            <div className="absolute bottom-0 inset-x-0 bg-black/60 backdrop-blur-sm px-2 py-1.5 border-t border-white/10 z-20">
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-white/90 block text-center truncate">
+                            <div className="absolute bottom-0 inset-x-0 bg-black/60 backdrop-blur-sm px-1 py-0.5 border-t border-white/10 z-20">
+                                <span className="text-[8px] font-bold uppercase tracking-wider text-white/90 block text-center truncate">
                                     {label}
                                 </span>
                             </div>
 
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/image:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 z-10 pb-6">
-                                <Button size="icon" variant="secondary" className="h-7 w-7 rounded-lg shadow-lg hover:scale-110 transition-transform" onClick={handleDirectUploadClick}>
-                                    <Upload size={12} />
-                                </Button>
-                                <Button size="icon" variant="destructive" className="h-7 w-7 rounded-lg shadow-lg hover:scale-110 transition-transform" onClick={(e) => handleAssetRemove(id, e)}>
-                                    <Trash2 size={12} />
-                                </Button>
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/image:opacity-100 transition-opacity flex items-center justify-center gap-2 z-10">
+                                <button
+                                    onClick={handleDirectUploadClick}
+                                    className="p-1.5 rounded-md bg-white/20 hover:bg-white/40 text-white backdrop-blur-md transition-all shadow-lg"
+                                >
+                                    <ImageIcon size={14} />
+                                </button>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); handleAssetRemove(id, e); }}
+                                    className="p-1.5 rounded-md bg-red-500/80 hover:bg-red-500 text-white transition-all shadow-lg"
+                                >
+                                    <X size={14} />
+                                </button>
                             </div>
                         </div>
                     ) : assets[id] === "LIGHTING_SET" ? (

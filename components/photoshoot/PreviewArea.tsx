@@ -127,7 +127,6 @@ export function PreviewArea({
                     </div>
                 </div>
                 {stopButton}
-                {!stopButton && generateButton}
             </div>
         );
     }
@@ -264,9 +263,6 @@ export function PreviewArea({
                                     <span className="text-sm font-black text-[var(--text-primary)]">{resultImages.length}</span>
                                 </div>
                             </div>
-                            <div className="flex gap-3">
-                                {generateButton}
-                            </div>
                         </div>
                     )
                 }
@@ -332,7 +328,6 @@ export function PreviewArea({
                         : "Use the settings on the left to define photoshoot parameters."}
                 </p>
             </div>
-            {generateButton}
         </div>
     );
 }

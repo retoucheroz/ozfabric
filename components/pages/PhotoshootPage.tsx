@@ -10,10 +10,11 @@ import { Switch } from "@/components/ui/switch"
 import { Separator } from "@/components/ui/separator"
 import {
     ChevronRight, ChevronLeft, ChevronDown, Sparkles, User,
-    Image as ImageIcon, Camera, X, FileText, Edit2, Glasses, Check, Shirt, ScanLine
+    Image as ImageIcon, Camera, X, FileText, Edit2, Glasses, Check, Shirt, ScanLine, Loader2
 } from "lucide-react"
 import { TbSettings2, TbShirtFilled, TbJacket, TbShirt, TbHanger } from "react-icons/tb"
-import { PiHandbag, PiBaseballCap, PiDiamond, PiBelt, PiPantsLight, PiPants, PiPantsFill } from "react-icons/pi"
+import { PiHandbag, PiBaseballCap, PiDiamond, PiBelt, PiPantsLight, PiPants, PiPantsFill, PiSock, PiSneakerLight } from "react-icons/pi"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 import { toast } from "sonner"
 
@@ -89,6 +90,7 @@ export default function PhotoshootPage() {
 
     const [targetPoseShot, setTargetPoseShot] = useState<string | null>(null);
     const [showProductManager, setShowProductManager] = useState(false);
+    const [isDraggingSocks, setIsDraggingSocks] = useState(false);
 
     // Block navigation when generation is in progress
     useEffect(() => {
@@ -223,9 +225,9 @@ export default function PhotoshootPage() {
 
                                                         <Button
                                                             onClick={() => canMoveToStep(2) && setWizardStep(2)}
-                                                            className="w-full h-auto py-2 rounded-md bg-[#F5F5F5] hover:bg-white text-black font-black text-[10px] uppercase tracking-widest shadow-none transition-all hover:scale-[1.01] active:scale-[0.99] group flex justify-center items-center gap-2"
+                                                            className="w-full h-12 rounded-md bg-[#F5F5F5] hover:bg-white text-black font-black text-[11px] uppercase tracking-widest shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] group flex justify-center items-center gap-2"
                                                         >
-                                                            {language === "tr" ? "İLERLE" : "NEXT"} <ChevronRight className="w-4 h-4" />
+                                                            {language === "tr" ? "İLERLE" : "NEXT"} <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                                         </Button>
                                                     </div>
                                                 </div>
@@ -391,11 +393,10 @@ export default function PhotoshootPage() {
                                         {language === "tr" ? "ÇEKİM AYARLARI" : "SHOOT SETTINGS"}
                                     </h4>
 
-                                    <div className="grid grid-cols-2 gap-4 flex-1">
+                                    <div className="grid grid-cols-3 gap-4 flex-1">
                                         <AssetCard id="background" label={language === "tr" ? "ARKAPLAN" : "BACKGROUND"} icon={ImageIcon} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="portrait" />
                                         <AssetCard id="lighting" label={language === "tr" ? "IŞIK" : "LIGHT"} icon={Camera} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} lightingSendImage={lightingSendImage} setLightingSendImage={setLightingSendImage} variant="portrait" />
                                         <AssetCard id="fit_pattern" label={language === "tr" ? "KALIP" : "FIT"} icon={TbShirtFilled} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="portrait" />
-                                        <AssetCard id="shoes" label={language === "tr" ? "AYAKKABI" : "SHOES"} icon={TbHanger} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="portrait" />
                                     </div>
                                 </div>
 
@@ -443,9 +444,166 @@ export default function PhotoshootPage() {
                             {/* Section 3: Accessories */}
                             <div className="space-y-4 pt-6 border-t border-white/5">
                                 <h4 className="text-[10px] font-bold text-white uppercase tracking-[0.2em] px-1 opacity-70">{language === "tr" ? "DİĞER AKSESUARLAR" : "OTHER ACCESSORIES"}</h4>
-                                <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
+                                <div className="grid grid-cols-4 lg:grid-cols-8 gap-3">
                                     <AssetCard id="jacket" label={language === "tr" ? "DIŞ GİYİM" : "OUTERWEAR"} icon={TbJacket} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="square" />
                                     <AssetCard id="bag" label={language === "tr" ? "ÇANTA" : "BAG"} icon={PiHandbag} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="square" />
+                                    <AssetCard id="shoes" label={language === "tr" ? "AYAKKABI" : "SHOES"} icon={PiSneakerLight} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="square" />
+                                    <TooltipProvider delayDuration={300}>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <div
+                                                    className={cn(
+                                                        "flex flex-col items-center justify-between p-2 h-auto aspect-square rounded-md border-2 transition-all group select-none shadow-sm relative overflow-hidden",
+                                                        (pantLength === 'covering' || pantLength === 'flare') ? "opacity-30 cursor-not-allowed bg-zinc-900/10 border-white/5 grayscale"
+                                                            : (socksType !== 'none' || assets.socks
+                                                                ? "cursor-pointer bg-zinc-800 border-white shadow-xl"
+                                                                : "cursor-pointer bg-zinc-900/40 border-white/5 hover:border-white/20"),
+                                                        isDraggingSocks && "ring-2 ring-white border-white bg-white/5 scale-[1.02]"
+                                                    )}
+                                                    onDragOver={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        if (!(pantLength === 'covering' || pantLength === 'flare')) {
+                                                            setIsDraggingSocks(true);
+                                                        }
+                                                    }}
+                                                    onDragLeave={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        setIsDraggingSocks(false);
+                                                    }}
+                                                    onDrop={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        setIsDraggingSocks(false);
+                                                        if (pantLength === 'covering' || pantLength === 'flare') return;
+
+                                                        const files = Array.from(e.dataTransfer.files);
+                                                        if (files && files.length > 0) {
+                                                            const imageFiles = files.filter(f => f.type.startsWith('image/'));
+                                                            if (imageFiles.length > 0) {
+                                                                handleAssetUpload('socks', imageFiles[0]);
+                                                            } else {
+                                                                toast.error(language === "tr" ? "Sadece görsel dosyaları kabul edilir" : "Only image files are accepted");
+                                                            }
+                                                        }
+                                                    }}
+                                                    onClick={() => {
+                                                        if (pantLength === 'covering' || pantLength === 'flare') return;
+                                                        if (assets.socks) return; // Don't cycle colors if image is uploaded
+                                                        const colors: ('none' | 'white' | 'black' | 'grey' | 'navy' | 'beige' | 'brown' | 'red' | 'green' | 'blue' | 'anthracite')[] = ['none', 'white', 'black', 'grey', 'navy', 'beige', 'brown', 'red', 'green', 'blue', 'anthracite'];
+                                                        const currentIndex = colors.indexOf(socksType);
+                                                        const nextIndex = (currentIndex + 1) % colors.length;
+                                                        setSocksType(colors[nextIndex]);
+                                                    }}
+                                                >
+                                                    <input
+                                                        type="file"
+                                                        id="socks-upload"
+                                                        className="hidden"
+                                                        accept="image/*"
+                                                        onChange={(e) => {
+                                                            if (e.target.files?.[0]) {
+                                                                handleAssetUpload('socks', e.target.files[0]);
+                                                            }
+                                                        }}
+                                                    />
+
+                                                    {assets.socks ? (
+                                                        <div className="absolute inset-0 w-full h-full bg-zinc-900">
+                                                            <img src={assets.socks as string} className="w-full h-full object-contain" alt="socks" />
+                                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        document.getElementById('socks-upload')?.click();
+                                                                    }}
+                                                                    className="p-1.5 rounded-md bg-white/20 hover:bg-white/40 text-white backdrop-blur-md transition-all shadow-lg"
+                                                                >
+                                                                    <ImageIcon size={14} />
+                                                                </button>
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        handleAssetRemove('socks', e);
+                                                                    }}
+                                                                    className="p-1.5 rounded-md bg-red-500/80 hover:bg-red-500 text-white transition-all shadow-lg"
+                                                                >
+                                                                    <X size={14} />
+                                                                </button>
+                                                            </div>
+                                                            <div className="absolute bottom-0 inset-x-0 bg-black/60 backdrop-blur-sm px-1 py-0.5 border-t border-white/10">
+                                                                <span className="text-[8px] font-bold uppercase tracking-wider text-white/90 block text-center truncate">
+                                                                    {language === "tr" ? "ÇORAP" : "SOCKS"}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <>
+                                                            <div className="flex flex-col items-center gap-1.5 pt-1">
+                                                                <PiSock
+                                                                    className={cn(
+                                                                        "w-6 h-6 transition-all duration-300",
+                                                                        !(pantLength === 'covering' || pantLength === 'flare') && "group-hover:scale-110",
+                                                                        socksType === 'none' ? "text-zinc-500" : (
+                                                                            socksType === 'white' ? "text-white" :
+                                                                                socksType === 'black' ? "text-zinc-400" : "text-white"
+                                                                        )
+                                                                    )}
+                                                                    style={socksType !== 'none' && socksType !== 'white' && socksType !== 'black' ? {
+                                                                        color: ({
+                                                                            grey: '#94a3b8', navy: '#1e3a8a', beige: '#f5f5dc', brown: '#78350f',
+                                                                            red: '#dc2626', green: '#16a34a', blue: '#2563eb', anthracite: '#334155'
+                                                                        } as Record<string, string>)[socksType]
+                                                                    } : {}}
+                                                                />
+                                                                <span className={cn(
+                                                                    "text-[9px] font-black uppercase tracking-widest text-center leading-tight transition-colors",
+                                                                    socksType !== 'none' ? "text-white" : cn("text-zinc-500", !(pantLength === 'covering' || pantLength === 'flare') && "group-hover:text-white")
+                                                                )}>
+                                                                    {language === "tr" ? "ÇORAP" : "SOCKS"}
+                                                                </span>
+                                                            </div>
+
+                                                            <div className="flex flex-col items-center gap-0.5 pb-1 w-full text-center">
+                                                                <span className={cn(
+                                                                    "text-[7px] font-black uppercase tracking-tighter opacity-60",
+                                                                    socksType !== 'none' ? "text-white" : "text-zinc-500"
+                                                                )}>
+                                                                    {language === "tr"
+                                                                        ? (socksType === 'black' ? "SİYAH" : socksType === 'white' ? "BEYAZ" : socksType === 'grey' ? "GRİ" : socksType === 'navy' ? "LACİVERT" : socksType === 'beige' ? "BEJ" : socksType === 'brown' ? "KAHVERENGİ" : socksType === 'red' ? "KIRMIZI" : socksType === 'green' ? "YEŞİL" : socksType === 'blue' ? "MAVİ" : socksType === 'anthracite' ? "ANTRASİT" : "YOK")
+                                                                        : (socksType === 'black' ? "BLACK" : socksType === 'white' ? "WHITE" : socksType === 'grey' ? "GREY" : socksType === 'navy' ? "NAVY" : socksType === 'beige' ? "BEIGE" : socksType === 'brown' ? "BROWN" : socksType === 'red' ? "RED" : socksType === 'green' ? "GREEN" : socksType === 'blue' ? "BLUE" : socksType === 'anthracite' ? "ANTHRACITE" : "NONE")}
+                                                                </span>
+                                                                <div className="flex flex-wrap justify-center gap-0.5 max-w-[40px]">
+                                                                    {['none', 'white', 'black', 'grey', 'navy', 'beige', 'brown', 'red', 'green', 'blue', 'anthracite'].map(c => (
+                                                                        <div key={c} className={cn("w-1 h-1 rounded-full transition-all", socksType === c ? "bg-white scale-110 shadow-[0_0_2px_white]" : "bg-zinc-700")} />
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    document.getElementById('socks-upload')?.click();
+                                                                }}
+                                                                className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-sm bg-white/10 hover:bg-white/20 text-white/70 hover:text-white"
+                                                            >
+                                                                <ImageIcon size={10} />
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </TooltipTrigger>
+                                            {(pantLength === 'covering' || pantLength === 'flare') && (
+                                                <TooltipContent side="top" className="text-[9px] max-w-[150px] text-center bg-zinc-900 text-zinc-300 border border-white/10 font-bold uppercase p-2 rounded-md tracking-tight">
+                                                    {language === "tr"
+                                                        ? "Uzun paça kullanıldığında çoraplar görünmez."
+                                                        : "Socks are not visible when using long length pants."}
+                                                </TooltipContent>
+                                            )}
+                                        </Tooltip>
+                                    </TooltipProvider>
+
                                     <AssetCard id="glasses" label={language === "tr" ? "GÖZLÜK" : "GLASSES"} icon={Glasses} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="square" />
                                     <AssetCard id="hat" label={language === "tr" ? "ŞAPKA" : "HAT"} icon={PiBaseballCap} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="square" />
                                     <AssetCard id="jewelry" label={language === "tr" ? "TAKILAR" : "JEWELRY"} icon={PiDiamond} assets={assets} activeLibraryAsset={activeLibraryAsset} setActiveLibraryAsset={setActiveLibraryAsset} handleAssetUpload={handleAssetUpload} handleAssetRemove={handleAssetRemove} language={language} variant="square" />
@@ -465,9 +623,9 @@ export default function PhotoshootPage() {
                                 </Button>
                                 <Button
                                     onClick={() => canMoveToStep(3) && setWizardStep(3)}
-                                    className="px-4 py-2 h-auto rounded-md bg-[#F5F5F5] hover:bg-white text-black font-black text-[10px] uppercase tracking-widest shadow-none transition-all hover:scale-[1.02] active:scale-[0.98] group"
+                                    className="px-8 h-12 rounded-md bg-[#F5F5F5] hover:bg-white text-black font-black text-[11px] uppercase tracking-widest shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] group flex items-center gap-2"
                                 >
-                                    {language === "tr" ? "İLERLE" : "NEXT"} <ChevronRight className="ml-2 w-3.5 h-3.5" />
+                                    {language === "tr" ? "İLERLE" : "NEXT"} <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                 </Button>
                             </div>
                         </div>
@@ -475,10 +633,7 @@ export default function PhotoshootPage() {
 
                     {/* WIZARD STEP 3: PRODUCTION */}
                     {wizardStep === 3 && (
-
                         <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-
-
                             <div className="w-full">
                                 <div className="max-w-5xl mx-auto px-1 md:px-0 space-y-6">
 
@@ -519,13 +674,136 @@ export default function PhotoshootPage() {
                                                     </div>
                                                 </div>
 
-                                                <div className="flex items-center gap-3 pl-4 border-l border-white/5">
-                                                    <div className="flex flex-col">
-                                                        <span className="text-[9px] font-black text-white/30 uppercase tracking-widest leading-none mb-1">Estimated Cost</span>
-                                                        <span className="text-[11px] font-black text-white tracking-widest">~{estimatedCost} CREDITS</span>
-                                                    </div>
+                                                <div className="flex items-center pl-4 border-l border-white/5">
+                                                    <Button
+                                                        size="sm"
+                                                        className={cn(
+                                                            "h-10 px-6 shadow-xl transition-all duration-300 font-black uppercase tracking-widest flex items-center gap-2",
+                                                            isProcessing
+                                                                ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
+                                                                : "bg-white hover:bg-zinc-200 text-black shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+                                                        )}
+                                                        onClick={() => batchMode ? handleBatchGenerate() : handleGenerate()}
+                                                        disabled={isProcessing}
+                                                    >
+                                                        {isProcessing ? (
+                                                            <>
+                                                                <Loader2 className="w-4 h-4 animate-spin text-zinc-500" />
+                                                                {language === "tr" ? "ÜRETİLİYOR..." : "GENERATING..."}
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Camera className="w-4 h-4" />
+                                                                <span className="flex items-center gap-1.5">
+                                                                    {language === "tr" ? "ÜRETİMİ BAŞLAT" : "START PRODUCTION"}
+                                                                    <span className="ml-1 px-2 py-0.5 rounded-full bg-black/10 text-[9px] font-black border border-black/5">
+                                                                        {estimatedCost} {language === 'tr' ? 'KREDİ' : 'CREDITS'}
+                                                                    </span>
+                                                                </span>
+                                                            </>
+                                                        )}
+                                                    </Button>
                                                 </div>
                                             </div>
+                                        </div>
+                                    </div>
+
+                                    {/* TOP 2: Production Features Bar */}
+                                    <div className="py-2.5 px-6 rounded-md bg-white/5 border border-white/10 shadow-2xl backdrop-blur-xl flex flex-col md:flex-row md:items-center gap-8">
+                                        <div className="md:border-r border-white/10 pr-6 flex-none hidden lg:block">
+                                            <p className="text-[10px] uppercase font-black text-white/40 tracking-[0.2em] m-0">{language === "tr" ? "ÜRETİM" : "PRODUCTION"}</p>
+                                        </div>
+
+                                        <div className="flex-1 flex flex-wrap items-center gap-x-10 gap-y-4">
+                                            {/* Mavi Toggle */}
+                                            {user?.role === 'admin' && setIsMaviBatch && (
+                                                <div className="flex items-center gap-3 pr-6 border-r border-white/10">
+                                                    <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest whitespace-nowrap">MAVI</span>
+                                                    <Switch checked={isMaviBatch} onCheckedChange={setIsMaviBatch} className="scale-75" />
+                                                </div>
+                                            )}
+
+                                            {/* Product Code */}
+                                            <div className="flex items-center gap-3">
+                                                <label className="text-[10px] uppercase font-black text-white/40 tracking-widest whitespace-nowrap">{language === "tr" ? "ÜRÜN KODU" : "PRODUCT CODE"}</label>
+                                                <input
+                                                    type="text"
+                                                    className="bg-white/5 border border-white/10 rounded-md px-3 py-1.5 text-[11px] font-black text-white outline-none focus:border-white/20 transition-all w-32 placeholder:text-white/10"
+                                                    value={productCode}
+                                                    onChange={(e) => setProductCode(e.target.value)}
+                                                    placeholder="23132..."
+                                                />
+                                            </div>
+
+                                            {/* Missing Configs - Inline version */}
+                                            <div className="flex items-center gap-3">
+                                                <label className="text-[10px] uppercase font-black text-white/40 tracking-widest whitespace-nowrap">{language === "tr" ? "AYARLAR" : "CONFIG"}:</label>
+                                                <div className="flex items-center gap-1.5">
+                                                    {(() => {
+                                                        const itemsToCheck = [
+                                                            { key: 'model', labelTr: 'Manken', labelEn: 'Model', group: 'product' },
+                                                            { key: 'background', labelTr: 'Arkaplan', labelEn: 'BG', group: 'product' },
+                                                            { key: 'jacket', labelTr: 'Dış', labelEn: 'Outer', group: 'accessories' },
+                                                            { key: 'bag', labelTr: 'Çanta', labelEn: 'Bag', group: 'accessories' },
+                                                            { key: 'shoes', labelTr: 'Ayakkabı', labelEn: 'Shoes', group: 'accessories' },
+                                                            { key: 'socks', labelTr: 'Çorap', labelEn: 'Socks', group: 'accessories' },
+                                                        ];
+                                                        const unselected = itemsToCheck.filter(i => !assets[i.key]);
+
+                                                        if (unselected.length === 0) return <span className="text-[9px] font-bold text-green-500 uppercase px-2 py-1 rounded bg-green-500/10 border border-green-500/20">{language === 'tr' ? 'TAMAM' : 'OK'}</span>;
+
+                                                        return (
+                                                            <div className="flex items-center gap-1.5 overflow-x-auto max-w-[300px] no-scrollbar">
+                                                                {unselected.map(item => (
+                                                                    <button
+                                                                        key={item.key}
+                                                                        onClick={() => { setWizardStep(2); setActiveGroup(item.group as any); setActiveLibraryAsset(item.key); }}
+                                                                        className="px-2 py-1 rounded bg-red-500/10 border border-red-500/20 text-red-500 text-[9px] font-black uppercase hover:bg-red-500 hover:text-white transition-all whitespace-nowrap"
+                                                                    >
+                                                                        {language === 'tr' ? item.labelTr : item.labelEn}
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+                                                        );
+                                                    })()}
+                                                </div>
+                                            </div>
+
+                                            {/* Technical Accessories - Summary toggle */}
+                                            {(() => {
+                                                const accessories = [
+                                                    { id: 'jacket', label: 'Ceket', labelEn: 'Jacket' },
+                                                    { id: 'bag', label: 'Çanta', labelEn: 'Bag' },
+                                                    { id: 'glasses', label: 'Gözlük', labelEn: 'Glasses' },
+                                                    { id: 'hat', label: 'Şapka', labelEn: 'Hat' },
+                                                    { id: 'jewelry', label: 'Takı', labelEn: 'Jewelry' },
+                                                    { id: 'belt', label: 'Kemer', labelEn: 'Belt' },
+                                                ];
+                                                const activeOnes = accessories.filter(acc => !!assets[acc.id]);
+                                                if (activeOnes.length === 0) return null;
+
+                                                return (
+                                                    <div className="flex items-center gap-3 pl-6 border-l border-white/10">
+                                                        <label className="text-[10px] uppercase font-black text-white/40 tracking-widest whitespace-nowrap">{language === 'tr' ? 'TEKNİK' : 'TECH'}:</label>
+                                                        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                                                            {activeOnes.map(acc => (
+                                                                <button
+                                                                    key={acc.id}
+                                                                    onClick={() => setTechAccessories({ ...techAccessories, [acc.id]: !techAccessories[acc.id] })}
+                                                                    className={cn(
+                                                                        "px-2 py-1 rounded text-[9px] font-black uppercase transition-all whitespace-nowrap border",
+                                                                        techAccessories[acc.id]
+                                                                            ? "bg-blue-600 border-blue-400 text-white"
+                                                                            : "bg-white/5 border-white/10 text-white/40 hover:text-white hover:border-white/20"
+                                                                    )}
+                                                                >
+                                                                    {language === 'tr' ? acc.label : acc.labelEn}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })()}
                                         </div>
                                     </div>
 
@@ -559,7 +837,7 @@ export default function PhotoshootPage() {
                                                                             <img src={shot.image} alt={shot.label} className="w-full h-full object-cover" />
                                                                         ) : (
                                                                             <div className="w-full h-full flex items-center justify-center bg-muted/20">
-                                                                                <Shirt className="w-8 h-8 opacity-20" />
+                                                                                < Shirt className="w-8 h-8 opacity-20" />
                                                                             </div>
                                                                         )}
 
@@ -567,7 +845,6 @@ export default function PhotoshootPage() {
                                                                             <p className="text-[10px] font-black text-white text-center leading-snug uppercase">
                                                                                 {language === 'tr' ? shot.label : shot.labelEn}
                                                                             </p>
-                                                                            {/* Sadece burada Poz Seç yazısını minik gösterdik ama tıklama butonunu alta ayırdık */}
                                                                         </div>
 
                                                                         <div className="absolute top-2 left-2">
@@ -650,7 +927,7 @@ export default function PhotoshootPage() {
                                                                         "relative aspect-[3/4] rounded-xl border transition-all duration-300 overflow-hidden group w-full",
                                                                         isDisabled ? "cursor-not-allowed opacity-20 grayscale" : "cursor-pointer",
                                                                         isSelected
-                                                                            ? (isMaviActive ? "border-zinc-400 ring-2 ring-zinc-400/20 shadow-lg" : "border-white ring-2 ring-white/20 shadow-lg")
+                                                                            ? (isMaviActive ? "border-zinc-100 border-zinc-100 text-black" : "border-white ring-2 ring-white/20 shadow-lg")
                                                                             : (!isDisabled && "border-[var(--border-subtle)] opacity-40 grayscale bg-[var(--bg-elevated)] hover:opacity-80 transition-opacity")
                                                                     )}
                                                                     onClick={() => {
@@ -682,7 +959,7 @@ export default function PhotoshootPage() {
                                                                             <div className={cn(
                                                                                 "w-4 h-4 rounded-md flex items-center justify-center border transition-all",
                                                                                 isSelected
-                                                                                    ? (isMaviActive ? "bg-blue-600 border-blue-400 text-white" : "bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white")
+                                                                                    ? (isMaviActive ? "bg-zinc-100 border-zinc-100 text-black" : "bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white")
                                                                                     : "bg-white/20 border-white/40 text-transparent"
                                                                             )}>
                                                                                 <Check className="w-3 h-3" />
@@ -698,61 +975,25 @@ export default function PhotoshootPage() {
                                         </div>
                                     </div>
 
-                                    {/* BOTTOM: Batch Panel + Preview */}
-                                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch pt-4">
-                                        {/* Sol Taraf: Batch Ayarları ve Seçimler */}
-                                        <div className="col-span-1 lg:col-span-5 flex flex-col">
-                                            <div className="flex-1 bg-white/[0.02] border border-white/5 rounded-[32px] overflow-hidden shadow-2xl flex flex-col p-8">
-                                                <BatchPanel
-                                                    productName={productName}
-                                                    selectedMoodId={selectedMoodId}
-                                                    language={language}
-                                                    batchMode={batchMode}
-                                                    setBatchMode={setBatchMode}
-                                                    productCode={productCode}
-                                                    setProductCode={setProductCode}
-                                                    availableBatchShots={availableBatchShots}
-                                                    batchShotSelection={batchShotSelection}
-                                                    setBatchShotSelection={setBatchShotSelection}
-                                                    isAdmin={user?.role === 'admin'}
-                                                    isMaviBatch={isMaviBatch}
-                                                    setIsMaviBatch={setIsMaviBatch}
-                                                    stylingSideOnly={stylingSideOnly}
-                                                    setStylingSideOnly={setStylingSideOnly}
-                                                    techAccessories={techAccessories}
-                                                    setTechAccessories={setTechAccessories}
-                                                    techAccessoryDescriptions={techAccessoryDescriptions}
-                                                    setTechAccessoryDescriptions={setTechAccessoryDescriptions}
-                                                    assets={assets}
-                                                    productDescription={productDescription}
-                                                    setProductDescription={setProductDescription}
-                                                    setWizardStep={setWizardStep}
-                                                    setActiveGroup={setActiveGroup}
-                                                    setActiveLibraryAsset={setActiveLibraryAsset}
-                                                />
-                                            </div>
-                                        </div>
-
-                                        {/* Sağ Taraf: Önizleme / Üretim Alanı */}
-                                        <div className="col-span-1 lg:col-span-7 flex flex-col">
-                                            <div className="flex-1 bg-white/[0.02] border border-white/5 rounded-[32px] overflow-hidden shadow-2xl flex flex-col">
-                                                <PreviewArea
-                                                    language={language}
-                                                    isProcessing={isProcessing}
-                                                    isStoppingBatch={isStoppingBatch}
-                                                    handleStopBatch={handleStopBatch}
-                                                    isGenerationSuccess={isGenerationSuccess}
-                                                    resultImages={resultImages}
-                                                    router={router}
-                                                    StudioSteps={StudioSteps}
-                                                    handleGenerate={handleGenerate}
-                                                    handleBatchGenerate={handleBatchGenerate}
-                                                    batchMode={true}
-                                                    productCode={productCode}
-                                                    estimatedCost={estimatedCost}
-                                                    isAdmin={user?.role === 'admin'}
-                                                />
-                                            </div>
+                                    {/* BOTTOM: Preview area take full width */}
+                                    <div className="w-full pt-4">
+                                        <div className="bg-white/[0.02] border border-white/5 rounded-[32px] overflow-hidden shadow-2xl flex flex-col">
+                                            <PreviewArea
+                                                language={language}
+                                                isProcessing={isProcessing}
+                                                isStoppingBatch={isStoppingBatch}
+                                                handleStopBatch={handleStopBatch}
+                                                isGenerationSuccess={isGenerationSuccess}
+                                                resultImages={resultImages}
+                                                router={router}
+                                                StudioSteps={StudioSteps}
+                                                handleGenerate={handleGenerate}
+                                                handleBatchGenerate={handleBatchGenerate}
+                                                batchMode={true}
+                                                productCode={productCode}
+                                                estimatedCost={estimatedCost}
+                                                isAdmin={user?.role === 'admin'}
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -762,9 +1003,9 @@ export default function PhotoshootPage() {
                 </div>
 
 
-
                 {/* Preview Dialog */}
                 <Dialog open={showPreview} onOpenChange={setShowPreview}>
+
                     <DialogContent className="max-w-6xl w-[95vw] max-h-[90vh] p-0 flex flex-col bg-[var(--bg-surface)] border-[var(--border-subtle)] shadow-2xl rounded-2xl overflow-hidden">
                         {/* Functional Header */}
                         <div className="flex-none px-6 py-4 border-b border-[var(--border-subtle)] bg-[var(--bg-elevated)] flex items-center justify-between">
@@ -880,9 +1121,7 @@ export default function PhotoshootPage() {
                             </Button>
                         </div>
                     </DialogContent>
-                </Dialog>
-
-                {/* Modular Dialogs */}
+                </Dialog >
 
                 <SavePoseDialog
                     isOpen={showSavePoseDialog}
@@ -968,15 +1207,17 @@ export default function PhotoshootPage() {
                 />
 
                 {/* Library Backdrop (Click outside to close) */}
-                {activeLibraryAsset && !(activeLibraryAsset === 'model' && wizardStep === 1) && (
-                    <div
-                        className="fixed inset-0 bg-black/5 z-[55] animate-in fade-in duration-300"
-                        onClick={() => {
-                            setActiveLibraryAsset(null);
-                            setActiveGroup(null);
-                        }}
-                    />
-                )}
+                {
+                    activeLibraryAsset && !(activeLibraryAsset === 'model' && wizardStep === 1) && (
+                        <div
+                            className="fixed inset-0 bg-black/5 z-[55] animate-in fade-in duration-300"
+                            onClick={() => {
+                                setActiveLibraryAsset(null);
+                                setActiveGroup(null);
+                            }}
+                        />
+                    )
+                }
             </div>
 
             <LibrarySidebar
@@ -1050,6 +1291,7 @@ export default function PhotoshootPage() {
                 addToGlobalLibrary={addToGlobalLibrary}
                 selectedPoseUrl={targetPoseShot ? (assets[`pose_${targetPoseShot}`] || null) : (assets.pose || null)}
             />
-        </div >
+        </div>
+
     );
 }

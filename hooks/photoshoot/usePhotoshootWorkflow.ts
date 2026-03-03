@@ -78,14 +78,14 @@ export const usePhotoshootWorkflow = () => {
         model: null, background: null, main_product: null, pose: null,
         top_front: null, bottom_front: null, shoes: null, top_back: null,
         bottom_back: null, jacket: null, bag: null, glasses: null,
-        hat: null, jewelry: null, belt: null, inner_wear: null, lighting: null
+        hat: null, jewelry: null, belt: null, inner_wear: null, lighting: null, socks: null
     });
 
     const [assetsHighRes, setAssetsHighRes] = useState<{ [key: string]: string | null }>({
         model: null, background: null, main_product: null, pose: null,
         top_front: null, bottom_front: null, shoes: null, top_back: null,
         bottom_back: null, jacket: null, bag: null, glasses: null,
-        hat: null, jewelry: null, belt: null, inner_wear: null, lighting: null
+        hat: null, jewelry: null, belt: null, inner_wear: null, lighting: null, socks: null
     });
 
     const [poseFocus, setPoseFocus] = useState<'upper' | 'full' | 'lower' | 'closeup'>('full');
