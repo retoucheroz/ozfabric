@@ -5,6 +5,7 @@ import { useState, useEffect, useRef, Suspense } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
 import {
   Upload,
   Loader2,
@@ -258,20 +259,12 @@ function GhostPageContent() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)] bg-[#0D0D0F] overflow-hidden">
-      <div className="flex-1 overflow-y-auto custom-scrollbar">
-        <div className="max-w-[1240px] mx-auto w-full min-h-full flex flex-col lg:flex-row">
+    <div className="flex flex-col h-full bg-[#0D0D0F]">
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8">
+        <div className="max-w-[1180px] mx-auto w-full flex flex-col lg:flex-row gap-8">
           {/* Left: Input */}
-          <div className="w-full lg:w-[420px] lg:border-r border-b lg:border-b-0 border-white/5 bg-background p-4 md:p-8 lg:overflow-y-auto space-y-4 shrink-0">
-            <div className="flex items-center gap-4 mb-8">
-              <div className="w-12 h-12 rounded-md bg-zinc-900 border border-white/10 text-white flex items-center justify-center shadow-xl">
-                <TbHanger className="w-6 h-6" />
-              </div>
-              <div className="flex flex-col">
-                <h2 className="text-2xl font-black tracking-tighter uppercase italic text-white">{t("ghost.title")}</h2>
-                <p className="text-[10px] text-zinc-500 uppercase font-black tracking-[0.2em] mt-0.5">{t("ghost.subtitle")}</p>
-              </div>
-            </div>
+          <div className="w-full lg:w-[420px] flex flex-col space-y-6 shrink-0">
+
 
             {/* Main Garment Upload */}
             <div className="space-y-3">
@@ -279,7 +272,7 @@ function GhostPageContent() {
                 <TbShirt className="w-4 h-4 text-white" />
                 {language === "tr" ? "ANA GİYSİ GÖRSELİ" : "MAIN GARMENT IMAGE"} *
               </label>
-              <div className="h-40 border-2 border-dashed border-white/5 rounded-2xl bg-white/[0.02] relative group hover:border-white transition-all cursor-pointer overflow-hidden">
+              <div className="h-40 border-2 border-dashed border-white/5 rounded-2xl bg-[#18181b] relative group hover:border-white transition-all cursor-pointer overflow-hidden">
                 <input
                   type="file"
                   accept="image/*"
@@ -313,7 +306,7 @@ function GhostPageContent() {
                   <TbSignature className="w-3.5 h-3.5 text-white" />
                   {language === "tr" ? "LOGO / DETAY" : "LOGO / DETAIL"}
                 </label>
-                <div className="h-32 border-2 border-dashed border-white/5 rounded-2xl bg-white/[0.02] relative group hover:bg-white/[0.05] transition-all cursor-pointer overflow-hidden">
+                <div className="h-32 border-2 border-dashed border-white/5 rounded-2xl bg-[#18181b] relative group hover:bg-white/[0.05] transition-all cursor-pointer overflow-hidden">
                   <input
                     type="file"
                     accept="image/*"
@@ -345,7 +338,7 @@ function GhostPageContent() {
                   <TbPalette className="w-3.5 h-3.5 text-white" />
                   {language === "tr" ? "KUMAŞ / DOKU" : "FABRIC / TEXTURE"}
                 </label>
-                <div className="h-32 border-2 border-dashed border-white/5 rounded-2xl bg-white/[0.02] relative group hover:bg-white/[0.05] transition-all cursor-pointer overflow-hidden">
+                <div className="h-32 border-2 border-dashed border-white/5 rounded-2xl bg-[#18181b] relative group hover:bg-white/[0.05] transition-all cursor-pointer overflow-hidden">
                   <input
                     type="file"
                     accept="image/*"
@@ -384,21 +377,23 @@ function GhostPageContent() {
                 <TbAdjustmentsHorizontal className="w-4 h-4 text-white" />
                 {language === "tr" ? "GÖRÜNÜM AÇILARI" : "VIEW ANGLES"}
               </label>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-5 gap-1.5">
                 {ANGLE_OPTIONS.map((angle) => (
                   <Button
                     key={angle.id}
                     variant={selectedAngle === angle.id ? "default" : "outline"}
                     className={cn(
-                      "h-24 flex-col gap-2 transition-all duration-300 rounded-md border-white/5",
+                      "h-16 flex-col gap-1 transition-all duration-300 rounded-md border-white/5 p-1",
                       selectedAngle === angle.id
                         ? "bg-white text-black shadow-2xl border-white ring-2 ring-white/20"
-                        : "bg-white/[0.02] hover:border-white/20 text-zinc-500 hover:text-white"
+                        : "bg-[#18181b] hover:border-white/20 text-[#f5f5f5] hover:text-white"
                     )}
                     onClick={() => setSelectedAngle(angle.id)}
                   >
-                    <angle.icon className={cn("w-8 h-8 mb-1", selectedAngle === angle.id ? "text-black" : "text-white opacity-40")} />
-                    <span className="font-black text-[10px] uppercase tracking-widest">{language === "tr" ? angle.labelTr : angle.label}</span>
+                    <angle.icon className={cn("w-5 h-5", selectedAngle === angle.id ? "text-black" : "text-[#f5f5f5]/50")} />
+                    <span className="font-black text-[9px] uppercase tracking-tighter leading-none text-center h-4 flex items-center justify-center">
+                      {language === "tr" ? angle.labelTr : angle.label}
+                    </span>
                   </Button>
                 ))}
               </div>
@@ -408,9 +403,9 @@ function GhostPageContent() {
             <div className="grid grid-cols-2 gap-2">
               <Dialog open={resolutionDialogOpen} onOpenChange={setResolutionDialogOpen}>
                 <DialogTrigger asChild>
-                  <Card className="p-3 cursor-pointer hover:bg-[var(--bg-elevated)] transition-all border border-[var(--border-subtle)] hover:border-[var(--accent-primary)] group">
+                  <Card className="p-3 cursor-pointer bg-[#18181b] transition-all border border-white/5 hover:border-white/20 group">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-md bg-[var(--bg-sidebar)] border border-[var(--border-subtle)] flex items-center justify-center shrink-0">
+                      <div className="w-9 h-9 rounded-md bg-[#0D0D0F] border border-white/5 flex items-center justify-center shrink-0">
                         <TbHdr className="w-5 h-5 text-[var(--text-muted)] group-hover:text-[var(--accent-primary)]" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -450,9 +445,9 @@ function GhostPageContent() {
 
               <Dialog open={aspectRatioDialogOpen} onOpenChange={setAspectRatioDialogOpen}>
                 <DialogTrigger asChild>
-                  <Card className="p-3 cursor-pointer hover:bg-[var(--bg-elevated)] transition-all border border-[var(--border-subtle)] hover:border-[var(--accent-primary)] group">
+                  <Card className="p-3 cursor-pointer bg-[#18181b] transition-all border border-white/5 hover:border-white/20 group">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-[var(--bg-sidebar)] border border-[var(--border-subtle)] flex items-center justify-center shrink-0">
+                      <div className="w-9 h-9 rounded-lg bg-[#0D0D0F] border border-white/5 flex items-center justify-center shrink-0">
                         <TbSquareRotated className="w-5 h-5 text-[var(--text-muted)] group-hover:text-[var(--accent-primary)]" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -532,48 +527,78 @@ function GhostPageContent() {
             </div>
           </div>
 
-          {/* Middle: Result */}
-          <div className="flex-1 bg-[#0D0D0F] p-8 flex items-center justify-center min-h-[400px]">
-            {isProcessing ? (
-              <div className="max-w-md w-full space-y-8 text-center animate-in fade-in duration-500">
-                <div className="relative w-48 h-48 mx-auto">
-                  <div className="absolute inset-0 rounded-full border-4 border-white/5"></div>
-                  <div className="absolute inset-0 rounded-full border-4 border-t-white border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Shirt className="w-16 h-16 text-white animate-pulse" />
+          {/* Right Side: Result Section */}
+          <div className="flex-1 flex flex-col space-y-2">
+            <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest px-1 flex items-center gap-1.5 mb-1.5">
+              <Sparkles className="w-4 h-4 text-[var(--accent-primary)]" />
+              {language === 'tr' ? 'SONUÇ' : 'RESULT'}
+            </Label>
+
+            <Card className="relative flex-1 min-h-[500px] lg:min-h-0 bg-[#18181b] border-2 border-dashed border-border dark:border-white/10 overflow-hidden flex items-center justify-center group rounded-3xl shadow-none hover:border-border/80 dark:hover:border-white/20 transition-colors">
+              {isProcessing ? (
+                <div className="absolute inset-0 bg-black/80 backdrop-blur-xl z-20 flex flex-col items-center justify-center p-8 text-center space-y-6">
+                  <div className="relative">
+                    <div className="w-24 h-24 border-2 border-white/5 border-t-white rounded-full animate-spin" />
+                    <div className="absolute inset-0 m-auto w-12 h-12 flex items-center justify-center">
+                      <Shirt className="w-6 h-6 text-white animate-pulse" />
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <h3 className="text-xl font-black uppercase italic tracking-tighter text-white">{t("styles.generating")}</h3>
+                    <p className="text-[10px] uppercase font-black tracking-[0.2em] text-zinc-500 transition-all duration-300 min-h-[1.5em] max-w-[240px] mx-auto">
+                      {language === 'tr' ? LOADING_MESSAGES[currentMessageIndex].tr : LOADING_MESSAGES[currentMessageIndex].en}
+                    </p>
+                  </div>
+                  <div className="w-full max-w-[280px] space-y-4">
+                    <Progress value={generationProgress} className="h-1.5 w-full bg-white/5" />
+                    <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                      <span>{generationProgress}%</span>
+                      <span>{language === 'tr' ? 'Tahmini süre: 10-15sn' : 'Est. time: 10-15s'}</span>
+                    </div>
                   </div>
                 </div>
-
-                <div className="space-y-3">
-                  <h3 className="text-xl font-black uppercase italic tracking-tighter text-white">{t("styles.generating")}</h3>
-                  <p className="text-[10px] uppercase font-black tracking-[0.2em] text-zinc-500 transition-all duration-300 min-h-[1.5em]">
-                    {language === 'tr' ? LOADING_MESSAGES[currentMessageIndex].tr : LOADING_MESSAGES[currentMessageIndex].en}
-                  </p>
-                </div>
-
-                <div className="space-y-4">
-                  <Progress value={generationProgress} className="h-1.5 w-full bg-white/5" />
-                  <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-zinc-500">
-                    <span>{generationProgress}%</span>
-                    <span>{language === 'tr' ? 'Tahmini süre: 10-15sn' : 'Est. time: 10-15s'}</span>
+              ) : resultImage ? (
+                <div className="w-full h-full flex flex-col p-4 space-y-4 animate-in fade-in zoom-in duration-500">
+                  <div className="relative flex-1 overflow-hidden rounded-2xl shadow-inner bg-black/5">
+                    <img src={resultImage} className="w-full h-full object-contain" alt="Result" />
+                    <div className="absolute top-4 right-4 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button variant="secondary" className="bg-white text-black hover:bg-zinc-200 font-black h-10 px-5 rounded-md uppercase tracking-widest text-[10px]" onClick={() => router.push(`/studio?image=${encodeURIComponent(resultImage)}`)}>{t("common.getSpecs")}</Button>
+                      <Button variant="secondary" size="icon" className="bg-white text-black hover:bg-zinc-200 h-10 w-10 rounded-md" onClick={handleDownload}>
+                        <Download className="w-5 h-5" />
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between px-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase">{language === 'tr' ? 'BAŞARIYLA ÜRETİLDİ' : 'SUCCESSFULLY GENERATED'}</span>
+                    </div>
+                    <div className="flex gap-3">
+                      <Button variant="ghost" size="sm" onClick={() => setResultImage(null)} className="h-10 text-[11px] font-black uppercase tracking-widest rounded-md px-5 border border-white/5 bg-white/5 hover:bg-white hover:text-black transition-all">
+                        <TbRefresh className="w-4 h-4 mr-2" />
+                        {language === 'tr' ? 'YENİ' : 'NEW'}
+                      </Button>
+                      <Button size="sm" onClick={handleDownload} className="h-10 bg-white text-black text-[11px] font-black uppercase tracking-widest rounded-md px-5 hover:bg-zinc-200 shadow-xl transition-all">
+                        <Download className="w-4 h-4 mr-2" />
+                        {language === 'tr' ? 'İNDİR' : 'DOWNLOAD'}
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ) : resultImage ? (
-              <Card className="max-w-xl w-full aspect-[2/3] p-3 bg-zinc-900 border border-white/10 shadow-2xl animate-in zoom-in-95 duration-500 relative group rounded-md">
-                <img src={resultImage} className="w-full h-full object-contain rounded-xl" />
-                <div className="absolute top-6 right-6 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Button variant="secondary" className="bg-white text-black hover:bg-zinc-200 font-black h-10 px-5 rounded-md uppercase tracking-widest text-[10px]" onClick={() => router.push(`/studio?image=${encodeURIComponent(resultImage)}`)}>{t("common.getSpecs")}</Button>
-                  <Button variant="secondary" size="icon" className="bg-white text-black hover:bg-zinc-200 h-10 w-10 rounded-md" onClick={handleDownload}><Download className="w-5 h-5" /></Button>
+              ) : (
+                <div className="flex flex-col items-center gap-4 text-center p-12">
+                  <div className="w-20 h-20 rounded-full bg-[#18181b] border border-white/5 flex items-center justify-center">
+                    <TbHanger className="w-10 h-10 text-white/50" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="font-black text-2xl uppercase tracking-[0.2em] text-[#f5f5f5]">{t("ghost.title")}</h4>
+                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em] max-w-[280px] mx-auto">
+                      {t("ghost.subtitle")}
+                    </p>
+                  </div>
                 </div>
-              </Card>
-            ) : (
-              <div className="text-center opacity-20 max-w-sm">
-                <Shirt className="w-32 h-32 mx-auto mb-6 stroke-[0.5]" />
-                <h3 className="text-3xl font-black uppercase italic tracking-tighter mb-2 text-white">{t("ghost.studioTitle")}</h3>
-                <p className="text-[10px] uppercase font-black tracking-widest text-zinc-500">{t("ghost.studioDesc")}</p>
-              </div>
-            )}
+              )}
+            </Card>
           </div>
         </div>
       </div>

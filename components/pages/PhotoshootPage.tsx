@@ -331,7 +331,7 @@ export default function PhotoshootPage() {
   if (!mounted) return null;
 
   return (
-    <div className="flex h-[calc(100vh-64px)] overflow-hidden relative">
+    <div className="flex h-full overflow-hidden relative">
       {/* LEFT COLUMN: Wizard Content */}
       <div
         className={cn(
@@ -344,7 +344,7 @@ export default function PhotoshootPage() {
       >
         <div
           className={cn(
-            "p-4 md:p-8 mx-auto space-y-8 transition-all duration-500 flex-1 w-full",
+            "px-4 py-4 md:px-8 md:py-4 mx-auto space-y-4 transition-all duration-500 flex-1 w-full",
             wizardStep === 1
               ? "max-w-[1240px]"
               : wizardStep === 3

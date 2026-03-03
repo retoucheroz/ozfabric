@@ -199,30 +199,7 @@ export default function FaceHeadSwapPage() {
 
     return (
         <div className="max-w-[1240px] mx-auto p-4 md:p-8 space-y-8 min-h-screen pb-24">
-            {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-8 mb-10">
-                <div className="space-y-1.5">
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-md bg-zinc-900 border border-white/10 text-white flex items-center justify-center shadow-xl">
-                            <TbRefresh className="w-6 h-6" />
-                        </div>
-                        <div>
-                            <h1 className="text-3xl font-black tracking-tighter text-white uppercase italic">{t("faceSwap.title")}</h1>
-                            <p className="text-[11px] text-zinc-500 font-black uppercase tracking-[0.2em] mt-1">
-                                {language === 'tr' ? 'NANO BANANA PRO • KUSURSUZ GEÇİŞLER' : 'NANO BANANA PRO • SEAMLESS TRANSITIONS'}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div className="flex items-center gap-3">
-                    <div className="px-4 py-1.5 rounded-md bg-white/5 border border-white/10 flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                        <span className="text-[10px] font-black text-white uppercase tracking-widest">
-                            Quantum Engine v4.2
-                        </span>
-                    </div>
-                </div>
-            </div>
+
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-2">
                 {/* Left Side: Inputs & Config */}
@@ -234,7 +211,7 @@ export default function FaceHeadSwapPage() {
                                 <TbUserCircle className="w-4 h-4 text-[var(--accent-primary)]" />
                                 {t("faceSwap.identitySource")}
                             </Label>
-                            <Card className="relative h-[240px] overflow-hidden border-2 border-dashed border-white/5 hover:border-white/20 hover:bg-white/[0.02] transition-all bg-zinc-900/40 p-2 flex items-center justify-center group cursor-pointer rounded-2xl" onClick={() => identityInputRef.current?.click()}>
+                            <Card className="relative h-[240px] overflow-hidden border-2 border-dashed border-white/5 hover:border-white/20 hover:bg-white/[0.02] transition-all bg-[#18181b] p-2 flex items-center justify-center group cursor-pointer rounded-2xl" onClick={() => identityInputRef.current?.click()}>
                                 <input type="file" ref={identityInputRef} className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'identity')} />
                                 {identityImage ? (
                                     <div className="relative w-full h-full">
@@ -245,7 +222,7 @@ export default function FaceHeadSwapPage() {
                                     </div>
                                 ) : (
                                     <div className="flex flex-col items-center gap-3 text-center p-4">
-                                        <div className="w-12 h-12 rounded-md bg-white/5 flex items-center justify-center group-hover:bg-white text-zinc-500 group-hover:text-black transition-all">
+                                        <div className="w-12 h-12 rounded-md bg-[#18181b] border border-white/5 flex items-center justify-center group-hover:bg-white text-zinc-500 group-hover:text-black transition-all">
                                             <UserCircle2 className="w-6 h-6" />
                                         </div>
                                         <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">{t("faceSwap.uploadReference")}</span>
@@ -259,7 +236,7 @@ export default function FaceHeadSwapPage() {
                                 <TbPhoto className="w-4 h-4 text-[var(--accent-primary)]" />
                                 {t("faceSwap.baseImage")}
                             </Label>
-                            <Card className="relative h-[240px] overflow-hidden border-2 border-dashed border-white/5 hover:border-white/20 hover:bg-white/[0.02] transition-all bg-zinc-900/40 p-2 flex items-center justify-center group cursor-pointer rounded-2xl" onClick={() => baseInputRef.current?.click()}>
+                            <Card className="relative h-[240px] overflow-hidden border-2 border-dashed border-white/5 hover:border-white/20 hover:bg-white/[0.02] transition-all bg-[#18181b] p-2 flex items-center justify-center group cursor-pointer rounded-2xl" onClick={() => baseInputRef.current?.click()}>
                                 <input type="file" ref={baseInputRef} className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'base')} />
                                 {baseImage ? (
                                     <div className="relative w-full h-full">
@@ -270,7 +247,7 @@ export default function FaceHeadSwapPage() {
                                     </div>
                                 ) : (
                                     <div className="flex flex-col items-center gap-3 text-center p-4">
-                                        <div className="w-12 h-12 rounded-md bg-white/5 flex items-center justify-center group-hover:bg-white text-zinc-500 group-hover:text-black transition-all">
+                                        <div className="w-12 h-12 rounded-md bg-[#18181b] border border-white/5 flex items-center justify-center group-hover:bg-white text-zinc-500 group-hover:text-black transition-all">
                                             <ImageIcon className="w-6 h-6" />
                                         </div>
                                         <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">{t("faceSwap.uploadBase")}</span>
@@ -281,7 +258,7 @@ export default function FaceHeadSwapPage() {
                     </div>
 
                     {/* 2. Mode & Parameters Panel */}
-                    <Card className="p-5 space-y-6 bg-card border shadow-sm rounded-2xl">
+                    <Card className="p-5 space-y-6 bg-[#18181b] border border-white/5 shadow-sm rounded-2xl">
                         <div className="space-y-3">
                             <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 mb-1">
                                 <TbAdjustmentsHorizontal className="w-4 h-4 text-[var(--accent-primary)]" />
@@ -345,7 +322,7 @@ export default function FaceHeadSwapPage() {
                                 value={seed}
                                 onChange={(e) => setSeed(e.target.value)}
                                 placeholder={language === 'tr' ? 'Rastgele için boş bırakın' : 'Leave empty for random'}
-                                className="w-full h-11 bg-muted/50 border border-border/50 rounded-md px-4 text-[11px] font-medium focus:ring-1 focus:ring-white/20 outline-none transition-all"
+                                className="w-full h-11 bg-[#0D0D0F] border border-white/5 rounded-md px-4 text-[11px] font-medium focus:ring-1 focus:ring-white/20 outline-none transition-all"
                             />
                         </div>
 
@@ -382,8 +359,12 @@ export default function FaceHeadSwapPage() {
                 </div>
 
                 {/* Right Side: Result Section */}
-                <div className="lg:col-span-7 flex flex-col h-full">
-                    <Card className="relative flex-1 min-h-[500px] lg:min-h-0 bg-card dark:bg-[#12121a] border-2 border-dashed border-border dark:border-white/10 overflow-hidden flex items-center justify-center group rounded-3xl shadow-none hover:border-border/80 dark:hover:border-white/20 transition-colors">
+                <div className="lg:col-span-7 flex flex-col h-full space-y-2">
+                    <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest px-1 flex items-center gap-1.5 mb-1.5">
+                        <Sparkles className="w-4 h-4 text-[var(--accent-primary)]" />
+                        {language === 'tr' ? 'SONUÇ' : 'RESULT'}
+                    </Label>
+                    <Card className="relative flex-1 min-h-[500px] lg:min-h-0 bg-[#18181b] border-2 border-dashed border-border dark:border-white/10 overflow-hidden flex items-center justify-center group rounded-3xl shadow-none hover:border-border/80 dark:hover:border-white/20 transition-colors">
                         {isGenerating ? (
                             <div className="absolute inset-0 bg-black/80 backdrop-blur-xl z-20 flex flex-col items-center justify-center p-8 text-center space-y-6">
                                 <div className="relative">
@@ -436,7 +417,7 @@ export default function FaceHeadSwapPage() {
                             </div>
                         ) : (
                             <div className="flex flex-col items-center gap-4 text-center opacity-40 p-12">
-                                <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
+                                <div className="w-20 h-20 rounded-full bg-[#18181b] border border-white/5 flex items-center justify-center">
                                     <ImageIcon className="w-10 h-10 text-muted-foreground/30" />
                                 </div>
                                 <div className="space-y-1">

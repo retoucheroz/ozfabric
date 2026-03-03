@@ -48,7 +48,7 @@ export default function MannequinPage() {
   const [selectedMannequin, setSelectedMannequin] = useState<number | null>(null);
 
   return (
-    <div className="flex h-[calc(100vh-64px)] bg-[var(--bg-surface)] overflow-hidden">
+    <div className="flex h-full bg-[var(--bg-surface)] overflow-hidden">
       {/* Main Selection Area */}
       <div className="flex-1 flex flex-col border-r">
 

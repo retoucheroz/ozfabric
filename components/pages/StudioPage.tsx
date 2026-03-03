@@ -278,7 +278,7 @@ function StudioPageContent() {
 
   return (
     <>
-      <div className="flex flex-col h-[calc(100vh-64px)] overflow-hidden bg-[#0D0D0F]">
+      <div className="flex flex-col h-full overflow-hidden bg-[#0D0D0F]">
         {/* Header Area */}
         <div className="h-20 border-b border-white/5 bg-[#0D0D0F] flex items-center justify-between px-8 shrink-0 z-30">
           <div className="flex items-center gap-4">

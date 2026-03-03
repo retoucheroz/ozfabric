@@ -22,7 +22,7 @@ const translations: Translations = {
 
     // Sidebar
     "sidebar.design": { en: "Design", tr: "Tasarım" },
-    "sidebar.photoshoot": { en: "Studio", tr: "Stüdyo" },
+    "sidebar.photoshoot": { en: "E-COM", tr: "E-COM" },
     "sidebar.studio": { en: "STUDIO", tr: "STÜDYO" },
     "sidebar.catalog": { en: "CATALOG", tr: "KATALOG" },
     "sidebar.tools": { en: "TOOLS", tr: "ARAÇLAR" },
@@ -37,7 +37,7 @@ const translations: Translations = {
     "sidebar.aiModel": { en: "Generate Photo", tr: "Fotoğraf Üret" },
     "sidebar.tryOn": { en: "Detail Shot", tr: "Detay Çekim" },
     "sidebar.ghost": { en: "Ghost / Flatlay", tr: "Ghost / Flatlay" },
-    "sidebar.editorial": { en: "Campaign", tr: "Kampanya" },
+    "sidebar.editorial": { en: "EDITORIAL", tr: "EDİTORYAL" },
     "sidebar.ecom": { en: "E-com", tr: "E-com" },
     "sidebar.collections": { en: "Collections", tr: "Koleksiyonlar" },
     "sidebar.history": { en: "History", tr: "Geçmiş" },
@@ -74,11 +74,11 @@ const translations: Translations = {
     "home.totalDesigns": { en: "Total Designs", tr: "Toplam Tasarım" },
     "home.creditsAvailable": { en: "Credits Available", tr: "Mevcut Kredi" },
     "home.aiGenerations": { en: "AI Generations", tr: "AI Üretimleri" },
-    "home.createVisualize": { en: "Create & Visualize", tr: "Oluştur & Görselleştir" },
+    "home.createVisualize": { en: "Create", tr: "Oluştur" },
 
-    "home.photoshootTitle": { en: "AI Studio", tr: "Stüdyo" },
-    "home.photoshootDesc": { en: "Create professional studio photos.", tr: "Profesyonel stüdyo çekimleri gerçekleştirin." },
-    "home.videoTitle": { en: "Generate Video", tr: "Video Üret" },
+    "home.photoshootTitle": { en: "E-COMM", tr: "E-COMM" },
+    "home.editorialTitle": { en: "EDİTORYAL", tr: "EDİTORYAL" },
+    "home.videoTitle": { en: "VİDEO", tr: "VİDEO" },
     "home.videoDesc": { en: "Create cinematic reels and stories with AI.", tr: "AI ile sinematik reels ve hikayeler oluşturun." },
 
     "home.sketchTitle": { en: "Sketch to Design", tr: "Eskizden Üret" },
@@ -87,7 +87,7 @@ const translations: Translations = {
     "home.virtualTryOn": { en: "Generate Detail", tr: "Detay Üret" },
     "home.virtualTryOnDesc": { en: "Visualize garments in AI studios instantly.", tr: "Giysileri AI stüdyolar içerisinde anında görselleştirin." },
 
-    "home.ghostModelTitle": { en: "Ghost / Flatlay", tr: "Ghost / Flatlay Üret" },
+    "home.ghostModelTitle": { en: "GHOST - FLATLAY", tr: "GHOST - FLATLAY" },
     "home.ghostModelDesc": { en: "Transform hanging/flat items into 3D ghost mannequin shots.", tr: "Askıda veya düz ürünlerinizi 3D hayalet manken çekimine çevirin." },
 
     "home.trainTitle": { en: "Train Model", tr: "Model Eğit" },

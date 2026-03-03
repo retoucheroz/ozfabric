@@ -1,7 +1,7 @@
-"use client";
+"use client"
 
-import StudioPage from "@/components/pages/StudioPage";
+import StudioSelectionPage from "@/components/pages/StudioSelectionPage"
 
 export default function Page() {
-  return <StudioPage />;
+    return <StudioSelectionPage />
 }

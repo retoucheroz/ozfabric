@@ -518,14 +518,14 @@ export default function EditorialPage() {
     };
 
     return (
-        <div className="flex flex-col h-[calc(100vh-64px)] bg-[var(--bg-sidebar)] overflow-hidden relative">
+        <div className="flex flex-col h-full bg-[var(--bg-sidebar)] overflow-hidden relative">
 
 
             <div className="flex-1 flex overflow-hidden relative">
                 <div className="flex-1 overflow-y-auto custom-scrollbar">
                     <div className={cn(
-                        "p-4 md:p-8 mx-auto space-y-8 transition-all duration-500 flex-1 w-full",
-                        wizardStep === 1 ? "max-w-[1230px]" : wizardStep === 3 ? "max-w-[1182px]" : "max-w-[926px]"
+                        "px-4 py-4 md:px-8 md:py-4 mx-auto space-y-4 transition-all duration-500 flex-1 w-full",
+                        wizardStep === 1 ? "max-w-[1240px]" : wizardStep === 3 ? "max-w-[1182px]" : "max-w-[926px]"
                     )}>
                         {/* Progress */}
                         <div>
@@ -640,33 +640,33 @@ export default function EditorialPage() {
                                                             <div className="space-y-2">
                                                                 <div className="flex items-center gap-2">
                                                                     <span className="w-6 h-6 rounded-full bg-white text-black text-[11px] flex items-center justify-center font-black italic shadow-lg">1</span>
-                                                                    <span className="text-[10px] font-black uppercase tracking-widest text-white">{language === "tr" ? "MODEL SEÇİMİ" : "MODEL SELECTION"}</span>
+                                                                    <span className="text-[10px] font-black uppercase tracking-widest text-[var(--text-primary)]">{language === "tr" ? "MODEL SEÇİMİ" : "MODEL SELECTION"}</span>
                                                                 </div>
-                                                                <p className="text-[10px] text-zinc-500 font-bold leading-relaxed">
+                                                                <p className="text-[11px] text-[var(--text-primary)] font-bold leading-relaxed">
                                                                     {language === "tr"
-                                                                        ? "Model portrenizi yükleyin; çekim moduna göre mevcut kıyafeti koruyabilir veya tamamen yeni bir stil kurgulayabilirsiniz."
-                                                                        : "Upload your model portrait; depending on the mode, preserve the existing outfit or curate a completely new style."}
+                                                                        ? "Model seçiminizi yapın, ya da yeni bir tane üretin."
+                                                                        : "Select your model or generate a new one."}
                                                                 </p>
                                                             </div>
                                                             <div className="space-y-2 border-x border-white/5 px-8">
                                                                 <div className="flex items-center gap-2">
                                                                     <span className="w-6 h-6 rounded-full bg-white text-black text-[11px] flex items-center justify-center font-black italic shadow-lg">2</span>
-                                                                    <span className="text-[10px] font-black uppercase tracking-widest text-white">{language === "tr" ? "KOMBİN SEÇİMİ" : "OUTFIT SELECTION"}</span>
+                                                                    <span className="text-[10px] font-black uppercase tracking-widest text-[var(--text-primary)]">{language === "tr" ? "KOMBİN SEÇİMİ" : "OUTFIT SELECTION"}</span>
                                                                 </div>
-                                                                <p className="text-[10px] text-zinc-500 font-bold leading-relaxed">
+                                                                <p className="text-[11px] text-[var(--text-primary)] font-bold leading-relaxed">
                                                                     {language === "tr"
-                                                                        ? "İster tek görselden oluşan kombin karenizi yükleyin, isterseniz ürün görsellerinizi yükleyin AI robotumuz kombinlesin."
+                                                                        ? "İster tek görselden oluşan kombin fotoğrafınızı yükleyin, isterseniz ürün görsellerinizi yükleyin AI robotumuz kombinlesin."
                                                                         : "Select your single-image outfit visual, or upload product images and let our AI robot curate the look."}
                                                                 </p>
                                                             </div>
                                                             <div className="space-y-2">
                                                                 <div className="flex items-center gap-2">
                                                                     <span className="w-6 h-6 rounded-full bg-white text-black text-[11px] flex items-center justify-center font-black italic shadow-lg">3</span>
-                                                                    <span className="text-[10px] font-black uppercase tracking-widest text-white">{language === "tr" ? "SONUÇ" : "RESULT"}</span>
+                                                                    <span className="text-[10px] font-black uppercase tracking-widest text-[var(--text-primary)]">{language === "tr" ? "SONUÇ" : "RESULT"}</span>
                                                                 </div>
-                                                                <p className="text-[10px] text-zinc-500 font-bold leading-relaxed">
+                                                                <p className="text-[11px] text-[var(--text-primary)] font-bold leading-relaxed">
                                                                     {language === "tr"
-                                                                        ? "Gelişmiş sahne analizi teknolojisi ile yüksek moda standartlarında, gerçekçi ve estetik editoryal karelerinizi oluşturun."
+                                                                        ? "Gelişmiş sahne analizi teknolojisi ile yüksek moda standartlarında, gerçekçi ve estetik editoryal fotoğraflarınızı oluşturun."
                                                                         : "Generate high-fashion, realistic editorial imagery through advanced scene analysis and aesthetic processing."}
                                                                 </p>
                                                             </div>

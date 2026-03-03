@@ -68,10 +68,13 @@ export function TopNav() {
                     {mounted && (
                         <nav className="flex items-center ml-4">
                             <button
-                                onClick={() => setActiveCategory(activeCategory === "studio" ? null : "studio")}
+                                onClick={() => {
+                                    setActiveCategory(activeCategory === "studio" ? null : "studio");
+                                    router.push('/studio');
+                                }}
                                 className={cn(
                                     "px-4 md:px-6 h-[72px] text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] transition-all relative",
-                                    activeCategory === "studio"
+                                    activeCategory === "studio" || pathname === "/studio"
                                         ? "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]"
                                         : "text-zinc-500 hover:text-zinc-300"
                                 )}
@@ -213,7 +216,7 @@ export function TopNav() {
                             ) : (
                                 <>
                                     <SubNavItem href="/resize" icon={TbMaximize} label={t("sidebar.resize")} active={pathname === "/resize"} />
-                                    <SubNavItem href="/studio" icon={TbClipboardText} label={t("sidebar.techPack")} active={pathname === "/studio"} />
+                                    <SubNavItem href="/tech-pack" icon={TbClipboardText} label={t("sidebar.techPack")} active={pathname === "/tech-pack"} />
                                     <SubNavItem href="/analysis" icon={TbAnalyze} label={t("sidebar.analysis")} active={pathname === "/analysis"} />
                                     <SubNavItem href="/train" icon={TbWand} label={t("sidebar.train")} active={pathname === "/train"} />
                                 </>

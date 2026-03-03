@@ -689,7 +689,7 @@ export default function VideoPage() {
     const estimatedCost = currentDuration * costPerSec;
 
     return (
-        <div className="flex flex-col h-[calc(100vh-64px)] bg-[#0D0D0F] text-foreground overflow-hidden">
+        <div className="flex flex-col h-full bg-[#0D0D0F] text-foreground overflow-hidden">
 
             {/* Main Content */}
             <main className="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-thin scrollbar-thumb-card scrollbar-track-transparent">
@@ -958,12 +958,7 @@ export default function VideoPage() {
                                                         </button>
                                                     )}
                                                 </div>
-                                                <div className="flex items-center gap-2 mt-1 px-1">
-                                                    <Switch id="loop-frame" checked={isLoopEnabled} onCheckedChange={setIsLoopEnabled} className="scale-75 origin-left data-[state=checked]:bg-zinc-500" />
-                                                    <label htmlFor="loop-frame" className="text-[10px] font-black uppercase text-[#a1a1aa] cursor-pointer hover:text-[#F5F5F5] transition-colors">
-                                                        {language === 'tr' ? 'LOOP (SONA KOPYALA)' : 'LOOP (COPY TO END)'}
-                                                    </label>
-                                                </div>
+
                                             </div>
 
                                             {/* Mid Swap Button */}
@@ -1033,7 +1028,7 @@ export default function VideoPage() {
 
                                     {/* Right: Settings Summary */}
                                     <div className="flex flex-col gap-4 h-full">
-                                        <Card className="bg-[#0D0D0F] border-[var(--border-subtle)] p-6 backdrop-blur-sm rounded-2xl flex flex-col flex-1">
+                                        <Card className="bg-[#18181b] border-[var(--border-subtle)] p-6 backdrop-blur-sm rounded-2xl flex flex-col flex-1">
                                             <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] lg:grid-cols-[1fr_320px] gap-8 w-full h-full flex-1">
 
                                                 {/* Sol Kolon: Süre, En/Boy, Kalite */}
@@ -1134,34 +1129,42 @@ export default function VideoPage() {
                                             </div>
                                         </Card>
 
-                                        <Button
-                                            onClick={handleGenerate}
-                                            disabled={isProcessing}
-                                            className="w-[90%] mx-auto h-14 shrink-0 overflow-hidden bg-[#F5F5F5] hover:opacity-80 text-[#0D0D0F] font-black rounded-md text-[12px] uppercase tracking-[0.2em] flex items-center justify-center shadow-2xl transition-all active:scale-[0.98] ring-1 ring-[#F5F5F5] ring-offset-2 ring-offset-[#0D0D0F]"
-                                        >
-                                            {isProcessing ? (
-                                                <TbLoader2 className="w-2.5 h-2.5 animate-spin" />
-                                            ) : (
-                                                <div className="flex items-center justify-center whitespace-nowrap">
-                                                    <TbSparkles className="w-2.5 h-2.5 mr-2" />
-                                                    <span className="block">{language === 'tr' ? 'VİDEOYU OLUŞTUR' : 'GENERATE VIDEO'}</span>
-                                                    <span className="ml-3 pl-3 border-l border-current/20 shrink-0 text-[12px] tracking-widest font-black">
-                                                        {estimatedCost} {language === 'tr' ? 'KR' : 'CR'}
-                                                    </span>
-                                                </div>
-                                            )}
-                                        </Button>
+                                        <div className="flex items-center gap-8 w-full mt-2 px-1">
+                                            <div className="flex items-center gap-2 shrink-0">
+                                                <Switch id="loop-frame" checked={isLoopEnabled} onCheckedChange={setIsLoopEnabled} className="scale-75 data-[state=checked]:bg-white" />
+                                                <label htmlFor="loop-frame" className="text-[10px] font-black uppercase text-[#a1a1aa] cursor-pointer hover:text-[#F5F5F5] transition-colors whitespace-nowrap">
+                                                    {language === 'tr' ? 'LOOP (SONA KOPYALA)' : 'LOOP (COPY TO END)'}
+                                                </label>
+                                            </div>
+                                            <Button
+                                                onClick={handleGenerate}
+                                                disabled={isProcessing}
+                                                className="flex-1 h-14 shrink-0 overflow-hidden bg-[#F5F5F5] hover:opacity-80 text-[#0D0D0F] font-black rounded-md text-[12px] uppercase tracking-[0.2em] flex items-center justify-center shadow-2xl transition-all active:scale-[0.98] ring-1 ring-[#F5F5F5] ring-offset-2 ring-offset-[#0D0D0F]"
+                                            >
+                                                {isProcessing ? (
+                                                    <TbLoader2 className="w-2.5 h-2.5 animate-spin" />
+                                                ) : (
+                                                    <div className="flex items-center justify-center whitespace-nowrap">
+                                                        <TbSparkles className="w-2.5 h-2.5 mr-2" />
+                                                        <span className="block">{language === 'tr' ? 'VİDEOYU OLUŞTUR' : 'GENERATE VIDEO'}</span>
+                                                        <span className="ml-3 pl-3 border-l border-current/20 shrink-0 text-[12px] tracking-widest font-black">
+                                                            {estimatedCost} {language === 'tr' ? 'KR' : 'CR'}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
 
                                 {/* Prompt & Multi-shot Section */}
-                                <Card className="bg-[#0D0D0F] border-[var(--border-subtle)] overflow-hidden rounded-2xl">
-                                    <div className="px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between border-b border-[var(--border-subtle)] bg-[#0D0D0F]/50 gap-4">
+                                <Card className="bg-[#18181b] border-[var(--border-subtle)] overflow-hidden rounded-2xl">
+                                    <div className="px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between border-b border-[var(--border-subtle)] bg-[#18181b]/50 gap-4">
                                         <div className="flex items-center gap-2">
-                                            <span className="text-xs font-black uppercase tracking-widest text-[#F5F5F5] italic">
+                                            <span className="text-xs font-black uppercase tracking-widest text-[#F5F5F5]">
                                                 {multiShot
                                                     ? (language === 'tr' ? 'Çoklu Sahne Yapılandırması' : 'Multi-Shot Configuration')
-                                                    : (language === 'tr' ? 'Video Komutu' : 'Video Prompt')}
+                                                    : (language === 'tr' ? 'Video Promptu' : 'Video Prompt')}
                                             </span>
                                             <TooltipProvider>
                                                 <Tooltip>
@@ -1179,13 +1182,13 @@ export default function VideoPage() {
 
                                     </div>
 
-                                    <div className="p-4 sm:p-6 bg-[#0D0D0F]">
+                                    <div className="p-4 sm:p-6 bg-[#18181b]">
                                         {multiShot ? (
                                             <div className="space-y-6">
                                                 {/* MULTI SHOT LIST */}
                                                 <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[var(--border-subtle)]">
                                                     {shots.map((shot, index) => (
-                                                        <div key={shot.id} className="relative p-5 rounded-2xl bg-[#0D0D0F] border border-[var(--border-subtle)] animate-in slide-in-from-right-2">
+                                                        <div key={shot.id} className="relative p-5 rounded-2xl bg-[#18181b] border border-[var(--border-subtle)] animate-in slide-in-from-right-2">
                                                             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
                                                                 <h4 className="text-[10px] font-black text-[#a1a1aa] uppercase tracking-widest flex items-center gap-3">
                                                                     <div className="w-7 h-7 rounded-full bg-white text-black flex items-center justify-center text-[11px] font-black italic shadow-xl">{index + 1}</div>
@@ -1220,7 +1223,7 @@ export default function VideoPage() {
                                                                     onDragOver={(e) => e.preventDefault()}
                                                                     onDrop={(e) => handleDrop(e, shot.id)}
                                                                     placeholder={language === 'tr' ? `Sahne ${index + 1} detaylarını yazın...` : `Describe shot ${index + 1}...`}
-                                                                    className="min-h-[100px] bg-[#0D0D0F] border-[var(--border-subtle)] text-sm resize-none focus:border-[var(--accent-primary)]/50 rounded-2xl p-4"
+                                                                    className="min-h-[100px] bg-[#18181b] border-[var(--border-subtle)] text-sm resize-none focus:border-[var(--accent-primary)]/50 rounded-2xl p-4"
                                                                 />
                                                             </div>
                                                             <div className="flex justify-end mt-3">
@@ -1228,7 +1231,7 @@ export default function VideoPage() {
                                                                     variant="ghost"
                                                                     size="sm"
                                                                     onClick={() => setShowElementsDialog(true)}
-                                                                    className="h-9 gap-2 text-[10px] font-black uppercase tracking-widest bg-[#0D0D0F] hover:bg-[var(--accent-soft)] text-[#a1a1aa] hover:text-[var(--accent-primary)] rounded-md border border-[var(--border-subtle)] px-4"
+                                                                    className="h-9 gap-2 text-[10px] font-black uppercase tracking-widest bg-[#18181b] hover:bg-[var(--accent-soft)] text-[#a1a1aa] hover:text-[var(--accent-primary)] rounded-md border border-[var(--border-subtle)] px-4"
                                                                 >
                                                                     <TbLayoutGrid className="w-4 h-4" />
                                                                     {language === 'tr' ? 'ELEMENTLER' : 'ELEMENTS'}
@@ -1248,7 +1251,7 @@ export default function VideoPage() {
                                                             <TbPlus className="w-4 h-4" />
                                                             {language === 'tr' ? 'YENİ SAHNE' : 'NEW SHOT'}
                                                         </Button>
-                                                        <div className="flex items-center gap-3 px-4 py-2 bg-[#0D0D0F] rounded-md border border-[var(--border-subtle)]">
+                                                        <div className="flex items-center gap-3 px-4 py-2 bg-[#18181b] rounded-md border border-[var(--border-subtle)]">
                                                             <span className="text-[10px] font-black text-[#a1a1aa] uppercase tracking-widest whitespace-nowrap">
                                                                 {language === 'tr' ? 'TOPLAM:' : 'TOTAL:'}
                                                             </span>
@@ -1256,7 +1259,7 @@ export default function VideoPage() {
                                                         </div>
                                                     </div>
 
-                                                    <div className="flex items-center gap-4 bg-[#0D0D0F] px-4 py-2 rounded-md border border-[var(--border-subtle)] self-start sm:self-auto">
+                                                    <div className="flex items-center gap-4 bg-[#18181b] px-4 py-2 rounded-md border border-[var(--border-subtle)] self-start sm:self-auto">
                                                         <div className="flex items-center gap-3 cursor-pointer" onClick={() => setIsSoundOn(!isSoundOn)}>
                                                             <div className={`w-10 h-6 rounded-full relative transition-all ${isSoundOn ? 'bg-[var(--accent-primary)]' : 'bg-[#0D0D0F] border border-[var(--border-subtle)]'}`}>
                                                                 <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${isSoundOn ? 'left-5' : 'left-1'}`} />
@@ -1278,8 +1281,8 @@ export default function VideoPage() {
                                                     onChange={(e) => handleTextareaChange(e.target.value)}
                                                     onDragOver={(e) => e.preventDefault()}
                                                     onDrop={(e) => handleDrop(e)}
-                                                    placeholder={language === 'tr' ? "Neon ışıklı bir şehirde sinematik moda yürüyüşü..." : "A cinematic fashion editorial walk through a neon-lit city..."}
-                                                    className="min-h-[160px] bg-[#0D0D0F] border-[var(--border-subtle)] text-base sm:text-lg resize-none focus:ring-1 focus:ring-[var(--accent-primary)]/30 rounded-2xl p-6 text-[#F5F5F5]"
+                                                    placeholder={language === 'tr' ? "Yumuşak gün ışığında, rüzgarda dalgalanan ipek elbiseli modelin Paris sokaklarında zarif yürüyüşü, 8k sinematik moda çekimi, vton estetiği..." : "An elegant editorial fashion walk through Paris streets in soft sunlight, silk dress flowing in the wind, 8k cinematic quality, high-fashion aesthetic..."}
+                                                    className="min-h-[160px] bg-[#18181b] border-[var(--border-subtle)] text-base sm:text-lg resize-none focus:ring-1 focus:ring-[var(--accent-primary)]/30 rounded-2xl p-6 text-[#F5F5F5]"
                                                 />
                                                 {/* Mention Menu placeholder - handled by code logic */}
 
@@ -1289,7 +1292,7 @@ export default function VideoPage() {
                                                             variant="ghost"
                                                             size="sm"
                                                             onClick={() => setShowElementsDialog(true)}
-                                                            className="h-10 gap-2 text-[10px] font-black uppercase tracking-widest bg-[#0D0D0F] border border-[var(--border-subtle)] text-[#a1a1aa] hover:text-[var(--accent-primary)] rounded-md hover:bg-[var(--accent-soft)] px-5"
+                                                            className="h-10 gap-2 text-[10px] font-black uppercase tracking-widest bg-[#18181b] border border-[var(--border-subtle)] text-[#a1a1aa] hover:text-[var(--accent-primary)] rounded-md hover:bg-[var(--accent-soft)] px-5"
                                                         >
                                                             <TbLayoutGrid className="w-4 h-4" />
                                                             {language === 'tr' ? 'Elementler' : 'Elements'}
