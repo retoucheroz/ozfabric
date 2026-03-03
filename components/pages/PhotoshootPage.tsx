@@ -258,7 +258,7 @@ export default function PhotoshootPage() {
                                                     handleAssetUpload={handleAssetUpload}
                                                     handleAssetRemove={handleAssetRemove}
                                                     savedModels={savedModels}
-                                                    modelDescription={modelDescription}
+                                                    modelDescription={modelDescription ?? ""}
                                                     setModelDescription={setModelDescription}
                                                     onClose={() => setActiveLibraryAsset(null)}
                                                     gridCols={4}
