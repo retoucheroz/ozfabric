@@ -36,7 +36,7 @@ export function PhotoshootTutorial({ language }: PhotoshootTutorialProps) {
                                 {language === "tr" ? "MODEL & ÜRÜN SEÇİMİ" : "MODEL & PRODUCT SELECTION"}
                             </span>
                         </div>
-                        <p className="text-[9px] text-[var(--text-muted)] leading-relaxed font-bold">
+                        <p className="text-[11px] text-[var(--text-primary)] leading-relaxed font-bold">
                             {language === "tr" ? "Model seçimi ve ürün seçimlerinizi yapın." : "Select your model and products."}
                         </p>
                     </div>
@@ -48,7 +48,7 @@ export function PhotoshootTutorial({ language }: PhotoshootTutorialProps) {
                                 {language === "tr" ? "STÜDYO AYARLARI" : "STUDIO SETTINGS"}
                             </span>
                         </div>
-                        <p className="text-[9px] text-[var(--text-muted)] leading-relaxed font-bold">
+                        <p className="text-[11px] text-[var(--text-primary)] leading-relaxed font-bold">
                             {language === "tr" ? "Stüdyo, poz, ışık ve gelişmiş diğer ayarlarınızı seçin." : "Choose studio, pose, lighting and advanced settings."}
                         </p>
                     </div>
@@ -60,7 +60,7 @@ export function PhotoshootTutorial({ language }: PhotoshootTutorialProps) {
                                 {language === "tr" ? "SONUÇ" : "RESULT"}
                             </span>
                         </div>
-                        <p className="text-[9px] text-[var(--text-muted)] leading-relaxed font-bold">
+                        <p className="text-[11px] text-[var(--text-primary)] leading-relaxed font-bold">
                             {language === "tr" ? "Tek görsel veya çoklu üretim seçeneklerinden birini seçin." : "Choose between single or batch production options."}
                         </p>
                     </div>

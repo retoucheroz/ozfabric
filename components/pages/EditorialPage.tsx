@@ -590,7 +590,7 @@ export default function EditorialPage() {
                                     </div>
 
                                     {/* Right: Tutorial / Model Library */}
-                                    <div className="lg:col-span-8 hidden lg:grid flex-col relative overflow-hidden grid-cols-1 grid-rows-1 h-[540px] bg-white/40 dark:bg-black/20 backdrop-blur-md rounded-[32px] border border-white/20 dark:border-white/5 shadow-2xl">
+                                    <div className="lg:col-span-8 hidden lg:grid flex-col relative overflow-hidden grid-cols-1 grid-rows-1 h-[540px] bg-white/40 dark:bg-[#18181b] backdrop-blur-md rounded-[32px] border border-white/20 dark:border-white/5 shadow-2xl">
                                         <AnimatePresence>
                                             {activeLibraryAsset === 'model' ? (
                                                 <motion.div

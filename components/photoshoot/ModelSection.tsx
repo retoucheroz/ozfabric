@@ -56,13 +56,10 @@ export function ModelSection({
                             <User size={12} className={g === 'female' ? 'text-[#F5F5F5]' : 'text-zinc-400'} />
                             {g === 'female' ? (language === "tr" ? "Kadın Stüdyolar" : "Female Studios") : (language === "tr" ? "Erkek Stüdyolar" : "Male Studios")}
                         </h4>
-                        <div className={cn(
-                            "grid gap-3 min-h-[140px] scrollbar-none pr-1",
-                            gridCols === 3 ? "grid-cols-3" :
-                                gridCols === 4 ? "grid-cols-4" :
-                                    gridCols === 5 ? "grid-cols-5" :
-                                        gridCols === 6 ? "grid-cols-6" : "grid-cols-3"
-                        )}>
+                        <div
+                            className="grid gap-4 min-h-[140px] scrollbar-none pr-1 mb-10"
+                            style={{ gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))` }}
+                        >
                             <div className="aspect-[2/3] shrink-0">
                                 <AssetCard
                                     id="model"
@@ -134,15 +131,18 @@ export function ModelSection({
     }
 
     return (
-        <div className="w-full">
-            <div className="relative rounded-md border-2 overflow-hidden transition-all duration-500 bg-[var(--bg-elevated)] border-[var(--border-subtle)] shadow-sm h-[150px] flex flex-col">
+        <div className="w-full space-y-2">
+            <label className="text-[11px] uppercase font-black text-[var(--text-muted)] tracking-[0.2em] px-1">
+                {language === "tr" ? "MODEL SEÇİMİ" : "MODEL SELECTION"}
+            </label>
+            <div className="relative rounded-md border-2 overflow-hidden transition-all duration-500 bg-[#18181b] border-[var(--border-subtle)] shadow-sm h-[125px] flex flex-col">
 
                 {/* Gender Toggle Tabs */}
                 <div className="flex border-b border-white/5">
                     <button
                         onClick={() => setGender("female")}
                         className={cn(
-                            "flex-1 flex items-center justify-center gap-2 py-3 text-[10px] font-black uppercase tracking-[0.2em] transition-all",
+                            "flex-1 flex items-center justify-center gap-2 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] transition-all",
                             gender === 'female'
                                 ? "bg-white text-black"
                                 : "bg-zinc-900 text-zinc-500 hover:text-white"
@@ -155,7 +155,7 @@ export function ModelSection({
                     <button
                         onClick={() => setGender("male")}
                         className={cn(
-                            "flex-1 flex items-center justify-center gap-2 py-3 text-[10px] font-black uppercase tracking-[0.2em] transition-all",
+                            "flex-1 flex items-center justify-center gap-2 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] transition-all",
                             gender === 'male'
                                 ? "bg-white text-black"
                                 : "bg-zinc-900 text-zinc-500 hover:text-white"
@@ -167,7 +167,7 @@ export function ModelSection({
                 </div>
 
                 {/* Model Upload Area */}
-                <div className="flex-1 [&_.group\/card]:h-full [&_.group\/card>div]:rounded-none [&_.group\/card>div]:border-0 [&_.group\/card>div]:shadow-none [&_.group\/card>div]:h-full">
+                <div className="flex-1 [&_.group\/card]:h-full [&_.group\/card>div]:rounded-none [&_.group\/card>div]:border-0 [&_.group\/card>div]:shadow-none [&_.group\/card>div]:bg-transparent [&_.group\/card>div]:h-full">
                     <AssetCard
                         id="model"
                         label={language === "tr" ? "MODEL" : "MODEL"}
@@ -180,6 +180,7 @@ export function ModelSection({
                         handleAssetRemove={handleAssetRemove}
                         language={language}
                         variant="portrait"
+                        orientation="horizontal"
                         description={language === "tr" ? "YÜKLE VEYA SÜRÜKLE" : "UPLOAD OR DRAG"}
                         hideLibrary={false}
                     />

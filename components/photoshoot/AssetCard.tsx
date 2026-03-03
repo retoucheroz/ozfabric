@@ -116,31 +116,45 @@ export function AssetCard({
 
     const renderMultipleThumbnails = (itemImages: string[]) => (
         <div className="relative w-full h-full bg-[var(--bg-elevated)] flex flex-col min-h-[220px]">
-            <div className="grid grid-cols-3 gap-3 overflow-y-auto flex-1 scrollbar-none p-3 pb-16">
-                {itemImages.map((img, idx) => (
-                    <div key={idx} className="relative aspect-square rounded-2xl border border-white/5 overflow-hidden group/thumb bg-zinc-900 shadow-inner">
-                        <img src={img} className="w-full h-full object-cover transition-all duration-700 group-hover/thumb:scale-110 group-hover/thumb:rotate-1" />
-                        <div className="absolute inset-x-0 bottom-0 top-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center">
-                            <button
-                                onClick={(e) => { e.stopPropagation(); handleAssetRemove(id, e, idx); }}
-                                className="w-10 h-10 rounded-full bg-red-500 text-white shadow-2xl flex items-center justify-center scale-50 group-hover/thumb:scale-100 transition-all duration-300 hover:bg-red-600"
-                            >
-                                <Trash2 size={18} />
-                            </button>
-                        </div>
+            {itemImages.length === 0 ? (
+                <div
+                    className="flex-1 flex flex-col items-center justify-center p-6 pb-20 cursor-pointer group/empty"
+                    onClick={handleDirectUploadClick}
+                >
+                    <div className="w-24 h-24 rounded-3xl border-2 border-dashed border-white/10 flex items-center justify-center bg-zinc-900/50 group-hover/empty:bg-zinc-800 transition-all mb-4 group-hover/empty:scale-[1.05] group-hover/empty:border-white/20">
+                        <Plus size={32} className="text-zinc-500 group-hover/empty:text-white transition-colors" />
                     </div>
-                ))}
-                {itemImages.length < 10 && (
-                    <button
-                        onClick={handleDirectUploadClick}
-                        className="relative aspect-square rounded-2xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center hover:bg-white/5 hover:border-[var(--accent-primary)]/40 transition-all group/add hover:scale-[0.98] active:scale-95"
-                    >
-                        <div className="p-3 rounded-full bg-white/5 group-hover/add:bg-[var(--accent-primary)]/10 transition-colors">
-                            <Plus size={24} className="text-zinc-600 group-hover/add:text-[var(--accent-primary)] transition-colors" />
+                    <p className="text-[10px] font-black uppercase text-zinc-500 tracking-widest text-center px-4 leading-relaxed group-hover/empty:text-zinc-400 transition-colors">
+                        {language === "tr" ? "TÜM GÖRSELLERİ BURAYA SÜRÜKLEYEBİLİRSİNİZ." : "YOU CAN DRAG ALL IMAGES HERE."}
+                    </p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-3 gap-3 overflow-y-auto flex-1 scrollbar-none p-3 pb-16">
+                    {itemImages.map((img, idx) => (
+                        <div key={idx} className="relative aspect-square rounded-2xl border border-white/5 overflow-hidden group/thumb bg-zinc-900 shadow-inner">
+                            <img src={img} className="w-full h-full object-cover transition-all duration-700 group-hover/thumb:scale-110 group-hover/thumb:rotate-1" />
+                            <div className="absolute inset-x-0 bottom-0 top-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center">
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); handleAssetRemove(id, e, idx); }}
+                                    className="w-10 h-10 rounded-full bg-red-500 text-white shadow-2xl flex items-center justify-center scale-50 group-hover/thumb:scale-100 transition-all duration-300 hover:bg-red-600"
+                                >
+                                    <Trash2 size={18} />
+                                </button>
+                            </div>
                         </div>
-                    </button>
-                )}
-            </div>
+                    ))}
+                    {itemImages.length < 10 && (
+                        <button
+                            onClick={handleDirectUploadClick}
+                            className="relative aspect-square rounded-2xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center hover:bg-white/5 hover:border-[var(--accent-primary)]/40 transition-all group/add hover:scale-[0.98] active:scale-95"
+                        >
+                            <div className="p-3 rounded-full bg-white/5 group-hover/add:bg-[var(--accent-primary)]/10 transition-colors">
+                                <Plus size={24} className="text-zinc-600 group-hover/add:text-[var(--accent-primary)] transition-colors" />
+                            </div>
+                        </button>
+                    )}
+                </div>
+            )}
 
             <div className="absolute bottom-3 inset-x-3 bg-zinc-900/95 backdrop-blur-2xl px-4 py-3 rounded-2xl border border-white/10 z-20 flex justify-between items-center shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
                 <div className="flex flex-col gap-0.5">
@@ -280,15 +294,24 @@ export function AssetCard({
                                 </div>
                             )
                     ) : (
-                        <div className="flex flex-col items-center gap-2.5 p-3 text-center">
-                            <div className="p-3.5 rounded-2xl bg-zinc-800/80 text-white border border-white/5 shadow-inner">
-                                {Icon ? <Icon size={24} /> : <Upload size={24} />}
+                        <div className={cn(
+                            "flex gap-4 p-4 transition-all duration-300 w-full h-full",
+                            isHorizontal ? "flex-row items-center text-left" : "flex-col items-center text-center justify-center"
+                        )}>
+                            <div className={cn(
+                                "rounded-2xl bg-zinc-800/80 text-white border border-white/5 shadow-inner shrink-0 transition-transform group-hover/card:scale-110",
+                                isHorizontal ? "p-3" : "p-3.5"
+                            )}>
+                                {Icon ? <Icon size={isHorizontal ? 20 : 24} /> : <Upload size={isHorizontal ? 20 : 24} />}
                             </div>
-                            <div className="space-y-0.5">
-                                <span className="text-[11px] font-black uppercase tracking-wide text-black dark:text-white block leading-tight">
+                            <div className={cn(
+                                "space-y-1 overflow-hidden",
+                                isHorizontal ? "flex-1" : "space-y-0.5"
+                            )}>
+                                <span className="text-[11px] font-black uppercase tracking-widest text-black dark:text-white block leading-tight truncate">
                                     {label}
                                 </span>
-                                <span className="text-[9px] font-black text-[var(--accent-primary)] uppercase tracking-tighter block opacity-80 group-hover/card:opacity-100 transition-opacity">
+                                <span className="text-[9px] font-black text-zinc-500 uppercase tracking-tighter block opacity-60 group-hover/card:opacity-100 transition-opacity">
                                     {description || (language === "tr" ? "YÜKLE VEYA SÜRÜKLE" : "UPLOAD OR DRAG")}
                                 </span>
                             </div>
@@ -301,10 +324,11 @@ export function AssetCard({
                                         setActiveLibraryAsset(isActive ? null : id as any);
                                     }}
                                     className={cn(
-                                        "absolute top-3 right-3 p-2 rounded-xl border transition-all z-20 hover:scale-110",
+                                        "absolute p-2 rounded-xl border transition-all z-20 hover:scale-110",
                                         isActive
                                             ? "bg-white border-white text-black shadow-[0_0_15px_rgba(255,255,255,0.3)] ring-2 ring-white/20"
-                                            : "bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border-white/20 dark:border-white/10 text-zinc-400 hover:text-white hover:border-white/50 shadow-sm"
+                                            : "bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border-white/20 dark:border-white/10 text-zinc-400 hover:text-white hover:border-white/50 shadow-sm",
+                                        isHorizontal ? "bottom-3 right-3" : "top-3 right-3"
                                     )}
                                 >
                                     <Library size={16} />

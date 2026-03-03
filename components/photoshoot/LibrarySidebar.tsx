@@ -339,7 +339,7 @@ export function LibrarySidebar({
                             <TabsList className="w-full grid grid-cols-2 h-12 bg-white/5 rounded-2xl p-1.5 border border-white/5">
                                 <TabsTrigger value="library" className="text-[10px] font-black uppercase tracking-widest rounded-xl data-[state=active]:bg-white data-[state=active]:text-black">{language === "tr" ? "Kütüphane" : "Library"}</TabsTrigger>
                                 <TabsTrigger value="prompt" className="text-[10px] font-black uppercase tracking-widest rounded-xl data-[state=active]:bg-white data-[state=active]:text-black">
-                                    {language === "tr" ? "PROMPT" : "PROMPT"}
+                                    {language === "tr" ? (internalAsset === 'model' ? "YARAT" : "PROMPT") : "PROMPT"}
                                 </TabsTrigger>
                             </TabsList>
                         </div>
@@ -441,6 +441,7 @@ export function LibrarySidebar({
                             ) : internalAsset === 'model' ? (
                                 <ModelSection
                                     view="library"
+                                    gridCols={6}
                                     language={language}
                                     gender={gender}
                                     setGender={setGender}
@@ -650,18 +651,34 @@ export function LibrarySidebar({
                             )}
                         </TabsContent>
 
-                        <TabsContent value="prompt" className="flex-1 p-6 space-y-6">
-                            <div className="space-y-4">
-                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">{language === "tr" ? "ÖZEL PROMPT" : "CUSTOM PROMPT"}</label>
-                                <textarea
-                                    className="w-full h-40 p-4 text-[11px] rounded-[24px] border border-white/5 bg-white/[0.03] text-white resize-none focus:border-white/20 outline-none transition-all font-bold placeholder:text-white/20"
-                                    placeholder={language === "tr" ? "Tam olarak ne istediğinizi tarif edin..." : "Describe exactly what you want..."}
-                                ></textarea>
-                                <Button className="w-full h-12 rounded-2xl bg-white text-black font-black uppercase tracking-widest hover:bg-zinc-200 transition-all">{language === "tr" ? "PROMPT'U UYGULA" : "APPLY PROMPT"}</Button>
-                                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-tight leading-relaxed">
-                                    {language === "tr" ? "Bu slot için yapay zekaya özel bir talimat gönderin. Mevcut kütüphane öğelerini geçersiz kılabilir." : "Send a specific instruction to AI for this slot. It may override current library items."}
-                                </p>
-                            </div>
+                        <TabsContent value="prompt" className="flex-1 p-6 flex flex-col items-center justify-center space-y-4 min-h-[300px]">
+                            {internalAsset === 'model' ? (
+                                <>
+                                    <div className="p-4 rounded-full bg-white/5 border border-white/10">
+                                        <Sparkles size={32} className="text-zinc-500 animate-pulse" />
+                                    </div>
+                                    <div className="text-center space-y-1">
+                                        <h3 className="text-sm font-black text-white uppercase tracking-widest">
+                                            {language === "tr" ? "YAKINDA" : "COMING SOON"}
+                                        </h3>
+                                        <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter">
+                                            {language === "tr" ? "Kendi modelinizi tasarlamaya hazır olun." : "Get ready to design your own model."}
+                                        </p>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="space-y-4 w-full">
+                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">{language === "tr" ? "ÖZEL PROMPT" : "CUSTOM PROMPT"}</label>
+                                    <textarea
+                                        className="w-full h-40 p-4 text-[11px] rounded-[24px] border border-white/5 bg-white/[0.03] text-white resize-none focus:border-white/20 outline-none transition-all font-bold placeholder:text-white/20"
+                                        placeholder={language === "tr" ? "Tam olarak ne istediğinizi tarif edin..." : "Describe exactly what you want..."}
+                                    ></textarea>
+                                    <Button className="w-full h-12 rounded-2xl bg-white text-black font-black uppercase tracking-widest hover:bg-zinc-200 transition-all">{language === "tr" ? "PROMPT'U UYGULA" : "APPLY PROMPT"}</Button>
+                                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-tight leading-relaxed">
+                                        {language === "tr" ? "Bu slot için yapay zekaya özel bir talimat gönderin. Mevcut kütüphane öğelerini geçersiz kılabilir." : "Send a specific instruction to AI for this slot. It may override current library items."}
+                                    </p>
+                                </div>
+                            )}
                         </TabsContent>
 
                         <TabsContent value="assets" className="flex-1 overflow-y-auto p-3 space-y-4">

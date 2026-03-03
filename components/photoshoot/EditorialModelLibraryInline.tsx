@@ -39,7 +39,7 @@ export function EditorialModelLibraryInline({
     savedModels,
     modelDescription,
     setModelDescription,
-    gridCols = 5
+    gridCols = 6
 }: EditorialModelLibraryInlineProps) {
     const [tab, setTab] = useState("library");
 
@@ -61,7 +61,7 @@ export function EditorialModelLibraryInline({
                             {language === "tr" ? "KÜTÜPHANE" : "LIBRARY"}
                         </TabsTrigger>
                         <TabsTrigger value="prompt" className="text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:text-black rounded-md">
-                            {language === "tr" ? "PROMPT" : "PROMPT"}
+                            {language === "tr" ? "YARAT" : "CREATE"}
                         </TabsTrigger>
                     </TabsList>
 
@@ -76,7 +76,7 @@ export function EditorialModelLibraryInline({
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-6 scrollbar-none">
-                    <TabsContent value="library" className="m-0 h-full outline-none max-w-5xl mx-auto w-full">
+                    <TabsContent value="library" className="m-0 h-full outline-none max-w-7xl mx-auto w-full">
                         <ModelSection
                             view="library"
                             gridCols={gridCols}
@@ -101,31 +101,16 @@ export function EditorialModelLibraryInline({
                     </TabsContent>
 
                     <TabsContent value="prompt" className="m-0 h-full outline-none">
-                        <div className="space-y-6 max-w-md mx-auto">
-                            <div className="space-y-3">
-                                <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest block px-1">
-                                    {language === "tr" ? "ÖZEL MODEL TANIMI" : "CUSTOM MODEL DESCRIPTION"}
-                                </label>
-                                <textarea
-                                    value={modelDescription}
-                                    onChange={(e) => setModelDescription(e.target.value)}
-                                    className="w-full h-56 p-4 text-xs font-bold leading-relaxed rounded-2xl border border-white/5 bg-black/20 text-white resize-none focus:ring-2 focus:ring-white/20 outline-none shadow-inner custom-scrollbar"
-                                    placeholder={language === "tr" ? "Modelin görünümünü, yaşını, etnik kökenini ve stilini tarif edin..." : "Describe the model's appearance, age, ethnicity, and style..."}
-                                ></textarea>
+                        <div className="flex flex-col items-center justify-center h-full min-h-[400px] space-y-4">
+                            <div className="p-4 rounded-full bg-white/5 border border-white/10">
+                                <Sparkles size={32} className="text-zinc-500 animate-pulse" />
                             </div>
-                            <Button
-                                onClick={() => {
-                                    onClose();
-                                    toast.success(language === "tr" ? "Model tanımı güncellendi" : "Model description updated");
-                                }}
-                                className="w-full h-12 bg-white hover:bg-zinc-200 text-black font-black uppercase tracking-widest rounded-2xl shadow-xl transition-all"
-                            >
-                                {language === "tr" ? "TANIMI UYGULA" : "APPLY DESCRIPTION"}
-                            </Button>
-                            <div className="flex gap-3 p-4 rounded-2xl bg-white/5 border border-white/5">
-                                <UserCircle className="w-5 h-5 text-zinc-400 shrink-0" />
-                                <p className="text-[9px] text-zinc-500 font-bold leading-relaxed uppercase tracking-tight">
-                                    {language === "tr" ? "Not: Görsel yüklemek yerine sadece metin ile model tarif edebilirsiniz. Bu durumda kütüphanedeki görseller yoksayılır." : "Note: You can describe the model with text instead of uploading an image. In this case, library images will be ignored."}
+                            <div className="text-center space-y-1">
+                                <h3 className="text-sm font-black text-white uppercase tracking-widest">
+                                    {language === "tr" ? "YAKINDA" : "COMING SOON"}
+                                </h3>
+                                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter">
+                                    {language === "tr" ? "Kendi modelinizi tasarlamaya hazır olun." : "Get ready to design your own model."}
                                 </p>
                             </div>
                         </div>
