@@ -1736,257 +1736,123 @@ export default function PhotoshootPage() {
                     {/* SHOT SELECTION - ALWAYS FULL WIDTH, NEVER CHANGES */}
                     <div className="w-full">
                       <div className="w-full">
-                        <label className="text-[11px] font-black text-white uppercase tracking-[0.3em] opacity-40 block mb-8">
-                          {language === "tr"
-                            ? "AÇI VE KARE SEÇİMLERİ"
-                            : "ANGLE & SHOT SELECTION"}
+                        <label className="text-[11px] font-black text-white uppercase tracking-[0.3em] opacity-40 block mb-6">
+                          {language === "tr" ? "AÇI VE KARE SEÇİMLERİ" : "ANGLE & SHOT SELECTION"}
                         </label>
 
-                        {/* ALL SHOTS IN ONE FLAT GRID ROW */}
-                        <div className="flex flex-row gap-8">
-                          {/* Styling shots — always 2 cols */}
-                          <div className="flex-shrink-0">
-                            <div className="grid grid-cols-2 gap-3">
-                              {availableBatchShots
-                                .filter((s) => s.id.includes("styling"))
-                                .map((shot) => {
-                                  const isSelected =
-                                    batchShotSelection[shot.id] ?? false;
-                                  const isMaviActive =
-                                    user?.role === "admin" && isMaviBatch;
+                        {/* SINGLE FLAT ROW — all shots, no grouping */}
+                        <div className="flex flex-row gap-4 overflow-x-auto pb-2">
+                          {availableBatchShots.map((shot) => {
+                            const isSelected = batchShotSelection[shot.id] ?? false;
+                            const isMaviActive = user?.role === "admin" && isMaviBatch;
+                            const isStylingShot = shot.id.includes("styling");
+                            const isLowerDetailShot = shot.id === "std_detail_front" || shot.id === "std_detail_back";
+                            const isDisabled = workflowType === "upper" && isLowerDetailShot;
 
-                                  return (
-                                    <div
-                                      key={shot.id}
-                                      className="flex flex-col gap-3"
-                                    >
-                                      <div
-                                        className={cn(
-                                          "relative aspect-[3/4] rounded-md border transition-all duration-300 overflow-hidden group cursor-pointer w-full",
-                                          isSelected
-                                            ? isMaviActive
-                                              ? "border-zinc-400 ring-2 ring-zinc-400/20 shadow-lg"
-                                              : "border-white ring-2 ring-white/20 shadow-lg"
-                                            : "border-[var(--border-subtle)] opacity-40 grayscale bg-[var(--bg-elevated)] hover:opacity-80 transition-opacity",
-                                        )}
-                                        onClick={() =>
-                                          setBatchShotSelection((prev) => ({
-                                            ...prev,
-                                            [shot.id]: !isSelected,
-                                          }))
-                                        }
-                                      >
-                                        <div className="w-full h-full relative">
-                                          {shot.image ? (
-                                            <img
-                                              src={shot.image}
-                                              alt={shot.label}
-                                              className="w-full h-full object-cover"
-                                            />
-                                          ) : (
-                                            <div className="w-full h-full flex items-center justify-center bg-muted/20">
-                                              <Shirt className="w-8 h-8 opacity-20" />
-                                            </div>
-                                          )}
-
-                                          <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/90 via-black/60 to-transparent flex flex-col items-center justify-end">
-                                            <p className="text-[10px] font-black text-white text-center leading-snug uppercase">
-                                              {language === "tr"
-                                                ? shot.label
-                                                : shot.labelEn}
-                                            </p>
-                                          </div>
-
-                                          <div className="absolute top-2 left-2">
-                                            <div
-                                              className={cn(
-                                                "w-5 h-5 rounded-md flex items-center justify-center border transition-all",
-                                                isSelected
-                                                  ? isMaviActive
-                                                    ? "bg-zinc-100 border-zinc-100 text-black"
-                                                    : "bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white"
-                                                  : "bg-white/20 border-white/40 text-transparent",
-                                              )}
-                                            >
-                                              <Check className="w-3.5 h-3.5" />
-                                            </div>
-                                          </div>
-
-                                          {isSelected && (
-                                            <div
-                                              className="absolute top-2 right-2 flex items-center gap-1.5 px-2 py-1 rounded-md bg-black/60 backdrop-blur-md border border-white/10"
-                                              onClick={(e) =>
-                                                e.stopPropagation()
-                                              }
-                                            >
-                                              <span className="text-[10px] font-bold text-white tracking-widest leading-none">
-                                                YNC
-                                              </span>
-                                              <Switch
-                                                className="scale-[0.6] origin-right !m-0 data-[state=checked]:bg-zinc-100"
-                                                checked={
-                                                  stylingSideOnly[shot.id] ||
-                                                  false
-                                                }
-                                                onCheckedChange={(val) =>
-                                                  setStylingSideOnly({
-                                                    ...stylingSideOnly,
-                                                    [shot.id]: val,
-                                                  })
-                                                }
-                                              />
-                                            </div>
-                                          )}
-                                        </div>
-                                      </div>
-
-                                      {/* Poz Seç - right below */}
-                                      {isSelected && (
-                                        <button
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            setActiveGroup("product");
-                                            setTargetPoseShot(shot.id);
-                                            setActiveLibraryAsset("pose");
-                                            const isUpperFocus =
-                                              shot.id.includes("upper") ||
-                                              shot.id.includes("closeup") ||
-                                              shot.image?.includes(
-                                                "ust_vucut",
-                                              ) ||
-                                              shot.image?.includes("closeup");
-                                            setPoseFocus(
-                                              isUpperFocus ? "upper" : "full",
-                                            );
-                                          }}
-                                          className={cn(
-                                            "flex items-center justify-center gap-1.5 w-full py-2.5 rounded-md border shadow-sm transition-colors cursor-pointer group/pose-btn",
-                                            assets[`pose_${shot.id}`]
-                                              ? "border-zinc-500/30 bg-zinc-500/10 text-zinc-300 hover:bg-zinc-500 hover:text-white"
-                                              : "border-white/30 bg-white/5 text-white hover:bg-white hover:text-black",
-                                          )}
-                                        >
-                                          {assets[`pose_${shot.id}`] ? (
-                                            <>
-                                              <Check className="w-3.5 h-3.5 group-hover/pose-btn:text-white" />
-                                              <span className="text-[9px] font-bold uppercase tracking-wider">
-                                                {language === "tr"
-                                                  ? "Özel Poz Seçili"
-                                                  : "Custom Pose Selected"}
-                                              </span>
-                                            </>
-                                          ) : (
-                                            <>
-                                              <div className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse group-hover/pose-btn:bg-white" />
-                                              <span className="text-[9px] font-bold uppercase tracking-wider">
-                                                {language === "tr"
-                                                  ? "Poz Seç (İsteğe Bağlı)"
-                                                  : "Select Pose (Optional)"}
-                                              </span>
-                                            </>
-                                          )}
-                                        </button>
-                                      )}
+                            return (
+                              <div key={shot.id} className="flex flex-col gap-2 flex-shrink-0" style={{ width: "min(300px, 18vw)", minWidth: "140px" }}>
+                                {/* Card — 2:3 ratio */}
+                                <div
+                                  className={cn(
+                                    "relative w-full overflow-hidden border transition-all duration-200",
+                                    isDisabled ? "cursor-not-allowed opacity-20 grayscale" : "cursor-pointer",
+                                    isSelected
+                                      ? isMaviActive
+                                        ? "border-zinc-300 ring-2 ring-zinc-300/20"
+                                        : "border-white ring-2 ring-white/20"
+                                      : !isDisabled
+                                        ? "border-white/10 opacity-50 grayscale hover:opacity-80 hover:border-white/30"
+                                        : "border-white/5"
+                                  )}
+                                  style={{ aspectRatio: "2/3" }}
+                                  onClick={() => {
+                                    if (isDisabled) {
+                                      toast.error(
+                                        language === "tr"
+                                          ? "Bu açı bir üst ürün için seçilemez."
+                                          : "Cannot select this angle for an upper garment."
+                                      );
+                                      return;
+                                    }
+                                    setBatchShotSelection(prev => ({ ...prev, [shot.id]: !isSelected }));
+                                  }}
+                                >
+                                  {/* Image */}
+                                  {shot.image ? (
+                                    <img src={shot.image} alt={shot.label} className="absolute inset-0 w-full h-full object-cover" />
+                                  ) : (
+                                    <div className="absolute inset-0 flex items-center justify-center bg-white/5">
+                                      <Shirt className="w-6 h-6 opacity-20" />
                                     </div>
-                                  );
-                                })}
-                            </div>
-                          </div>
+                                  )}
 
-                          {/* Technical shots — flexible multi-col */}
-                          <div className="flex-1 min-w-0">
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
-                              {availableBatchShots
-                                .filter((s) => !s.id.includes("styling"))
-                                .map((shot) => {
-                                  const isSelected =
-                                    batchShotSelection[shot.id] ?? false;
-                                  const isMaviActive =
-                                    user?.role === "admin" && isMaviBatch;
-                                  const isLowerDetailShot =
-                                    shot.id === "std_detail_front" ||
-                                    shot.id === "std_detail_back";
-                                  const isDisabled =
-                                    workflowType === "upper" &&
-                                    isLowerDetailShot;
+                                  {/* Label */}
+                                  <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
+                                    <p className="text-[9px] font-black text-white text-center uppercase tracking-wide leading-tight">
+                                      {language === "tr" ? shot.label : shot.labelEn}
+                                    </p>
+                                  </div>
 
-                                  return (
-                                    <div
-                                      key={shot.id}
-                                      className="flex flex-col gap-2"
-                                    >
-                                      <div
-                                        className={cn(
-                                          "relative aspect-[3/4] rounded-xl border transition-all duration-300 overflow-hidden group w-full",
-                                          isDisabled
-                                            ? "cursor-not-allowed opacity-20 grayscale"
-                                            : "cursor-pointer",
-                                          isSelected
-                                            ? isMaviActive
-                                              ? "border-zinc-100 border-zinc-100 text-black"
-                                              : "border-white ring-2 ring-white/20 shadow-lg"
-                                            : !isDisabled &&
-                                            "border-[var(--border-subtle)] opacity-40 grayscale bg-[var(--bg-elevated)] hover:opacity-80 transition-opacity",
-                                        )}
-                                        onClick={() => {
-                                          if (isDisabled) {
-                                            toast.error(
-                                              language === "tr"
-                                                ? "Bu açı bir üst ürün için seçilemez. Lütfen 'Detaylı Ürün' adımında 'Alt Ürün' veya 'Set' seçtiğinizden emin olun."
-                                                : "This angle cannot be selected for an upper garment. Please ensure you selected 'Lower' or 'Set' in the 'Product Details' step.",
-                                            );
-                                            return;
-                                          }
-                                          setBatchShotSelection((prev) => ({
-                                            ...prev,
-                                            [shot.id]: !isSelected,
-                                          }));
-                                        }}
-                                      >
-                                        <div className="w-full h-full relative">
-                                          {shot.image ? (
-                                            <img
-                                              src={shot.image}
-                                              alt={shot.label}
-                                              className="w-full h-full object-cover"
-                                            />
-                                          ) : (
-                                            <div className="w-full h-full flex items-center justify-center bg-muted/20">
-                                              <Shirt className="w-6 h-6 opacity-20" />
-                                            </div>
-                                          )}
-
-                                          <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
-                                            <p className="text-[9px] font-black text-white text-center leading-snug uppercase">
-                                              {language === "tr"
-                                                ? shot.label
-                                                : shot.labelEn}
-                                            </p>
-                                          </div>
-
-                                          <div className="absolute top-2 left-2">
-                                            <div
-                                              className={cn(
-                                                "w-4 h-4 rounded-md flex items-center justify-center border transition-all",
-                                                isSelected
-                                                  ? isMaviActive
-                                                    ? "bg-zinc-100 border-zinc-100 text-black"
-                                                    : "bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white"
-                                                  : "bg-white/20 border-white/40 text-transparent",
-                                              )}
-                                            >
-                                              <Check className="w-3 h-3" />
-                                            </div>
-                                          </div>
-                                        </div>
-                                      </div>
+                                  {/* Checkbox */}
+                                  <div className="absolute top-2 left-2">
+                                    <div className={cn(
+                                      "w-4 h-4 rounded flex items-center justify-center border transition-all",
+                                      isSelected
+                                        ? isMaviActive
+                                          ? "bg-zinc-100 border-zinc-100 text-black"
+                                          : "bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white"
+                                        : "bg-black/40 border-white/30 text-transparent"
+                                    )}>
+                                      <Check className="w-2.5 h-2.5" />
                                     </div>
-                                  );
-                                })}
-                            </div>
-                          </div>
-                        </div>{/* end flex flex-row shots */}
-                      </div>
+                                  </div>
+
+                                  {/* YNC toggle — styling shots only */}
+                                  {isStylingShot && isSelected && (
+                                    <div
+                                      className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-sm border border-white/10"
+                                      onClick={e => e.stopPropagation()}
+                                    >
+                                      <span className="text-[8px] font-bold text-white tracking-widest">YNC</span>
+                                      <Switch
+                                        className="scale-[0.55] origin-right !m-0 data-[state=checked]:bg-zinc-100"
+                                        checked={stylingSideOnly[shot.id] || false}
+                                        onCheckedChange={val => setStylingSideOnly({ ...stylingSideOnly, [shot.id]: val })}
+                                      />
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* Poz Seç button — styling shots only */}
+                                {isStylingShot && isSelected && (
+                                  <button
+                                    onClick={e => {
+                                      e.stopPropagation();
+                                      setActiveGroup("product");
+                                      setTargetPoseShot(shot.id);
+                                      setActiveLibraryAsset("pose");
+                                      const isUpperFocus = shot.id.includes("upper") || shot.id.includes("closeup") || shot.image?.includes("ust_vucut") || shot.image?.includes("closeup");
+                                      setPoseFocus(isUpperFocus ? "upper" : "full");
+                                    }}
+                                    className={cn(
+                                      "flex items-center justify-center gap-1 w-full py-1.5 rounded border text-[8px] font-bold uppercase tracking-wider transition-colors cursor-pointer",
+                                      assets[`pose_${shot.id}`]
+                                        ? "border-zinc-500/30 bg-zinc-500/10 text-zinc-300 hover:bg-zinc-500 hover:text-white"
+                                        : "border-white/20 bg-white/5 text-white/60 hover:bg-white hover:text-black"
+                                    )}
+                                  >
+                                    {assets[`pose_${shot.id}`] ? (
+                                      <><Check className="w-2.5 h-2.5" />{language === "tr" ? "Poz Seçili" : "Pose Set"}</>
+                                    ) : (
+                                      <><div className="w-1 h-1 rounded-full bg-orange-400 animate-pulse" />{language === "tr" ? "Poz Seç" : "Set Pose"}</>
+                                    )}
+                                  </button>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>{/* end single row */}
+                      </div>{/* end inner w-full */}
                     </div>{/* end shot selection */}
 
                     {/* RESULTS — appears BELOW selection, never resizes cards */}
@@ -2253,7 +2119,8 @@ export default function PhotoshootPage() {
           />
 
           {/* Library Backdrop (Click outside to close) */}
-          {activeLibraryAsset &&
+          {
+            activeLibraryAsset &&
             !(activeLibraryAsset === "model" && wizardStep === 1) && (
               <div
                 className="fixed inset-0 bg-black/5 z-[55] animate-in fade-in duration-300"
@@ -2262,8 +2129,9 @@ export default function PhotoshootPage() {
                   setActiveGroup(null);
                 }}
               />
-            )}
-        </div>
+            )
+          }
+        </div >
 
         <LibrarySidebar
           language={language}
@@ -2344,7 +2212,7 @@ export default function PhotoshootPage() {
               : assets.pose || null
           }
         />
-      </div>
+      </div >
     </div >
   );
 }
