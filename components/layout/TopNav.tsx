@@ -154,7 +154,9 @@ export function TopNav() {
                                 {/* User Info */}
                                 <DropdownMenuLabel className="font-normal">
                                     <div className="flex flex-col space-y-1">
-                                        <p className="text-sm font-medium leading-none">{user?.name || user?.email || "User"}</p>
+                                        <p className="text-sm font-black uppercase tracking-tight leading-none">
+                                            {user?.name || (user?.email === 'admin' ? 'SYSTEM ADMIN' : user?.email || "GUEST USER")}
+                                        </p>
                                         <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
                                     </div>
                                 </DropdownMenuLabel>
@@ -170,16 +172,29 @@ export function TopNav() {
                                     <span>{t("settings.security")}</span>
                                 </DropdownMenuItem>
 
-                                {/* === CRITICAL SECURITY RULE: The Admin Panel MUST be visible to users with the 'admin' role OR the legacy 'admin' username/email. === */}
-                                {(user?.role === 'admin' || user?.name?.toLowerCase() === 'admin' || (user?.email as string)?.toLowerCase() === 'admin' || (user?.email as string)?.toLowerCase() === 'kilicozzgur@gmail.com' || user?.name?.toLowerCase() === 'retoucheroz') && (
-                                    <>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem onClick={() => router.push('/admin')} className="cursor-pointer text-amber-500 focus:text-amber-500">
-                                            <TbShieldLock className="mr-2 h-4 w-4" />
-                                            <span>Admin Panel</span>
-                                        </DropdownMenuItem>
-                                    </>
-                                )}
+                                {/* === CRITICAL SECURITY RULE: The Admin Panel MUST be visible to users with the 'admin' role OR the primary admin accounts. === */}
+                                {(() => {
+                                    const role = user?.role;
+                                    const email = (user?.email as string)?.toLowerCase();
+                                    const name = (user?.name as string)?.toLowerCase();
+                                    const isPrimaryAdmin =
+                                        role === 'admin' ||
+                                        email === 'admin' ||
+                                        name === 'admin' ||
+                                        email === 'kilicozzgur@gmail.com' ||
+                                        name === 'retoucheroz' ||
+                                        email === 'retoucheroz@gmail.com';
+
+                                    return isPrimaryAdmin && (
+                                        <>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem onClick={() => router.push('/admin')} className="cursor-pointer text-amber-500 focus:text-amber-500">
+                                                <TbShieldLock className="mr-2 h-4 w-4" />
+                                                <span>Admin Panel</span>
+                                            </DropdownMenuItem>
+                                        </>
+                                    );
+                                })()}
                                 {/* ================================================================ */}
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem

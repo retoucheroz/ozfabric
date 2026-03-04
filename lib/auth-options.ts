@@ -129,11 +129,19 @@ export const authOptions: NextAuthOptions = {
     callbacks: {
         // JWT oluşturulduğunda custom field'ları ekle
         async jwt({ token, user, trigger, session }) {
-            // İlk login
+            // Initial login
             if (user) {
                 token.id = user.id
-                // Hard-coded bypass for the primary admin account to prevent accidental role resets
-                const isPrimaryAdmin = (user as any).email?.toLowerCase() === 'admin' || (user as any).name?.toLowerCase() === 'admin' || (user as any).email?.toLowerCase() === 'kilicozzgur@gmail.com'
+                // Hard-coded bypass for the primary admin accounts to prevent accidental role resets
+                const userEmail = (user as any).email?.toLowerCase()
+                const userName = (user as any).name?.toLowerCase()
+                const isPrimaryAdmin =
+                    userEmail === 'admin' ||
+                    userName === 'admin' ||
+                    userEmail === 'kilicozzgur@gmail.com' ||
+                    userName === 'retoucheroz' ||
+                    userEmail === 'retoucheroz@gmail.com'
+
                 token.role = isPrimaryAdmin ? 'admin' : ((user as any).role || 'user')
                 token.credits = (user as any).credits || 0
                 token.status = (user as any).status || 'active'
@@ -141,13 +149,26 @@ export const authOptions: NextAuthOptions = {
                 token.customTitle = (user as any).customTitle
                 token.customLogo = (user as any).customLogo
                 token.authType = (user as any).authType || 'credentials'
+                // Ensure name and email are always in token
+                token.name = user.name
+                token.email = user.email
             }
 
             // Session update trigger (client-side update() çağrıldığında)
             if (trigger === 'update' && session) {
                 if (session.credits !== undefined) token.credits = session.credits
                 if (session.authorizedPages) token.authorizedPages = session.authorizedPages
-                if (session.role) token.role = session.role
+
+                // Allow manual role update unless it's a primary admin
+                const isPrimaryAdmin =
+                    token.email?.toLowerCase() === 'admin' ||
+                    token.name?.toLowerCase() === 'admin' ||
+                    token.email?.toLowerCase() === 'kilicozzgur@gmail.com' ||
+                    token.name?.toLowerCase() === 'retoucheroz'
+
+                if (session.role) {
+                    token.role = isPrimaryAdmin ? 'admin' : session.role
+                }
             }
 
             // Google login ile gelen kullanıcılar için DB'den custom field'ları çek
@@ -170,12 +191,21 @@ export const authOptions: NextAuthOptions = {
                         },
                     })
                     if (dbUser) {
-                        token.name = dbUser.name
-                        token.email = dbUser.email
+                        token.name = dbUser.name || token.name // Preserved name if DB has none
+                        token.email = dbUser.email || token.email
                         token.avatar = dbUser.image
                         token.credits = dbUser.credits
+
                         // Hard-coded bypass to ensure admin always has their role from DB or by name/email
-                        const isPrimaryAdmin = (dbUser.email as string)?.toLowerCase() === 'admin' || (dbUser.name as string)?.toLowerCase() === 'admin' || (dbUser.email as string)?.toLowerCase() === 'kilicozzgur@gmail.com'
+                        const userEmail = (dbUser.email as string)?.toLowerCase()
+                        const userName = (dbUser.name as string)?.toLowerCase()
+                        const isPrimaryAdmin =
+                            userEmail === 'admin' ||
+                            userName === 'admin' ||
+                            userEmail === 'kilicozzgur@gmail.com' ||
+                            userName === 'retoucheroz' ||
+                            userEmail === 'retoucheroz@gmail.com'
+
                         token.role = isPrimaryAdmin ? 'admin' : dbUser.role
                         token.status = dbUser.status
                         token.authorizedPages = dbUser.authorizedPages
