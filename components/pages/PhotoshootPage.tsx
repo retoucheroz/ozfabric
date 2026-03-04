@@ -1727,21 +1727,40 @@ export default function PhotoshootPage() {
 
                   {/* MAIN STUDIO AREA - DYNAMICALLY TRANSFORMS */}
                   <div
-                    className="bg-white/[0.02] border border-white/5 rounded-[32px] p-8 shadow-2xl flex flex-col lg:flex-row gap-8 items-start min-h-[600px] overflow-hidden relative"
+                    className={cn(
+                      "bg-white/[0.02] border border-white/5 rounded-[32px] p-8 shadow-2xl overflow-hidden relative",
+                      isProcessing || resultImages.length > 0
+                        ? "flex flex-col lg:flex-row gap-8 items-start min-h-[600px]"
+                        : "flex flex-col"
+                    )}
                   >
                     {/* LEFT SECTION: SELECTION */}
-                    <div className="w-full lg:w-[380px] xl:w-[420px] shrink-0 transition-all duration-1000">
-                      <div className="scale-100 origin-top-left transition-all duration-1000">
+                    <div className={cn(
+                      "transition-all duration-700",
+                      isProcessing || resultImages.length > 0
+                        ? "w-full lg:w-[380px] xl:w-[420px] shrink-0"
+                        : "w-full"
+                    )}>
+                      <div className="w-full">
                         <label className="text-[11px] font-black text-white uppercase tracking-[0.3em] opacity-40 block mb-8">
                           {language === "tr"
                             ? "AÇI VE KARE SEÇİMLERİ"
                             : "ANGLE & SHOT SELECTION"}
                         </label>
 
-                        <div className="flex flex-col gap-8">
-                          {/* Sol: Styling Angles (Büyük ve yan yana) */}
-                          <div className="flex-none w-full">
-                            <div className="grid grid-cols-2 gap-4">
+                        <div className={cn(
+                          "flex flex-col gap-8",
+                          !(isProcessing || resultImages.length > 0) && "lg:flex-row"
+                        )}>
+                          {/* Styling Angles */}
+                          <div className={cn(
+                            "flex-none",
+                            !(isProcessing || resultImages.length > 0) ? "w-full lg:w-auto lg:flex-1" : "w-full"
+                          )}>
+                            <div className={cn(
+                              "grid gap-4",
+                              !(isProcessing || resultImages.length > 0) ? "grid-cols-2" : "grid-cols-2"
+                            )}>
                               {availableBatchShots
                                 .filter((s) => s.id.includes("styling"))
                                 .map((shot) => {
@@ -1888,9 +1907,16 @@ export default function PhotoshootPage() {
                             </div>
                           </div>
 
-                          {/* Sağ: Diğer Teknik Kareler (4 sütunlu grid) */}
-                          <div className="flex-1">
-                            <div className="grid grid-cols-2 gap-4">
+                          {/* Teknik Kareler */}
+                          <div className={cn(
+                            !(isProcessing || resultImages.length > 0) ? "flex-1" : "w-full"
+                          )}>
+                            <div className={cn(
+                              "grid gap-4",
+                              !(isProcessing || resultImages.length > 0)
+                                ? "grid-cols-2 md:grid-cols-3 xl:grid-cols-4"
+                                : "grid-cols-2"
+                            )}>
                               {availableBatchShots
                                 .filter((s) => !s.id.includes("styling"))
                                 .map((shot) => {
