@@ -30,7 +30,8 @@ import { Separator } from "@/components/ui/separator"
 import { SERVICE_COSTS } from "@/lib/pricingConstants";
 import { Input } from "@/components/ui/input"
 import { dbOperations, STORES } from "@/lib/db"
-import { SavedModel, MODEL_PRESETS, ASPECT_RATIOS, RESOLUTION_OPTIONS } from "@/lib/photoshoot-shared"
+import { SavedModel, MODEL_PRESETS } from "@/lib/photoshoot-shared"
+import { ASPECT_RATIOS, RESOLUTION_OPTIONS } from "@/lib/photoshoot-constants"
 import { ModelSection } from "@/components/photoshoot/ModelSection"
 import { AssetCard } from "@/components/photoshoot/AssetCard"
 import { WizardProgress } from "@/components/photoshoot/WizardProgress"
@@ -108,8 +109,10 @@ export default function EditorialPage() {
     const [modelImageHighRes, setModelImageHighRes] = useState<string | null>(null);
     const [outfitImages, setOutfitImages] = useState<string[]>([]);
 
-    const [resolution, setResolution] = useState("1K");
+    const [resolution, setResolution] = useState("4K");
     const [aspectRatio, setAspectRatio] = useState("1:1");
+    // Compatibility for Ecom style
+    const aspect_ratio = aspectRatio;
     const [wizardStep, setWizardStep] = useState<1 | 2>(1);
     const [seed, setSeed] = useState<string>("");
     const [useReferencePose, setUseReferencePose] = useState(false);
@@ -308,6 +311,7 @@ export default function EditorialPage() {
                     modelImage: analysisModel,
                     resolution,
                     aspectRatio,
+                    aspect_ratio: aspectRatio,
                     hairStyle,
                     language
                 })
@@ -351,6 +355,7 @@ export default function EditorialPage() {
                     posePrompt: selectedPosePrompt,
                     resolution,
                     aspectRatio,
+                    aspect_ratio: aspectRatio,
                     modelType: 'full_body',
                     modelDescription,
                     prompt: analyzedAesthetic, // Use the structured prompt from analyze

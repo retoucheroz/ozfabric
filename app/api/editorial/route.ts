@@ -17,11 +17,14 @@ export async function POST(req: NextRequest) {
             aperture: _____, // Ignored
             prompt: finalPrompt, // Now receives the fully structured master prompt
             resolution = "1K",
-            aspectRatio = "1:1",
+            aspectRatio: camelAspectRatio,
+            aspect_ratio: snakeAspectRatio,
             seed = null,
             modelType = "full_body",
             modelDescription
         } = await req.json();
+
+        const aspectRatio = snakeAspectRatio || camelAspectRatio || "1:1";
 
         const finalSeed = seed !== null ? Number(seed) : Math.floor(Math.random() * 1000000000);
 

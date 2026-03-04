@@ -35,10 +35,13 @@ export async function POST(req: NextRequest) {
             modelImage,
             useReferencePose,
             resolution = "1K",
-            aspectRatio = "3:4",
+            aspectRatio: camelAspectRatio,
+            aspect_ratio: snakeAspectRatio,
             hairStyle = "original",
             language = "tr"
         } = await req.json();
+
+        const aspectRatio = snakeAspectRatio || camelAspectRatio || "3:4";
 
         // Find hair style prompt
         const hairStyleObj = [
