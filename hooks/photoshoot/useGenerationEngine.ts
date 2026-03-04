@@ -665,19 +665,15 @@ export const useGenerationEngine = (
                                 if (preview.spec.excludeAllAccessories && isAccessory) return acc;
 
                                 const assetVal = assetsHighRes[k] || assets[k];
-                                if (k === 'glasses') {
-                                    const hasGlasses = preview.spec.includeGlasses || (isStylingShot ? true : techAccessories.glasses);
-                                    acc[k] = (hasGlasses && assetVal) ? "PRESENT" : undefined;
-                                } else if (k === 'lighting' && !lightingSendImage) {
+                                if (k === 'lighting' && !lightingSendImage) {
                                     acc[k] = undefined;
                                 } else {
-                                    acc[k] = assetVal ? "PRESENT" : undefined;
+                                    acc[k] = assetVal;
                                 }
                                 return acc;
                             }, {});
                             const poseKey = `pose_${preview.spec.view}`;
-                            const hasPose = assets[poseKey] || assetsHighRes.pose || assets.pose;
-                            imgs.pose = hasPose ? "PRESENT" : undefined;
+                            imgs.pose = assets[poseKey] || assetsHighRes.pose || assets.pose;
                             return imgs;
                         })(),
                         gender: modelGender,
@@ -979,7 +975,7 @@ export const useGenerationEngine = (
                                     imageUrl,
                                     idx: i,
                                     requestPayload,
-                                    inputAssets: Object.keys(uploadedImages).filter(k => uploadedImages[k] !== undefined)
+                                    inputAssets: uploadedImages  // store full object with URLs
                                 };
                             }
                         } else {
@@ -1016,7 +1012,7 @@ export const useGenerationEngine = (
                             title: `Batch: ${productCode} - ${preview.title}`,
                             type: "Photoshoot",
                             imageUrl: imageUrl,
-                            description: `Seed: ${finalSeed} | Assets: ${newImg.inputAssets.join(', ')} | Prompt: ${newImg.prompt}`
+                            description: `Seed: ${finalSeed} | Assets: ${Object.keys(newImg.inputAssets).join(', ')} | Prompt: ${newImg.prompt}`
                         });
                     }
                 }

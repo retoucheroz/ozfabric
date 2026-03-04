@@ -1727,53 +1727,20 @@ export default function PhotoshootPage() {
 
                   {/* MAIN STUDIO AREA - DYNAMICALLY TRANSFORMS */}
                   <div
-                    className={cn(
-                      "bg-white/[0.02] border border-white/5 rounded-[32px] p-8 shadow-2xl transition-all duration-1000 overflow-hidden relative",
-                      isProcessing || resultImages.length > 0
-                        ? "flex flex-col lg:flex-row gap-8 items-start min-h-[600px]"
-                        : "flex flex-col space-y-12",
-                    )}
+                    className="bg-white/[0.02] border border-white/5 rounded-[32px] p-8 shadow-2xl flex flex-col lg:flex-row gap-8 items-start min-h-[600px] overflow-hidden relative"
                   >
                     {/* LEFT SECTION: SELECTION */}
-                    <div
-                      className={cn(
-                        "transition-all duration-1000",
-                        isProcessing || resultImages.length > 0
-                          ? "w-full lg:w-[320px] xl:w-[400px] shrink-0"
-                          : "w-full",
-                      )}
-                    >
-                      <div
-                        className={cn(
-                          "transition-all duration-1000",
-                          isProcessing || resultImages.length > 0
-                            ? "scale-[0.8] lg:scale-[0.7] xl:scale-[0.6] origin-top-left"
-                            : "scale-100",
-                        )}
-                      >
+                    <div className="w-full lg:w-[380px] xl:w-[420px] shrink-0 transition-all duration-1000">
+                      <div className="scale-100 origin-top-left transition-all duration-1000">
                         <label className="text-[11px] font-black text-white uppercase tracking-[0.3em] opacity-40 block mb-8">
                           {language === "tr"
                             ? "AÇI VE KARE SEÇİMLERİ"
                             : "ANGLE & SHOT SELECTION"}
                         </label>
 
-                        <div
-                          className={cn(
-                            "flex flex-col gap-8",
-                            !(isProcessing || resultImages.length > 0)
-                              ? "xl:flex-row"
-                              : "flex-col",
-                          )}
-                        >
+                        <div className="flex flex-col gap-8">
                           {/* Sol: Styling Angles (Büyük ve yan yana) */}
-                          <div
-                            className={cn(
-                              "flex-none w-full",
-                              !(isProcessing || resultImages.length > 0)
-                                ? "lg:w-1/3"
-                                : "",
-                            )}
-                          >
+                          <div className="flex-none w-full">
                             <div className="grid grid-cols-2 gap-4">
                               {availableBatchShots
                                 .filter((s) => s.id.includes("styling"))
@@ -1923,14 +1890,7 @@ export default function PhotoshootPage() {
 
                           {/* Sağ: Diğer Teknik Kareler (4 sütunlu grid) */}
                           <div className="flex-1">
-                            <div
-                              className={cn(
-                                "grid gap-4",
-                                !(isProcessing || resultImages.length > 0)
-                                  ? "grid-cols-2 md:grid-cols-4"
-                                  : "grid-cols-2 md:grid-cols-2",
-                              )}
-                            >
+                            <div className="grid grid-cols-2 gap-4">
                               {availableBatchShots
                                 .filter((s) => !s.id.includes("styling"))
                                 .map((shot) => {
@@ -2053,26 +2013,7 @@ export default function PhotoshootPage() {
                   </div>
 
                   {/* OPTIONAL: PreviewArea shown BELOW when not in production */}
-                  {!(isProcessing || resultImages.length > 0) && (
-                    <div className="w-full pt-12 border-t border-white/5 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500">
-                      <PreviewArea
-                        language={language}
-                        isProcessing={isProcessing}
-                        isStoppingBatch={isStoppingBatch}
-                        handleStopBatch={handleStopBatch}
-                        isGenerationSuccess={isGenerationSuccess}
-                        resultImages={resultImages}
-                        router={router}
-                        StudioSteps={StudioSteps}
-                        handleGenerate={handleGenerate}
-                        handleBatchGenerate={handleBatchGenerate}
-                        batchMode={true}
-                        productCode={productCode}
-                        estimatedCost={estimatedCost}
-                        isAdmin={user?.role === "admin"}
-                      />
-                    </div>
-                  )}
+                  {/* Always hidden as we now show it in the grid above */}
                 </div>
               </div>
             </div>

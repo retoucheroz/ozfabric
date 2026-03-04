@@ -6,6 +6,8 @@ export function ActivityTracker() {
     const pathname = usePathname()
 
     useEffect(() => {
+        // Disabled to save DB bandwidth
+        /*
         const updateActivity = async () => {
             try {
                 await fetch('/api/user/activity', {
@@ -17,8 +19,8 @@ export function ActivityTracker() {
                 // Silently fail activity tracking
             }
         }
-
         updateActivity()
+        */
     }, [pathname])
 
     return null

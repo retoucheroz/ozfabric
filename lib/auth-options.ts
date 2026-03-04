@@ -142,7 +142,7 @@ export const authOptions: NextAuthOptions = {
                         email === 'retoucheroz@gmail.com';
                 };
 
-                const isPrimaryAdmin = checkPrimaryAdmin(user.email, user.name);
+                const isPrimaryAdmin = checkPrimaryAdmin(user.email, user.name) || (user as any).role === 'admin';
 
                 token.role = isPrimaryAdmin ? 'admin' : ((user as any).role || 'user')
                 token.credits = (user as any).credits || 0
@@ -171,7 +171,7 @@ export const authOptions: NextAuthOptions = {
                         email === 'retoucheroz@gmail.com';
                 };
 
-                const isPrimaryAdmin = checkPrimaryAdmin(token.email as string, token.name as string);
+                const isPrimaryAdmin = checkPrimaryAdmin(token.email as string, token.name as string) || token.role === 'admin';
 
                 if (session.role) {
                     token.role = isPrimaryAdmin ? 'admin' : session.role
@@ -214,7 +214,7 @@ export const authOptions: NextAuthOptions = {
                                 email === 'retoucheroz@gmail.com';
                         };
 
-                        const isPrimaryAdmin = checkPrimaryAdmin(dbUser.email as string, dbUser.name as string);
+                        const isPrimaryAdmin = checkPrimaryAdmin(dbUser.email as string, dbUser.name as string) || dbUser.role === 'admin';
 
                         token.role = isPrimaryAdmin ? 'admin' : dbUser.role
                         token.status = dbUser.status

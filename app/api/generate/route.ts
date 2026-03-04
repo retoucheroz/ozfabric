@@ -205,12 +205,13 @@ export async function POST(req: NextRequest) {
         // Ensure pose image is an R2 URL if provided (but we typically delete it below)
         let uploadedImages = rawUploadedImages || {};
 
-        if (!preview) {
-            // === R2 INPUT SANITIZATION ===
+        // === R2/S3 INPUT SANITIZATION ===
+        // We now run this even in preview mode to ensure the user sees the S3 links in debug info
+        if (rawUploadedImages) {
             let { ensureR2Url: ensureS3R2 } = await import("@/lib/s3");
             const sanitizedData = await Promise.all(
                 Object.entries(rawUploadedImages || {}).map(async ([key, value]) => {
-                    if (typeof value === 'string' && value) {
+                    if (typeof value === 'string' && value && value !== "PRESENT") {
                         return [key, await ensureS3R2(value, "inputs")];
                     }
                     return [key, value];
@@ -384,7 +385,7 @@ export async function POST(req: NextRequest) {
                 }
             }
 
-            return assets.filter(a => a && a.startsWith("http"));
+            return assets.filter(a => a && (a.startsWith("http") || a.startsWith("data:") || a === "PRESENT"));
         };
 
         // 2. Build Structured Prompt JSON for each view

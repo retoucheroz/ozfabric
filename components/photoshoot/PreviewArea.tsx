@@ -298,11 +298,15 @@ export function PreviewArea({
                                 <div>
                                     <label className="text-[10px] font-black text-[var(--accent-primary)] uppercase tracking-[0.2em] block mb-2">Input Assets</label>
                                     <div className="flex flex-wrap gap-2">
-                                        {debugImage.inputAssets?.length > 0 ? debugImage.inputAssets.map((asset: string) => (
-                                            <span key={asset} className="px-3 py-1 bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-full text-[10px] font-bold uppercase tracking-tighter">
-                                                {asset}
-                                            </span>
-                                        )) : (
+                                        {debugImage.inputAssets && Object.entries(debugImage.inputAssets).map(([key, val]: any) => (
+                                            <div key={key} className="w-full p-3 bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-xl space-y-1">
+                                                <span className="text-[10px] font-black uppercase text-[var(--accent-primary)]">{key}</span>
+                                                <div className="text-[9px] font-mono break-all opacity-60">
+                                                    {typeof val === 'string' ? (val.startsWith('http') ? val : (val.startsWith('data:') ? `BASE64 (${val.length} chars)` : val)) : JSON.stringify(val)}
+                                                </div>
+                                            </div>
+                                        ))}
+                                        {(!debugImage.inputAssets || Object.keys(debugImage.inputAssets).length === 0) && (
                                             <span className="text-xs text-[var(--text-muted)] italic">No specific asset list stored</span>
                                         )}
                                     </div>

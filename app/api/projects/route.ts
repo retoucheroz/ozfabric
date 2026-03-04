@@ -11,20 +11,27 @@ export async function GET() {
         const projects = await prisma.project.findMany({
             where: { userId: session.user.id },
             orderBy: { createdAt: "desc" },
+            select: {
+                id: true,
+                title: true,
+                type: true,
+                imageUrl: true,
+                originalImage: true,
+                isFavorite: true,
+                createdAt: true,
+                // settings: true, // Settings often contains heavy metadata, skipping if not used in list
+            }
         });
 
-        // Map them back to the frontend properties if needed,
-        // or just return as is. The frontend expects camelCase with timestamp.
         const formatted = projects.map((p: any) => ({
             id: p.id,
             title: p.title,
             type: p.type,
             imageUrl: p.imageUrl,
             originalImage: p.originalImage,
-            description: p.prompt || "",
+            description: "", // PROMPT REMOVED
             isFavorite: p.isFavorite,
-            createdAt: new Date(p.createdAt).getTime(), // convert string/date to ms timestamp
-            settings: p.settings,
+            createdAt: new Date(p.createdAt).getTime(),
         }));
 
         return NextResponse.json({ projects: formatted });
@@ -41,6 +48,7 @@ export async function POST(req: Request) {
 
         const body = await req.json();
 
+        // NO PROMPT SAVED AS PER USER REQUEST
         const project = await prisma.project.create({
             data: {
                 userId: session.user.id,
@@ -48,16 +56,17 @@ export async function POST(req: Request) {
                 type: body.type || "Style",
                 imageUrl: body.imageUrl,
                 originalImage: body.originalImage || null,
-                prompt: body.description || null,
+                prompt: null, // ALWAYS NULL FOR BANDWIDTH SAVING
                 isFavorite: body.isFavorite || false,
                 settings: body.settings || {},
-                // If the frontend generated an ID, you could theoretically force it:
-                // id: body.id, 
-            }
+                createdAt: new Date(),
+            },
+            select: { id: true, title: true, type: true, imageUrl: true, createdAt: true }
         });
 
         return NextResponse.json({
-            success: true, project: {
+            success: true,
+            project: {
                 ...project,
                 createdAt: new Date(project.createdAt).getTime()
             }
