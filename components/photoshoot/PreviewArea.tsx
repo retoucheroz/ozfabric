@@ -45,23 +45,30 @@ export function PreviewArea({
     const generateButton = (
         <div className="w-full max-w-md mb-6 space-y-2">
             <Button
+                variant="hot-coral"
                 size="lg"
                 className={cn(
-                    "w-full shadow-xl transition-all duration-300",
-                    "bg-zinc-100 hover:bg-white text-black font-black uppercase tracking-widest"
+                    "w-full h-14"
                 )}
                 onClick={() => batchMode ? handleBatchGenerate() : handleGenerate()}
                 disabled={isProcessing}
             >
                 {isProcessing ? (
                     <span className="flex items-center gap-2">
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        {language === "tr" ? "ÜRETİLİYOR..." : "GENERATING..."}
+                        <Loader2 className="w-4 h-4 animate-spin text-white/50" />
+                        {language === "tr" ? "OLUŞTURULUYOR..." : "GENERATING..."}
                     </span>
                 ) : (
                     <span className="flex items-center gap-2">
-                        <Camera className="w-5 h-5" />
-                        {language === "tr" ? "ÜRETİMİ BAŞLAT" : "START PRODUCTION"}
+                        <Camera className="w-5 h-5 flex-none" />
+                        <span className="whitespace-nowrap">
+                            {language === "tr" ? "OLUŞTUR" : "GENERATE"}
+                        </span>
+                        <div className="h-4 w-px bg-white/20 mx-1 shrink-0" />
+                        <div className="flex items-center gap-1.5 opacity-90 scale-90">
+                            <Zap className="w-3.5 h-3.5" />
+                            <span className="text-[10px] font-black">{estimatedCost}</span>
+                        </div>
                     </span>
                 )}
             </Button>

@@ -124,12 +124,6 @@ export async function POST(req: NextRequest) {
             - SOURCE: Use the "IMAGE FOR SCENE".
             - Mirror the body position and shot type exactly. 
 
-            ### COMPONENT 4: CAMERA & OPTICS
-            ${!camera || camera === "Auto"
-                ? "Camera Mode: AUTO"
-                : `Camera Mode: MANUAL (Camera: ${camera}, Lens: ${lens}, Focal: ${focalLength}mm, Aperture: ${aperture})`
-            }
-
             ### YOUR TASK:
             1. Identify the subject from "IMAGE FOR IDENTITY".
             2. Meticulously analyze the "IMAGE FOR OUTFIT" collage for ALL items including CLOTHING and ACCESSORIES (glasses, etc.).
@@ -139,7 +133,7 @@ export async function POST(req: NextRequest) {
 
             ### OUTPUT FORMAT:
             Generate a single cohesive paragraph. 
-            Include the following bracketed headers internally: [SUBJECT SOURCE], [OUTFIT], [ENVIRONMENT], [CAMERA LOGIC], [PHYSICAL INTEGRATION].
+            Include the following bracketed headers internally: [SUBJECT SOURCE], [OUTFIT], [ENVIRONMENT], [PHYSICAL INTEGRATION].
         `.trim();
 
         let finalPrompt = "";

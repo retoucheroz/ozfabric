@@ -19,6 +19,7 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-white/5 hover:text-white active:scale-[0.98]",
         link: "text-violet-400 underline-offset-4 hover:underline hover:text-violet-300",
+        "hot-coral": "bg-[#FF3D5A] hover:bg-[#FF3D5A]/90 text-[#F5F5F5] font-black uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-[0.98] ring-1 ring-[#FF3D5A] ring-offset-2 ring-offset-[#0D0D0F]",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

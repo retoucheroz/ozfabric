@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import {
     ArrowLeftRight, ArrowUpDown, Wand2, Download, CreditCard, Check,
     Clapperboard, User, Layers, Video as VideoIcon, Sparkles, Loader2, RotateCw, X, Maximize2, Play, Info, Volume2, VolumeX, ShieldAlert, Zap,
-    Settings, Globe, CheckCircle2, AlertCircle, Camera, Music, Trash2, Edit2, ChevronRight, ChevronLeft, ChevronDown, Plus, Upload
+    Settings, Globe, CheckCircle2, AlertCircle, Camera, Music, Trash2, Edit2, ChevronRight, ChevronLeft, ChevronDown, Plus, Upload, Coins
 } from "lucide-react"
 import {
     TbVideo,
@@ -920,14 +920,14 @@ export default function VideoPage() {
                         ) : (
                             <div className="space-y-6 animate-in fade-in duration-500">
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                                <div className="grid grid-cols-1 md:grid-cols-[560px_1fr] gap-6 items-stretch">
                                     {/* Left: Compact Frames */}
-                                    <div className="space-y-4">
-                                        <div className="grid grid-cols-2 gap-4 relative">
+                                    <div className="space-y-4 flex flex-col h-full">
+                                        <div className="grid grid-cols-2 gap-4 relative flex-1">
                                             <div className="flex flex-col gap-2">
                                                 <div
                                                     onClick={() => firstFrameInputRef.current?.click()}
-                                                    className="relative h-[220px] rounded-2xl border-2 border-dashed border-[var(--border-subtle)] bg-[#18181b] flex flex-col items-center justify-center p-3 cursor-pointer hover:border-[var(--accent-primary)] transition-all group overflow-hidden"
+                                                    className="relative h-full min-h-[320px] rounded-2xl border-2 border-dashed border-[var(--border-subtle)] bg-[#18181b] flex flex-col items-center justify-center p-3 cursor-pointer hover:border-[var(--accent-primary)] transition-all group overflow-hidden"
                                                 >
                                                     {firstFrame ? (
                                                         <>
@@ -976,7 +976,7 @@ export default function VideoPage() {
                                             <div className="flex flex-col gap-2">
                                                 <div
                                                     onClick={() => endFrameInputRef.current?.click()}
-                                                    className="relative h-[220px] rounded-2xl border-2 border-dashed border-[var(--border-subtle)] bg-[#18181b] flex flex-col items-center justify-center p-3 cursor-pointer hover:border-[var(--accent-primary)] transition-all group overflow-hidden"
+                                                    className="relative h-full min-h-[320px] rounded-2xl border-2 border-dashed border-[var(--border-subtle)] bg-[#18181b] flex flex-col items-center justify-center p-3 cursor-pointer hover:border-[var(--accent-primary)] transition-all group overflow-hidden"
                                                 >
                                                     {endFrame ? (
                                                         <>
@@ -1007,29 +1007,14 @@ export default function VideoPage() {
                                                         </button>
                                                     )}
                                                 </div>
-
-                                                {/* Generate End Frame Button */}
-                                                <button
-                                                    onClick={() => {
-                                                        if (!firstFrame) {
-                                                            toast.error(language === 'tr' ? "Lütfen önce ilk kareyi yükleyin." : "Please upload the first frame first.");
-                                                            return;
-                                                        }
-                                                        setShowEndFrameDialog(true);
-                                                    }}
-                                                    className="flex items-center justify-center gap-1.5 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-[var(--accent-primary)] hover:text-[#F5F5F5] bg-[var(--accent-soft)] hover:bg-[var(--accent-primary)] border border-[var(--accent-primary)]/20 rounded-md transition-all"
-                                                >
-                                                    <TbWand className="w-3.5 h-3.5" />
-                                                    {language === 'tr' ? 'End Frame Üret' : 'Gen End Frame'}
-                                                </button>
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* Right: Settings Summary */}
-                                    <div className="flex flex-col gap-4 h-full">
-                                        <Card className="bg-[#18181b] border-[var(--border-subtle)] p-6 backdrop-blur-sm rounded-2xl flex flex-col flex-1">
-                                            <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] lg:grid-cols-[1fr_320px] gap-8 w-full h-full flex-1">
+                                    <div className="flex flex-col gap-4">
+                                        <Card className="bg-[#18181b] border-[var(--border-subtle)] p-6 backdrop-blur-sm rounded-2xl flex flex-col h-full">
+                                            <div className="grid grid-cols-1 md:grid-cols-[1fr_240px] lg:grid-cols-[1fr_240px] gap-8 w-full h-full flex-1">
 
                                                 {/* Sol Kolon: Süre, En/Boy, Kalite */}
                                                 <div className="flex flex-col gap-6 relative">
@@ -1087,6 +1072,26 @@ export default function VideoPage() {
                                                             </div>
                                                         </div>
                                                     </div>
+
+                                                    <Button
+                                                        variant="hot-coral"
+                                                        onClick={handleGenerate}
+                                                        disabled={isProcessing}
+                                                        className="w-full mt-4 h-12 shrink-0 overflow-hidden"
+                                                    >
+                                                        {isProcessing ? (
+                                                            <TbLoader2 className="w-2.5 h-2.5 animate-spin" />
+                                                        ) : (
+                                                            <div className="flex items-center justify-center whitespace-nowrap">
+                                                                <TbSparkles className="w-2.5 h-2.5 mr-2" />
+                                                                <span className="block">{language === 'tr' ? 'OLUŞTUR' : 'CREATE'}</span>
+                                                                <span className="ml-3 pl-3 border-l border-current/20 shrink-0 text-[10px] tracking-widest font-black flex items-center gap-1.5">
+                                                                    <Coins className="w-3.5 h-3.5 text-white/80" />
+                                                                    {estimatedCost}
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                    </Button>
                                                 </div>
 
                                                 {/* Sağ Kolon: Model Seçimi, Oluştur */}
@@ -1123,37 +1128,38 @@ export default function VideoPage() {
                                                             </div>
                                                             <Switch checked={multiShot} onCheckedChange={setMultiShot} className="data-[state=checked]:bg-white" />
                                                         </div>
+
+                                                        <div className="flex items-center justify-between bg-black/20 px-4 py-3 rounded-md border border-[var(--border-subtle)] mt-4 shadow-inner">
+                                                            <div className="flex items-center gap-4">
+                                                                <TbRefresh className="w-4 h-4 text-zinc-400" />
+                                                                <span className="text-[10px] font-black text-[#F5F5F5] uppercase tracking-widest">
+                                                                    {language === 'tr' ? 'LOOP (SONA KOPYALA)' : 'LOOP (COPY TO END)'}
+                                                                </span>
+                                                            </div>
+                                                            <Switch id="loop-frame" checked={isLoopEnabled} onCheckedChange={setIsLoopEnabled} className="data-[state=checked]:bg-white" />
+                                                        </div>
+
+                                                        <div className="mt-4">
+                                                            <button
+                                                                onClick={() => {
+                                                                    if (!firstFrame) {
+                                                                        toast.error(language === 'tr' ? "Lütfen önce ilk kareyi yükleyin." : "Please upload the first frame first.");
+                                                                        return;
+                                                                    }
+                                                                    setShowEndFrameDialog(true);
+                                                                }}
+                                                                className="w-full flex items-center justify-center gap-2 h-11 text-[9px] font-black uppercase tracking-widest text-[var(--accent-primary)] hover:text-[#F5F5F5] bg-[var(--accent-soft)] hover:bg-[var(--accent-primary)] border border-[var(--accent-primary)]/20 rounded-md transition-all shadow-inner"
+                                                            >
+                                                                <TbWand className="w-4 h-4" />
+                                                                {language === 'tr' ? 'Bitiş görseli üret' : 'Generate end frame'}
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
 
                                             </div>
                                         </Card>
 
-                                        <div className="flex items-center gap-8 w-full mt-2 px-1">
-                                            <div className="flex items-center gap-2 shrink-0">
-                                                <Switch id="loop-frame" checked={isLoopEnabled} onCheckedChange={setIsLoopEnabled} className="scale-75 data-[state=checked]:bg-white" />
-                                                <label htmlFor="loop-frame" className="text-[10px] font-black uppercase text-[#a1a1aa] cursor-pointer hover:text-[#F5F5F5] transition-colors whitespace-nowrap">
-                                                    {language === 'tr' ? 'LOOP (SONA KOPYALA)' : 'LOOP (COPY TO END)'}
-                                                </label>
-                                            </div>
-                                            <Button
-                                                onClick={handleGenerate}
-                                                disabled={isProcessing}
-                                                className="flex-1 h-14 shrink-0 overflow-hidden bg-[#F5F5F5] hover:opacity-80 text-[#0D0D0F] font-black rounded-md text-[12px] uppercase tracking-[0.2em] flex items-center justify-center shadow-2xl transition-all active:scale-[0.98] ring-1 ring-[#F5F5F5] ring-offset-2 ring-offset-[#0D0D0F]"
-                                            >
-                                                {isProcessing ? (
-                                                    <TbLoader2 className="w-2.5 h-2.5 animate-spin" />
-                                                ) : (
-                                                    <div className="flex items-center justify-center whitespace-nowrap">
-                                                        <TbSparkles className="w-2.5 h-2.5 mr-2" />
-                                                        <span className="block">{language === 'tr' ? 'VİDEOYU OLUŞTUR' : 'GENERATE VIDEO'}</span>
-                                                        <span className="ml-3 pl-3 border-l border-current/20 shrink-0 text-[12px] tracking-widest font-black">
-                                                            {estimatedCost} {language === 'tr' ? 'KR' : 'CR'}
-                                                        </span>
-                                                    </div>
-                                                )}
-                                            </Button>
-                                        </div>
                                     </div>
                                 </div>
 

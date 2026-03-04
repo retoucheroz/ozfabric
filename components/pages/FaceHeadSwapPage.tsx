@@ -18,6 +18,8 @@ import {
     RefreshCw,
     Maximize2,
     Monitor,
+    Coins,
+    Camera,
 } from "lucide-react"
 import {
     TbRefresh,
@@ -27,7 +29,8 @@ import {
     TbSettings2,
     TbAdjustmentsHorizontal,
     TbAspectRatio,
-    TbHdr
+    TbHdr,
+    TbCoins
 } from "react-icons/tb"
 import {
     Select,
@@ -327,22 +330,30 @@ export default function FaceHeadSwapPage() {
                         </div>
 
                         <Button
-                            disabled={!identityImage || !baseImage || isGenerating}
+                            variant="hot-coral"
+                            size="lg"
+                            className="h-12 w-full overflow-hidden mt-4"
+                            disabled={isGenerating}
                             onClick={handleGenerate}
-                            className="w-full h-14 rounded-md bg-white hover:bg-zinc-200 text-black font-black uppercase tracking-widest shadow-xl shadow-white/5 transition-all active:scale-[0.98] mt-4"
                         >
                             {isGenerating ? (
                                 <>
-                                    <Loader2 className="w-5 h-5 mr-3 animate-spin" />
-                                    {t("faceSwap.generating")}
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    <span>{t("faceSwap.generating")}</span>
                                 </>
                             ) : (
                                 <>
-                                    <Sparkles className="w-5 h-5 mr-3 text-black/50" />
-                                    {t("faceSwap.generate")}
-                                    <span className="ml-3 text-[10px] font-black opacity-50 border-l border-black/10 pl-3">
-                                        {estimatedCost} {language === "tr" ? "KREDİ" : "CREDITS"}
-                                    </span>
+                                    <Camera className="w-4 h-4 flex-none" />
+                                    <div className="flex items-center gap-1.5 whitespace-nowrap">
+                                        <span>{t("faceSwap.generate")}</span>
+                                        <div className="h-4 w-px bg-white/20 mx-1 shrink-0" />
+                                        <div className="flex items-center gap-1 opacity-90">
+                                            <TbCoins className="w-4 h-4" />
+                                            <span className="text-[10px] font-black">
+                                                {estimatedCost}
+                                            </span>
+                                        </div>
+                                    </div>
                                 </>
                             )}
                         </Button>

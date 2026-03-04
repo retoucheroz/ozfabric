@@ -38,6 +38,7 @@ import {
   TbJacket,
   TbShirt,
   TbHanger,
+  TbCoins,
 } from "react-icons/tb";
 import {
   PiHandbag,
@@ -934,7 +935,7 @@ export default function PhotoshootPage() {
                       <TooltipTrigger asChild>
                         <div
                           className={cn(
-                            "flex flex-col items-center justify-between p-2 h-auto aspect-square rounded-md border-2 transition-all group select-none shadow-sm relative overflow-hidden",
+                            "flex flex-col items-center justify-between p-3 h-auto aspect-square rounded-md border-2 transition-all group select-none shadow-sm relative overflow-hidden",
                             pantLength === "covering" || pantLength === "flare"
                               ? "opacity-30 cursor-not-allowed bg-zinc-900/10 border-white/5 grayscale"
                               : socksType !== "none" || assets.socks
@@ -1037,7 +1038,7 @@ export default function PhotoshootPage() {
                           />
 
                           {assets.socks ? (
-                            <div className="absolute inset-0 w-full h-full bg-zinc-900">
+                            <div className="absolute inset-0 w-full h-full bg-zinc-900 p-1.5">
                               <img
                                 src={assets.socks as string}
                                 className="w-full h-full object-contain"
@@ -1073,10 +1074,10 @@ export default function PhotoshootPage() {
                             </div>
                           ) : (
                             <>
-                              <div className="flex flex-col items-center gap-1.5 pt-1">
+                              <div className="flex flex-col items-center gap-1 pt-1">
                                 <PiSock
                                   className={cn(
-                                    "w-6 h-6 transition-all duration-300",
+                                    "w-5 h-5 transition-all duration-300",
                                     !(
                                       pantLength === "covering" ||
                                       pantLength === "flare"
@@ -1112,7 +1113,7 @@ export default function PhotoshootPage() {
                                 />
                                 <span
                                   className={cn(
-                                    "text-[9px] font-black uppercase tracking-widest text-center leading-tight transition-colors",
+                                    "text-[8px] font-black uppercase tracking-widest text-center leading-tight transition-colors",
                                     socksType !== "none"
                                       ? "text-white"
                                       : cn(
@@ -1399,15 +1400,11 @@ export default function PhotoshootPage() {
                           </div>
                         </div>
 
-                        <div className="flex items-center pl-4 border-l border-white/5 -ml-[20px]">
+                        <div className="flex items-center pl-3 border-l border-white/10 -ml-3">
                           <Button
+                            variant="hot-coral"
                             size="lg"
-                            className={cn(
-                              "h-12 px-6 shadow-xl transition-all duration-300 font-black uppercase tracking-widest flex items-center gap-2 text-[11px] rounded-md",
-                              isProcessing
-                                ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
-                                : "bg-white hover:bg-zinc-200 text-black shadow-[0_0_20px_rgba(255,255,255,0.1)]",
-                            )}
+                            className="h-12 w-full overflow-hidden translate-x-[5px]"
                             onClick={() =>
                               batchMode
                                 ? handleBatchGenerate()
@@ -1417,10 +1414,10 @@ export default function PhotoshootPage() {
                           >
                             {isProcessing ? (
                               <>
-                                <Loader2 className="w-4 h-4 animate-spin text-zinc-500" />
+                                <Loader2 className="w-4 h-4 animate-spin" />
                                 <span>
                                   {language === "tr"
-                                    ? "ÜRETİLİYOR..."
+                                    ? "OLUŞTURULUYOR..."
                                     : "GENERATING..."}
                                 </span>
                               </>
@@ -1430,12 +1427,16 @@ export default function PhotoshootPage() {
                                 <div className="flex items-center gap-1.5 whitespace-nowrap">
                                   <span>
                                     {language === "tr"
-                                      ? "ÜRETİMİ BAŞLAT"
-                                      : "START PRODUCTION"}
+                                      ? "OLUŞTUR"
+                                      : "GENERATE"}
                                   </span>
-                                  <span className="px-1.5 py-0.5 rounded bg-black/5 text-[10px] border border-black/5">
-                                    {estimatedCost}
-                                  </span>
+                                  <div className="h-4 w-px bg-white/20 mx-1 shrink-0" />
+                                  <div className="flex items-center gap-1 opacity-90">
+                                    <TbCoins className="w-4 h-4" />
+                                    <span className="text-[10px] font-black">
+                                      {estimatedCost}
+                                    </span>
+                                  </div>
                                 </div>
                               </>
                             )}

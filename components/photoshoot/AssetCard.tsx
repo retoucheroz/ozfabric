@@ -363,8 +363,8 @@ export function AssetCard({
                     onDrop={handleDrop}
                 >
                     {currentAsset && currentAsset !== "LIGHTING_SET" ? (
-                        <div className="relative w-full h-full group/image bg-[var(--bg-elevated)]">
-                            <img src={currentAsset as string} className="absolute inset-0 w-full h-full object-contain transition-transform duration-700 group-hover/image:scale-105" alt={label} />
+                        <div className="relative w-full h-full group/image bg-[var(--bg-elevated)] p-1.5">
+                            <img src={currentAsset as string} className="w-full h-full object-contain transition-transform duration-700 group-hover/image:scale-105" alt={label} />
 
                             {/* Persistent Label Overlay when image is loaded */}
                             <div className="absolute bottom-0 inset-x-0 bg-black/60 backdrop-blur-sm px-1 py-0.5 border-t border-white/10 z-20">
@@ -389,29 +389,29 @@ export function AssetCard({
                             </div>
                         </div>
                     ) : assets[id] === "LIGHTING_SET" ? (
-                        <div className="flex flex-col items-center gap-2.5 p-3 text-center transition-all group-hover/card:scale-105">
-                            <div className="p-3.5 rounded-2xl bg-zinc-800/80 text-white border border-white/5 shadow-inner">
-                                {Icon ? <Icon size={24} /> : <Upload size={24} />}
+                        <div className="flex flex-col items-center gap-2 p-2.5 text-center transition-all group-hover/card:scale-105">
+                            <div className="p-2.5 rounded-xl bg-zinc-800/80 text-white border border-white/5 shadow-inner">
+                                {Icon ? <Icon size={20} /> : <Upload size={20} />}
                             </div>
                             <div className="space-y-0.5">
-                                <span className="text-[11px] font-bold uppercase tracking-wide text-[var(--text-primary)] block leading-tight">
+                                <span className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-primary)] block leading-tight">
                                     {label}
                                 </span>
-                                <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-tighter opacity-80 block">
+                                <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-tighter opacity-80 block">
                                     {language === "tr" ? "PRESET AKTİF" : "PRESET ACTIVE"}
                                 </span>
                             </div>
                         </div>
                     ) : (
-                        <div className="flex flex-col items-center gap-2.5 p-3 text-center transition-all group-hover/card:scale-105">
-                            <div className="p-3.5 rounded-2xl bg-zinc-800/80 text-white border border-white/5 shadow-inner">
-                                {Icon ? <Icon size={24} /> : <Upload size={24} />}
+                        <div className="flex flex-col items-center gap-2 p-2.5 text-center transition-all group-hover/card:scale-105">
+                            <div className="p-2.5 rounded-xl bg-zinc-800/80 text-white border border-white/5 shadow-inner">
+                                {Icon ? <Icon size={20} /> : <Upload size={20} />}
                             </div>
                             <div className="space-y-0.5">
-                                <span className="text-[11px] font-bold uppercase tracking-wide text-[var(--text-primary)] block leading-tight">
+                                <span className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-primary)] block leading-tight">
                                     {label}
                                 </span>
-                                <span className="text-[9px] font-bold text-[var(--accent-primary)] uppercase tracking-tighter opacity-80 block group-hover/card:text-[var(--accent-primary)] transition-colors">
+                                <span className="text-[8px] font-bold text-[var(--accent-primary)] uppercase tracking-tighter opacity-80 block group-hover/card:text-[var(--accent-primary)] transition-colors">
                                     {language === "tr" ? "YÜKLE VEYA SÜRÜKLE" : "UPLOAD OR DROP"}
                                 </span>
                             </div>

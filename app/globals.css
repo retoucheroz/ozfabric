@@ -32,6 +32,9 @@
   --sidebar-item-text: #555570;
   --sidebar-icon-passive: #8888a0;
   --sidebar-group-label: #8888a0;
+
+  --hot-coral: #FF3D5A;
+  --hot-coral-hover: #E63550;
 }
 
 /* KOYU TEMA */
@@ -64,6 +67,9 @@
   --sidebar-item-text: #a1a1aa;
   --sidebar-icon-passive: #52525b;
   --sidebar-group-label: #52525b;
+
+  --hot-coral: #FF3D5A;
+  --hot-coral-hover: #E63550;
 }
 
 /* Tema geçiş animasyonu */
@@ -357,5 +363,11 @@
 
   .dark ::-webkit-scrollbar-thumb:hover {
     background: rgba(245, 245, 245, 0.4);
+  }
+
+  /* Hot Coral Standard Button Style */
+  .btn-hot-coral {
+    @apply bg-[#FF3D5A] hover:bg-[#FF3D5A]/90 text-[#F5F5F5] font-black uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-[0.98] ring-1 ring-[#FF3D5A] ring-offset-2 ring-offset-[#0D0D0F];
+    font-size: 12px;
   }
 }

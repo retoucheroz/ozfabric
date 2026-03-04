@@ -135,7 +135,7 @@ export function BehaviorToggles({
                         <div className="flex flex-col items-center gap-1 pt-1">
                             <Icon className={cn("w-5 h-5 transition-transform group-hover:scale-110", active ? "text-white" : "text-zinc-500")} />
                             <span className={cn(
-                                "text-[10px] font-black uppercase tracking-widest text-center leading-tight transition-colors",
+                                "text-[10px] font-black uppercase tracking-widest text-center leading-tight transition-colors h-6 flex items-center justify-center",
                                 active ? "text-white" : "text-zinc-400 group-hover:text-white"
                             )}>
                                 {label}
@@ -174,28 +174,35 @@ export function BehaviorToggles({
                 {/* 1. Hair */}
                 <ToggleItem
                     label={language === "tr" ? "SAÇ ARKADA" : "HAIR BACK"}
-                    brief={language === "tr" ? "Saçı arkaya atar" : "Tucks hair back"}
+                    brief={language === "tr"
+                        ? (hairBehindShoulders ? "Saç arkada" : "Saç önde")
+                        : (hairBehindShoulders ? "Hair back" : "Hair in front")}
                     detailed={language === "tr" ? "Modelin saçının omuz arkasına atılıp atılmayacağının seçimi." : "Choice of whether the model's hair is thrown behind the shoulders."}
                     icon={TbUserCircle}
                     active={hairBehindShoulders}
                     onClick={() => setHairBehindShoulders(!hairBehindShoulders)}
                 />
 
-                {/* 2. Look at Camera */}
+                {/* 2. Look Away (Inverted Look at Camera) */}
                 <ToggleItem
-                    label={language === "tr" ? "KAMERAYA BAK" : "LOOK AT CAM"}
-                    brief={language === "tr" ? "Göz teması kurar" : "Makes eye contact"}
-                    detailed={language === "tr" ? "Modelin doğrudan kameraya bakarak göz teması kurup kurmayacağını belirler." : "Determines whether the model looks directly at the camera to make eye contact."}
+                    label={language === "tr" ? "BAŞKA YÖNE BAK" : "LOOK AWAY"}
+                    brief={language === "tr"
+                        ? (!lookAtCamera ? "Kameraya bakmaz" : "Kameraya bakar")
+                        : (!lookAtCamera ? "Looking away" : "Looking at cam")}
+                    detailed={language === "tr" ? "Modelin doğrudan kameraya bakmak yerine başka bir yöne odaklanmasını sağlar. Kapalıyken (varsayılan) model doğrudan kameraya bakar." : "Makes the model focus on another direction instead of looking directly at the camera. When off (default), the model looks directly at the camera."}
                     icon={TbCamera}
-                    active={lookAtCamera}
+                    active={!lookAtCamera}
                     onClick={() => setLookAtCamera(!lookAtCamera)}
                 />
 
-                {/* 3. Buttons/Zipper */}
                 <ToggleItem
-                    label={language === "tr" ? "ÖNÜ AÇIK" : "OPEN FRONT"}
-                    brief={language === "tr" ? "Önünü açık bırakır" : "Keep front open"}
-                    detailed={language === "tr" ? "Düğmeli ya da fermuarlı bir üst ürün ise onun önünün açık kapalı seçeneği." : "Option for buttoned or zippered tops to be open or closed."}
+                    label={language === "tr" ? "GÖMLEK DÜĞMELERİ" : "OPEN FRONT"}
+                    brief={language === "tr"
+                        ? (buttonsOpen ? "Önü açık" : "Önü kapalı")
+                        : (buttonsOpen ? "Front open" : "Front closed")}
+                    detailed={language === "tr"
+                        ? "Sadece gömlekler için değil; ceket, hırka gibi tüm düğmeli veya fermuarlı üst ürünlerin önünün açık mı yoksa kapalı mı kalacağını belirler."
+                        : "Determines whether the front of any buttoned or zippered upper garment (like shirts, jackets, or cardigans) remains open or closed."}
                     icon={TbShirt}
                     active={buttonsOpen}
                     onClick={() => setButtonsOpen(!buttonsOpen)}
@@ -203,9 +210,13 @@ export function BehaviorToggles({
 
                 {/* 4. Tucked */}
                 <ToggleItem
-                    label={language === "tr" ? "SOKMA" : "TUCK IN"}
-                    brief={language === "tr" ? "Üstü alta sokar" : "Top into bottom"}
-                    detailed={language === "tr" ? "Üst ürünün alt ürünün (pantolon, etek vb.) içine tamamen sokulup sokulmamasını belirler. Kapalıyken üst, alta tamamen dışarıda kalır. Açıkken tamamen içeri sokulur." : "Determines whether the top garment is fully tucked into the bottom garment. Off = hem hangs freely over the waistband. On = fully tucked in."}
+                    label="TUCK"
+                    brief={language === "tr"
+                        ? (tucked ? "İçeride" : "Dışarıda")
+                        : (tucked ? "Tucked" : "Loose")}
+                    detailed={language === "tr"
+                        ? "Üst ürünün (tişört, gömlek vb.) pantolon veya etek gibi alt ürünlerin içine sokulup sokulmayacağını belirler. Kapalıyken üst ürün dışarıda kalır."
+                        : "Determines whether the top garment is tucked into the bottom garment. When off, the top hangs loosely over the waistband."}
                     icon={TbArrowBarToDown}
                     active={tucked}
                     onClick={() => setTucked(!tucked)}
@@ -214,7 +225,9 @@ export function BehaviorToggles({
                 {/* 5. Sleeves Rolled */}
                 <ToggleItem
                     label={language === "tr" ? "KOLLAR SIVALI" : "ROLLED SLEEVE"}
-                    brief={language === "tr" ? "Kollari yukarı çeker" : "Pull up sleeves"}
+                    brief={language === "tr"
+                        ? (sleevesRolled ? "Kollar sıvalı" : "Kollar inik")
+                        : (sleevesRolled ? "Sleeves rolled" : "Sleeves down")}
                     detailed={language === "tr" ? "Uzun kollu ürünlerin kollarının dirseğe kadar sıvanması seçeneği." : "Rolling up the sleeves of long-sleeved products to the elbows."}
                     icon={TbHandStop}
                     active={sleevesRolled}
@@ -224,7 +237,9 @@ export function BehaviorToggles({
                 {/* 6. Wind */}
                 <ToggleItem
                     label={language === "tr" ? "RÜZGAR" : "WIND"}
-                    brief={language === "tr" ? "Hafif esinti verir" : "Soft hair breeze"}
+                    brief={language === "tr"
+                        ? (enableWind ? "Rüzgarlı" : "Durgun")
+                        : (enableWind ? "Windy" : "Still")}
                     detailed={language === "tr" ? "Modelin saçına hafif bir rüzgar esintisi efekti verilmesini sağlar." : "Gives a light wind breeze effect to the model's hair."}
                     icon={TbWind}
                     active={enableWind}
@@ -232,54 +247,65 @@ export function BehaviorToggles({
                 />
 
                 {/* 7. Model Mood (Box 7) */}
-                <div
-                    className={cn(
-                        "flex flex-col items-center justify-between p-3.5 h-[130px] rounded-md border-2 transition-all cursor-pointer group select-none shadow-sm",
-                        selectedMoodId
-                            ? "bg-zinc-800 border-white shadow-xl"
-                            : "bg-zinc-900/40 border-white/5 hover:border-white/20"
-                    )}
-                    onClick={() => {
-                        const moods = ['natural', 'warm', 'powerful', 'relaxed', 'professional', 'subtle'];
-                        const currentIndex = moods.indexOf(selectedMoodId || 'natural');
-                        const nextIndex = (currentIndex + 1) % moods.length;
-                        setSelectedMoodId(moods[nextIndex]);
-                    }}
-                >
-                    <div className="flex flex-col items-center gap-3 pt-2">
-                        <TbMoodSmile className={cn("w-10 h-10 transition-all duration-300 group-hover:scale-110", selectedMoodId ? "text-white" : "text-zinc-500")} />
-                        <span className={cn(
-                            "text-[10px] font-black uppercase tracking-[0.2em] text-center leading-tight transition-colors mt-2",
-                            selectedMoodId ? "text-white" : "text-zinc-400 group-hover:text-white"
-                        )}>
-                            {language === "tr" ? "MODEL TAVRI" : "MODEL MOOD"}
-                        </span>
-                    </div>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <div
+                                className={cn(
+                                    "flex flex-col items-center justify-between p-2.5 h-[130px] rounded-md border-2 transition-all cursor-pointer group select-none shadow-sm",
+                                    selectedMoodId && selectedMoodId !== 'natural'
+                                        ? "bg-zinc-800 border-white shadow-xl"
+                                        : "bg-zinc-900/40 border-white/5 hover:border-white/20"
+                                )}
+                                onClick={() => {
+                                    const moods = ['natural', 'warm', 'powerful', 'relaxed', 'professional', 'subtle'];
+                                    const currentIndex = moods.indexOf(selectedMoodId || 'natural');
+                                    const nextIndex = (currentIndex + 1) % moods.length;
+                                    setSelectedMoodId(moods[nextIndex]);
+                                }}
+                            >
+                                <div className="flex flex-col items-center gap-1 pt-1">
+                                    <TbMoodSmile className={cn("w-5 h-5 transition-transform group-hover:scale-110", (selectedMoodId && selectedMoodId !== 'natural') ? "text-white" : "text-zinc-500")} />
+                                    <span className={cn(
+                                        "text-[10px] font-black uppercase tracking-widest text-center leading-tight transition-colors h-6 flex items-center justify-center",
+                                        (selectedMoodId && selectedMoodId !== 'natural') ? "text-white" : "text-zinc-400 group-hover:text-white"
+                                    )}>
+                                        {language === "tr" ? "MODEL TAVRI" : "MODEL MOOD"}
+                                    </span>
+                                </div>
 
-                    <div className="flex flex-col items-center gap-1.5 pb-1 w-full text-center">
-                        <span className={cn(
-                            "text-[8px] font-black uppercase tracking-widest opacity-60",
-                            selectedMoodId ? "text-white" : "text-zinc-500"
-                        )}>
-                            {language === "tr"
-                                ? [
-                                    { id: 'natural', label: 'Doğal' }, { id: 'warm', label: 'Sıcak' },
-                                    { id: 'powerful', label: 'Güçlü' }, { id: 'relaxed', label: 'Rahat' },
-                                    { id: 'professional', label: 'Profesyonel' }, { id: 'subtle', label: 'Sakin' }
-                                ].find(m => m.id === selectedMoodId)?.label || "VARSAYILAN"
-                                : [
-                                    { id: 'natural', labelEn: 'Natural' }, { id: 'warm', labelEn: 'Warm' },
-                                    { id: 'powerful', labelEn: 'Powerful' }, { id: 'relaxed', labelEn: 'Relaxed' },
-                                    { id: 'professional', labelEn: 'Professional' }, { id: 'subtle', labelEn: 'Subtle' }
-                                ].find(m => m.id === selectedMoodId)?.labelEn || "DEFAULT"}
-                        </span>
-                        <div className="flex justify-center gap-1">
-                            {['natural', 'warm', 'powerful', 'relaxed', 'professional', 'subtle'].map(m => (
-                                <div key={m} className={cn("w-1 h-1 rounded-full transition-all", selectedMoodId === m ? "bg-white scale-125 shadow-[0_0_5px_white]" : "bg-zinc-700")} />
-                            ))}
-                        </div>
-                    </div>
-                </div>
+                                <div className="flex flex-col items-center gap-1.5 pb-1 w-full text-center">
+                                    <span className={cn(
+                                        "text-[8px] font-black uppercase tracking-widest opacity-60",
+                                        (selectedMoodId && selectedMoodId !== 'natural') ? "text-white" : "text-zinc-500"
+                                    )}>
+                                        {language === "tr"
+                                            ? [
+                                                { id: 'natural', label: 'Doğal' }, { id: 'warm', label: 'Sıcak' },
+                                                { id: 'powerful', label: 'Güçlü' }, { id: 'relaxed', label: 'Rahat' },
+                                                { id: 'professional', label: 'Profesyonel' }, { id: 'subtle', label: 'Sakin' }
+                                            ].find(m => m.id === selectedMoodId)?.label || "VARSAYILAN"
+                                            : [
+                                                { id: 'natural', labelEn: 'Natural' }, { id: 'warm', labelEn: 'Warm' },
+                                                { id: 'powerful', labelEn: 'Powerful' }, { id: 'relaxed', labelEn: 'Relaxed' },
+                                                { id: 'professional', labelEn: 'Professional' }, { id: 'subtle', labelEn: 'Subtle' }
+                                            ].find(m => m.id === selectedMoodId)?.labelEn || "DEFAULT"}
+                                    </span>
+                                    <div className="flex justify-center gap-1 mt-1">
+                                        {['natural', 'warm', 'powerful', 'relaxed', 'professional', 'subtle'].map(m => (
+                                            <div key={m} className={cn("w-1 h-1 rounded-full transition-all", selectedMoodId === m ? "bg-white scale-125 shadow-[0_0_5px_white]" : "bg-zinc-700")} />
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="max-w-[200px] text-center p-3 bg-zinc-900 border border-white/10 shadow-2xl rounded-md">
+                            <p className="text-[10px] leading-relaxed text-zinc-300 font-bold uppercase tracking-tight">
+                                {language === "tr" ? "Modelin yüz ifadesini ve genel duruş enerjisini belirler." : "Determines the model's facial expression and general pose energy."}
+                            </p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
 
                 {/* 8. Pant Length (Box 8) */}
                 <div
@@ -300,7 +326,7 @@ export function BehaviorToggles({
                     <div className="flex flex-col items-center gap-1.5 pt-1">
                         <TbArrowBarToDown className={cn("w-5 h-5 transition-transform group-hover:scale-110", pantLength !== 'none' ? "text-white" : "text-zinc-500")} />
                         <span className={cn(
-                            "text-[10px] font-black uppercase tracking-widest text-center leading-tight transition-colors",
+                            "text-[10px] font-black uppercase tracking-widest text-center leading-tight transition-colors h-6 flex items-center justify-center",
                             pantLength !== 'none' ? "text-white" : "text-zinc-400 group-hover:text-white"
                         )}>
                             {language === "tr" ? "PAÇA BOYU" : "PANT LENGTH"}

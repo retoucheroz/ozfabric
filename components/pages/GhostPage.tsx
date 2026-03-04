@@ -20,7 +20,8 @@ import {
   Sparkles,
   Edit2,
   Trash2,
-  Shirt
+  Shirt,
+  Camera
 } from "lucide-react"
 import {
   TbHanger,
@@ -33,13 +34,14 @@ import {
   TbSparkles,
   TbLoader2,
   TbRefresh,
-  TbMaximize,
   TbSquare,
   TbSquareRotated,
   TbArrowUpRight,
   TbArrowDownLeft,
   TbLayoutBoard,
-  TbShirtFilled
+  TbShirtFilled,
+  TbCoins,
+  TbAspectRatio
 } from "react-icons/tb"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useProjects } from "@/context/projects-context"
@@ -66,14 +68,9 @@ const RESOLUTION_OPTIONS = [
 
 const ASPECT_RATIO_OPTIONS = [
   { id: "1:1", label: "Square (1:1)", labelTr: "Kare (1:1)" },
-  { id: "3:4", label: "Portrait (3:4)", labelTr: "Dikey (3:4)" },
-  { id: "4:3", label: "Landscape (4:3)", labelTr: "Yatay (4:3)" },
+  { id: "2:3", label: "Classic (2:3)", labelTr: "Klasik (2:3)" },
   { id: "9:16", label: "Story (9:16)", labelTr: "Hikaye (9:16)" },
   { id: "16:9", label: "Wide (16:9)", labelTr: "Geniş (16:9)" },
-  { id: "2:3", label: "Classic (2:3)", labelTr: "Klasik (2:3)" },
-  { id: "3:2", label: "Landscape (3:2)", labelTr: "Yatay (3:2)" },
-  { id: "21:9", label: "Ultra Wide (21:9)", labelTr: "Ultra Geniş (21:9)" },
-  { id: "9:21", label: "Ultra Tall (9:21)", labelTr: "Ultra Dikey (9:21)" },
 ];
 
 const LOADING_MESSAGES = [
@@ -105,9 +102,6 @@ function GhostPageContent() {
   const [selectedAngle, setSelectedAngle] = useState<string>("front_straight")
   const [selectedResolution, setSelectedResolution] = useState("1K")
   const [selectedAspectRatio, setSelectedAspectRatio] = useState("2:3")
-  const [angleDialogOpen, setAngleDialogOpen] = useState(false)
-  const [resolutionDialogOpen, setResolutionDialogOpen] = useState(false)
-  const [aspectRatioDialogOpen, setAspectRatioDialogOpen] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [resultImage, setResultImage] = useState<string | null>(null)
 
@@ -400,90 +394,42 @@ function GhostPageContent() {
             </div>
 
             {/* Resolution and Aspect Ratio Selectors */}
-            <div className="grid grid-cols-2 gap-2">
-              <Dialog open={resolutionDialogOpen} onOpenChange={setResolutionDialogOpen}>
-                <DialogTrigger asChild>
-                  <Card className="p-3 cursor-pointer bg-[#18181b] transition-all border border-white/5 hover:border-white/20 group">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-md bg-[#0D0D0F] border border-white/5 flex items-center justify-center shrink-0">
-                        <TbHdr className="w-5 h-5 text-[var(--text-muted)] group-hover:text-[var(--accent-primary)]" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[10px] uppercase font-black tracking-widest text-[var(--text-muted)]">{language === "tr" ? "ÇÖZÜNÜRLÜK" : "RESOLUTION"}</p>
-                        <p className="font-bold text-xs text-[var(--text-primary)]">{RESOLUTION_OPTIONS.find(r => r.id === selectedResolution)?.label}</p>
-                      </div>
-                      <TbChevronRight className="w-4 h-4 text-[var(--text-muted)] shrink-0" />
-                    </div>
-                  </Card>
-                </DialogTrigger>
-                <DialogContent className="max-w-sm">
-                  <DialogHeader>
-                    <DialogTitle>{language === "tr" ? "Çözünürlük Seçin" : "Select Resolution"}</DialogTitle>
-                  </DialogHeader>
-                  <div className="flex flex-col gap-2 mt-4">
-                    {RESOLUTION_OPTIONS.map((res) => (
-                      <Button
-                        key={res.id}
-                        variant={selectedResolution === res.id ? "default" : "outline"}
-                        className={`justify-between h-14 px-4 ${selectedResolution === res.id ? 'bg-white text-black hover:bg-zinc-200' : ''}`}
-                        onClick={() => { setSelectedResolution(res.id); setResolutionDialogOpen(false); }}
-                      >
-                        <span className="font-medium">{language === "tr" ? res.labelTr : res.label}</span>
-                        <Badge variant="secondary" className={selectedResolution === res.id ? 'bg-white/20 text-white border-white/20' : ''}>
-                          {res.id}
-                        </Badge>
-                      </Button>
-                    ))}
-                  </div>
-                  <p className="text-[10px] text-muted-foreground mt-2 italic px-1">
-                    {language === "tr"
-                      ? "* Yüksek çözünürlükler (2K, 4K) daha fazla kredi tüketebilir ve işlem süresi uzayabilir."
-                      : "* Higher resolutions (2K, 4K) may consume more credits and take longer to process."}
-                  </p>
-                </DialogContent>
-              </Dialog>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                  <TbAspectRatio className="w-4 h-4 text-white" />
+                  {language === "tr" ? "ORAN" : "RATIO"}
+                </label>
+                <select
+                  value={selectedAspectRatio}
+                  onChange={(e) => setSelectedAspectRatio(e.target.value)}
+                  className="w-full h-11 bg-white/5 border border-white/10 rounded-md px-4 text-[10px] font-bold text-white uppercase tracking-tight focus:outline-none"
+                >
+                  {ASPECT_RATIO_OPTIONS.map(ratio => (
+                    <option key={ratio.id} value={ratio.id} className="bg-zinc-900">
+                      {ratio.id} ({language === 'tr' ? ratio.labelTr : ratio.label})
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-              <Dialog open={aspectRatioDialogOpen} onOpenChange={setAspectRatioDialogOpen}>
-                <DialogTrigger asChild>
-                  <Card className="p-3 cursor-pointer bg-[#18181b] transition-all border border-white/5 hover:border-white/20 group">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-[#0D0D0F] border border-white/5 flex items-center justify-center shrink-0">
-                        <TbSquareRotated className="w-5 h-5 text-[var(--text-muted)] group-hover:text-[var(--accent-primary)]" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[10px] uppercase font-black tracking-widest text-[var(--text-muted)]">{language === "tr" ? "BOYUT" : "ASPECT RATIO"}</p>
-                        <p className="font-bold text-xs text-[var(--text-primary)]">{ASPECT_RATIO_OPTIONS.find(r => r.id === selectedAspectRatio)?.label}</p>
-                      </div>
-                      <TbChevronRight className="w-4 h-4 text-[var(--text-muted)] shrink-0" />
-                    </div>
-                  </Card>
-                </DialogTrigger>
-                <DialogContent className="max-w-sm">
-                  <DialogHeader>
-                    <DialogTitle>{language === "tr" ? "Boyut Oranı Seçin" : "Select Aspect Ratio"}</DialogTitle>
-                  </DialogHeader>
-                  <div className="flex flex-col gap-2 mt-4 max-h-[300px] overflow-y-auto pr-2">
-                    {ASPECT_RATIO_OPTIONS.map((ratio) => (
-                      <Button
-                        key={ratio.id}
-                        variant={selectedAspectRatio === ratio.id ? "default" : "outline"}
-                        className={`justify-between h-14 px-4 ${selectedAspectRatio === ratio.id ? 'bg-white text-black hover:bg-zinc-200' : ''}`}
-                        onClick={() => { setSelectedAspectRatio(ratio.id); setAspectRatioDialogOpen(false); }}
-                      >
-                        <span className="font-medium">{language === "tr" ? ratio.labelTr : ratio.label}</span>
-                        <Badge variant="secondary" className={selectedAspectRatio === ratio.id ? 'bg-white/20 text-white border-white/20' : ''}>
-                          {ratio.id}
-                        </Badge>
-                      </Button>
-                    ))}
-                  </div>
-                  <p className="text-[10px] text-muted-foreground mt-2 italic px-1">
-                    {language === "tr"
-                      ? "* Farklı pazar yerleri ve kullanım alanlarına göre görüntü oranını belirler."
-                      : "* Determines the image ratio based on different marketplaces and use cases."}
-                  </p>
-                </DialogContent>
-              </Dialog>
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                  <Maximize2 className="w-4 h-4 text-white" />
+                  {language === "tr" ? "KALİTE" : "QUALITY"}
+                </label>
+                <select
+                  value={selectedResolution}
+                  onChange={(e) => setSelectedResolution(e.target.value)}
+                  className="w-full h-11 bg-white/5 border border-white/10 rounded-md px-4 text-[10px] font-bold text-white uppercase tracking-tight focus:outline-none"
+                >
+                  {RESOLUTION_OPTIONS.map(res => (
+                    <option key={res.id} value={res.id} className="bg-zinc-900">
+                      {res.id} {language === 'tr' ? res.labelTr : res.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             {/* Active Model Indicator */}
@@ -505,22 +451,38 @@ function GhostPageContent() {
             {/* Generate Button */}
             <div className="space-y-2 pt-6">
               <Button
-                className="w-full py-8 rounded-md bg-white hover:bg-zinc-200 text-black font-black text-[11px] shadow-2xl transition-all active:scale-[0.98] flex items-center gap-4 uppercase tracking-[0.2em]"
-                disabled={!mainImage || isProcessing}
+                variant="hot-coral"
+                size="lg"
+                className="h-12 w-full overflow-hidden"
+                disabled={isProcessing}
                 onClick={handleGenerate}
               >
                 {isProcessing ? (
                   <>
-                    <TbLoader2 className="w-5 h-5 animate-spin" />
-                    <span>{t("ghost.processing") || "GENERATING..."}</span>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>
+                      {language === "tr"
+                        ? "OLUŞTURULUYOR..."
+                        : "GENERATING..."}
+                    </span>
                   </>
                 ) : (
                   <>
-                    <TbSparkles className="w-5 h-5 opacity-50" />
-                    <span>{t("ghost.generate") || "GENERATE GHOST"}</span>
-                    <span className="ml-1 opacity-40 font-black border-l border-black/10 pl-4">
-                      {selectedResolution === "4K" ? SERVICE_COSTS.IMAGE_GENERATION.GHOST_MODEL_4K : SERVICE_COSTS.IMAGE_GENERATION.GHOST_MODEL_1_2K} {language === "tr" ? "KR" : "CR"}
-                    </span>
+                    <Camera className="w-4 h-4 flex-none" />
+                    <div className="flex items-center gap-1.5 whitespace-nowrap">
+                      <span>
+                        {language === "tr"
+                          ? "OLUŞTUR"
+                          : "GENERATE"}
+                      </span>
+                      <div className="h-4 w-px bg-white/20 mx-1 shrink-0" />
+                      <div className="flex items-center gap-1 opacity-90">
+                        <TbCoins className="w-4 h-4" />
+                        <span className="text-[10px] font-black">
+                          {selectedResolution === "4K" ? SERVICE_COSTS.IMAGE_GENERATION.GHOST_MODEL_4K : SERVICE_COSTS.IMAGE_GENERATION.GHOST_MODEL_1_2K}
+                        </span>
+                      </div>
+                    </div>
                   </>
                 )}
               </Button>

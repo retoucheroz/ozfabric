@@ -288,8 +288,8 @@ const translations: Translations = {
 
     // Ghost Mannequin Page
     "ghost.title": { en: "Ghost / Flatlay", tr: "Ghost / Flatlay" },
-    "ghost.subtitle": { en: "TRANSFORM GARMENTS SHOT ON HANGER OR TABLE INTO GHOST MODEL", tr: "ASKIDA YA DA MASADA ÇEKİLEN ÜRÜNLERİ GHOST MODEL'E DÖNÜŞTÜRÜN" },
-    "ghost.uploadFlatLay": { en: "Upload Flat Lay Garment", tr: "Düz Serim Giysi Yükle" },
+    "ghost.subtitle": { en: "TRANSFORM GARMENTS SHOT ON HANGER OR TABLE INTO GHOST MODEL", tr: "DEKUPE YA DA ASKIDA ÇEKİLMİŞ ÜRÜNLERİNİZİ GHOST MODEL YA DA FLATLAY ÇEKİME DÖNÜŞTÜRÜN." },
+    "ghost.uploadFlatLay": { en: "Upload Flat Lay Garment", tr: "Dekupe ya da askıda çekilmiş ürün görseli yükle" },
     "ghost.generate3D": { en: "Generate 3D View", tr: "3D Görünüm Oluştur" },
     "ghost.studioTitle": { en: "3D Volume Studio", tr: "3D Hacim Stüdyosu" },
     "ghost.studioDesc": { en: "Upload a clothing item to see it transformed into a ghost mannequin product shot.", tr: "Bir giysiyi hayalet manken ürün çekimine dönüştürmek için yükleyin." },
