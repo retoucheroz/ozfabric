@@ -69,26 +69,22 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         const initData = async () => {
             try {
-                // 1. Check for legacy LocalStorage data
-                const lsProjects = localStorage.getItem("modeon_projects");
-                const lsCollections = localStorage.getItem("modeon_collections");
-                const lsModels = localStorage.getItem("modeon_models");
+                // --- 1. Fetch Cloud/Database Projects ---
+                const cloudRes = await fetch("/api/projects");
+                let cloudProjects: Project[] = [];
+                if (cloudRes.ok) {
+                    const data = await cloudRes.json();
+                    if (data.projects) {
+                        cloudProjects = data.projects;
+                        setProjects(cloudProjects);
+                    }
+                }
 
-                // 2. Load from IndexedDB
-                const idbProjects = await dbOperations.getAll<Project>(STORES.PROJECTS);
+                // --- 2. Load Local Collections and Models (Still local for now) ---
                 const idbCollections = await dbOperations.getAll<Collection>(STORES.COLLECTIONS);
                 const idbModels = await dbOperations.getAll<TrainedModel>(STORES.MODELS);
-
-                // 3. Simple Migration Strategy: If IDB is empty but LS has data, use LS and sync to IDB
-                if (idbProjects.length === 0 && lsProjects) {
-                    const parsed = JSON.parse(lsProjects);
-                    setProjects(parsed);
-                    // Sync to IDB in background
-                    parsed.forEach((p: any) => dbOperations.add(STORES.PROJECTS, p));
-                    localStorage.removeItem("modeon_projects"); // Clear to prevent loops
-                } else {
-                    setProjects(idbProjects);
-                }
+                const lsCollections = localStorage.getItem("modeon_collections");
+                const lsModels = localStorage.getItem("modeon_models");
 
                 if (idbCollections.length === 0 && lsCollections) {
                     const parsed = JSON.parse(lsCollections);
@@ -107,8 +103,37 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
                 } else {
                     setModels(idbModels);
                 }
+
+                // --- 3. Migration: Local IndexedDB Projects to Cloud ---
+                const idbProjects = await dbOperations.getAll<Project>(STORES.PROJECTS);
+                if (idbProjects.length > 0) {
+                    console.log(`Migrating ${idbProjects.length} local projects to Cloud...`);
+                    for (const localP of idbProjects) {
+                        // Check if already synced (prevent duplicates if migration interrupted)
+                        const exists = cloudProjects.find(cp => cp.id === localP.id);
+                        if (!exists) {
+                            await fetch("/api/projects", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify(localP)
+                            });
+                        }
+                    }
+                    // After successful migration, wipe local IDB projects to prevent double-syncs
+                    for (const localP of idbProjects) {
+                        await dbOperations.delete(STORES.PROJECTS, localP.id);
+                    }
+
+                    // Re-fetch clean list from cloud
+                    const freshRes = await fetch("/api/projects");
+                    if (freshRes.ok) {
+                        const data = await freshRes.json();
+                        setProjects(data.projects || []);
+                    }
+                }
+
             } catch (err) {
-                console.error("Failed to initialize projects data from DB:", err);
+                console.error("Failed to initialize or migrate projects data:", err);
             }
         };
 
@@ -138,20 +163,32 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
         return () => window.removeEventListener('focus', handleFocus);
     }, []);
 
-    // Individual persistence helpers (don't save entire arrays on every tiny update)
-    const persistProject = (p: Project) => dbOperations.add(STORES.PROJECTS, p);
+    // Individual persistence helpers 
     const persistCollection = (c: Collection) => dbOperations.add(STORES.COLLECTIONS, c);
     const persistModel = (m: TrainedModel) => dbOperations.add(STORES.MODELS, m);
 
     const addProject = (project: Omit<Project, "id" | "createdAt">): string => {
         const id = crypto.randomUUID();
-        const newProject: Project = {
-            ...project,
-            id,
-            createdAt: Date.now(),
-        };
+        const newProject: Project = { ...project, id, createdAt: Date.now() };
+
+        // Optimistic UI update
         setProjects((prev) => [newProject, ...prev]);
-        persistProject(newProject);
+
+        // Cloud Sync
+        fetch("/api/projects", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newProject)
+        }).then(async (res) => {
+            if (res.ok) {
+                const data = await res.json();
+                // Optionally update with server ID if you didn't use the client's UUID
+                // setProjects(prev => prev.map(p => p.id === id ? { ...data.project } : p));
+            } else {
+                console.error("Failed to sync project to cloud");
+            }
+        }).catch(err => console.error(err));
+
         return id;
     };
 
@@ -218,8 +255,12 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
     };
 
     const deleteProject = (id: string) => {
+        // Optimistic update
         setProjects((prev) => prev.filter((p) => p.id !== id));
-        dbOperations.delete(STORES.PROJECTS, id);
+
+        // Cloud sync
+        fetch(`/api/projects/${id}`, { method: "DELETE" })
+            .catch(err => console.error("Cloud delete project failed:", err));
     };
 
     const deleteModel = (id: string) => {
@@ -228,14 +269,20 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
     };
 
     const updateProject = (id: string, updates: Partial<Project>) => {
+        // Optimistic update
         setProjects((prev) => prev.map((p) => {
             if (p.id === id) {
-                const updated = { ...p, ...updates };
-                persistProject(updated);
-                return updated;
+                return { ...p, ...updates };
             }
             return p;
         }));
+
+        // Cloud sync
+        fetch(`/api/projects/${id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updates)
+        }).catch(err => console.error("Cloud update project failed:", err));
     };
 
     const deductCredits = async (amount: number): Promise<boolean> => {

@@ -39,6 +39,7 @@ model User {
   accounts          Account[]
   sessions          Session[]
   creditTransactions CreditTransaction[]
+  projects          Project[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt       @map("updated_at")
@@ -126,4 +127,34 @@ model AppSetting {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("app_settings")
+}
+
+model Project {
+  id            String   @id @default(cuid())
+  userId        String   @map("user_id")
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title         String   @default("Untitled Project")
+  type          String   // ecom, editorial, video, ghost, product, face-swap, etc.
+  imageUrl      String   @map("image_url")        // S3 URL
+  originalImage String?  @map("original_image")   // Input/original image URL if any
+  prompt        String?  @db.Text
+  settings      Json?    // Any extra metadata
+  isFavorite    Boolean  @default(false) @map("is_favorite")
+  
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt      @map("updated_at")
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("projects")
+}
+
+model GlobalLibrary {
+  id        String   @id
+  category  String
+  data      Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@map("global_library")
 }
