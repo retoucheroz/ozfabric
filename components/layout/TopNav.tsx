@@ -52,6 +52,8 @@ export function TopNav() {
         { label: t("nav.train"), href: "/train", icon: BrainCircuit },
     ];
 
+    const effectiveCategory = activeCategory || (studioPaths.includes(pathname) ? "studio" : toolPaths.includes(pathname) ? "tools" : null);
+
     return (
         <header className="sticky top-0 z-50 flex flex-col w-full bg-[#0D0D0F] border-b border-white/5">
             {/* Main Header Row */}
@@ -66,7 +68,6 @@ export function TopNav() {
                         </div>
                         <span>ModeOn<span className="text-[#F5F5F5]">.ai</span></span>
                     </Link>
-
                     {/* Main Navigation Categories */}
                     {mounted && (
                         <nav className="flex items-center ml-4">
@@ -76,7 +77,7 @@ export function TopNav() {
                                 }}
                                 className={cn(
                                     "px-4 md:px-6 h-[72px] text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] transition-all relative",
-                                    activeCategory === "studio" || studioPaths.includes(pathname)
+                                    effectiveCategory === "studio"
                                         ? "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]"
                                         : "text-zinc-500 hover:text-zinc-300"
                                 )}
@@ -87,7 +88,7 @@ export function TopNav() {
                                 onClick={() => setActiveCategory(activeCategory === "tools" ? null : "tools")}
                                 className={cn(
                                     "px-4 md:px-6 h-[72px] text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] transition-all relative",
-                                    activeCategory === "tools" || toolPaths.includes(pathname)
+                                    effectiveCategory === "tools"
                                         ? "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]"
                                         : "text-zinc-500 hover:text-zinc-300"
                                 )}
@@ -198,7 +199,7 @@ export function TopNav() {
 
             {/* Sub-navigation Bar (Integrated) */}
             <AnimatePresence>
-                {(activeCategory || studioPaths.includes(pathname) || toolPaths.includes(pathname)) && (
+                {effectiveCategory && (
                     <motion.div
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 50, opacity: 1 }}
@@ -207,7 +208,7 @@ export function TopNav() {
                         className="overflow-hidden border-b border-white/5 bg-[#0D0D0F]"
                     >
                         <div className="max-w-[1800px] mx-auto h-full flex items-center justify-center px-8 gap-4 md:gap-8">
-                            {(activeCategory === "studio" || studioPaths.includes(pathname)) ? (
+                            {effectiveCategory === "studio" ? (
                                 <>
                                     <SubNavItem href="/photoshoot" icon={TbCameraPlus} label={t("sidebar.photoshoot")} active={pathname === "/photoshoot"} />
                                     <SubNavItem href="/editorial" icon={TbPhotoScan} label={t("sidebar.editorial")} active={pathname === "/editorial"} />
