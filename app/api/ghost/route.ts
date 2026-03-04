@@ -24,10 +24,11 @@ VIEW STANDARD:
 Rotate the garment so the LEFT side panel is prominently visible. Yaw angle: 30 degrees toward camera-left. Arms must look like they are pointing left.
 
 GHOST FORM:
-Reconstruct a worn 3D ghost mannequin form with rounded shoulders and realistic sleeve volume.
+- Reconstruct a worn 3D ghost mannequin form with rounded shoulders and realistic sleeve volume.
 
-LOGO & FABRIC LOCK:
-Preserve all logos and fabric textures exactly from the reference images.
+FABRIC NEATNESS & FIDELITY:
+- REPAIR & IRON: Remove excessive wrinkles and creases. The garment must look professionally ironed and steamed, with smooth, clean fabric surfaces.
+- DETAIL INTEGRITY: Strictly preserve original seams, stitching, button placements, pockets, and specific construction details (cut) from the reference images. Do not simplify or alter the design.
 
 STUDIO OUTPUT:
 Pure white background (#FFFFFF), soft studio lighting, perfectly centered, 2:3 aspect ratio.`;
@@ -49,7 +50,11 @@ VIEW STANDARD:
 Rotate the garment so the RIGHT side panel (back view) is visible. Yaw angle: 30 degrees toward camera-right. Arms must look like they are pointing right.
 
 GHOST FORM:
-Reconstruct a worn 3D ghost mannequin form with realistic back structure.
+- Reconstruct a worn 3D ghost mannequin form with realistic back structure.
+
+FABRIC NEATNESS & FIDELITY:
+- REPAIR & IRON: Remove excessive wrinkles and creases. The garment must look professionally ironed and steamed, with smooth, clean fabric surfaces.
+- DETAIL INTEGRITY: Strictly preserve original seams, stitching, pockets, and specific construction details (cut) from the reference images. Do not simplify or alter the design.
 
 STUDIO OUTPUT:
 Pure white background (#FFFFFF), soft studio lighting, perfectly centered, 2:3 aspect ratio.`;
@@ -60,12 +65,10 @@ const STRAIGHT_FRONT_PROMPT = `IMPORTANT ORIENTATION & POSE LOCK:
 - No angle, no 3/4 view, no rotation.
 - DO NOT FLIP / DO NOT MIRROR.
 
-FORM CORRECTION RULE:
-If the reference garment is slightly tilted, asymmetrical, or uneven, correct it to a perfectly straight and symmetrical front view.
-Align shoulders evenly.
-Align hemline horizontally.
-Center zipper, placket, and neckline.
-Correct minor distortions while preserving original design.
+FORM CORRECTION & FIDELITY:
+- SYMMETRY: Correct any tilt or unevenness. Align shoulders evenly and hemline horizontally. Center all zippers, plackets, and necklines.
+- REPAIR & IRON: Remove excessive wrinkles, creases, and messy folds. Fabric must appear clean and professionally steamed/ironed.
+- DETAIL INTEGRITY: Maintain 100% fidelity to the original design. Strictly preserve original seams, stitching patterns, plackets, buttonholes, and specific garment cut.
 
 TASK:
 Create a photorealistic, studio-grade ghost mannequin (invisible mannequin) apparel product image on pure white background, 2:3 aspect ratio.
@@ -94,12 +97,10 @@ const STRAIGHT_BACK_PROMPT = `IMPORTANT ORIENTATION & POSE LOCK:
 - No angle, no rotation.
 - DO NOT FLIP / DO NOT MIRROR.
 
-FORM CORRECTION RULE:
-If the reference is slightly rotated or uneven, straighten it into a perfectly aligned back view.
-Shoulders symmetrical.
-Hemline horizontal.
-Center back seam aligned vertically.
-Correct distortions but preserve original design.
+FORM CORRECTION & FIDELITY:
+- SYMMETRY: Straighten the garment into a perfectly aligned back view. Shoulders must be symmetrical and hemline horizontal. Center back seam must be vertical.
+- REPAIR & IRON: Remove excessive wrinkles and creases for a professionally ironed look.
+- DETAIL INTEGRITY: Strictly maintain all original back seams, stitching patterns, and garment construction (cut).
 
 TASK:
 Create a photorealistic, studio-grade ghost mannequin apparel image on pure white background, 2:3 aspect ratio.
