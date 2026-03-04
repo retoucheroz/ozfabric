@@ -5,7 +5,6 @@ import { deductCredits } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 
 // Configure route
-export const maxDuration = 60;
 export const dynamic = 'force-dynamic'
 
 interface GenerateRequest {
