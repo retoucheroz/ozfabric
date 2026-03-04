@@ -287,8 +287,14 @@ export default function PhotoshootPage() {
   const [targetPoseShot, setTargetPoseShot] = useState<string | null>(null);
   const [showProductManager, setShowProductManager] = useState(false);
   const [isDraggingSocks, setIsDraggingSocks] = useState(false);
+  // Once generation starts, LOCK the layout so cards never shift
+  const [generationHasStarted, setGenerationHasStarted] = useState(false);
 
   // Block navigation when generation is in progress
+  useEffect(() => {
+    if (isProcessing && !generationHasStarted) setGenerationHasStarted(true);
+  }, [isProcessing]);
+
   useEffect(() => {
     if (!isProcessing) return;
 
@@ -1729,7 +1735,7 @@ export default function PhotoshootPage() {
                   <div
                     className={cn(
                       "bg-white/[0.02] border border-white/5 rounded-[32px] p-8 shadow-2xl overflow-hidden relative",
-                      isProcessing || resultImages.length > 0
+                      generationHasStarted
                         ? "flex flex-col lg:flex-row gap-8 items-start min-h-[600px]"
                         : "flex flex-col"
                     )}
@@ -1737,7 +1743,7 @@ export default function PhotoshootPage() {
                     {/* LEFT SECTION: SELECTION */}
                     <div className={cn(
                       "transition-all duration-700",
-                      isProcessing || resultImages.length > 0
+                      generationHasStarted
                         ? "w-full lg:w-[380px] xl:w-[420px] shrink-0"
                         : "w-full"
                     )}>
@@ -1750,17 +1756,14 @@ export default function PhotoshootPage() {
 
                         <div className={cn(
                           "flex flex-col gap-8",
-                          !(isProcessing || resultImages.length > 0) && "lg:flex-row"
+                          !generationHasStarted && "lg:flex-row"
                         )}>
                           {/* Styling Angles */}
                           <div className={cn(
                             "flex-none",
-                            !(isProcessing || resultImages.length > 0) ? "w-full lg:w-auto lg:flex-1" : "w-full"
+                            !generationHasStarted ? "w-full lg:w-auto lg:flex-1" : "w-full"
                           )}>
-                            <div className={cn(
-                              "grid gap-4",
-                              !(isProcessing || resultImages.length > 0) ? "grid-cols-2" : "grid-cols-2"
-                            )}>
+                            <div className="grid grid-cols-2 gap-4">
                               {availableBatchShots
                                 .filter((s) => s.id.includes("styling"))
                                 .map((shot) => {
@@ -1909,11 +1912,11 @@ export default function PhotoshootPage() {
 
                           {/* Teknik Kareler */}
                           <div className={cn(
-                            !(isProcessing || resultImages.length > 0) ? "flex-1" : "w-full"
+                            !generationHasStarted ? "flex-1" : "w-full"
                           )}>
                             <div className={cn(
                               "grid gap-4",
-                              !(isProcessing || resultImages.length > 0)
+                              !generationHasStarted
                                 ? "grid-cols-2 md:grid-cols-3 xl:grid-cols-4"
                                 : "grid-cols-2"
                             )}>
@@ -2015,7 +2018,7 @@ export default function PhotoshootPage() {
                   <div
                     className={cn(
                       "transition-all duration-1000 flex-1 w-full",
-                      isProcessing || resultImages.length > 0
+                      generationHasStarted
                         ? "opacity-100 lg:border-l lg:border-white/5 lg:pl-8 lg:min-h-[500px]"
                         : "opacity-0 h-0 invisible overflow-hidden absolute",
                     )}

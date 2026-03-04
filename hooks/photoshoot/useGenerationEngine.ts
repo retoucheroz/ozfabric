@@ -788,10 +788,19 @@ export const useGenerationEngine = (
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ image: base64, path })
                 });
-                if (!res.ok) return base64;
+                if (!res.ok) {
+                    const errText = await res.text();
+                    console.warn(`[syncAsset] Upload failed (${res.status}): ${errText}. Falling back to base64 — server will re-upload.`);
+                    return base64;
+                }
                 const data = await res.json();
-                return data.url || base64;
+                if (!data.url || data.url.startsWith('data:')) {
+                    console.warn(`[syncAsset] S3 returned base64 back — S3 credentials may be misconfigured. Server will re-attempt.`);
+                    return base64;
+                }
+                return data.url;
             } catch (e) {
+                console.warn(`[syncAsset] Network error, falling back:`, e);
                 return base64;
             }
         };

@@ -177,6 +177,10 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
     }
 
     if (!finalImageUrl) throw new Error("No image generated");
-    const { uploadFromUrl } = await import("@/lib/s3");
+    // Gemini returns data: URLs; other providers return http URLs
+    const { uploadFromUrl, uploadBase64 } = await import("@/lib/s3");
+    if (finalImageUrl.startsWith('data:')) {
+        return await uploadBase64(finalImageUrl, "generations");
+    }
     return await uploadFromUrl(finalImageUrl, "generations");
 }

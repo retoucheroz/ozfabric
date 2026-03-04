@@ -988,7 +988,7 @@ export async function POST(req: NextRequest) {
             if (canShowWaistRiseFitTuck) {
                 if (sp.garment.details?.waist) productBlock.push(`Waist: ${sp.garment.details.waist}.`);
                 if (sp.styling.tucked === 'tucked') {
-                    productBlock.push(`[TOP_GARMENT_TUCKED]\nThe top garment is completely inserted into the bottom garment at the waist.\nLayer order:\nBottom garment waistband and belt loops are clearly visible and fully exposed.\nThe top garment is cleanly and tightly tucked into the waistband interior, fully flat and evenly compressed along the waistline, with zero bunching or fabric distortion.\n[/TOP_GARMENT_TUCKED]`);
+                    productBlock.push(`[TOP_GARMENT_TUCKED]\nThe top garment is completely inserted into the bottom garment at the waist.\nLayer order:\nBottom garment waistband is clearly visible and fully exposed above the tucked hem. NO belt is being worn.\nThe top garment is cleanly and tightly tucked into the waistband interior, fully flat and evenly compressed along the waistline, with zero bunching or fabric distortion.\n[/TOP_GARMENT_TUCKED]`);
                 } else if (sp.styling.tucked === 'untucked') {
                     productBlock.push(`[TOP_GARMENT_UNTUCKED]\nThe top garment is worn fully outside and over the bottom garment.\nLayer order:\nThe top garment is the outermost layer, completely covering the waistband and belt loops.\nFabric behavior:\nThe fabric falls naturally and vertically from the chest down to the hemline, with no inward folding or insertion. The entire hem of the top garment is visible above the leg region.\n[/TOP_GARMENT_UNTUCKED]`);
                 }
