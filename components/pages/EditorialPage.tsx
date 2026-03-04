@@ -30,7 +30,7 @@ import { Separator } from "@/components/ui/separator"
 import { SERVICE_COSTS } from "@/lib/pricingConstants";
 import { Input } from "@/components/ui/input"
 import { dbOperations, STORES } from "@/lib/db"
-import { SavedModel, MODEL_PRESETS } from "@/lib/photoshoot-shared"
+import { SavedModel, MODEL_PRESETS, ASPECT_RATIOS, RESOLUTION_OPTIONS } from "@/lib/photoshoot-shared"
 import { ModelSection } from "@/components/photoshoot/ModelSection"
 import { AssetCard } from "@/components/photoshoot/AssetCard"
 import { WizardProgress } from "@/components/photoshoot/WizardProgress"
@@ -109,7 +109,7 @@ export default function EditorialPage() {
     const [outfitImages, setOutfitImages] = useState<string[]>([]);
 
     const [resolution, setResolution] = useState("1K");
-    const [aspectRatio, setAspectRatio] = useState("3:4");
+    const [aspectRatio, setAspectRatio] = useState("1:1");
     const [wizardStep, setWizardStep] = useState<1 | 2>(1);
     const [seed, setSeed] = useState<string>("");
     const [useReferencePose, setUseReferencePose] = useState(false);
@@ -685,8 +685,8 @@ export default function EditorialPage() {
                                                     {language === "tr" ? "ORAN" : "RATIO"}
                                                 </label>
                                                 <select value={aspectRatio} onChange={(e) => setAspectRatio(e.target.value)} className="w-full h-11 bg-white/5 border border-white/10 rounded-md px-4 text-[10px] font-bold text-white uppercase tracking-tight focus:outline-none">
-                                                    {["1:1", "2:3", "9:16", "16:9"].map(r => (
-                                                        <option key={r} value={r} className="bg-zinc-900">{r}</option>
+                                                    {ASPECT_RATIOS.map(r => (
+                                                        <option key={r.id} value={r.id} className="bg-zinc-900">{language === "tr" ? r.labelTr : r.label}</option>
                                                     ))}
                                                 </select>
                                             </div>
@@ -697,9 +697,9 @@ export default function EditorialPage() {
                                                     {language === "tr" ? "KALİTE" : "QUALITY"}
                                                 </label>
                                                 <select value={resolution} onChange={(e) => setResolution(e.target.value)} className="w-full h-11 bg-white/5 border border-white/10 rounded-md px-4 text-[10px] font-bold text-white uppercase tracking-tight focus:outline-none">
-                                                    <option value="1K" className="bg-zinc-900">1K STANDARD</option>
-                                                    <option value="2K" className="bg-zinc-900">2K HIGH</option>
-                                                    <option value="4K" className="bg-zinc-900">4K ULTRA</option>
+                                                    {RESOLUTION_OPTIONS.map(opt => (
+                                                        <option key={opt.id} value={opt.id} className="bg-zinc-900">{language === "tr" ? opt.labelTr : opt.label}</option>
+                                                    ))}
                                                 </select>
                                             </div>
                                         </div>

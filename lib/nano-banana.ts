@@ -24,13 +24,29 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
             ? payload.image_urls
             : Object.values(payload.image_urls);
 
+        // Explicitly calculate dimensions to force aspect ratio adherence
+        let width = 1024;
+        let height = 1024;
+        const resolutionVal = payload.resolution || "1K";
+        const ar = payload.aspect_ratio || "1:1";
+        const baseSize = resolutionVal === "4K" ? 2048 : resolutionVal === "2K" ? 1440 : 1024;
+
+        if (ar === "1:1") { width = baseSize; height = baseSize; }
+        else if (ar === "2:3") { width = Math.round(baseSize * 0.81); height = Math.round(baseSize * 1.22); }
+        else if (ar === "3:4") { width = Math.round(baseSize * 0.88); height = Math.round(baseSize * 1.18); }
+        else if (ar === "9:16") { width = Math.round(baseSize * 0.75); height = Math.round(baseSize * 1.33); }
+        else if (ar === "16:9") { width = Math.round(baseSize * 1.33); height = Math.round(baseSize * 0.75); }
+        else if (ar === "4:3") { width = Math.round(baseSize * 1.15); height = Math.round(baseSize * 0.86); }
+
         const kiePayload = {
             model: "nano-banana-pro",
             input: {
                 prompt: payload.prompt,
                 image_input: imageList.slice(0, 8), // Kie Limit: 8 images max
-                aspect_ratio: payload.aspect_ratio || "3:4",
-                resolution: payload.resolution || "1K",
+                aspect_ratio: ar,
+                width,
+                height,
+                resolution: resolutionVal,
                 output_format: "png",
                 ...(payload.seed && { seed: payload.seed })
             }
@@ -135,11 +151,19 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
             });
         });
 
-        // Map resolution to Gemini supported values (2K, 4K)
+        // Explicitly calculate dimensions for Gemini as well
+        let width = 1024;
+        let height = 1024;
+        const ar = payload.aspect_ratio || "1:1";
         let geminiResolution = payload.resolution || "1K";
-        if (geminiResolution === "4K") geminiResolution = "4K";
-        else if (geminiResolution === "2K") geminiResolution = "2K";
-        else geminiResolution = "2K"; // Default to 2K for better quality if not specified
+        const baseSize = geminiResolution === "4K" ? 2048 : geminiResolution === "2K" ? 1440 : 1024;
+
+        if (ar === "1:1") { width = baseSize; height = baseSize; }
+        else if (ar === "2:3") { width = Math.round(baseSize * 0.81); height = Math.round(baseSize * 1.22); }
+        else if (ar === "3:4") { width = Math.round(baseSize * 0.88); height = Math.round(baseSize * 1.18); }
+        else if (ar === "9:16") { width = Math.round(baseSize * 0.75); height = Math.round(baseSize * 1.33); }
+        else if (ar === "16:9") { width = Math.round(baseSize * 1.33); height = Math.round(baseSize * 0.75); }
+        else if (ar === "4:3") { width = Math.round(baseSize * 1.15); height = Math.round(baseSize * 0.86); }
 
         const googlePayload = {
             contents: [{
@@ -149,8 +173,10 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
             generationConfig: {
                 responseModalities: ["TEXT", "IMAGE"],
                 imageConfig: {
-                    aspectRatio: payload.aspect_ratio || "3:4",
-                    imageSize: geminiResolution
+                    aspectRatio: ar,
+                    imageSize: geminiResolution,
+                    width,
+                    height
                 }
             }
         };
@@ -196,12 +222,29 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
             ? payload.image_urls
             : Object.values(payload.image_urls);
 
+        // Explicitly calculate dimensions to force aspect ratio adherence
+        let width = 1024;
+        let height = 1024;
+        const resolutionVal = payload.resolution || "1K";
+        const ar = payload.aspect_ratio || "1:1";
+
+        const baseSize = resolutionVal === "4K" ? 2048 : resolutionVal === "2K" ? 1440 : 1024;
+
+        if (ar === "1:1") { width = baseSize; height = baseSize; }
+        else if (ar === "2:3") { width = Math.round(baseSize * 0.81); height = Math.round(baseSize * 1.22); }
+        else if (ar === "3:4") { width = Math.round(baseSize * 0.88); height = Math.round(baseSize * 1.18); }
+        else if (ar === "9:16") { width = Math.round(baseSize * 0.75); height = Math.round(baseSize * 1.33); }
+        else if (ar === "16:9") { width = Math.round(baseSize * 1.33); height = Math.round(baseSize * 0.75); }
+        else if (ar === "4:3") { width = Math.round(baseSize * 1.15); height = Math.round(baseSize * 0.86); }
+
         const falPayload = {
             prompt: payload.prompt,
             negative_prompt: payload.negative_prompt,
             image_urls: imageList.slice(0, 14),
-            aspect_ratio: payload.aspect_ratio || "3:4",
-            resolution: payload.resolution || "1K",
+            aspect_ratio: ar,
+            width,
+            height,
+            resolution: resolutionVal,
             seed: payload.seed,
             enable_web_search: payload.enable_web_search,
             output_format: "png"

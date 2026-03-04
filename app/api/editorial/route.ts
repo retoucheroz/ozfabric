@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
             aperture: _____, // Ignored
             prompt: finalPrompt, // Now receives the fully structured master prompt
             resolution = "1K",
-            aspectRatio = "3:4",
+            aspectRatio = "1:1",
             seed = null,
             modelType = "full_body",
             modelDescription
