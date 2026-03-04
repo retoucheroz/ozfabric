@@ -6,7 +6,6 @@ import { deductCredits } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 
 const PATTERN_COST = 10;
-export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
     try {

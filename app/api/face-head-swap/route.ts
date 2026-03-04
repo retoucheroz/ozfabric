@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { deductCredits } from "@/lib/auth-helpers";
 import { SERVICE_COSTS } from "@/lib/pricingConstants";
 
-export const maxDuration = 300;
+export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 const HEAD_SWAP_PROMPT = `Use Image 2 as the ABSOLUTE MASTER for the entire body, pose, clothing, neck position, head orientation, and background.

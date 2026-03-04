@@ -6,7 +6,7 @@ import { deductCredits } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 
 // Configure route config
-export const maxDuration = 300; // 300 seconds max duration (5 minutes)
+export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 // Negative prompts for common issues

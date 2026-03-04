@@ -5,7 +5,6 @@ import { deductCredits } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 
 const DEPTH_COST = 10;
-export const maxDuration = 30;
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {

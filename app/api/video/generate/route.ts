@@ -6,7 +6,7 @@ import { deductCredits } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { SERVICE_COSTS } from "@/lib/pricingConstants";
 
-export const maxDuration = 300;
+export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {

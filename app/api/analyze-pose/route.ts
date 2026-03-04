@@ -5,7 +5,6 @@ import { authOptions } from "@/lib/auth-options";
 import { deductCredits } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 
-export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {

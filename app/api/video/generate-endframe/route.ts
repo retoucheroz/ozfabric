@@ -6,7 +6,7 @@ import { deductCredits } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 
 const ENDFRAME_COST = 50;
-export const maxDuration = 120;
+export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
