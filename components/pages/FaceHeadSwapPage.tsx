@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import { useLanguage } from "@/context/language-context"
+import { downloadFile } from "@/lib/download"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
@@ -178,26 +179,7 @@ export default function FaceHeadSwapPage() {
 
     const handleDownload = async () => {
         if (!resultImage) return
-        try {
-            const response = await fetch(resultImage)
-            const blob = await response.blob()
-            const url = window.URL.createObjectURL(blob)
-            const a = document.createElement('a')
-            a.href = url
-            a.download = `swap_${Date.now()}.png`
-            document.body.appendChild(a)
-            a.click()
-            document.body.removeChild(a)
-            window.URL.revokeObjectURL(url)
-        } catch (e) {
-            const a = document.createElement('a')
-            a.href = resultImage
-            a.target = "_blank"
-            a.download = `swap_${Date.now()}.png`
-            document.body.appendChild(a)
-            a.click()
-            document.body.removeChild(a)
-        }
+        await downloadFile(resultImage, `swap_${Date.now()}.png`);
     }
 
     return (

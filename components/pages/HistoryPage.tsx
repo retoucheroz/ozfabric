@@ -3,6 +3,7 @@
 import Image from "next/image"
 import { useProjects, Project } from "@/context/projects-context"
 import { useLanguage } from "@/context/language-context"
+import { downloadFile } from "@/lib/download"
 import {
     Search,
     Download,
@@ -119,21 +120,10 @@ export default function HistoryPage() {
         }
     }
 
+
     const handleDownload = async (imageUrl: string, title: string) => {
-        try {
-            const response = await fetch(imageUrl)
-            const blob = await response.blob()
-            const url = window.URL.createObjectURL(blob)
-            const link = document.createElement('a')
-            link.href = url
-            link.download = `${title.replace(/\s+/g, '_')}_${Date.now()}.png`
-            document.body.appendChild(link)
-            link.click()
-            document.body.removeChild(link)
-            window.URL.revokeObjectURL(url)
-        } catch (e) {
-            toast.error(language === "tr" ? "İndirme başarısız" : "Download failed")
-        }
+        const fileName = `${title.replace(/\s+/g, '_')}_${Date.now()}.png`;
+        await downloadFile(imageUrl, fileName);
     }
 
     // Grid columns logic: Slider 2 -> 8 Cols (Zoom Out), Slider 8 -> 2 Cols (Zoom In)

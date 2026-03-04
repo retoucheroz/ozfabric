@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { downloadFile } from "@/lib/download"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog"
@@ -500,27 +501,7 @@ export default function VideoPage() {
     const handleDownloadEndFrame = async () => {
         const url = generatedEndFrameUrl || endFrame;
         if (!url) return;
-        try {
-            const response = await fetch(url);
-            const blob = await response.blob();
-            const downloadUrl = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = downloadUrl;
-            a.download = `endframe_${Date.now()}.png`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(downloadUrl);
-        } catch {
-            // Fallback for base64
-            const a = document.createElement('a');
-            a.href = url;
-            a.target = "_blank";
-            a.download = `endframe_${Date.now()}.png`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
+        await downloadFile(url, `endframe_${Date.now()}.png`);
     };
 
     const handleGenerate = async () => {
@@ -660,21 +641,7 @@ export default function VideoPage() {
 
     const handleDownloadVideo = async () => {
         if (!generatedVideoUrl) return;
-        try {
-            const response = await fetch(generatedVideoUrl);
-            const blob = await response.blob();
-            const downloadUrl = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = downloadUrl;
-            a.download = `modeon_video_${Date.now()}.mp4`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(downloadUrl);
-        } catch {
-            // Fallback: open in new tab
-            window.open(generatedVideoUrl, '_blank');
-        }
+        await downloadFile(generatedVideoUrl, `modeon_video_${Date.now()}.mp4`);
     };
 
     // --- UI RENDER ---
