@@ -173,10 +173,7 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
             generationConfig: {
                 responseModalities: ["TEXT", "IMAGE"],
                 imageConfig: {
-                    aspectRatio: ar,
-                    imageSize: geminiResolution,
-                    width,
-                    height
+                    aspect_ratio: ar,
                 }
             }
         };
