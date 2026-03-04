@@ -1731,22 +1731,10 @@ export default function PhotoshootPage() {
                     </div>
                   </div>
 
-                  {/* MAIN STUDIO AREA - DYNAMICALLY TRANSFORMS */}
-                  <div
-                    className={cn(
-                      "bg-white/[0.02] border border-white/5 rounded-[32px] p-8 shadow-2xl overflow-hidden relative",
-                      generationHasStarted
-                        ? "flex flex-col lg:flex-row gap-8 items-start min-h-[600px]"
-                        : "flex flex-col"
-                    )}
-                  >
-                    {/* LEFT SECTION: SELECTION */}
-                    <div className={cn(
-                      "transition-all duration-700",
-                      generationHasStarted
-                        ? "w-full lg:w-[380px] xl:w-[420px] shrink-0"
-                        : "w-full"
-                    )}>
+                  {/* MAIN STUDIO AREA */}
+                  <div className="bg-white/[0.02] border border-white/5 rounded-[32px] p-8 shadow-2xl flex flex-col gap-8 overflow-hidden relative">
+                    {/* SHOT SELECTION - ALWAYS FULL WIDTH, NEVER CHANGES */}
+                    <div className="w-full">
                       <div className="w-full">
                         <label className="text-[11px] font-black text-white uppercase tracking-[0.3em] opacity-40 block mb-8">
                           {language === "tr"
@@ -1754,16 +1742,11 @@ export default function PhotoshootPage() {
                             : "ANGLE & SHOT SELECTION"}
                         </label>
 
-                        <div className={cn(
-                          "flex flex-col gap-8",
-                          !generationHasStarted && "lg:flex-row"
-                        )}>
-                          {/* Styling Angles */}
-                          <div className={cn(
-                            "flex-none",
-                            !generationHasStarted ? "w-full lg:w-auto lg:flex-1" : "w-full"
-                          )}>
-                            <div className="grid grid-cols-2 gap-4">
+                        {/* ALL SHOTS IN ONE FLAT GRID ROW */}
+                        <div className="flex flex-row gap-8">
+                          {/* Styling shots — always 2 cols */}
+                          <div className="flex-shrink-0">
+                            <div className="grid grid-cols-2 gap-3">
                               {availableBatchShots
                                 .filter((s) => s.id.includes("styling"))
                                 .map((shot) => {
@@ -1910,16 +1893,9 @@ export default function PhotoshootPage() {
                             </div>
                           </div>
 
-                          {/* Teknik Kareler */}
-                          <div className={cn(
-                            !generationHasStarted ? "flex-1" : "w-full"
-                          )}>
-                            <div className={cn(
-                              "grid gap-4",
-                              !generationHasStarted
-                                ? "grid-cols-2 md:grid-cols-3 xl:grid-cols-4"
-                                : "grid-cols-2"
-                            )}>
+                          {/* Technical shots — flexible multi-col */}
+                          <div className="flex-1 min-w-0">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
                               {availableBatchShots
                                 .filter((s) => !s.id.includes("styling"))
                                 .map((shot) => {
@@ -2009,40 +1985,33 @@ export default function PhotoshootPage() {
                                 })}
                             </div>
                           </div>
-                        </div>
+                        </div>{/* end flex flex-row shots */}
                       </div>
-                    </div>
-                  </div>
+                    </div>{/* end shot selection */}
 
-                  {/* RIGHT SECTION: PRODUCTION & RESULTS */}
-                  <div
-                    className={cn(
-                      "transition-all duration-1000 flex-1 w-full",
-                      generationHasStarted
-                        ? "opacity-100 lg:border-l lg:border-white/5 lg:pl-8 lg:min-h-[500px]"
-                        : "opacity-0 h-0 invisible overflow-hidden absolute",
+                    {/* RESULTS — appears BELOW selection, never resizes cards */}
+                    {generationHasStarted && (
+                      <div className="w-full border-t border-white/5 pt-8">
+                        <PreviewArea
+                          language={language}
+                          isProcessing={isProcessing}
+                          isStoppingBatch={isStoppingBatch}
+                          handleStopBatch={handleStopBatch}
+                          isGenerationSuccess={isGenerationSuccess}
+                          resultImages={resultImages}
+                          router={router}
+                          StudioSteps={StudioSteps}
+                          handleGenerate={handleGenerate}
+                          handleBatchGenerate={handleBatchGenerate}
+                          batchMode={true}
+                          productCode={productCode}
+                          estimatedCost={estimatedCost}
+                          isAdmin={user?.role === "admin"}
+                        />
+                      </div>
                     )}
-                  >
-                    <PreviewArea
-                      language={language}
-                      isProcessing={isProcessing}
-                      isStoppingBatch={isStoppingBatch}
-                      handleStopBatch={handleStopBatch}
-                      isGenerationSuccess={isGenerationSuccess}
-                      resultImages={resultImages}
-                      router={router}
-                      StudioSteps={StudioSteps}
-                      handleGenerate={handleGenerate}
-                      handleBatchGenerate={handleBatchGenerate}
-                      batchMode={true}
-                      productCode={productCode}
-                      estimatedCost={estimatedCost}
-                      isAdmin={user?.role === "admin"}
-                    />
-                  </div>
 
-                  {/* OPTIONAL: PreviewArea shown BELOW when not in production */}
-                  {/* Always hidden as we now show it in the grid above */}
+                  </div>{/* end main studio area */}
                 </div>
               </div>
             </div>
