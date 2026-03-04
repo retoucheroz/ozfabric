@@ -17,17 +17,25 @@ interface NanoBananaPayload {
 
 export async function generateWithNanoBanana(payload: NanoBananaPayload): Promise<string> {
     const apiProvider = await getGlobalSetting('nano_banana_provider') || 'fal_ai';
+    const resolutionVal = payload.resolution || "1K";
+
+    // FORCED 4K RULE: If user wants 4K, Gemini is often insufficiently controlled. 
+    // Fallback to Fal which handles explicit resolution better.
+    let effectiveProvider = apiProvider;
+    if (resolutionVal === "4K" && apiProvider === 'gemini_ai') {
+        effectiveProvider = 'fal_ai';
+    }
+
     let finalImageUrl: string | undefined = undefined;
 
-    if (apiProvider === 'kie_ai') {
+    if (effectiveProvider === 'kie_ai') {
         const imageList = Array.isArray(payload.image_urls)
             ? payload.image_urls
             : Object.values(payload.image_urls);
 
-        // Explicitly calculate dimensions to force aspect ratio adherence
+        // Explicitly calculate dimensions
         let width = 1024;
         let height = 1024;
-        const resolutionVal = payload.resolution || "1K";
         const ar = payload.aspect_ratio || "1:1";
         const baseSize = resolutionVal === "4K" ? 2048 : resolutionVal === "2K" ? 1440 : 1024;
 
@@ -42,7 +50,7 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
             model: "nano-banana-pro",
             input: {
                 prompt: payload.prompt,
-                image_input: imageList.slice(0, 8), // Kie Limit: 8 images max
+                image_input: imageList.slice(0, 8),
                 aspect_ratio: ar,
                 width,
                 height,
@@ -53,7 +61,7 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
         };
 
         const kieKey = process.env.KIE_API_KEY;
-        if (!kieKey) throw new Error("KIE_API_KEY is missing in environmental variables");
+        if (!kieKey) throw new Error("KIE_API_KEY is missing");
 
         const createTaskRes = await fetch("https://api.kie.ai/api/v1/jobs/createTask", {
             method: "POST",
@@ -64,44 +72,27 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
             body: JSON.stringify(kiePayload),
         });
 
-        if (!createTaskRes.ok) {
-            const err = await createTaskRes.text();
-            throw new Error(`Kie API Create Task Error: ${err}`);
-        }
+        if (!createTaskRes.ok) throw new Error(`Kie API Error: ${await createTaskRes.text()}`);
         const createTaskData = await createTaskRes.json();
-        const taskId = createTaskData?.data?.taskId || createTaskData?.taskId; // Check both common locations
+        const taskId = createTaskData?.data?.taskId || createTaskData?.taskId;
 
-        if (!taskId) {
-            console.error("Kie API Response Error Structure:", JSON.stringify(createTaskData, null, 2));
-            const errorMsg = createTaskData?.message || createTaskData?.msg || createTaskData?.info || JSON.stringify(createTaskData).substring(0, 500);
-            throw new Error(`Kie API error: ${errorMsg}`);
-        }
-
-        let maxRetries = 240; // Poll for up to 240 seconds (4 minutes)
+        let maxRetries = 240;
         while (maxRetries > 0) {
             await new Promise(r => setTimeout(r, 1000));
             maxRetries--;
-
             const pollRes = await fetch(`https://api.kie.ai/api/v1/jobs/recordInfo?taskId=${taskId}`, {
                 headers: { "Authorization": `Bearer ${kieKey}` }
             });
-
             if (!pollRes.ok) continue;
             const pollData = await pollRes.json();
-
             if (pollData?.data?.state === "success") {
-                try {
-                    const resultJson = JSON.parse(pollData.data.resultJson);
-                    finalImageUrl = resultJson.resultUrls?.[0];
-                    break;
-                } catch (e) { }
-            } else if (pollData?.data?.state === "failed") {
-                throw new Error(`Kie API Generation Failed: ${pollData?.data?.failMsg}`);
-            }
+                const resultJson = JSON.parse(pollData.data.resultJson);
+                finalImageUrl = resultJson.resultUrls?.[0];
+                break;
+            } else if (pollData?.data?.state === "failed") throw new Error(`Kie failed: ${pollData?.data?.failMsg}`);
         }
-        if (!finalImageUrl) throw new Error("Kie API timeout for task ID: " + taskId);
 
-    } else if (apiProvider === 'gemini_ai') {
+    } else if (effectiveProvider === 'gemini_ai') {
         const geminiKey = process.env.GEMINI_API_KEY;
         if (!geminiKey) throw new Error("GEMINI_API_KEY is missing");
 
@@ -109,122 +100,50 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
             ? payload.image_urls
             : Object.values(payload.image_urls);
 
-        // Fetch all images and convert to base64
         const base64Images = await Promise.all(imageList.map(async (url: string) => {
             try {
-                // Handle already base64 data
                 if (url.startsWith('data:')) {
                     const parts = url.split(',');
-                    const mimeType = parts[0].match(/:(.*?);/)?.[1] || "image/png";
-                    const data = parts[1];
-                    return { data, mimeType };
+                    return { data: parts[1], mimeType: parts[0].match(/:(.*?);/)?.[1] || "image/png" };
                 }
-
                 const resp = await fetch(url);
                 if (!resp.ok) return null;
                 const buffer = await resp.arrayBuffer();
-                return {
-                    data: Buffer.from(buffer).toString('base64'),
-                    mimeType: resp.headers.get("content-type") || "image/png"
-                };
-            } catch (e) {
-                console.error(`Failed to fetch image ${url} for Gemini Base64 conversion:`, e);
-                return null;
-            }
+                return { data: Buffer.from(buffer).toString('base64'), mimeType: resp.headers.get("content-type") || "image/png" };
+            } catch (e) { return null; }
         }));
 
         const validBase64 = base64Images.filter((img): img is { data: string, mimeType: string } => img !== null);
-
-        // CORRECT MODEL: gemini-3.1-flash-image-preview for Studio Image Generation (Nano Banana 2)
-        const modelId = "gemini-3.1-flash-image-preview";
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${geminiKey}`;
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent?key=${geminiKey}`;
 
         const parts: any[] = [{ text: payload.prompt }];
+        validBase64.forEach(img => parts.push({ inlineData: img }));
 
-        // Add all reference images as parts
-        validBase64.forEach(img => {
-            parts.push({
-                inlineData: {
-                    data: img.data,
-                    mimeType: img.mimeType
-                }
-            });
-        });
-
-        // Explicitly calculate dimensions for Gemini as well
-        let width = 1024;
-        let height = 1024;
         const ar = payload.aspect_ratio || "1:1";
-        let geminiResolution = payload.resolution || "1K";
-        const baseSize = geminiResolution === "4K" ? 2048 : geminiResolution === "2K" ? 1440 : 1024;
-
-        if (ar === "1:1") { width = baseSize; height = baseSize; }
-        else if (ar === "2:3") { width = Math.round(baseSize * 0.81); height = Math.round(baseSize * 1.22); }
-        else if (ar === "3:4") { width = Math.round(baseSize * 0.88); height = Math.round(baseSize * 1.18); }
-        else if (ar === "9:16") { width = Math.round(baseSize * 0.75); height = Math.round(baseSize * 1.33); }
-        else if (ar === "16:9") { width = Math.round(baseSize * 1.33); height = Math.round(baseSize * 0.75); }
-        else if (ar === "4:3") { width = Math.round(baseSize * 1.15); height = Math.round(baseSize * 0.86); }
-
-        const googlePayload = {
-            contents: [{
-                role: "user",
-                parts: parts
-            }],
-            generationConfig: {
-                responseModalities: ["TEXT", "IMAGE"],
-                imageConfig: {
-                    aspect_ratio: ar,
-                }
-            }
-        };
-
         const response = await fetch(endpoint, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(googlePayload),
+            body: JSON.stringify({
+                contents: [{ role: "user", parts: parts }],
+                generationConfig: {
+                    responseModalities: ["TEXT", "IMAGE"],
+                    imageConfig: { aspect_ratio: ar }
+                }
+            }),
         });
 
         const data = await response.json();
+        if (!response.ok) throw new Error(`Gemini Error: ${data.error?.message || JSON.stringify(data)}`);
 
-        if (!response.ok) {
-            throw new Error(`Gemini API Error (${response.status}): ${data.error?.message || JSON.stringify(data)}`);
-        }
-
-        // The image content in generateContent is returned as a part in the candidate
-        const candidates = data.candidates || [];
-        let b64 = null;
-
-        for (const candidate of candidates) {
-            const resultParts = candidate.content?.parts || [];
-            for (const part of resultParts) {
-                if (part.inlineData?.data) {
-                    b64 = part.inlineData.data;
-                    break;
-                }
-            }
-            if (b64) break;
-        }
-
-        if (!b64) {
-            console.error("Gemini Unexpected Response (No Image Data):", JSON.stringify(data, null, 2));
-            throw new Error("Gemini API (gemini-3-pro-image-preview) did not return generated image data. Check if safety filters blocked it.");
-        }
-
+        const b64 = data.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData?.data)?.inlineData?.data;
+        if (!b64) throw new Error("Gemini returned no image data");
         finalImageUrl = `data:image/png;base64,${b64}`;
 
-
-
     } else {
-        const imageList = Array.isArray(payload.image_urls)
-            ? payload.image_urls
-            : Object.values(payload.image_urls);
-
-        // Explicitly calculate dimensions to force aspect ratio adherence
-        let width = 1024;
-        let height = 1024;
-        const resolutionVal = payload.resolution || "1K";
+        // FAL AI
+        const imageList = Array.isArray(payload.image_urls) ? payload.image_urls : Object.values(payload.image_urls);
+        let width = 1024, height = 1024;
         const ar = payload.aspect_ratio || "1:1";
-
         const baseSize = resolutionVal === "4K" ? 2048 : resolutionVal === "2K" ? 1440 : 1024;
 
         if (ar === "1:1") { width = baseSize; height = baseSize; }
@@ -236,14 +155,10 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
 
         const falPayload = {
             prompt: payload.prompt,
-            negative_prompt: payload.negative_prompt,
             image_urls: imageList.slice(0, 14),
             aspect_ratio: ar,
-            width,
-            height,
+            width, height,
             resolution: resolutionVal,
-            seed: payload.seed,
-            enable_web_search: payload.enable_web_search,
             output_format: "png"
         };
 
@@ -252,23 +167,16 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
 
         const response = await fetch("https://fal.run/fal-ai/nano-banana-pro/edit", {
             method: "POST",
-            headers: {
-                "Authorization": `Key ${falKey}`,
-                "Content-Type": "application/json",
-            },
+            headers: { "Authorization": `Key ${falKey}`, "Content-Type": "application/json" },
             body: JSON.stringify(falPayload),
         });
 
-        if (!response.ok) {
-            const err = await response.text();
-            throw new Error(`Fal API Error: ${err}`);
-        }
+        if (!response.ok) throw new Error(`Fal Error: ${await response.text()}`);
         const data = await response.json();
         finalImageUrl = data.images?.[0]?.url;
     }
 
-    if (!finalImageUrl) throw new Error("Failed to generate image URL");
-
+    if (!finalImageUrl) throw new Error("No image generated");
     const { uploadFromUrl } = await import("@/lib/s3");
     return await uploadFromUrl(finalImageUrl, "generations");
 }

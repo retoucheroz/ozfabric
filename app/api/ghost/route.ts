@@ -24,11 +24,11 @@ VIEW STANDARD:
 Rotate the garment so the LEFT side panel is prominently visible. Yaw angle: 30 degrees toward camera-left. Arms must look like they are pointing left.
 
 GHOST FORM:
-- Reconstruct a worn 3D ghost mannequin form with rounded shoulders and realistic sleeve volume.
+- Reconstruct a realistic, worn 3D ghost mannequin form with natural shoulder curvature and sleeve volume.
 
-FABRIC NEATNESS & FIDELITY:
-- REPAIR & IRON: Remove excessive wrinkles and creases. The garment must look professionally ironed and steamed, with smooth, clean fabric surfaces.
-- DETAIL INTEGRITY: Strictly preserve original seams, stitching, button placements, pockets, and specific construction details (cut) from the reference images. Do not simplify or alter the design.
+FABRIC QUALITY & CONSTRUCTION FIDELITY:
+- TEXTURE & FINISH: The garment must appear in pristine condition, professionally steamed and perfectly smooth. Focus on a high-end commercial fashion catalogue finish with clean, uniform fabric surfaces.
+- STRUCTURAL FIDELITY: Maintain 100% accuracy to the original garment's construction. Every seam, stitching line, button placement, and specific cut detail must be perfectly preserved and identical to the reference images.
 
 STUDIO OUTPUT:
 Pure white background (#FFFFFF), soft studio lighting, perfectly centered, 2:3 aspect ratio.`;
@@ -50,11 +50,11 @@ VIEW STANDARD:
 Rotate the garment so the RIGHT side panel (back view) is visible. Yaw angle: 30 degrees toward camera-right. Arms must look like they are pointing right.
 
 GHOST FORM:
-- Reconstruct a worn 3D ghost mannequin form with realistic back structure.
+- Reconstruct a realistic 3D ghost mannequin form with accurate back structure and natural drape.
 
-FABRIC NEATNESS & FIDELITY:
-- REPAIR & IRON: Remove excessive wrinkles and creases. The garment must look professionally ironed and steamed, with smooth, clean fabric surfaces.
-- DETAIL INTEGRITY: Strictly preserve original seams, stitching, pockets, and specific construction details (cut) from the reference images. Do not simplify or alter the design.
+FABRIC QUALITY & CONSTRUCTION FIDELITY:
+- TEXTURE & FINISH: Pristine, smooth, and professionally retouched fabric surfaces. Commercial grade quality with zero distracting creases.
+- STRUCTURAL FIDELITY: Strictly maintain 100% fidelity to the original back seams, stitching patterns, and garment construction details (cut).
 
 STUDIO OUTPUT:
 Pure white background (#FFFFFF), soft studio lighting, perfectly centered, 2:3 aspect ratio.`;
@@ -66,9 +66,9 @@ const STRAIGHT_FRONT_PROMPT = `IMPORTANT ORIENTATION & POSE LOCK:
 - DO NOT FLIP / DO NOT MIRROR.
 
 FORM CORRECTION & FIDELITY:
-- SYMMETRY: Correct any tilt or unevenness. Align shoulders evenly and hemline horizontally. Center all zippers, plackets, and necklines.
-- REPAIR & IRON: Remove excessive wrinkles, creases, and messy folds. Fabric must appear clean and professionally steamed/ironed.
-- DETAIL INTEGRITY: Maintain 100% fidelity to the original design. Strictly preserve original seams, stitching patterns, plackets, buttonholes, and specific garment cut.
+- SYMMETRY: Ensure a perfectly aligned, symmetrical front view. Shoulders must be level, and the hemline perfectly horizontal. Center all plackets and necklines.
+- FABRIC QUALITY: Produce a pristine, smooth, and professionally steamed appearance. High-end commercial fashion retouching style.
+- CONSTRUCTION FIDELITY: Strictly preserve 100% of the original seams, stitching lines, and specific garment cut details.
 
 TASK:
 Create a photorealistic, studio-grade ghost mannequin (invisible mannequin) apparel product image on pure white background, 2:3 aspect ratio.
@@ -98,9 +98,9 @@ const STRAIGHT_BACK_PROMPT = `IMPORTANT ORIENTATION & POSE LOCK:
 - DO NOT FLIP / DO NOT MIRROR.
 
 FORM CORRECTION & FIDELITY:
-- SYMMETRY: Straighten the garment into a perfectly aligned back view. Shoulders must be symmetrical and hemline horizontal. Center back seam must be vertical.
-- REPAIR & IRON: Remove excessive wrinkles and creases for a professionally ironed look.
-- DETAIL INTEGRITY: Strictly maintain all original back seams, stitching patterns, and garment construction (cut).
+- SYMMETRY: Align the garment into a perfectly straight back view. Symmetrical shoulders and horizontal hemline are mandatory.
+- FABRIC QUALITY: Pristine commercial finish. Smooth fabric with high-end studio lighting quality.
+- CONSTRUCTION FIDELITY: Maintain absolute fidelity to original back seams, stitching details, and garment construction.
 
 TASK:
 Create a photorealistic, studio-grade ghost mannequin apparel image on pure white background, 2:3 aspect ratio.
