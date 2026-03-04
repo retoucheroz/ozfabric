@@ -46,6 +46,7 @@ const translations: Translations = {
     "sidebar.video": { en: "Video", tr: "Video" },
     "sidebar.analysis": { en: "Analysis", tr: "Analiz" },
     "sidebar.faceHeadSwap": { en: "Face Swap", tr: "Face Swap" },
+    "sidebar.product": { en: "PRODUCT", tr: "ÜRÜN" },
 
     "faceSwap.title": { en: "Face & Head Swap", tr: "Yüz & Kafa Değiştir" },
     "faceSwap.identitySource": { en: "Identity Source", tr: "Kimlik Kaynağı" },
@@ -66,6 +67,9 @@ const translations: Translations = {
     "faceSwap.error": { en: "Swap failed. Please try again.", tr: "Değiştirme başarısız oldu. Lütfen tekrar deneyin." },
     "faceSwap.errorBothImages": { en: "Please upload both identity source and base image.", tr: "Lütfen hem kimlik kaynağını hem de hedef görseli yükleyin." },
 
+    "home.faceSwapTitle": { en: "FACE SWAP", tr: "FACE SWAP" },
+    "home.faceSwapDesc": { en: "Swap model faces.", tr: "Modellerin yüzünü değiştirin." },
+
     // Home Page
     "home.welcome": { en: "Welcome back", tr: "Tekrar hoş geldin" },
     "home.readyToCreate": { en: "Ready to create studio-quality photos with AI?", tr: "Yapay zeka ile stüdyo kalitesinde fotoğraflar oluşturmaya hazır mısın?" },
@@ -76,10 +80,12 @@ const translations: Translations = {
     "home.aiGenerations": { en: "AI Generations", tr: "AI Üretimleri" },
     "home.createVisualize": { en: "Create", tr: "Oluştur" },
 
-    "home.photoshootTitle": { en: "E-COMM", tr: "E-COMM" },
+    "home.photoshootTitle": { en: "E-COMMERCE", tr: "E-TİCARET" },
+    "home.photoshootDesc": { en: "Create professional e-commerce shots.", tr: "Profesyonel e-ticaret çekimleri oluşturun." },
     "home.editorialTitle": { en: "EDİTORYAL", tr: "EDİTORYAL" },
+    "home.editorialDesc": { en: "Create campaign, lookbook, and image shots.", tr: "Kampanya, lookbook, imaj çekimleri oluşturun." },
     "home.videoTitle": { en: "VİDEO", tr: "VİDEO" },
-    "home.videoDesc": { en: "Create cinematic reels and stories with AI.", tr: "AI ile sinematik reels ve hikayeler oluşturun." },
+    "home.videoDesc": { en: "Transform your visuals into flawless videos.", tr: "Görsellerinizi kusursuz videolara dönüştürün." },
 
     "home.sketchTitle": { en: "Sketch to Design", tr: "Eskizden Üret" },
     "home.sketchDesc": { en: "Turn sketches into realistic products.", tr: "Eskizlerinizi gerçek ürünlere dönüştürün." },
@@ -87,8 +93,8 @@ const translations: Translations = {
     "home.virtualTryOn": { en: "Generate Detail", tr: "Detay Üret" },
     "home.virtualTryOnDesc": { en: "Visualize garments in AI studios instantly.", tr: "Giysileri AI stüdyolar içerisinde anında görselleştirin." },
 
-    "home.ghostModelTitle": { en: "GHOST - FLATLAY", tr: "GHOST - FLATLAY" },
-    "home.ghostModelDesc": { en: "Transform hanging/flat items into 3D ghost mannequin shots.", tr: "Askıda veya düz ürünlerinizi 3D hayalet manken çekimine çevirin." },
+    "home.ghostModelTitle": { en: "GHOST", tr: "GHOST" },
+    "home.ghostModelDesc": { en: "Transform hanging or cutout images into ghost models.", tr: "Askıda ya da dekupe görselleri ghost modele dönüştürün." },
 
     "home.trainTitle": { en: "Train Model", tr: "Model Eğit" },
     "home.trainDesc": { en: "Train custom models and styles.", tr: "Özel modeller ve stiller eğitin." },
@@ -97,6 +103,18 @@ const translations: Translations = {
     "home.newStyleDesc": { en: "Generate complete garments from text prompts.", tr: "Metin açıklamalarından komple giysiler oluşturun." },
     "home.patternAI": { en: "Pattern AI", tr: "Desen AI" },
     "home.patternAIDesc": { en: "Create seamless textures and fabric prints.", tr: "Dikişsiz dokular ve kumaş desenleri oluşturun." },
+
+    "product.title": { en: "PRODUCT", tr: "ÜRÜN" },
+    "product.subtitle": { en: "Generate professional product shots.", tr: "Profesyonel ürün çekimleri oluşturun." },
+    "product.mainImage": { en: "MAIN PRODUCT IMAGE", tr: "ANA ÜRÜN GÖRSELİ" },
+    "product.detailImages": { en: "OPTIONAL DETAIL IMAGES", tr: "OPSİYONEL DETAY GÖRSELLERİ" },
+    "product.detail1": { en: "DETAIL 1", tr: "DETAY 1" },
+    "product.detail2": { en: "DETAIL 2", tr: "DETAY 2" },
+    "product.prompt": { en: "SCENE PROMPT", tr: "SAHNE KOMUTU" },
+    "product.promptPlaceholder": { en: "Describe the scene, lighting, and environment...", tr: "Sahneyi, ışığı ve çevreyi tarif edin..." },
+    "product.generating": { en: "GENERATING PRODUCT...", tr: "ÜRÜN ÜRETİLİYOR..." },
+    "product.success": { en: "Product image generated!", tr: "Ürün görseli oluşturuldu!" },
+    "product.errorMain": { en: "Please upload main product image", tr: "Lütfen ana ürün görseli yükleyin" },
 
 
     "home.retexture": { en: "Retexture", tr: "Doku Değiştir" },

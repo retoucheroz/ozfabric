@@ -7,7 +7,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Home, Plus, Edit3, BrainCircuit, LayoutGrid, Settings, CreditCard, User, LogOut, Sparkles, Globe, Moon, Sun, Zap, Coins } from "lucide-react"
+
+const studioPaths = ["/photoshoot", "/editorial", "/product", "/video", "/face-head-swap", "/photoshoot/ghost"];
+const toolPaths = ["/resize", "/tech-pack", "/analysis", "/train"];
+import { Home, Plus, Edit3, BrainCircuit, LayoutGrid, Settings, CreditCard, User, LogOut, Sparkles, Globe, Moon, Sun, Zap, Coins, Package } from "lucide-react"
 import { useProjects } from "@/context/projects-context"
 import { useLanguage } from "@/context/language-context"
 import { useTheme } from "next-themes"
@@ -70,11 +73,10 @@ export function TopNav() {
                             <button
                                 onClick={() => {
                                     setActiveCategory(activeCategory === "studio" ? null : "studio");
-                                    router.push('/studio');
                                 }}
                                 className={cn(
                                     "px-4 md:px-6 h-[72px] text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] transition-all relative",
-                                    activeCategory === "studio" || pathname === "/studio"
+                                    activeCategory === "studio" || studioPaths.includes(pathname)
                                         ? "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]"
                                         : "text-zinc-500 hover:text-zinc-300"
                                 )}
@@ -85,7 +87,7 @@ export function TopNav() {
                                 onClick={() => setActiveCategory(activeCategory === "tools" ? null : "tools")}
                                 className={cn(
                                     "px-4 md:px-6 h-[72px] text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] transition-all relative",
-                                    activeCategory === "tools"
+                                    activeCategory === "tools" || toolPaths.includes(pathname)
                                         ? "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]"
                                         : "text-zinc-500 hover:text-zinc-300"
                                 )}
@@ -196,19 +198,20 @@ export function TopNav() {
 
             {/* Sub-navigation Bar (Integrated) */}
             <AnimatePresence>
-                {activeCategory && (
+                {(activeCategory || studioPaths.includes(pathname) || toolPaths.includes(pathname)) && (
                     <motion.div
                         initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
+                        animate={{ height: 50, opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.15, ease: "easeOut" }}
-                        className="overflow-hidden bg-[#0D0D0F] border-b border-white/5"
+                        className="overflow-hidden border-b border-white/5 bg-[#0D0D0F]"
                     >
-                        <div className="max-w-7xl mx-auto px-4 md:px-8 py-3 flex items-center justify-center gap-6 md:gap-8">
-                            {activeCategory === "studio" ? (
+                        <div className="max-w-[1800px] mx-auto h-full flex items-center justify-center px-8 gap-4 md:gap-8">
+                            {(activeCategory === "studio" || studioPaths.includes(pathname)) ? (
                                 <>
                                     <SubNavItem href="/photoshoot" icon={TbCameraPlus} label={t("sidebar.photoshoot")} active={pathname === "/photoshoot"} />
                                     <SubNavItem href="/editorial" icon={TbPhotoScan} label={t("sidebar.editorial")} active={pathname === "/editorial"} />
+                                    <SubNavItem href="/product" icon={Package} label={t("sidebar.product")} active={pathname === "/product"} />
                                     <SubNavItem href="/video" icon={TbMovie} label={t("sidebar.video")} active={pathname === "/video"} />
                                     <SubNavItem href="/face-head-swap" icon={TbFaceId} label={t("sidebar.faceHeadSwap")} active={pathname === "/face-head-swap"} />
                                     <SubNavItem href="/photoshoot/ghost" icon={TbHanger} label={t("sidebar.ghost")} active={pathname === "/photoshoot/ghost"} />

@@ -1,6 +1,7 @@
 "use client"
 
-import { Plus, Shirt, Zap, Layers, Sparkles, TrendingUp, Palette, ArrowRight, CreditCard, Wand2, Camera, Video as VideoIcon } from "lucide-react"
+import { Plus, Shirt, Zap, Layers, Sparkles, TrendingUp, Palette, ArrowRight, CreditCard, Wand2, Camera, Video as VideoIcon, Package } from "lucide-react"
+import { TbFaceId } from "react-icons/tb"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { useProjects } from "@/context/projects-context"
@@ -30,6 +31,15 @@ export default function HomePage() {
         return `${Math.floor(hours / 24)} days ago`;
     }
 
+    const quickActions = [
+        { href: "/photoshoot", icon: Camera, titleKey: "home.photoshootTitle", descKey: "home.photoshootDesc" },
+        { href: "/editorial", icon: Layers, titleKey: "home.editorialTitle", descKey: "home.editorialDesc" },
+        { href: "/product", icon: Package, titleKey: "product.title", descKey: "product.subtitle" },
+        { href: "/video", icon: VideoIcon, titleKey: "home.videoTitle", descKey: "home.videoDesc" },
+        { href: "/photoshoot/ghost", icon: Shirt, titleKey: "home.ghostModelTitle", descKey: "home.ghostModelDesc" },
+        { href: "/face-head-swap", icon: TbFaceId, titleKey: "home.faceSwapTitle", descKey: "home.faceSwapDesc" }
+    ];
+
     return (
         <div className="p-4 md:p-8 space-y-8 max-w-7xl mx-auto">
             {/* Header Section */}
@@ -46,61 +56,28 @@ export default function HomePage() {
             {/* Quick Actions */}
             <div>
                 <h2 className="text-lg font-semibold text-[var(--text-primary)] mt-8 mb-4 tracking-tight">{t("home.createVisualize")}</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-                    {/* 1. E-COMM */}
-                    <Link href="/photoshoot" className="group block h-full">
-                        <div className="bg-[#18181b] border border-white/5 rounded-md p-6 h-full transition-all hover:bg-white/[0.03] hover:border-white/20 border-l-2 border-l-[#F5F5F5]">
-                            <div className="w-10 h-10 rounded-md bg-white/5 flex items-center justify-center mb-4 text-[#F5F5F5] group-hover:bg-white/10 transition-colors">
-                                <Camera className="w-5 h-5" />
-                            </div>
-                            <h3 className="text-sm font-black uppercase tracking-widest text-[#F5F5F5] mb-1">{t("home.photoshootTitle")}</h3>
-                            <p className="text-xs text-zinc-500 line-clamp-2 leading-relaxed">{t("home.photoshootDesc")}</p>
-                        </div>
-                    </Link>
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                    {quickActions.map((action, i) => (
+                        <Link key={i} href={action.href} className="group block h-full">
+                            <div className="relative overflow-hidden bg-[#18181b] border border-white/5 p-4 h-full flex flex-col rounded-md cursor-pointer transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-black/50 hover:border-[#FF5A5F]/50">
+                                {/* Glow Effect */}
+                                <div className="absolute -top-24 -right-24 w-48 h-48 rounded-full blur-[60px] opacity-0 group-hover:opacity-20 transition-opacity duration-500 bg-[#FF5A5F]" />
 
-                    {/* 2. Editorial */}
-                    <Link href="/editorial" className="group block h-full">
-                        <div className="bg-[#18181b] border border-white/5 rounded-md p-6 h-full transition-all hover:bg-white/[0.03] hover:border-white/20 border-l-2 border-l-zinc-400">
-                            <div className="w-10 h-10 rounded-md bg-white/5 flex items-center justify-center mb-4 text-zinc-300 group-hover:bg-white/10 transition-colors">
-                                <Layers className="w-5 h-5" />
+                                <div className="relative flex flex-col h-full space-y-2.5">
+                                    <div className="w-8 h-8 rounded-md bg-white/5 flex items-center justify-center text-zinc-400 transition-colors duration-500 group-hover:bg-[#FF5A5F]/10 group-hover:text-[#FF5A5F]">
+                                        <action.icon className="w-4 h-4" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h3 className="text-[11px] font-black uppercase tracking-widest text-[#F5F5F5] mb-0.5">{t(action.titleKey)}</h3>
+                                        <p className="text-[10px] text-zinc-500 line-clamp-2 leading-tight">{t(action.descKey)}</p>
+                                    </div>
+                                    <div className="pt-2 mt-auto">
+                                        <div className="h-1 w-0 group-hover:w-full transition-all duration-700 rounded-full bg-[#FF5A5F]" />
+                                    </div>
+                                </div>
                             </div>
-                            <h3 className="text-sm font-black uppercase tracking-widest text-[#F5F5F5] mb-1">{t("home.editorialTitle")}</h3>
-                            <p className="text-xs text-zinc-500 line-clamp-2 leading-relaxed">{language === 'tr' ? 'Kampanya çekimleri oluşturun.' : 'Create campaign shots.'}</p>
-                        </div>
-                    </Link>
-
-                    {/* 3. Video Studio */}
-                    <Link href="/video" className="group block h-full">
-                        <div className="bg-[#18181b] border border-white/5 rounded-md p-6 h-full transition-all hover:bg-white/[0.03] hover:border-white/20 border-l-2 border-l-zinc-500">
-                            <div className="w-10 h-10 rounded-md bg-white/5 flex items-center justify-center mb-4 text-zinc-400 group-hover:bg-white/10 transition-colors">
-                                <VideoIcon className="w-5 h-5" />
-                            </div>
-                            <h3 className="text-sm font-black uppercase tracking-widest text-[#F5F5F5] mb-1">{t("home.videoTitle")}</h3>
-                            <p className="text-xs text-zinc-500 line-clamp-2 leading-relaxed">{t("home.videoDesc")}</p>
-                        </div>
-                    </Link>
-
-                    {/* 4. Ghost - Flatlay */}
-                    <Link href="/photoshoot/ghost" className="group block h-full">
-                        <div className="bg-[#18181b] border border-white/5 rounded-md p-6 h-full transition-all hover:bg-white/[0.03] hover:border-white/20 border-l-2 border-l-zinc-600">
-                            <div className="w-10 h-10 rounded-md bg-white/5 flex items-center justify-center mb-4 text-zinc-500 group-hover:bg-white/10 transition-colors">
-                                <Shirt className="w-5 h-5" />
-                            </div>
-                            <h3 className="text-sm font-black uppercase tracking-widest text-[#F5F5F5] mb-1">{t("home.ghostModelTitle")}</h3>
-                            <p className="text-xs text-zinc-500 line-clamp-2 leading-relaxed">{t("home.ghostModelDesc")}</p>
-                        </div>
-                    </Link>
-
-                    {/* 5. Face Swap */}
-                    <Link href="/face-head-swap" className="group block h-full">
-                        <div className="bg-[#18181b] border border-white/5 rounded-md p-6 h-full transition-all hover:bg-white/[0.03] hover:border-white/20 border-l-2 border-l-zinc-700">
-                            <div className="w-10 h-10 rounded-md bg-white/5 flex items-center justify-center mb-4 text-zinc-600 group-hover:bg-white/10 transition-colors">
-                                <Sparkles className="w-5 h-5" />
-                            </div>
-                            <h3 className="text-sm font-black uppercase tracking-widest text-[#F5F5F5] mb-1">FACE SWAP</h3>
-                            <p className="text-xs text-zinc-500 line-clamp-2 leading-relaxed">{language === 'tr' ? 'Modellerin yüzünü değiştirin.' : 'Swap model faces.'}</p>
-                        </div>
-                    </Link>
+                        </Link>
+                    ))}
                 </div>
             </div>
 

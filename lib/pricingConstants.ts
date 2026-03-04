@@ -52,6 +52,8 @@ export const SERVICE_COSTS = {
         FACE_SWAP_4K: 140,
         GHOST_MODEL_1_2K: 75,
         GHOST_MODEL_4K: 150,
+        PRODUCT_MODEL_1_2K: 75,
+        PRODUCT_MODEL_4K: 150,
         UPSCALER_PER_MP: 10,
         EDITORIAL_ANALYZE: 20,
     },

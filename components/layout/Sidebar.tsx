@@ -106,9 +106,8 @@ export function Sidebar({ variant = "default" }: SidebarProps) {
         { label: t("sidebar.train"), href: '/train', icon: TbWand },
     ].filter(item => isAuthorized(item.href));
 
-    // KATALOG Group
     const catalogItems = [
-        { label: t("sidebar.techPack"), href: '/studio', icon: TbClipboardText },
+        { label: t("sidebar.techPack"), href: '/tech-pack', icon: TbClipboardText },
     ].filter(item => isAuthorized(item.href));
 
 

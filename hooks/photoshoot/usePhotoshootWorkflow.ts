@@ -22,6 +22,7 @@ export const usePhotoshootWorkflow = () => {
     const router = useRouter();
 
     // States
+    const [generationMode, setGenerationMode] = useState<"quick" | "pro" | null>(null);
     const [showExpert, setShowExpert] = useState(false);
     const [mounted, setMounted] = useState(false);
     const [showAdvanced, setShowAdvanced] = useState(false);
@@ -438,6 +439,7 @@ export const usePhotoshootWorkflow = () => {
     return {
         projects, addProject, deductCredits, models, t, language, router,
         showExpert, setShowExpert, mounted, setMounted, showAdvanced, setShowAdvanced,
+        generationMode, setGenerationMode,
         showGarmentDetails, setShowGarmentDetails, wizardStep, setWizardStep, user, setUser,
         isRestoringRef, productName, setProductName, isManualProductName, setIsManualProductName,
         workflowType, setWorkflowType, resolution, setResolution, aspectRatio, setAspectRatio,

@@ -5,7 +5,7 @@ import { dbOperations, STORES } from "@/lib/db"
 
 export type Project = {
     id: string;
-    type: "Style" | "Pattern" | "Try-On" | "Ghost" | "Tech Pack" | "Expand" | "Upscale" | "Retexture" | "Photoshoot" | "Sketch" | "Editorial" | "Video";
+    type: "Style" | "Pattern" | "Try-On" | "Ghost" | "Tech Pack" | "Expand" | "Upscale" | "Retexture" | "Photoshoot" | "Sketch" | "Editorial" | "Video" | "Product";
     title: string;
     imageUrl: string;
     createdAt: number;
