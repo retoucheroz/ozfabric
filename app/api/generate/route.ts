@@ -876,6 +876,13 @@ export async function POST(req: NextRequest) {
                         framingBlock.push("Constraint: ABSOLUTELY EXCLUDE head, neck, face, shoulders, chest, and feet from the frame.");
                     }
                 }
+            } else if (safeAngleId === 'std_styling_upper') {
+                // Styling shot but with an explicit upper-body crop — inject framing constraints
+                framingBlock.push("Shot Type: Upper body editorial styling shot (Cowboy shot / Medium shot).");
+                framingBlock.push("Visible: Head to mid-thigh area. The frame MUST terminate at or above the knee line.");
+                framingBlock.push("FRAME LOCK: Strict upper-body crop. Do NOT show full body, feet, or legs below mid-thigh.");
+                framingBlock.push("No knees visible. No lower legs. No feet.");
+                framingBlock.push("This is an artistic styling frame, not a full-body shot.");
             }
             framingBlock.push(`[/FRAMING_DESCRIPTION]`);
             const framingStr = framingBlock.join("\n");
