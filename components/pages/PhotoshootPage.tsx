@@ -1753,7 +1753,7 @@ export default function PhotoshootPage() {
                             if (isDisabled) return null;
 
                             return (
-                              <div key={shot.id} className="flex flex-col gap-2 flex-shrink-0" style={{ width: "min(108px, 7vw)", minWidth: "65px" }}>
+                              <div key={shot.id} className="flex flex-col gap-2 flex-shrink-0" style={{ width: "min(103px, 6.5vw)", minWidth: "62px" }}>
                                 {/* Card — 2:3 ratio */}
                                 <div
                                   className={cn(
