@@ -1750,7 +1750,7 @@ export default function PhotoshootPage() {
                             const isDisabled = workflowType === "upper" && isLowerDetailShot;
 
                             return (
-                              <div key={shot.id} className="flex flex-col gap-2 flex-shrink-0" style={{ width: "min(150px, 10vw)", minWidth: "90px" }}>
+                              <div key={shot.id} className="flex flex-col gap-2 flex-shrink-0" style={{ width: "min(120px, 8vw)", minWidth: "72px" }}>
                                 {/* Card — 2:3 ratio */}
                                 <div
                                   className={cn(
