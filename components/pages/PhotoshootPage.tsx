@@ -1749,33 +1749,23 @@ export default function PhotoshootPage() {
                             const isLowerDetailShot = shot.id === "std_detail_front" || shot.id === "std_detail_back";
                             const isDisabled = workflowType === "upper" && isLowerDetailShot;
 
+                            // Üst ürün seçiliyken alt detay açılarını tamamen gizle
+                            if (isDisabled) return null;
+
                             return (
                               <div key={shot.id} className="flex flex-col gap-2 flex-shrink-0" style={{ width: "min(120px, 8vw)", minWidth: "72px" }}>
                                 {/* Card — 2:3 ratio */}
                                 <div
                                   className={cn(
-                                    "relative w-full overflow-hidden border transition-all duration-200",
-                                    isDisabled ? "cursor-not-allowed opacity-20 grayscale" : "cursor-pointer",
+                                    "relative w-full overflow-hidden border transition-all duration-200 cursor-pointer",
                                     isSelected
                                       ? isMaviActive
                                         ? "border-zinc-300 ring-2 ring-zinc-300/20"
                                         : "border-white ring-2 ring-white/20"
-                                      : !isDisabled
-                                        ? "border-white/10 opacity-50 grayscale hover:opacity-80 hover:border-white/30"
-                                        : "border-white/5"
+                                      : "border-white/10 opacity-50 grayscale hover:opacity-80 hover:border-white/30"
                                   )}
                                   style={{ aspectRatio: "2/3" }}
-                                  onClick={() => {
-                                    if (isDisabled) {
-                                      toast.error(
-                                        language === "tr"
-                                          ? "Bu açı bir üst ürün için seçilemez."
-                                          : "Cannot select this angle for an upper garment."
-                                      );
-                                      return;
-                                    }
-                                    setBatchShotSelection(prev => ({ ...prev, [shot.id]: !isSelected }));
-                                  }}
+                                  onClick={() => setBatchShotSelection(prev => ({ ...prev, [shot.id]: !isSelected }))}
                                 >
                                   {/* Image */}
                                   {shot.image ? (
