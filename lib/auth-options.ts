@@ -179,7 +179,8 @@ export const authOptions: NextAuthOptions = {
             }
 
             // Google login ile gelen kullanıcılar için DB'den custom field'ları çek
-            if (token.id && !user) {
+            // _loaded flag: sadece ilk token oluşturulduğunda DB'ye gider, sonraki refresh'lerde atlanır
+            if (token.id && !user && !token._loaded) {
                 try {
                     const dbUser = await prisma.user.findUnique({
                         where: { id: token.id as string },
@@ -222,6 +223,8 @@ export const authOptions: NextAuthOptions = {
                         token.customTitle = dbUser.customTitle
                         token.customLogo = dbUser.customLogo
                         token.authType = dbUser.authType
+
+                        token._loaded = true // ← bir kez yüklenince işaretle, sonraki refresh'lerde atlanır
                     }
                 } catch (e) {
                     console.error('JWT callback DB error:', e)
