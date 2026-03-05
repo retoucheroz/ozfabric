@@ -169,7 +169,7 @@ export default function AdminPanel() {
             if (res.ok) {
                 const data = await res.json();
                 setUsers(prev => prev.map(u => u.username === username ? { ...u, credits: data.credits } : u));
-                toast.success(t('admin.addUser'));
+                toast.success(t('settings.credits') + " " + t('common.updated')); // Krediler Güncellendi
             } else {
                 const data = await res.json();
                 toast.error(data.error || "Hata oluştu");
@@ -221,7 +221,7 @@ export default function AdminPanel() {
     };
 
     return (
-        <div className="p-6 space-y-8 max-w-7xl mx-auto">
+        <div className="h-full overflow-y-auto p-6 md:p-8 space-y-8 max-w-7xl mx-auto custom-scrollbar">
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">{t('admin.title')}</h1>

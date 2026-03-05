@@ -5,6 +5,21 @@ import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 
+/**
+ * Kritik Admin Hesaplarını Kontrol Eder
+ */
+const checkIsPrimaryAdmin = (email?: string | null, name?: string | null) => {
+    const e = email?.toLowerCase().trim();
+    const n = name?.toLowerCase().trim();
+    const primaryAdmins = [
+        'admin',
+        'kilicozzgur@gmail.com',
+        'retoucheroz',
+        'retoucheroz@gmail.com'
+    ];
+    return primaryAdmins.includes(e || '') || primaryAdmins.includes(n || '');
+};
+
 export const authOptions: NextAuthOptions = {
     // @ts-ignore — known type mismatch between @next-auth/prisma-adapter and next-auth v4
     adapter: PrismaAdapter(prisma),
@@ -121,29 +136,17 @@ export const authOptions: NextAuthOptions = {
                     customTitle: user.customTitle,
                     customLogo: user.customLogo,
                     authType: user.authType,
-                }
+                } as any
             },
         }),
     ],
 
     callbacks: {
-        // JWT oluşturulduğunda custom field'ları ekle
         async jwt({ token, user, trigger, session }) {
-            // Initial login
+            // İlk Giriş
             if (user) {
                 token.id = user.id
-                const checkPrimaryAdmin = (uEmail: string | null | undefined, uName: string | null | undefined) => {
-                    const email = uEmail?.toLowerCase();
-                    const name = uName?.toLowerCase();
-                    return email === 'admin' ||
-                        name === 'admin' ||
-                        email === 'kilicozzgur@gmail.com' ||
-                        name === 'retoucheroz' ||
-                        email === 'retoucheroz@gmail.com';
-                };
-
-                const isPrimaryAdmin = checkPrimaryAdmin(user.email, user.name) || (user as any).role === 'admin';
-
+                const isPrimaryAdmin = checkIsPrimaryAdmin(user.email, user.name) || (user as any).role === 'admin';
                 token.role = isPrimaryAdmin ? 'admin' : ((user as any).role || 'user')
                 token.credits = (user as any).credits || 0
                 token.status = (user as any).status || 'active'
@@ -151,51 +154,31 @@ export const authOptions: NextAuthOptions = {
                 token.customTitle = (user as any).customTitle
                 token.customLogo = (user as any).customLogo
                 token.authType = (user as any).authType || 'credentials'
-                // Ensure name and email are always in token and NEVER null
                 token.name = user.name || user.email?.split('@')[0] || 'User'
                 token.email = user.email
             }
 
-            // Session update trigger (client-side update() çağrıldığında)
+            // Session Update (Client-side update() çağrıldığında)
             if (trigger === 'update' && session) {
                 if (session.credits !== undefined) token.credits = session.credits
                 if (session.authorizedPages) token.authorizedPages = session.authorizedPages
 
-                const checkPrimaryAdmin = (uEmail: string | null | undefined, uName: string | null | undefined) => {
-                    const email = uEmail?.toLowerCase();
-                    const name = uName?.toLowerCase();
-                    return email === 'admin' ||
-                        name === 'admin' ||
-                        email === 'kilicozzgur@gmail.com' ||
-                        name === 'retoucheroz' ||
-                        email === 'retoucheroz@gmail.com';
-                };
-
-                const isPrimaryAdmin = checkPrimaryAdmin(token.email as string, token.name as string) || token.role === 'admin';
-
+                // Admin yetkisi asla düşürülmemeli
+                const isPrimaryAdmin = checkIsPrimaryAdmin(token.email as string, token.name as string) || token.role === 'admin';
                 if (session.role) {
                     token.role = isPrimaryAdmin ? 'admin' : session.role
                 }
             }
 
-            // Google login ile gelen kullanıcılar için DB'den custom field'ları çek
-            // _loaded flag: sadece ilk token oluşturulduğunda DB'ye gider, sonraki refresh'lerde atlanır
+            // Veritabanından veriyi tazele (Google login veya eksik veri durumunda)
             if (token.id && !user && !token._loaded) {
                 try {
                     const dbUser = await prisma.user.findUnique({
                         where: { id: token.id as string },
                         select: {
-                            id: true,
-                            email: true,
-                            name: true,
-                            credits: true,
-                            role: true,
-                            status: true,
-                            authorizedPages: true,
-                            customTitle: true,
-                            customLogo: true,
-                            authType: true,
-                            image: true,
+                            id: true, email: true, name: true, credits: true,
+                            role: true, status: true, authorizedPages: true,
+                            customTitle: true, customLogo: true, authType: true, image: true,
                         },
                     })
                     if (dbUser) {
@@ -204,19 +187,8 @@ export const authOptions: NextAuthOptions = {
                         token.avatar = dbUser.image
                         token.credits = dbUser.credits
 
-                        // Hard-coded bypass to ensure admin always has their role from DB or by name/email
-                        const checkPrimaryAdmin = (uEmail: string | null | undefined, uName: string | null | undefined) => {
-                            const email = uEmail?.toLowerCase();
-                            const name = uName?.toLowerCase();
-                            return email === 'admin' ||
-                                name === 'admin' ||
-                                email === 'kilicozzgur@gmail.com' ||
-                                name === 'retoucheroz' ||
-                                email === 'retoucheroz@gmail.com';
-                        };
-
-                        const isPrimaryAdmin = checkPrimaryAdmin(dbUser.email as string, dbUser.name as string) || dbUser.role === 'admin';
-
+                        // DB'deki rol 'user' bile olsa primary admin ise 'admin' olarak kalmalı
+                        const isPrimaryAdmin = checkIsPrimaryAdmin(dbUser.email, dbUser.name) || dbUser.role === 'admin';
                         token.role = isPrimaryAdmin ? 'admin' : dbUser.role
                         token.status = dbUser.status
                         token.authorizedPages = dbUser.authorizedPages
@@ -224,7 +196,7 @@ export const authOptions: NextAuthOptions = {
                         token.customLogo = dbUser.customLogo
                         token.authType = dbUser.authType
 
-                        token._loaded = true // ← bir kez yüklenince işaretle, sonraki refresh'lerde atlanır
+                        token._loaded = true
                     }
                 } catch (e) {
                     console.error('JWT callback DB error:', e)
@@ -237,18 +209,17 @@ export const authOptions: NextAuthOptions = {
         // Session'a custom field'ları aktar
         async session({ session, token }) {
             if (session.user) {
-                session.user.id = token.id
-                session.user.role = token.role
-                session.user.credits = token.credits
-                session.user.status = token.status
-                session.user.authorizedPages = token.authorizedPages
-                session.user.customTitle = token.customTitle
-                session.user.customLogo = token.customLogo
-                session.user.authType = token.authType
-                // Explicitly pass name and email
-                session.user.name = token.name
-                session.user.email = token.email
-                session.user.avatar = token.avatar
+                session.user.id = token.id as string
+                session.user.role = token.role as string
+                session.user.credits = token.credits as number
+                session.user.status = token.status as string
+                session.user.authorizedPages = token.authorizedPages as string[]
+                session.user.customTitle = token.customTitle as string
+                session.user.customLogo = token.customLogo as string
+                session.user.authType = token.authType as string
+                session.user.name = token.name as string
+                session.user.email = token.email as string
+                session.user.avatar = token.avatar as string
             }
             return session
         },
