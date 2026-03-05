@@ -74,13 +74,14 @@ export function Sidebar({ variant = "default" }: SidebarProps) {
     ) : null;
 
     const isAuthorized = (path: string) => {
-        if (!isKvActive) return true;
-        // Don't show everything while loading, only home
+        // While loading, only show home
         if (isLoading) return path === '/home';
-        if (process.env.NODE_ENV === 'development' && !user) return true;
-        if (!user) return false;
+        // Not logged in (should never happen in dashboard, but be safe)
+        if (!user) return process.env.NODE_ENV === 'development';
+        // Admin sees everything
         if (user.role === 'admin') return true;
-        return user.authorizedPages?.includes(path) || user.authorizedPages?.includes('*');
+        // Standard users see everything (admin panel link is hidden in TopNav separately)
+        return true;
     };
 
     // --- ITEM GROUPS ---

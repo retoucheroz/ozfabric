@@ -52,17 +52,7 @@ type User = {
     createdAt?: number;
 }
 
-const AVAILABLE_PAGES = [
-    { label: 'Photoshoot (AI Model)', path: '/photoshoot' },
-    { label: 'Batch Mode (Photoshoot)', path: 'photoshoot:batch' },
-    { label: 'Editorial', path: '/editorial' },
-    { label: 'Video', path: '/video' },
-    { label: 'Face & Head Swap', path: '/face-head-swap' },
-    { label: 'Analysis', path: '/analysis' },
-    { label: 'Studio (Tech Pack)', path: '/studio' },
-    { label: 'Train', path: '/train' },
-    { label: 'Ghost Mannequin', path: '/photoshoot/ghost' },
-];
+
 
 const getAdminHeaders = () => {
     return { 'Content-Type': 'application/json' };
@@ -77,6 +67,7 @@ export default function AdminPanel() {
     const [creditHistory, setCreditHistory] = useState<any[]>([]);
     const [isHistoryLoading, setIsHistoryLoading] = useState(false);
     const [provider, setProvider] = useState<string>('fal_ai');
+    const [pendingProvider, setPendingProvider] = useState<string>('fal_ai');
     const [userToDelete, setUserToDelete] = useState<string | null>(null);
 
     const fetchData = async () => {
@@ -98,7 +89,10 @@ export default function AdminPanel() {
             if (onlineRes.ok) setOnlineStats(await onlineRes.json());
             if (settingsRes.ok) {
                 const data = await settingsRes.json();
-                if (data.nano_banana_provider) setProvider(data.nano_banana_provider);
+                if (data.nano_banana_provider) {
+                    setProvider(data.nano_banana_provider);
+                    setPendingProvider(data.nano_banana_provider);
+                }
             }
         } catch (error) {
             toast.error("Failed to fetch admin data");
@@ -214,22 +208,16 @@ export default function AdminPanel() {
             if (!res.ok) {
                 const data = await res.json();
                 toast.error(data.error || "Failed to update provider");
-                fetchData(); // rollback
+                setPendingProvider(provider); // rollback pending
+                fetchData();
             } else {
                 toast.success('API Provider updated successfully');
             }
         } catch (error) {
             toast.error("Network error");
-            fetchData(); // rollback
+            setPendingProvider(provider); // rollback pending
+            fetchData();
         }
-    };
-
-    const togglePageAccess = (user: Omit<User, 'passwordHash'>, path: string) => {
-        const current = user.authorizedPages || [];
-        const updated = current.includes(path)
-            ? current.filter(p => p !== path)
-            : [...current, path];
-        updateUser(user.username, { authorizedPages: updated });
     };
 
     return (
@@ -261,18 +249,28 @@ export default function AdminPanel() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="space-y-1.5 flex-1 min-w-[200px]">
-                            <Label htmlFor="provider">Nano Banana Pro Provider</Label>
-                            <select
-                                id="provider"
-                                className="w-full h-10 px-3 rounded-md border border-white/10 bg-black text-sm focus:ring-1 ring-white/20 outline-none"
-                                value={provider}
-                                onChange={(e) => updateProvider(e.target.value)}
+                        <div className="space-y-3">
+                            <div className="space-y-1.5">
+                                <Label htmlFor="provider">Nano Banana Pro Provider</Label>
+                                <select
+                                    id="provider"
+                                    className="w-full h-10 px-3 rounded-md border border-white/10 bg-black text-sm focus:ring-1 ring-white/20 outline-none"
+                                    value={pendingProvider}
+                                    onChange={(e) => setPendingProvider(e.target.value)}
+                                >
+                                    <option value="fal_ai">Fal.ai API</option>
+                                    <option value="kie_ai">Kie.ai API</option>
+                                    <option value="gemini_ai">Gemini API</option>
+                                </select>
+                            </div>
+                            <Button
+                                size="sm"
+                                className="w-full bg-zinc-100 text-black hover:bg-white font-bold"
+                                disabled={pendingProvider === provider}
+                                onClick={() => updateProvider(pendingProvider)}
                             >
-                                <option value="fal_ai">Fal.ai API</option>
-                                <option value="kie_ai">Kie.ai API</option>
-                                <option value="gemini_ai">Gemini API</option>
-                            </select>
+                                {pendingProvider === provider ? '✓ Uygulandı' : 'Uygula'}
+                            </Button>
                         </div>
                     </CardContent>
                 </Card>
@@ -545,29 +543,7 @@ export default function AdminPanel() {
                                 </div>
                             </div>
 
-                            <div className="space-y-3">
-                                <Label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
-                                    <Layout className="w-3 h-3" /> {t('admin.authorizedPages')}
-                                </Label>
-                                <div className="grid grid-cols-1 gap-1 border rounded-xl p-3 bg-muted/20 max-h-[300px] overflow-y-auto custom-scrollbar">
-                                    {user.authorizedPages?.includes('*') ? (
-                                        <div className="text-[10px] font-bold text-violet-500 flex items-center gap-2 py-1">
-                                            <Shield className="w-3 h-3" /> FULL SYSTEM ACCESS (ADMIN)
-                                        </div>
-                                    ) : (
-                                        AVAILABLE_PAGES.map((page) => (
-                                            <div key={page.path} className="flex items-center justify-between py-1 border-b border-muted/20 last:border-0">
-                                                <span className="text-[10px] font-bold uppercase tracking-tight">{page.label}</span>
-                                                <Switch
-                                                    className="scale-75"
-                                                    checked={user.authorizedPages?.includes(page.path)}
-                                                    onCheckedChange={() => togglePageAccess(user, page.path)}
-                                                />
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
-                            </div>
+
                         </CardContent>
                     </Card>
                 ))}
