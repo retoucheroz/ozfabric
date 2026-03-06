@@ -143,10 +143,12 @@ const VALID_SLOTS: SlotKey[] = [
 
 export async function analyzeGarmentImage(
     imageBase64: string,
-    mimeType: string
+    mimeType: string,
+    apiKey?: string
 ): Promise<GarmentAnalysisResult> {
     // Use gemini-2.5-flash-lite as requested.
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
+    const ai = apiKey ? new GoogleGenerativeAI(apiKey) : genAI;
+    const model = ai.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
     try {
         const result = await model.generateContent([

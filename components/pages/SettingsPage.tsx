@@ -36,17 +36,19 @@ function SettingsContent() {
         username?: string,
         role?: string,
         avatar?: string,
-        createdAt?: number
+        createdAt?: number,
+        allowOwnApiKeys?: boolean,
+        geminiApiKey?: string,
+        falApiKey?: string
     } | null>(null);
 
     const fetchSession = async () => {
         try {
-            const res = await fetch('/api/auth/session');
+            // Fetch more detailed profile data including API keys
+            const res = await fetch('/api/user/profile');
             if (res.ok) {
                 const data = await res.json();
-                if (data?.user) {
-                    setUser(data.user);
-                }
+                setUser(data);
             }
         } catch (e) {
             console.error("Session fetch failed", e);
@@ -73,6 +75,7 @@ function SettingsContent() {
 
     const sections = [
         { id: "profile" as SettingsSection, label: t("settings.profile"), icon: User },
+        ...(user?.allowOwnApiKeys ? [{ id: "api" as any, label: "API", icon: Key }] : []),
         { id: "billing" as SettingsSection, label: t("settings.billing"), icon: CreditCard },
         { id: "notifications" as SettingsSection, label: t("settings.notifications"), icon: Bell },
         { id: "security" as SettingsSection, label: t("settings.security"), icon: Shield },
@@ -285,6 +288,81 @@ function SettingsContent() {
                     )}
 
 
+
+                    {/* API Section */}
+                    {activeSection === "api" as any && user?.allowOwnApiKeys && (
+                        <section className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="space-y-1">
+                                <h2 className="text-2xl font-black uppercase tracking-tight text-[var(--text-primary)] flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-xl bg-[var(--accent-soft)] flex items-center justify-center text-[var(--accent-primary)] shadow-lg shadow-[var(--accent-primary)]/10">
+                                        <Key className="w-6 h-6" />
+                                    </div>
+                                    {language === 'tr' ? 'API AYARLARI' : 'API SETTINGS'}
+                                </h2>
+                                <p className="text-[10px] text-[var(--text-muted)] font-black uppercase tracking-widest ml-13">
+                                    {language === 'tr' ? 'KENDİ API ANAHTARLARINIZI YÖNETİN' : 'MANAGE YOUR OWN API KEYS'}
+                                </p>
+                            </div>
+
+                            <Card className="p-8 space-y-8 bg-[var(--bg-sidebar)] border-[var(--border-subtle)] rounded-[32px] shadow-xl">
+                                <div className="space-y-6">
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest px-1">Gemini API Key</Label>
+                                        <Input
+                                            id="gemini-key"
+                                            type="password"
+                                            defaultValue={user?.geminiApiKey || ""}
+                                            className="h-12 bg-[var(--bg-surface)] border-[var(--border-subtle)] rounded-2xl px-4 font-bold focus:ring-1 focus:ring-[var(--accent-primary)]/30 text-[var(--text-primary)]"
+                                            placeholder="AI... (Gemini API Key)"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest px-1">Fal.ai API Key</Label>
+                                        <Input
+                                            id="fal-key"
+                                            type="password"
+                                            defaultValue={user?.falApiKey || ""}
+                                            className="h-12 bg-[var(--bg-surface)] border-[var(--border-subtle)] rounded-2xl px-4 font-bold focus:ring-1 focus:ring-[var(--accent-primary)]/30 text-[var(--text-primary)]"
+                                            placeholder="fal_... (Fal.ai Key)"
+                                        />
+                                    </div>
+
+                                    <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/10 text-amber-500 text-[10px] font-bold uppercase tracking-tight leading-relaxed">
+                                        {language === 'tr'
+                                            ? "NOT: KENDİ API ANAHTARLARINIZ GİRİLDİĞİNDE, SİSTEM KREDİLERİ YERİNE KENDİ HESAPLARINIZDAN ÜCRETLENDİRİLİRSİNİZ."
+                                            : "NOTE: WHEN YOUR OWN API KEYS ARE ENTERED, YOU WILL BE CHARGED FROM YOUR OWN ACCOUNTS INSTEAD OF SYSTEM CREDITS."}
+                                    </div>
+
+                                    <Button
+                                        className="w-full sm:w-auto h-12 px-10 bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-hover)] font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-[var(--accent-primary)]/20 transition-all active:scale-95 text-xs"
+                                        onClick={async () => {
+                                            const geminiKey = (document.getElementById('gemini-key') as HTMLInputElement).value;
+                                            const falKey = (document.getElementById('fal-key') as HTMLInputElement).value;
+
+                                            try {
+                                                const res = await fetch('/api/user/profile', {
+                                                    method: 'POST',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({ geminiApiKey: geminiKey, falApiKey: falKey })
+                                                });
+                                                if (res.ok) {
+                                                    toast.success(t("settings.saveSuccess") || "Değişiklikler kaydedildi.");
+                                                    fetchSession();
+                                                } else {
+                                                    toast.error("Hata oluştu.");
+                                                }
+                                            } catch (e) {
+                                                toast.error("Hata oluştu.");
+                                            }
+                                        }}
+                                    >
+                                        {t("settings.saveChanges")}
+                                    </Button>
+                                </div>
+                            </Card>
+                        </section>
+                    )}
 
                     {/* Billing Section */}
                     {activeSection === "billing" && (

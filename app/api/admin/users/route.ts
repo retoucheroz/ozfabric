@@ -34,7 +34,8 @@ export async function GET() {
                 id: true, name: true, email: true, role: true,
                 credits: true, status: true, lastSeenAt: true,
                 lastSeenPage: true, createdAt: true, authorizedPages: true,
-                customTitle: true, customLogo: true, image: true, authType: true
+                customTitle: true, customLogo: true, image: true, authType: true,
+                allowOwnApiKeys: true, geminiApiKey: true, falApiKey: true
             }
         });
 
@@ -53,7 +54,10 @@ export async function GET() {
             customTitle: u.customTitle,
             customLogo: u.customLogo,
             avatar: u.image,
-            authType: u.authType
+            authType: u.authType,
+            allowOwnApiKeys: u.allowOwnApiKeys,
+            geminiApiKey: u.geminiApiKey,
+            falApiKey: u.falApiKey
         }));
 
         return NextResponse.json(mapped);
@@ -109,8 +113,13 @@ export async function PATCH(req: Request) {
         // Rol değişikliğini API üzerinden engelle
         if (updates.role) delete updates.role;
 
+        const user = await prisma.user.findFirst({
+            where: { OR: [{ name: username }, { email: username }] }
+        });
+        if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+
         await prisma.user.update({
-            where: { name: username },
+            where: { id: user.id },
             data: updates
         });
 
@@ -129,7 +138,12 @@ export async function DELETE(req: Request) {
         // Admin kullanıcısı silinemez
         if (username === 'admin') return NextResponse.json({ error: 'Cannot delete system admin' }, { status: 400 });
 
-        await prisma.user.delete({ where: { name: username } });
+        const user = await prisma.user.findFirst({
+            where: { OR: [{ name: username }, { email: username }] }
+        });
+        if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+
+        await prisma.user.delete({ where: { id: user.id } });
         return NextResponse.json({ success: true });
     } catch (error) {
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

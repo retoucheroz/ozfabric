@@ -50,6 +50,9 @@ type User = {
     lastSeenPage?: string;
     avatar?: string;
     createdAt?: number;
+    allowOwnApiKeys?: boolean;
+    geminiApiKey?: string;
+    falApiKey?: string;
 }
 
 
@@ -520,6 +523,17 @@ export default function AdminPanel() {
                                         </div>
                                         <p className="text-[9px] text-muted-foreground uppercase font-bold leading-tight">PNG ONLY <br /> (TRANSPARENT)</p>
                                     </div>
+                                </div>
+
+                                <div className="flex items-center justify-between p-3 rounded-2xl bg-zinc-500/5 border border-zinc-500/10">
+                                    <div className="space-y-0.5">
+                                        <Label className="text-[10px] font-bold text-zinc-300 uppercase tracking-tight">Kendi API Key Kullanımı</Label>
+                                        <p className="text-[9px] text-zinc-500 uppercase font-bold leading-tight">Gemini & Fal.ai</p>
+                                    </div>
+                                    <Switch
+                                        checked={user.allowOwnApiKeys || false}
+                                        onCheckedChange={(checked) => updateUser(user.username, { allowOwnApiKeys: checked })}
+                                    />
                                 </div>
                             </div>
 

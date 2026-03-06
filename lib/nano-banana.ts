@@ -13,6 +13,8 @@ interface NanoBananaPayload {
     negative_prompt?: string;
     seed?: number;
     enable_web_search?: boolean;
+    userGeminiKey?: string;
+    userFalKey?: string;
 }
 
 export async function generateWithNanoBanana(payload: NanoBananaPayload): Promise<string> {
@@ -93,7 +95,7 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
         }
 
     } else if (effectiveProvider === 'gemini_ai') {
-        const geminiKey = process.env.GEMINI_API_KEY;
+        const geminiKey = payload.userGeminiKey || process.env.GEMINI_API_KEY;
         if (!geminiKey) throw new Error("GEMINI_API_KEY is missing");
 
         const imageList = Array.isArray(payload.image_urls)
@@ -162,7 +164,7 @@ export async function generateWithNanoBanana(payload: NanoBananaPayload): Promis
             output_format: "png"
         };
 
-        const falKey = process.env.FAL_KEY;
+        const falKey = payload.userFalKey || process.env.FAL_KEY;
         if (!falKey) throw new Error("FAL_KEY missing");
 
         const response = await fetch("https://fal.run/fal-ai/nano-banana-pro/edit", {

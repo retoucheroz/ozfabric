@@ -183,7 +183,7 @@ export async function POST(req: NextRequest) {
         if (!preview) {
             const user = await prisma.user.findUnique({
                 where: { id: session.user.id },
-                select: { id: true, credits: true, role: true }
+                select: { id: true, credits: true, role: true, allowOwnApiKeys: true, geminiApiKey: true, falApiKey: true }
             });
             if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
@@ -1143,6 +1143,12 @@ export async function POST(req: NextRequest) {
                 if (resolution.includes('4K')) finalRes = '4K';
             }
 
+            // Fetch user keys for generation
+            const user = await prisma.user.findUnique({
+                where: { id: session.user.id },
+                select: { allowOwnApiKeys: true, geminiApiKey: true, falApiKey: true }
+            });
+
             let { generateWithNanoBanana } = await import('@/lib/nano-banana');
             return await generateWithNanoBanana({
                 prompt: reqData.prompt,
@@ -1151,7 +1157,9 @@ export async function POST(req: NextRequest) {
                 resolution: finalRes,
                 negative_prompt: reqData.negative_prompt,
                 seed: requestSeed,
-                enable_web_search: enableWebSearch
+                enable_web_search: enableWebSearch,
+                userGeminiKey: user?.allowOwnApiKeys ? user.geminiApiKey : undefined,
+                userFalKey: user?.allowOwnApiKeys ? user.falApiKey : undefined
             });
         };
 
