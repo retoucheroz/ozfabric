@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Maximize2, ZoomIn, Loader2, Download, Image as ImageIcon, Sparkles, ArrowRight, RefreshCw } from "lucide-react"
+import { Maximize2, ZoomIn, Loader2, Download, Image as ImageIcon, Sparkles, ArrowRight, RefreshCw, X, ChevronRight } from "lucide-react"
 import { useProjects } from "@/context/projects-context"
 import { useLanguage } from "@/context/language-context"
 import { toast } from "sonner"
@@ -22,7 +22,8 @@ import {
     TbLoader2,
     TbArrowRight,
     TbRefresh,
-    TbHdr
+    TbHdr,
+    TbCoins
 } from "react-icons/tb"
 
 const UPSCALE_CREDITS: Record<string, number> = {
@@ -117,246 +118,297 @@ export default function ResizePage() {
     };
 
     return (
-        <div className="flex flex-col lg:flex-row h-auto lg:h-[calc(100vh-64px)] overflow-hidden lg:overflow-hidden overflow-y-auto lg:overflow-y-hidden">
-            {/* Left Panel - Controls */}
-            <div className="w-full lg:w-[420px] lg:border-r border-b lg:border-b-0 bg-[#0D0D0F] p-8 lg:overflow-y-auto space-y-8 shrink-0">
-                <div className="flex items-center gap-4 mb-8">
-                    <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-white/10 text-white flex items-center justify-center shadow-xl">
-                        <TbMaximize className="w-6 h-6" />
-                    </div>
-                    <div>
-                        <h2 className="text-2xl font-black tracking-tighter uppercase italic text-white leading-none">{t("resize.title")}</h2>
-                        <p className="text-[10px] text-zinc-500 uppercase font-black tracking-[0.2em] mt-1.5">{t("resize.subtitle")}</p>
-                    </div>
-                </div>
+        <div className="flex flex-col h-full bg-[#0D0D0F]">
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8 min-h-screen pb-24">
+                <div className="max-w-[1180px] mx-auto w-full flex flex-col lg:flex-row gap-8">
 
-                {/* Mode Tabs */}
-                <Tabs value={mode} onValueChange={(v) => setMode(v as "expand" | "upscale")} className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 h-11 p-1 bg-white/5 border border-white/5 rounded-xl">
-                        <TabsTrigger value="expand" className="text-[10px] font-black uppercase tracking-widest rounded-lg data-[state=active]:bg-white data-[state=active]:text-black transition-all gap-2">
-                            <TbMaximize className="w-4 h-4" />
-                            {t("resize.expand")}
-                        </TabsTrigger>
-                        <TabsTrigger value="upscale" className="text-[10px] font-black uppercase tracking-widest rounded-lg data-[state=active]:bg-white data-[state=active]:text-black transition-all gap-2">
-                            <TbZoomIn className="w-4 h-4" />
-                            {t("resize.upscale")}
-                        </TabsTrigger>
-                    </TabsList>
-
-                    {/* Expand Options */}
-                    <TabsContent value="expand" className="space-y-4 mt-4">
-                        <div className="space-y-2">
-                            <Label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest flex items-center gap-1.5 px-1">
-                                <TbAdjustmentsHorizontal className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
-                                {t("resize.expandDirection")}
-                            </Label>
-                            <Select value={expandDirection} onValueChange={setExpandDirection}>
-                                <SelectTrigger>
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">{t("resize.allSides")}</SelectItem>
-                                    <SelectItem value="horizontal">{t("resize.horizontal")}</SelectItem>
-                                    <SelectItem value="vertical">{t("resize.vertical")}</SelectItem>
-                                    <SelectItem value="top">{t("resize.top")}</SelectItem>
-                                    <SelectItem value="bottom">{t("resize.bottom")}</SelectItem>
-                                    <SelectItem value="left">{t("resize.left")}</SelectItem>
-                                    <SelectItem value="right">{t("resize.right")}</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        <div className="space-y-2">
-                            <div className="flex justify-between">
-                                <Label>{t("resize.expandAmount")}</Label>
-                                <span className="text-sm text-muted-foreground">{expandAmount}%</span>
+                    {/* Left: Input Panel */}
+                    <div className="w-full lg:w-[420px] flex flex-col space-y-6 shrink-0">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 rounded-md bg-[#18181B] border border-white/10 text-white shadow-lg">
+                                <Maximize2 className="w-5 h-5" />
                             </div>
-                            <Slider
-                                value={[expandAmount]}
-                                onValueChange={(v) => setExpandAmount(v[0])}
-                                min={10}
-                                max={100}
-                                step={10}
-                                className="py-2"
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label>{t("resize.expandPrompt")}</Label>
-                            <Textarea
-                                placeholder={t("resize.expandPromptPlaceholder")}
-                                value={expandPrompt}
-                                onChange={(e) => setExpandPrompt(e.target.value)}
-                                className="h-24 resize-none"
-                            />
-                            <p className="text-xs text-muted-foreground">{t("resize.expandPromptHint")}</p>
-                        </div>
-                    </TabsContent>
-
-                    {/* Upscale Options */}
-                    <TabsContent value="upscale" className="space-y-4 mt-4">
-                        <div className="space-y-4">
-                            <Label className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-1.5 px-1">{t("resize.upscaleFactor")}</Label>
-                            <div className="grid grid-cols-4 gap-2">
-                                {["1x", "2x", "4x", "8x"].map((factor) => (
-                                    <Button
-                                        key={factor}
-                                        variant={upscaleFactor === factor ? "default" : "outline"}
-                                        className={cn(
-                                            "h-12 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all",
-                                            upscaleFactor === factor
-                                                ? "bg-white text-black hover:bg-zinc-200 shadow-xl border-white"
-                                                : "bg-white/5 border-white/5 text-zinc-500 hover:text-white"
-                                        )}
-                                        onClick={() => setUpscaleFactor(factor)}
-                                    >
-                                        {factor}
-                                    </Button>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="space-y-4">
-                            <div className="flex justify-between items-center px-1">
-                                <Label className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-1.5 ">
-                                    <TbSparkles className="w-3.5 h-3.5" />
-                                    {language === "tr" ? "YARATICILIK" : "CREATIVITY"}
-                                </Label>
-                                <span className="text-[10px] font-black text-white bg-white/10 px-2 py-0.5 rounded-md">{creativity.toFixed(1)}</span>
-                            </div>
-                            <Slider
-                                value={[creativity]}
-                                onValueChange={(v) => setCreativity(v[0])}
-                                min={0}
-                                max={10}
-                                step={0.1}
-                                className="py-2"
-                            />
-                            <p className="text-[10px] font-bold uppercase tracking-tight text-zinc-500 leading-relaxed px-1 grayscale">
-                                {language === "tr" ? "Görsele yeni ve yaratıcı detaylar ekler." : "Adds new and creative details to the image."}
-                            </p>
-                        </div>
-
-                        <Card className="p-5 bg-white/[0.02] border border-white/5 rounded-2xl">
-                            <div className="flex items-start gap-4">
-                                <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center shrink-0">
-                                    <Sparkles className="w-4 h-4 text-white opacity-40 text-white mt-0.5" />
-                                </div>
-                                <div>
-                                    <h4 className="font-black uppercase tracking-widest text-[11px] text-white leading-none">{t("resize.aiEnhanced")}</h4>
-                                    <p className="text-[10px] font-bold uppercase tracking-tight text-zinc-500 mt-2 leading-relaxed">{t("resize.aiEnhancedDesc")}</p>
-                                </div>
-                            </div>
-                        </Card>
-
-                        <div className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 bg-white/5 border border-white/10 rounded-xl p-4 leading-relaxed">
-                            <strong className="text-white">{t("resize.note")}:</strong> {t("resize.upscaleNote")}
-                        </div>
-                    </TabsContent>
-                </Tabs>
-
-                {/* Upload Area */}
-                <div className="space-y-4 pt-4">
-                    <Label className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-1.5 px-1">
-                        <TbPhoto className="w-3.5 h-3.5 text-white" />
-                        {t("resize.uploadImage")}
-                    </Label>
-                    <div className="border-2 border-dashed rounded-2xl h-44 border-white/5 hover:border-white/20 transition-all relative group overflow-hidden cursor-pointer bg-white/[0.02]">
-                        <input
-                            type="file"
-                            accept="image/*"
-                            className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                            onChange={handleFileChange}
-                        />
-                        {preview ? (
-                            <img src={preview} className="w-full h-full object-contain p-4 grayscale group-hover:grayscale-0 transition-all" />
-                        ) : (
-                            <div className="absolute inset-0 flex flex-col items-center justify-center text-zinc-500 gap-3">
-                                <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
-                                    <ImageIcon className="w-6 h-6 opacity-30" />
-                                </div>
-                                <span className="text-[10px] font-black uppercase tracking-widest">{t("resize.dropImage")}</span>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                <div className="pt-4">
-                    <Button
-                        size="lg"
-                        className="w-full h-16 rounded-2xl bg-white hover:bg-zinc-200 text-black font-black text-[11px] shadow-2xl transition-all active:scale-[0.98] uppercase tracking-[0.2em]"
-                        onClick={handleProcess}
-                        disabled={!preview || isProcessing}
-                    >
-                        {isProcessing ? (
-                            <>
-                                <TbLoader2 className="w-5 h-5 mr-3 animate-spin" />
-                                <span>{t("resize.processing")}</span>
-                            </>
-                        ) : (
-                            <>
-                                <TbSparkles className="w-5 h-5 mr-3 opacity-50" />
-                                <span>{mode === "expand" ? t("resize.expandNow") : t("resize.upscaleNow")}</span>
-                                <span className="ml-4 opacity-40 font-black border-l border-black/10 pl-4">
-                                    {mode === "expand" ? "3" : UPSCALE_CREDITS[upscaleFactor]} {t("settings.credits")}
+                            <div className="flex flex-col">
+                                <label className="text-[13px] font-black uppercase tracking-[0.2em] text-white leading-none">
+                                    {t("resize.title")}
+                                </label>
+                                <span className="text-[11px] font-bold text-zinc-400 mt-1.5 leading-none">
+                                    {t("resize.subtitle")}
                                 </span>
-                            </>
-                        )}
-                    </Button>
-                </div>
-
-
-            </div>
-
-            {/* Right Panel - Result */}
-            <div className="flex-1 bg-[#0D0D0F] flex items-center justify-center p-8 relative">
-                {resultImage ? (
-                    <div className="relative max-w-full max-h-full">
-                        <img
-                            src={resultImage}
-                            className="max-h-[calc(100vh-160px)] max-w-full rounded-2xl shadow-2xl border border-white/10 animate-in zoom-in-95 duration-500"
-                        />
-                        <div className="absolute top-6 right-6 flex gap-3">
-                            <Button
-                                variant="secondary"
-                                size="sm"
-                                className="bg-white text-black hover:bg-zinc-200 h-10 px-5 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl"
-                                onClick={() => setResultImage(null)}
-                            >
-                                <RefreshCw className="w-4 h-4 mr-2" />
-                                {t("common.reset")}
-                            </Button>
-                            <Button
-                                size="sm"
-                                className="bg-white text-black hover:bg-zinc-200 h-10 px-5 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl"
-                                onClick={handleDownload}
-                            >
-                                <Download className="w-4 h-4 mr-2" />
-                                {t("common.download")}
-                            </Button>
+                            </div>
                         </div>
-                        <div className="absolute bottom-6 left-6 bg-black text-white border border-white/20 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest backdrop-blur-md shadow-2xl">
-                            {mode === "expand"
-                                ? `+${expandAmount}% ${expandDirection}`
-                                : `${upscaleFactor} ${t("resize.enhanced")}`}
+
+                        {/* Upload Area First */}
+                        <div className="space-y-3">
+                            <label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 flex items-center gap-2 px-1">
+                                <TbPhoto className="w-4 h-4 text-zinc-500" />
+                                {t("resize.uploadImage")}
+                            </label>
+                            <div className="h-44 border border-dashed border-white/20 rounded-2xl bg-[#121214] relative group hover:border-white/40 transition-all cursor-pointer overflow-hidden shadow-none">
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="absolute inset-0 z-10 opacity-0 cursor-pointer"
+                                    onChange={handleFileChange}
+                                />
+                                {preview ? (
+                                    <div className="relative h-full">
+                                        <img src={preview} className="w-full h-full object-contain p-2" />
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setFile(null); setPreview(null); }}
+                                            className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center z-20"
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground gap-3">
+                                        <div className="w-12 h-12 rounded-lg bg-[#18181B] border border-white/10 flex items-center justify-center group-hover:bg-white text-zinc-500 group-hover:text-black transition-all text-zinc-500">
+                                            <ImageIcon className="w-6 h-6" />
+                                        </div>
+                                        <span className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.18em]">{t("resize.dropImage")}</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Mode Tabs */}
+                        <Tabs value={mode} onValueChange={(v) => setMode(v as "expand" | "upscale")} className="w-full">
+                            <TabsList className="grid w-full grid-cols-2 h-12 p-1 bg-[#121214] border border-white/10 rounded-xl">
+                                <TabsTrigger value="expand" className="text-[11px] font-black uppercase tracking-[0.18em] rounded-lg data-[state=active]:bg-[#18181B] data-[state=active]:text-white data-[state=active]:shadow-none transition-all gap-2 text-zinc-500">
+                                    <Maximize2 className="w-3.5 h-3.5" />
+                                    {t("resize.expand")}
+                                </TabsTrigger>
+                                <TabsTrigger value="upscale" className="text-[11px] font-black uppercase tracking-[0.18em] rounded-lg data-[state=active]:bg-[#18181B] data-[state=active]:text-white data-[state=active]:shadow-none transition-all gap-2 text-zinc-500">
+                                    <ZoomIn className="w-3.5 h-3.5" />
+                                    {t("resize.upscale")}
+                                </TabsTrigger>
+                            </TabsList>
+
+                            {/* Expand Options */}
+                            <TabsContent value="expand" className="space-y-6 mt-6 focus-visible:outline-none">
+                                <div className="space-y-3">
+                                    <label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 flex items-center gap-2 px-1">
+                                        <TbAdjustmentsHorizontal className="w-4 h-4 text-zinc-500" />
+                                        {t("resize.expandDirection")}
+                                    </label>
+                                    <div className="relative">
+                                        <select
+                                            value={expandDirection}
+                                            onChange={(e) => setExpandDirection(e.target.value)}
+                                            className="w-full h-12 bg-[#121214] border border-white/10 rounded-xl px-4 pr-10 text-[11px] font-black text-white shadow-none uppercase tracking-[0.18em] focus:outline-none focus:border-white/30 transition-all appearance-none"
+                                        >
+                                            <option value="all" className="bg-[#121214]">{t("resize.allSides")}</option>
+                                            <option value="horizontal" className="bg-[#121214]">{t("resize.horizontal")}</option>
+                                            <option value="vertical" className="bg-[#121214]">{t("resize.vertical")}</option>
+                                            <option value="top" className="bg-[#121214]">{t("resize.top")}</option>
+                                            <option value="bottom" className="bg-[#121214]">{t("resize.bottom")}</option>
+                                            <option value="left" className="bg-[#121214]">{t("resize.left")}</option>
+                                            <option value="right" className="bg-[#121214]">{t("resize.right")}</option>
+                                        </select>
+                                        <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none rotate-90" />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-center px-1">
+                                        <label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 flex items-center gap-2">
+                                            <TbMaximize className="w-4 h-4" />
+                                            {t("resize.expandAmount")}
+                                        </label>
+                                        <span className="text-[11px] font-black text-white bg-white/10 px-2 py-0.5 rounded-md">{expandAmount}%</span>
+                                    </div>
+                                    <Slider
+                                        value={[expandAmount]}
+                                        onValueChange={(v) => setExpandAmount(v[0])}
+                                        min={10}
+                                        max={100}
+                                        step={10}
+                                        className="py-2"
+                                    />
+                                </div>
+
+                                <div className="space-y-3">
+                                    <label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 flex items-center gap-2 px-1">
+                                        <Sparkles className="w-4 h-4 text-zinc-500" />
+                                        {t("resize.expandPrompt")}
+                                    </label>
+                                    <textarea
+                                        placeholder={t("resize.expandPromptPlaceholder")}
+                                        value={expandPrompt}
+                                        onChange={(e) => setExpandPrompt(e.target.value)}
+                                        className="w-full h-28 bg-[#121214] border border-white/10 rounded-2xl p-4 text-[13px] font-medium text-white shadow-none placeholder:text-zinc-600 focus:outline-none focus:border-white/30 transition-all resize-none overflow-y-auto custom-scrollbar"
+                                    />
+                                    <p className="text-[10px] font-bold uppercase tracking-tight text-zinc-500 leading-relaxed px-1">
+                                        {t("resize.expandPromptHint")}
+                                    </p>
+                                </div>
+                            </TabsContent>
+
+                            {/* Upscale Options */}
+                            <TabsContent value="upscale" className="space-y-6 mt-6 focus-visible:outline-none">
+                                <div className="space-y-3">
+                                    <label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 flex items-center gap-2 px-1">
+                                        <Maximize2 className="w-4 h-4 text-zinc-500" />
+                                        {t("resize.upscaleFactor")}
+                                    </label>
+                                    <div className="grid grid-cols-4 gap-3">
+                                        {["1x", "2x", "4x", "8x"].map((factor) => (
+                                            <Button
+                                                key={factor}
+                                                className={cn(
+                                                    "h-12 text-[11px] font-black uppercase tracking-[0.18em] rounded-xl transition-all shadow-none",
+                                                    upscaleFactor === factor
+                                                        ? "bg-[#FF3D5A] text-white hover:bg-[#FF3D5A]/90"
+                                                        : "bg-[#121214] border border-white/10 text-zinc-500 hover:text-white"
+                                                )}
+                                                onClick={() => setUpscaleFactor(factor)}
+                                            >
+                                                {factor}
+                                            </Button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-center px-1">
+                                        <label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 flex items-center gap-2">
+                                            <Sparkles className="w-4 h-4 text-zinc-500" />
+                                            {language === "tr" ? "YARATICILIK" : "CREATIVITY"}
+                                        </label>
+                                        <span className="text-[11px] font-black text-white bg-white/10 px-2 py-0.5 rounded-md">{creativity.toFixed(1)}</span>
+                                    </div>
+                                    <Slider
+                                        value={[creativity]}
+                                        onValueChange={(v) => setCreativity(v[0])}
+                                        min={0}
+                                        max={10}
+                                        step={0.1}
+                                        className="py-2"
+                                    />
+                                    <p className="text-[10px] font-bold uppercase tracking-tight text-zinc-500 leading-relaxed px-1">
+                                        {language === "tr" ? "Görsele yeni ve yaratıcı detaylar ekler." : "Adds new and creative details to the image."}
+                                    </p>
+                                </div>
+
+                                <div className="p-5 bg-[#18181B] border border-white/10 rounded-2xl">
+                                    <div className="flex items-start gap-4">
+                                        <div className="w-8 h-8 rounded-xl bg-[#121214] flex items-center justify-center shrink-0">
+                                            <Sparkles className="w-4 h-4 text-[#FF3D5A]" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-black uppercase tracking-[0.18em] text-[11px] text-white leading-none">{t("resize.aiEnhanced")}</h4>
+                                            <p className="text-[10px] font-bold uppercase tracking-tight text-zinc-500 mt-2 leading-relaxed">{t("resize.aiEnhancedDesc")}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 bg-[#121214] border border-white/10 rounded-xl p-4 leading-relaxed">
+                                    <strong className="text-white">{t("resize.note")}:</strong> {t("resize.upscaleNote")}
+                                </div>
+                            </TabsContent>
+                        </Tabs>
+
+                        {/* Process Button */}
+                        <div className="pt-2">
+                            <Button
+                                className="w-full h-12 rounded-md bg-[#FF3D5A] hover:bg-[#FF3D5A]/90 text-white font-black text-[11px] shadow-xl transition-all active:scale-[0.98] uppercase tracking-[0.18em]"
+                                onClick={handleProcess}
+                                disabled={!preview || isProcessing}
+                            >
+                                {isProcessing ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                        <span>{t("resize.processing")}</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Sparkles className="w-4 h-4 mr-2" />
+                                        <div className="flex items-center gap-1.5 whitespace-nowrap">
+                                            <span>{mode === "expand" ? t("resize.expandNow") : t("resize.upscaleNow")}</span>
+                                            <div className="h-4 w-px bg-white/30 mx-1 shrink-0" />
+                                            <div className="flex items-center gap-1 opacity-90">
+                                                <TbCoins className="w-4 h-4" />
+                                                <span className="text-[11px] font-black tracking-tighter">
+                                                    {mode === "expand" ? "3" : UPSCALE_CREDITS[upscaleFactor]}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+                            </Button>
                         </div>
                     </div>
-                ) : (
-                    <div className="text-center opacity-20 max-w-sm flex flex-col items-center">
-                        <div className="w-24 h-24 rounded-full border-2 border-dashed border-white flex items-center justify-center mb-8">
-                            {mode === "expand" ? (
-                                <Maximize2 className="w-10 h-10 text-white" />
+
+                    {/* Right Side: Result Section */}
+                    <div className="flex-1 flex flex-col space-y-2">
+                        <Label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 px-1 flex items-center gap-1.5 mb-1.5">
+                            <Sparkles className="w-4 h-4 text-zinc-500" />
+                            {language === 'tr' ? 'SONUÇ' : 'RESULT'}
+                        </Label>
+
+                        <div className="relative flex-1 min-h-[500px] lg:min-h-0 bg-[#121214] border border-dashed border-white/20 overflow-hidden flex items-center justify-center group rounded-2xl shadow-none hover:border-white/40 transition-colors">
+                            {isProcessing ? (
+                                <div className="absolute inset-0 bg-black/80 backdrop-blur-xl z-20 flex flex-col items-center justify-center p-8 text-center space-y-6">
+                                    <div className="relative">
+                                        <div className="w-24 h-24 border-2 border-white/5 border-t-white rounded-full animate-spin" />
+                                        <div className="absolute inset-0 m-auto w-12 h-12 flex items-center justify-center">
+                                            <Sparkles className="w-6 h-6 text-white animate-pulse" />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-3">
+                                        <h3 className="text-xl font-black uppercase tracking-tighter text-white">{language === 'tr' ? 'İŞLENİYOR...' : 'PROCESSING...'}</h3>
+                                        <p className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 max-w-[240px] mx-auto transition-all duration-300 min-h-[1.5em] text-balance">
+                                            {language === 'tr' ? 'Görseliniz yapay zeka tarafından yeniden işleniyor.' : 'Your image is being reprocessed by AI.'}
+                                        </p>
+                                    </div>
+                                </div>
+                            ) : resultImage ? (
+                                <div className="w-full h-full flex flex-col p-4 space-y-4 animate-in fade-in zoom-in duration-500">
+                                    <div className="relative flex-1 overflow-hidden rounded-2xl shadow-inner bg-black/5">
+                                        <img src={resultImage} className="w-full h-full object-contain" alt="Result" />
+                                        <div className="absolute top-4 right-4 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Button variant="secondary" size="icon" className="bg-white text-black hover:bg-zinc-200 h-10 w-10 rounded-md" onClick={handleDownload}>
+                                                <Download className="w-5 h-5" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center justify-between px-2">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                                            <span className="text-[11px] font-black text-zinc-500 tracking-[0.18em] uppercase">
+                                                {mode === "expand" ? (language === 'tr' ? 'BAŞARIYLA GENİŞLETİLDİ' : 'SUCCESSFULLY EXPANDED') : (language === 'tr' ? 'BAŞARIYLA BÜYÜTÜLDİ' : 'SUCCESSFULLY UPSCALED')}
+                                            </span>
+                                        </div>
+                                        <div className="flex gap-3">
+                                            <Button variant="secondary" size="sm" onClick={() => setResultImage(null)} className="h-10 text-[11px] font-black uppercase tracking-[0.18em] rounded-md px-5 bg-[#F5F5F5] text-black hover:bg-zinc-200 shadow-none transition-all">
+                                                <RefreshCw className="w-4 h-4 mr-2" />
+                                                {language === 'tr' ? 'YENİ' : 'NEW'}
+                                            </Button>
+                                            <Button size="sm" onClick={handleDownload} className="h-10 bg-[#FF3D5A] text-white text-[11px] font-black uppercase tracking-[0.18em] rounded-md px-5 hover:bg-[#FF3D5A]/90 shadow-xl transition-all">
+                                                <Download className="w-4 h-4 mr-2" />
+                                                {language === 'tr' ? 'İNDİR' : 'DOWNLOAD'}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
                             ) : (
-                                <ZoomIn className="w-10 h-10 text-white" />
+                                <div className="flex flex-col items-center gap-4 text-center p-12">
+                                    <div className="w-20 h-20 rounded-full bg-[#18181B] border border-white/10 flex items-center justify-center shadow-none">
+                                        {mode === 'expand' ? <Maximize2 className="w-10 h-10 text-white/50" /> : <ZoomIn className="w-10 h-10 text-white/50" />}
+                                    </div>
+                                    <div className="space-y-1">
+                                        <h4 className="font-black text-2xl uppercase tracking-[0.2em] text-[#f5f5f5]">{t("resize.noResult")}</h4>
+                                        <p className="text-[11px] text-zinc-500 font-bold uppercase tracking-[0.18em] max-w-[280px] mx-auto text-balance mt-2">
+                                            {t("resize.noResultDesc")}
+                                        </p>
+                                    </div>
+                                </div>
                             )}
                         </div>
-                        <div>
-                            <h3 className="text-3xl font-black uppercase italic tracking-tighter text-white mb-3 leading-none">{t("resize.noResult")}</h3>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 leading-relaxed">{t("resize.noResultDesc")}</p>
-                        </div>
                     </div>
-                )}
+                </div>
             </div>
         </div>
-    );
+    )
 }

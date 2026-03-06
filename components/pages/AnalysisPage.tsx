@@ -15,7 +15,8 @@ import {
     User,
     Ruler,
     Zap,
-    Image as ImageIcon
+    Image as ImageIcon,
+    ChevronRight
 } from "lucide-react"
 import {
     TbPhoto,
@@ -25,6 +26,7 @@ import {
     TbRuler2,
     TbSparkles,
     TbAdjustmentsHorizontal,
+    TbCoins
 } from "react-icons/tb"
 import { useLanguage } from "@/context/language-context"
 import { toast } from "sonner"
@@ -226,338 +228,290 @@ export default function AnalysisPage() {
     ];
 
     return (
-        <div className="flex flex-col h-full bg-background overflow-hidden">
-            {/* Header Area */}
-            <div className="shrink-0 p-8 border-b border-white/5 bg-[#0D0D0F]">
-                <div className="max-w-7xl mx-auto w-full flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-white/10 text-white flex items-center justify-center shadow-xl">
-                            <TbSearch className="w-6 h-6" />
+        <div className="flex flex-col h-full bg-[#0D0D0F]">
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8 min-h-screen pb-24">
+                <div className="max-w-[1180px] mx-auto w-full flex flex-col lg:flex-row gap-8">
+
+                    {/* Left: Input Panel */}
+                    <div className="w-full lg:w-[420px] flex flex-col space-y-6 shrink-0">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 rounded-md bg-[#18181B] border border-white/10 text-white shadow-lg">
+                                <TbSearch className="w-5 h-5" />
+                            </div>
+                            <div className="flex flex-col">
+                                <label className="text-[13px] font-black uppercase tracking-[0.2em] text-white leading-none">
+                                    {language === "tr" ? "ANALİZ" : "ANALYSIS"}
+                                </label>
+                                <span className="text-[11px] font-bold text-zinc-400 mt-1.5 leading-none">
+                                    {language === "tr"
+                                        ? "Görsellerinizden teknik detayları analiz edin."
+                                        : "Analyze technical details from your images."}
+                                </span>
+                            </div>
                         </div>
-                        <div>
-                            <h1 className="text-3xl font-black tracking-tighter uppercase italic text-white leading-none">
-                                {language === "tr" ? "ANALİZ" : "ANALYSIS"}
-                            </h1>
-                            <p className="text-[11px] text-zinc-500 uppercase font-black tracking-[0.2em] mt-1.5 grayscale opacity-70">
-                                {language === "tr"
-                                    ? "YAPAY ZEKA DESTEKLİ TEKNİK ARAÇLAR"
-                                    : "AI-POWERED TECHNICAL TOOLS"}
-                            </p>
+
+                        {/* Mode Selection */}
+                        <div className="space-y-3">
+                            <Label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 flex items-center gap-2 px-1">
+                                <TbAdjustmentsHorizontal className="w-4 h-4 text-zinc-500" />
+                                {language === "tr" ? "ANALİZ MODU" : "ANALYSIS MODE"}
+                            </Label>
+                            <div className="relative">
+                                <select
+                                    value={mode}
+                                    onChange={(e) => {
+                                        const v = e.target.value as any;
+                                        setMode(v);
+                                        setResultEn(null);
+                                        setResultTr(null);
+                                        setStickmanUrl(null);
+                                        if (v === "pose" && images.length > 1) setImages([images[0]]);
+                                        if (v !== "pose" && images.length > 3) setImages(images.slice(0, 3));
+                                    }}
+                                    className="w-full h-12 bg-[#121214] border border-white/10 rounded-xl px-4 pr-10 text-[11px] font-black text-white shadow-none uppercase tracking-[0.18em] focus:outline-none focus:border-white/30 transition-all appearance-none"
+                                >
+                                    <option value="product" className="bg-[#121214]">{language === "tr" ? "Ürün Analizi" : "Product Analysis"}</option>
+                                    <option value="pose" className="bg-[#121214]">{language === "tr" ? "Poz Analizi" : "Pose Analysis"}</option>
+                                    <option value="pattern" className="bg-[#121214]">{language === "tr" ? "Kalıp Analizi" : "Pattern Analysis"}</option>
+                                </select>
+                                <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none rotate-90" />
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="flex items-center gap-4">
-                        <Select value={mode} onValueChange={(v: any) => {
-                            setMode(v);
-                            setResultEn(null);
-                            setResultTr(null);
-                            setStickmanUrl(null);
-                            if (v === "pose" && images.length > 1) setImages([images[0]]);
-                            if (v !== "pose" && images.length > 3) setImages(images.slice(0, 3));
-                        }}>
-                            <SelectTrigger className="w-56 h-12 bg-white/5 border-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest focus:ring-1 focus:ring-white/20 transition-all">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent className="bg-zinc-900 border-white/10">
-                                <SelectItem value="product" className="focus:bg-white focus:text-black text-[10px] font-black uppercase tracking-widest">
-                                    <div className="flex items-center gap-3">
-                                        <TbBolt className="w-4 h-4" />
-                                        <span>{language === "tr" ? "Ürün Analizi" : "Product Analysis"}</span>
-                                    </div>
-                                </SelectItem>
-                                <SelectItem value="pose" className="focus:bg-white focus:text-black text-[10px] font-black uppercase tracking-widest">
-                                    <div className="flex items-center gap-3">
-                                        <TbUserCircle className="w-4 h-4" />
-                                        <span>{language === "tr" ? "Poz Analizi" : "Pose Analysis"}</span>
-                                    </div>
-                                </SelectItem>
-                                <SelectItem value="pattern" className="focus:bg-white focus:text-black text-[10px] font-black uppercase tracking-widest">
-                                    <div className="flex items-center gap-3">
-                                        <TbRuler2 className="w-4 h-4" />
-                                        <span>{language === "tr" ? "Kalıp Analizi" : "Pattern Analysis"}</span>
-                                    </div>
-                                </SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </div>
-            </div>
-
-            {/* Main Content Area */}
-            <div className="flex-1 overflow-y-auto p-6 scrollbar-thin">
-                <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
-
-                    {/* LEFT PANEL: Inputs */}
-                    <div className="space-y-6">
-                        <Card className="p-6 bg-card border-border shadow-sm">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="font-black flex items-center gap-2 text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
-                                    <TbPhoto className="w-4 h-4 text-[var(--accent-primary)]" />
+                        {/* Uploads Area */}
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between px-1">
+                                <Label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 flex items-center gap-2">
+                                    <TbPhoto className="w-4 h-4 text-zinc-500" />
                                     {language === "tr" ? "GÖRSELLER" : "IMAGES"}
-                                </h3>
-                                <Badge variant="outline" className="text-[10px]">
-                                    Max {MAX_IMAGES}
-                                </Badge>
+                                </Label>
+                                <span className="text-[10px] font-black text-zinc-600 tracking-widest">
+                                    {images.length}/{MAX_IMAGES}
+                                </span>
                             </div>
 
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+                            <div className="grid grid-cols-3 gap-3">
                                 {images.map((img, idx) => (
-                                    <motion.div
-                                        initial={{ opacity: 0, scale: 0.9 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        key={idx}
-                                        className="relative aspect-square rounded-xl overflow-hidden border bg-muted group"
-                                    >
-                                        <img src={img} className="w-full h-full object-cover" />
+                                    <div key={idx} className="relative aspect-square rounded-2xl overflow-hidden border border-white/10 bg-[#121214] group">
+                                        <img src={img} className="w-full h-full object-cover p-1.5 rounded-2xl" />
                                         <button
                                             onClick={() => removeImage(idx)}
-                                            className="absolute top-1.5 right-1.5 w-6 h-6 bg-black/60 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500"
+                                            className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center z-20 scale-0 group-hover:scale-100 transition-transform shadow-lg"
                                         >
-                                            <X className="w-3.5 h-3.5" />
+                                            <X className="w-4 h-4" />
                                         </button>
                                         {idx === 0 && (
-                                            <Badge className="absolute bottom-1.5 left-1.5 bg-violet-600 text-[9px] px-1.5 h-4">
-                                                {language === "tr" ? "Ana" : "Main"}
-                                            </Badge>
+                                            <div className="absolute bottom-2 left-2 px-2 py-0.5 bg-[#FF3D5A] text-white text-[8px] font-black rounded uppercase tracking-tighter shadow-xl">
+                                                {language === "tr" ? "ANA" : "MAIN"}
+                                            </div>
                                         )}
-                                    </motion.div>
+                                    </div>
                                 ))}
 
                                 {images.length < MAX_IMAGES && (
                                     <div
                                         onClick={() => fileInputRef.current?.click()}
-                                        className="aspect-square rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-muted/50 transition-colors group"
+                                        className="aspect-square rounded-2xl border border-dashed border-white/20 bg-[#121214] flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-white/40 transition-all group"
                                     >
-                                        <Upload className="w-6 h-6 text-muted-foreground group-hover:text-violet-500 transition-colors" />
-                                        <span className="text-[10px] font-bold text-muted-foreground">
-                                            {language === "tr" ? "Görsel Yükle" : "Upload Image"}
-                                        </span>
+                                        <div className="w-8 h-8 rounded-lg bg-[#18181B] border border-white/10 flex items-center justify-center group-hover:bg-white text-zinc-500 group-hover:text-black transition-all">
+                                            <Upload className="w-4 h-4" />
+                                        </div>
+                                        <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">{language === "tr" ? "EKLE" : "ADD"}</span>
                                     </div>
                                 )}
-                                <input
-                                    type="file"
-                                    ref={fileInputRef}
-                                    className="hidden"
-                                    multiple={mode !== "pose"}
-                                    accept="image/*"
-                                    onChange={handleFileUpload}
-                                />
                             </div>
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                className="hidden"
+                                multiple={mode !== "pose"}
+                                accept="image/*"
+                                onChange={handleFileUpload}
+                            />
+                        </div>
 
-                            <AnimatePresence mode="wait">
-                                {mode === "product" || mode === "pattern" ? (
-                                    <motion.div
-                                        key="product-inputs"
-                                        initial={{ opacity: 0, height: 0 }}
-                                        animate={{ opacity: 1, height: "auto" }}
-                                        exit={{ opacity: 0, height: 0 }}
-                                        className="space-y-4 pt-4 border-t"
-                                    >
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="space-y-1.5">
-                                                <Label className="text-[10px] font-bold uppercase text-muted-foreground">{language === "tr" ? "Ürün Tipi" : "Product Type"}</Label>
-                                                <Select value={productType} onValueChange={setProductType}>
-                                                    <SelectTrigger className="h-9 text-xs bg-muted/20">
-                                                        <SelectValue placeholder={language === "tr" ? "Seçiniz" : "Select"} />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {PRODUCT_TYPES.map(t => (
-                                                            <SelectItem key={t.id} value={t.id} className="text-xs">
-                                                                {language === "tr" ? t.labelTr : t.labelEn}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                            <div className="space-y-1.5">
-                                                <Label className="text-[10px] font-bold uppercase text-muted-foreground text-nowrap">{language === "tr" ? "Ürün Adı (Opsiyonel)" : "Product Name (Optional)"}</Label>
-                                                <Input
-                                                    className="h-9 text-xs bg-muted/20"
-                                                    placeholder={language === "tr" ? "Örn: Keten Gömlek" : "e.g. Linen Shirt"}
-                                                    value={productName}
-                                                    onChange={e => setProductName(e.target.value)}
-                                                />
-                                            </div>
+                        {/* Main Content Area */}
+                        {/* Parameters */}
+                        <div className="space-y-4">
+                            {mode === "product" || mode === "pattern" ? (
+                                <div className="space-y-4">
+                                    <div className="space-y-3">
+                                        <Label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 flex items-center gap-2 px-1">
+                                            <TbBolt className="w-4 h-4 text-zinc-500" />
+                                            {language === "tr" ? "Ürün Tipi" : "Product Type"}
+                                        </Label>
+                                        <div className="relative">
+                                            <select
+                                                value={productType}
+                                                onChange={(e) => setProductType(e.target.value)}
+                                                className="w-full h-12 bg-[#121214] border border-white/10 rounded-xl px-4 pr-10 text-[11px] font-black text-white shadow-none uppercase tracking-[0.18em] focus:outline-none focus:border-white/30 transition-all appearance-none"
+                                            >
+                                                <option value="" className="bg-[#121214]">{language === "tr" ? "Seçiniz" : "Select"}</option>
+                                                {PRODUCT_TYPES.map(t => (
+                                                    <option key={t.id} value={t.id} className="bg-[#121214]">
+                                                        {language === "tr" ? t.labelTr : t.labelEn}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none rotate-90" />
                                         </div>
-                                    </motion.div>
-                                ) : (
-                                    <motion.div
-                                        key="pose-inputs"
-                                        initial={{ opacity: 0, height: 0 }}
-                                        animate={{ opacity: 1, height: "auto" }}
-                                        exit={{ opacity: 0, height: 0 }}
-                                        className="space-y-4 pt-4 border-t"
-                                    >
-                                        <div className="flex items-center justify-between p-3 bg-muted/20 rounded-xl border border-border/50">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                                                    <User className="w-4 h-4 text-emerald-500" />
-                                                </div>
-                                                <div className="flex flex-col">
-                                                    <span className="text-xs font-bold">{language === "tr" ? "DWPose Stickman Üret" : "Generate DWPose Stickman"}</span>
-                                                    <span className="text-[10px] text-muted-foreground">{language === "tr" ? "Poz hassasiyetini artırır." : "Increases pose precision."}</span>
-                                                </div>
-                                            </div>
-                                            <Switch checked={poseToStickman} onCheckedChange={setPoseToStickman} />
-                                        </div>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </Card>
-
-                        <Button
-                            className="w-full h-16 bg-white hover:bg-zinc-200 text-black font-black rounded-2xl shadow-2xl transition-all active:scale-[0.98] group overflow-hidden relative"
-                            onClick={handleAnalyze}
-                            disabled={isProcessing || images.length === 0}
-                        >
-                            <AnimatePresence mode="wait">
-                                {isProcessing ? (
-                                    <motion.div
-                                        key="loading"
-                                        className="flex items-center gap-3"
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -10 }}
-                                    >
-                                        <Loader2 className="w-5 h-5 animate-spin" />
-                                        <span className="text-[11px] uppercase tracking-[0.2em]">{language === "tr" ? "Analiz Ediliyor..." : "Analyzing..."}</span>
-                                    </motion.div>
-                                ) : (
-                                    <motion.div
-                                        key="ready"
-                                        className="flex flex-col items-center justify-center"
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -10 }}
-                                    >
+                                    </div>
+                                    <div className="space-y-3">
+                                        <Label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 px-1">
+                                            {language === "tr" ? "Ürün Adı (Opsiyonel)" : "Product Name (Optional)"}
+                                        </Label>
+                                        <Input
+                                            className="h-12 bg-[#121214] border-white/10 text-[11px] font-black uppercase tracking-[0.18em] rounded-xl text-white shadow-none focus:border-white/30"
+                                            placeholder={language === "tr" ? "Örn: Keten Gömlek" : "e.g. Linen Shirt"}
+                                            value={productName}
+                                            onChange={e => setProductName(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between p-4 bg-[#121214] rounded-2xl border border-white/10 group transition-all hover:bg-[#18181B]">
                                         <div className="flex items-center gap-3">
-                                            <TbSparkles className="w-5 h-5 opacity-50" />
-                                            <span className="text-[11px] uppercase tracking-[0.2em] font-black">{language === "tr" ? "ANALİZİ BAŞLAT" : "START ANALYSIS"}</span>
+                                            <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center">
+                                                <User className="w-5 h-5 text-green-500" />
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className="text-[11px] font-black uppercase tracking-[0.18em] text-white">{language === "tr" ? "Stickman Üret" : "Generate Stickman"}</span>
+                                                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-tighter mt-0.5">{language === "tr" ? "Poz hassasiyetini artırır." : "Increases precision."}</span>
+                                            </div>
                                         </div>
-                                        <span className="text-[9px] font-black opacity-30 tracking-[0.3em] mt-1 border-t border-black/10 pt-1">20 CREDITS</span>
-                                    </motion.div>
+                                        <Switch checked={poseToStickman} onCheckedChange={setPoseToStickman} className="data-[state=checked]:bg-green-500" />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Analysis Button */}
+                        <div className="pt-2">
+                            <Button
+                                className="w-full h-12 rounded-md bg-[#FF3D5A] hover:bg-[#FF3D5A]/90 text-white font-black text-[11px] shadow-xl transition-all active:scale-[0.98] uppercase tracking-[0.18em]"
+                                onClick={handleAnalyze}
+                                disabled={isProcessing || images.length === 0}
+                            >
+                                {isProcessing ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                        <span>{language === "tr" ? "ANALİZ EDİLİYOR..." : "ANALYZING..."}</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <TbSparkles className="w-4 h-4 mr-2" />
+                                        <div className="flex items-center gap-1.5 whitespace-nowrap">
+                                            <span>{language === "tr" ? "ANALİZİ BAŞLAT" : "START ANALYSIS"}</span>
+                                            <div className="h-4 w-px bg-white/30 mx-1 shrink-0" />
+                                            <div className="flex items-center gap-1 opacity-90">
+                                                <TbCoins className="w-4 h-4 text-white" />
+                                                <span className="text-[11px] font-black tracking-tighter">20</span>
+                                            </div>
+                                        </div>
+                                    </>
                                 )}
-                            </AnimatePresence>
-                        </Button>
+                            </Button>
+                        </div>
                     </div>
 
-                    {/* RIGHT PANEL: Results */}
-                    <div className="flex flex-col gap-4 h-full min-h-[500px]">
-                        <Card className="flex-1 bg-card border-border overflow-hidden flex flex-col shadow-sm">
-                            <div className="p-4 border-b bg-muted/10 flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-6 h-6 rounded bg-violet-500/10 flex items-center justify-center">
-                                        <MoveUpRight className="w-3.5 h-3.5 text-violet-500" />
-                                    </div>
-                                    <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                                        {language === "tr" ? "Analiz Sonucu" : "Analysis Result"}
-                                    </span>
-                                </div>
-                            </div>
+                    {/* Right: Results Panel */}
+                    <div className="flex-1 flex flex-col space-y-2">
+                        <Label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 px-1 flex items-center gap-1.5 mb-1.5">
+                            <TbSparkles className="w-4 h-4 text-zinc-500" />
+                            {language === 'tr' ? 'SONUÇ' : 'RESULT'}
+                        </Label>
 
-                            <div className="flex-1 p-0 relative bg-muted/5 group">
-                                {isProcessing ? (
-                                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/50 backdrop-blur-[2px] z-10">
-                                        <div className="relative">
-                                            <div className="w-20 h-20 rounded-full border-4 border-violet-500/20 border-t-violet-500 animate-spin" />
-                                            <div className="absolute inset-0 flex items-center justify-center">
-                                                <RotateCw className="w-8 h-8 text-violet-500 opacity-50" />
-                                            </div>
+                        <div className="relative flex-1 min-h-[500px] lg:min-h-0 bg-[#121214] border border-dashed border-white/20 overflow-hidden flex items-center justify-center group rounded-2xl shadow-none hover:border-white/40 transition-colors">
+                            {isProcessing ? (
+                                <div className="absolute inset-0 bg-black/80 backdrop-blur-xl z-20 flex flex-col items-center justify-center p-8 text-center space-y-6">
+                                    <div className="relative">
+                                        <div className="w-24 h-24 border-2 border-white/5 border-t-white rounded-full animate-spin" />
+                                        <div className="absolute inset-0 m-auto w-12 h-12 flex items-center justify-center">
+                                            <TbSearch className="w-6 h-6 text-white animate-pulse" />
                                         </div>
-                                        <p className="mt-4 text-xs font-medium text-muted-foreground animate-pulse">
-                                            {language === "tr" ? "Hassas analiz verileri işleniyor..." : "Processing precision analysis data..."}
+                                    </div>
+                                    <div className="space-y-3">
+                                        <h3 className="text-xl font-black uppercase tracking-tighter text-white">{language === 'tr' ? 'ANALİZ EDİLİYOR...' : 'ANALYZING...'}</h3>
+                                        <p className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 max-w-[240px] mx-auto transition-all duration-300 min-h-[1.5em] text-balance">
+                                            {language === 'tr' ? 'Hassas teknik veriler yapay zeka tarafından işleniyor.' : 'Precision technical data is being processed by AI.'}
                                         </p>
                                     </div>
-                                ) : null}
-
-                                <div className="h-full w-full overflow-y-auto p-6 flex flex-col scrollbar-thin">
-                                    {resultEn ? (
-                                        <div className="space-y-6">
-                                            {/* POSE: Stickman + Prompt side by side */}
-                                            {mode === "pose" && stickmanUrl && (
-                                                <div className="flex gap-4 items-start">
-                                                    <div className="w-32 shrink-0 flex flex-col gap-2">
-                                                        <span className="text-[9px] font-bold text-emerald-500 uppercase">Stickman (DWPose)</span>
-                                                        <div className="aspect-[3/4] rounded-lg overflow-hidden border bg-black flex items-center justify-center">
-                                                            <img src={stickmanUrl} className="w-full h-full object-contain" />
-                                                        </div>
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="w-full h-7 text-[10px] gap-1"
-                                                            onClick={downloadStickman}
-                                                        >
-                                                            <Download className="w-3 h-3" />
-                                                            {language === "tr" ? "İndir" : "Download"}
-                                                        </Button>
-                                                    </div>
+                                </div>
+                            ) : resultEn ? (
+                                <div className="w-full h-full flex flex-col p-6 space-y-6 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in duration-500">
+                                    {/* POSE RESULT: Stickman side card */}
+                                    {mode === "pose" && stickmanUrl && (
+                                        <div className="bg-[#18181B] border border-white/10 rounded-2xl p-4 flex items-center justify-between">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-16 h-20 bg-black rounded-lg overflow-hidden border border-white/5 flex items-center justify-center shrink-0">
+                                                    <img src={stickmanUrl} className="w-full h-full object-contain" />
                                                 </div>
-                                            )}
-
-                                            {/* ENGLISH PROMPT */}
-                                            <div className="space-y-2">
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                                                        🇬🇧 English Prompt
-                                                    </span>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="h-7 gap-1.5 hover:bg-violet-500/10 hover:text-violet-600 transition-colors"
-                                                        onClick={() => copyText(resultEn!, "en")}
-                                                    >
-                                                        {copiedEn ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                                                        <span className="text-[10px] font-bold">{copiedEn ? (language === "tr" ? "Kopyalandı" : "Copied") : (language === "tr" ? "Kopyala" : "Copy")}</span>
-                                                    </Button>
-                                                </div>
-                                                <div className="bg-background/80 rounded-xl border-border border p-4 font-mono text-[12px] leading-relaxed whitespace-pre-wrap text-foreground/90 selection:bg-violet-500/20">
-                                                    {resultEn}
+                                                <div>
+                                                    <h4 className="text-[11px] font-black uppercase tracking-[0.18em] text-white">{language === 'tr' ? 'STICKMAN GÖRSELİ' : 'STICKMAN IMAGE'}</h4>
+                                                    <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-tighter mt-1">{language === 'tr' ? 'POZ VERİLERİ ÇIKARTILDI' : 'POSE DATA EXTRACTED'}</p>
                                                 </div>
                                             </div>
-
-                                            {/* TURKISH PROMPT */}
-                                            {resultTr && (
-                                                <div className="space-y-2">
-                                                    <div className="flex items-center justify-between">
-                                                        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                                                            🇹🇷 Türkçe Çeviri
-                                                        </span>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            className="h-7 gap-1.5 hover:bg-violet-500/10 hover:text-violet-600 transition-colors"
-                                                            onClick={() => copyText(resultTr!, "tr")}
-                                                        >
-                                                            {copiedTr ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                                                            <span className="text-[10px] font-bold">{copiedTr ? (language === "tr" ? "Kopyalandı" : "Copied") : (language === "tr" ? "Kopyala" : "Copy")}</span>
-                                                        </Button>
-                                                    </div>
-                                                    <div className="bg-background/80 rounded-xl border-border border p-4 font-mono text-[12px] leading-relaxed whitespace-pre-wrap text-foreground/90 selection:bg-violet-500/20">
-                                                        {resultTr}
-                                                    </div>
-                                                </div>
-                                            )}
+                                            <Button variant="secondary" onClick={downloadStickman} className="h-10 bg-white text-black hover:bg-zinc-200 rounded-xl px-4 font-black text-[10px] uppercase tracking-widest">
+                                                <Download className="w-4 h-4 mr-2" />
+                                                {language === 'tr' ? 'İNDİR' : 'DOWNLOAD'}
+                                            </Button>
                                         </div>
-                                    ) : (
-                                        <div className="flex-1 flex flex-col items-center justify-center text-center opacity-40">
-                                            <div className="w-20 h-20 rounded-full border-2 border-dashed border-border mb-6 flex items-center justify-center">
-                                                <Zap className="w-10 h-10 text-muted-foreground" />
+                                    )}
+
+                                    {/* ENGLISH PROMPT BOX */}
+                                    <div className="space-y-3">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#FF3D5A]">
+                                                {language === 'tr' ? '🇬🇧 İNGİLİZCE PROMPT' : '🇬🇧 ENGLISH PROMPT'}
+                                            </span>
+                                            <Button variant="ghost" onClick={() => copyText(resultEn!, "en")} className="h-8 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 hover:text-white hover:bg-white/5 rounded-lg border border-white/5">
+                                                {copiedEn ? <Check className="w-3.5 h-3.5 mr-2 text-green-500" /> : <Copy className="w-3.5 h-3.5 mr-2" />}
+                                                {copiedEn ? (language === "tr" ? "KOPYALANDI" : "COPIED") : (language === "tr" ? "KOPYALA" : "COPY")}
+                                            </Button>
+                                        </div>
+                                        <div className="bg-[#0D0D0F] border border-white/10 rounded-2xl p-6 text-[13px] font-medium leading-relaxed text-zinc-300 font-mono whitespace-pre-wrap">
+                                            {resultEn}
+                                        </div>
+                                    </div>
+
+                                    {/* TURKISH BOX (if applicable) */}
+                                    {resultTr && (
+                                        <div className="space-y-3">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
+                                                    {language === 'tr' ? '🇹🇷 TÜRKÇE ÇEVİRİ' : '🇹🇷 TURKISH TRANSLATION'}
+                                                </span>
+                                                <Button variant="ghost" onClick={() => copyText(resultTr!, "tr")} className="h-8 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 hover:text-white hover:bg-white/5 rounded-lg border border-white/5">
+                                                    {copiedTr ? <Check className="w-3.5 h-3.5 mr-2 text-green-500" /> : <Copy className="w-3.5 h-3.5 mr-2" />}
+                                                    {copiedTr ? (language === "tr" ? "KOPYALANDI" : "COPIED") : (language === "tr" ? "KOPYALA" : "COPY")}
+                                                </Button>
                                             </div>
-                                            <h4 className="font-bold text-lg mb-2">{language === "tr" ? "Henüz Analiz Yok" : "No Analysis Yet"}</h4>
-                                            <p className="text-sm max-w-[280px]">
-                                                {language === "tr"
-                                                    ? "Analizini yapmak istediğiniz görselleri yükleyip modu belirleyerek başlayın."
-                                                    : "Start by uploading images and selecting the mode you want to analyze."}
-                                            </p>
+                                            <div className="bg-[#0D0D0F]/50 border border-white/5 rounded-2xl p-6 text-[13px] font-medium leading-relaxed text-zinc-500 font-mono whitespace-pre-wrap italic">
+                                                {resultTr}
+                                            </div>
                                         </div>
                                     )}
                                 </div>
-                            </div>
-                        </Card>
+                            ) : (
+                                <div className="flex flex-col items-center gap-4 text-center p-12">
+                                    <div className="w-20 h-20 rounded-full bg-[#18181B] border border-white/10 flex items-center justify-center">
+                                        <Zap className="w-10 h-10 text-white/50" />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <h4 className="font-black text-2xl uppercase tracking-[0.2em] text-[#f5f5f5]">{language === "tr" ? "ANALİZ YOK" : "NO ANALYSIS"}</h4>
+                                        <p className="text-[11px] text-zinc-500 font-bold uppercase tracking-[0.18em] max-w-[280px] mx-auto text-balance mt-2">
+                                            {language === "tr"
+                                                ? "Analizini yapmak istediğiniz görselleri yükleyip modu belirleyerek başlayın."
+                                                : "Start by uploading images and selecting the mode you want to analyze."}
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
-
                 </div>
             </div>
         </div>
-    )
+    );
 }

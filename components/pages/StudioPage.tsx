@@ -51,7 +51,8 @@ import {
   TbHistory,
   TbChartBar,
   TbSettings,
-  TbHelp
+  TbHelp,
+  TbClipboardText
 } from "react-icons/tb"
 import { Input } from "@/components/ui/input"
 import { useProjects } from "@/context/projects-context"
@@ -276,276 +277,266 @@ function StudioPageContent() {
 
   if (!mounted) return null;
 
+  if (!mounted) return null;
+
   return (
     <>
-      <div className="flex flex-col h-full overflow-hidden bg-[#0D0D0F]">
-        {/* Header Area */}
-        <div className="h-20 border-b border-white/5 bg-[#0D0D0F] flex items-center justify-between px-8 shrink-0 z-30">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-md bg-zinc-900 border border-white/10 text-white flex items-center justify-center shadow-xl">
-              <TbChartBar className="w-6 h-6" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-black tracking-tighter uppercase italic text-white leading-none">PRODUCT STUDIO</h1>
-              <p className="text-[11px] text-zinc-500 uppercase font-black tracking-[0.2em] mt-1.5 grayscale opacity-70">AI PRODUCT INFORMATION & TECH SPECS</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="text-zinc-500 hover:text-white transition-colors">
-              <TbSettings className="w-5 h-5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="text-zinc-500 hover:text-white transition-colors">
-              <TbHelp className="w-5 h-5" />
-            </Button>
-          </div>
-        </div>
+      <div className="flex flex-col h-full bg-[#0D0D0F]">
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8 min-h-screen pb-24">
+          <div className="max-w-[1180px] mx-auto w-full flex flex-col lg:flex-row gap-8">
 
-        <div className="flex-1 lg:overflow-hidden flex flex-col lg:flex-row">
-          {/* Left: Visual Asset */}
-          <div className="w-full lg:w-[420px] lg:border-r border-white/5 bg-[#0D0D0F] p-8 lg:overflow-y-auto space-y-8 shrink-0 border-b lg:border-b-0">
-            <div className="space-y-1">
-              <h2 className="text-2xl font-black tracking-tighter uppercase italic text-white leading-none">{t("studio.title")}</h2>
-              <p className="text-[11px] text-zinc-500 uppercase font-black tracking-[0.2em] mt-2">{t("studio.techAnalysis")}</p>
-            </div>
+            {/* Left: Input Panel */}
+            <div className="w-full lg:w-[420px] flex flex-col space-y-6 shrink-0">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 rounded-md bg-[#18181B] border border-white/10 text-white shadow-lg">
+                  <TbClipboardText className="w-5 h-5" />
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-[13px] font-black uppercase tracking-[0.2em] text-white leading-none">
+                    TECH PACK
+                  </label>
+                  <span className="text-[11px] font-bold text-zinc-400 mt-1.5 leading-none">
+                    {language === "tr" ? "Teknik şartname ve ürün detayları." : "Technical specification and product details."}
+                  </span>
+                </div>
+              </div>
 
-            <section className="space-y-4">
-              <Label className="text-[10px] uppercase font-black tracking-widest text-white px-1 flex items-center gap-2">
-                <TbPhoto className="w-4 h-4" />
-                {language === "tr" ? "ÜRÜN GÖRÜNÜMÜ" : "PRODUCT VIEW"}
-              </Label>
-              <div className="border-2 border-dashed rounded-md h-56 border-white/5 hover:border-white/20 transition-all relative group overflow-hidden cursor-pointer bg-white/[0.02]">
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                  onChange={handleFileChange}
-                />
-                {preview ? (
-                  <img src={preview} className="w-full h-full object-contain p-4 grayscale group-hover:grayscale-0 transition-all" />
-                ) : (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-zinc-500 gap-3">
-                    <div className="w-12 h-12 rounded-md bg-white/5 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
-                      <TbPhoto className="w-6 h-6 opacity-30" />
+              {/* Upload Area */}
+              <div className="space-y-3">
+                <Label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 flex items-center gap-2 px-1">
+                  <TbPhoto className="w-4 h-4 text-zinc-500" />
+                  {language === "tr" ? "ÜRÜN GÖRSELLERİ" : "PRODUCT IMAGE"}
+                </Label>
+                <div className="border border-dashed rounded-2xl h-56 border-white/10 hover:border-white/20 transition-all relative group overflow-hidden cursor-pointer bg-[#121214]">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                    onChange={handleFileChange}
+                  />
+                  {preview ? (
+                    <img src={preview} className="w-full h-full object-contain p-4 transition-all" />
+                  ) : (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-zinc-500 gap-3">
+                      <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
+                        <Upload className="w-6 h-6 opacity-30" />
+                      </div>
+                      <span className="text-[10px] font-black uppercase tracking-widest">{t("studio.uploadRef") || "Upload Product Image"}</span>
                     </div>
-                    <span className="text-[10px] font-black uppercase tracking-widest">{t("studio.uploadRef") || "Upload Product Image"}</span>
+                  )}
+                </div>
+              </div>
+
+              {data && (
+                <div className="grid grid-cols-2 gap-3 pt-2">
+                  <Dialog open={isCollectionOpen} onOpenChange={setIsCollectionOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" className="h-12 bg-[#121214] border-white/10 hover:bg-[#18181B] text-white font-black text-[10px] uppercase tracking-widest px-4 rounded-xl shadow-none">
+                        <FolderPlus className="w-4 h-4 mr-2" /> {t("studio.addToCollection")}
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-[#121214] border-white/10 text-white">
+                      <DialogTitle className="font-black uppercase tracking-[0.18em] text-[12px]">{t("studio.selectCollection")}</DialogTitle>
+                      <DialogDescription className="text-zinc-500 text-[11px] font-bold uppercase">{t("studio.addToMoodboard")}</DialogDescription>
+                      <div className="grid gap-2 mt-4 max-h-60 overflow-y-auto custom-scrollbar">
+                        {collections.map(c => (
+                          <Button key={c.id} variant="ghost" className="justify-start text-[11px] font-black uppercase text-zinc-400 hover:text-white hover:bg-white/5" onClick={() => handleAddToCollection(c.id)}>
+                            <Folder className="w-4 h-4 mr-2" />
+                            {c.title}
+                          </Button>
+                        ))}
+                        {collections.length === 0 && <p className="text-center text-zinc-500 text-[10px] font-black uppercase">No collections created yet.</p>}
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+
+                  <Button variant="outline" onClick={() => window.print()} className="h-12 bg-[#FF3D5A] hover:bg-[#FF3D5A]/90 text-white border-none font-black text-[10px] uppercase tracking-widest px-4 rounded-xl shadow-xl transition-all">
+                    <Printer className="w-4 h-4 mr-2" /> {t("studio.print")}
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* Right: Results Panel */}
+            <div className="flex-1 flex flex-col space-y-2">
+              <Label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 px-1 flex items-center gap-1.5 mb-1.5">
+                <TbSparkles className="w-4 h-4 text-zinc-500" />
+                {language === 'tr' ? 'TEKNİK ŞARTNAME' : 'TECHNICAL SPECS'}
+              </Label>
+
+              <div className="relative flex-1 min-h-[500px] lg:min-h-0 bg-[#121214] border border-dashed border-white/20 overflow-hidden group rounded-2xl shadow-none hover:border-white/40 transition-colors">
+                {isAnalyzing ? (
+                  <div className="absolute inset-0 bg-black/80 backdrop-blur-xl z-20 flex flex-col items-center justify-center p-8 text-center space-y-6">
+                    <div className="relative">
+                      <div className="w-24 h-24 border-2 border-white/5 border-t-white rounded-full animate-spin" />
+                      <div className="absolute inset-0 m-auto w-12 h-12 flex items-center justify-center">
+                        <TbClipboardText className="w-6 h-6 text-white animate-pulse" />
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <h3 className="text-xl font-black uppercase tracking-tighter text-white">{t("studio.analyzing") || "ANALYZING..."}</h3>
+                      <p className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 max-w-[240px] mx-auto transition-all duration-300 min-h-[1.5em] text-balance">
+                        {t("studio.extracting") || "EXTRACTING FABRIC POINTS AND MEASUREMENTS."}
+                      </p>
+                    </div>
+                  </div>
+                ) : data ? (
+                  <div className="h-full w-full overflow-y-auto custom-scrollbar p-4 lg:p-8 animate-in fade-in zoom-in duration-500">
+                    <div id="tech-pack-content" className="max-w-4xl mx-auto space-y-12 bg-white text-black p-8 lg:p-12 shadow-2xl rounded-2xl border border-gray-100">
+                      {/* Title Block */}
+                      <div className="border-b-[3px] border-black pb-6">
+                        <h1 className="text-4xl font-black tracking-tighter uppercase mb-1 text-black leading-none">{data.productName}</h1>
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{t("studio.techSpecSheet")} • {new Date().getFullYear()} COLLECTION</p>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                        {/* Left: Specs */}
+                        <div className="space-y-12">
+                          <section>
+                            <div className="flex items-center gap-3 mb-4">
+                              <div className="w-7 h-7 rounded bg-black flex items-center justify-center text-white">
+                                <FileText className="w-3.5 h-3.5" />
+                              </div>
+                              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-black pt-0.5">{language === 'tr' ? 'KUMAŞ & YAPI' : 'FABRIC & DETAILS'}</h3>
+                            </div>
+                            <div className="border border-gray-100 rounded-xl overflow-hidden">
+                              <Table>
+                                <TableBody>
+                                  <TableRow className="border-gray-100">
+                                    <TableCell className="font-black text-[9px] uppercase tracking-widest text-gray-400 border-r border-gray-100 py-3">{language === 'tr' ? 'KUMAŞ' : 'FABRIC'}</TableCell>
+                                    <TableCell className="p-0">
+                                      <input
+                                        value={data.fabric.main}
+                                        onChange={(e) => handleFabricChange('main', e.target.value)}
+                                        className="w-full h-10 px-3 bg-transparent font-bold text-xs focus:outline-none"
+                                      />
+                                    </TableCell>
+                                  </TableRow>
+                                  <TableRow className="border-gray-100">
+                                    <TableCell className="font-black text-[9px] uppercase tracking-widest text-gray-400 border-r border-gray-100 py-3">{language === 'tr' ? 'İÇERİK' : 'COMP'}</TableCell>
+                                    <TableCell className="p-0">
+                                      <input
+                                        value={data.fabric.composition}
+                                        onChange={(e) => handleFabricChange('composition', e.target.value)}
+                                        className="w-full h-10 px-3 bg-transparent font-bold text-xs focus:outline-none"
+                                      />
+                                    </TableCell>
+                                  </TableRow>
+                                  <TableRow className="border-gray-100">
+                                    <TableCell className="font-black text-[9px] uppercase tracking-widest text-gray-400 border-r border-gray-100 py-3">{language === 'tr' ? 'KALIP' : 'FIT'}</TableCell>
+                                    <TableCell className="p-0">
+                                      <input
+                                        value={data?.fit || ""}
+                                        onChange={(e) => handleFitChange(e.target.value)}
+                                        className="w-full h-10 px-3 bg-transparent font-bold text-xs focus:outline-none"
+                                      />
+                                    </TableCell>
+                                  </TableRow>
+                                </TableBody>
+                              </Table>
+                            </div>
+                          </section>
+
+                          {/* Measurements */}
+                          <section>
+                            <div className="flex items-center gap-3 mb-4">
+                              <div className="w-7 h-7 rounded bg-black flex items-center justify-center text-white">
+                                <Ruler className="w-3.5 h-3.5" />
+                              </div>
+                              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-black pt-0.5">{language === 'tr' ? 'ÖLÇÜ TABLOSU' : 'MEASUREMENTS'}</h3>
+                            </div>
+                            <div className="border border-gray-100 rounded-xl overflow-hidden">
+                              <Table>
+                                <TableHeader className="bg-gray-50/50">
+                                  <TableRow className="border-gray-100">
+                                    <TableHead className="font-black text-[8px] uppercase tracking-widest text-gray-400 h-8">POINT OF MEASURE</TableHead>
+                                    <TableHead className="text-right font-black text-[8px] uppercase tracking-widest text-gray-400 h-8">CM</TableHead>
+                                  </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                  {data?.measurements?.points?.map((m: any, i: number) => (
+                                    <TableRow key={i} className="border-gray-100">
+                                      <TableCell className="p-0">
+                                        <input
+                                          value={m.label}
+                                          onChange={(e) => handleMeasurementChange(i, 'label', e.target.value)}
+                                          className="w-full h-9 px-3 bg-transparent font-bold text-[11px] focus:outline-none"
+                                        />
+                                      </TableCell>
+                                      <TableCell className="p-0 text-right">
+                                        <input
+                                          value={m.value}
+                                          onChange={(e) => handleMeasurementChange(i, 'value', e.target.value)}
+                                          className="w-16 h-9 px-3 bg-transparent font-mono font-black text-[11px] focus:outline-none text-right"
+                                        />
+                                      </TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </div>
+                          </section>
+                        </div>
+
+                        {/* Right: Visuals & Notes */}
+                        <div className="space-y-12">
+                          <section>
+                            <div className="flex items-center gap-3 mb-4">
+                              <div className="w-7 h-7 rounded bg-black flex items-center justify-center text-white">
+                                <Palette className="w-3.5 h-3.5" />
+                              </div>
+                              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-black pt-0.5">{language === 'tr' ? 'RENKLER' : 'COLORS'}</h3>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                              {data?.colors?.map((c: any, i: number) => (
+                                <div key={i} className="flex items-center gap-3 p-2 border border-gray-100 rounded-lg">
+                                  <div className="w-10 h-10 rounded-full border border-gray-100 shadow-sm shrink-0" style={{ backgroundColor: c.hex }} />
+                                  <div className="min-w-0">
+                                    <div className="font-bold text-[10px] text-black truncate uppercase leading-none">{c.name}</div>
+                                    <div className="text-[9px] text-gray-400 font-mono mt-1 font-bold">{c.pantone}</div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </section>
+
+                          <section>
+                            <div className="px-6 py-4 border-l-2 border-black italic text-xs text-gray-500 leading-relaxed">
+                              {data?.constructionDetails?.map((note: string, i: number) => (
+                                <p key={i} className="mb-2">● {note}</p>
+                              ))}
+                            </div>
+                          </section>
+
+                          <section>
+                            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-black mb-3">{t("studio.designerNotes")}</h3>
+                            <Textarea
+                              placeholder={t("studio.notesPlaceholder")}
+                              className="min-h-[100px] text-xs bg-gray-50 border-gray-100 text-black rounded-xl p-4 shadow-none focus:border-black transition-all"
+                              value={notes}
+                              onChange={(e) => setNotes(e.target.value)}
+                              onBlur={handleNotesBlur}
+                            />
+                          </section>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-4 text-center p-12">
+                    <div className="w-20 h-20 rounded-full bg-[#18181B] border border-white/10 flex items-center justify-center">
+                      <TbFileText className="w-10 h-10 text-white/50" />
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="font-black text-2xl uppercase tracking-[0.2em] text-[#f5f5f5]">{language === "tr" ? "VERİ YOK" : "NO DATA"}</h4>
+                      <p className="text-[11px] text-zinc-500 font-bold uppercase tracking-[0.18em] max-w-[280px] mx-auto text-balance mt-2">
+                        {t("studio.uploadToAnalyze") || "Upload a garment image to generate Technical Specs."}
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
-            </section>
-
-            {data && (
-              <div className="grid grid-cols-1 gap-2">
-                <Dialog open={isCollectionOpen} onOpenChange={setIsCollectionOpen}>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start" disabled={!data}>
-                      <FolderPlus className="w-4 h-4 mr-2" /> {t("studio.addToCollection")}
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogTitle>{t("studio.selectCollection")}</DialogTitle>
-                    <DialogDescription>{t("studio.addToMoodboard")}</DialogDescription>
-                    <div className="grid gap-2 mt-4">
-                      {collections.map(c => (
-                        <Button key={c.id} variant="ghost" className="justify-start" onClick={() => handleAddToCollection(c.id)}>
-                          <Folder className="w-4 h-4 mr-2" />
-                          {c.title}
-                        </Button>
-                      ))}
-                      {collections.length === 0 && <p className="text-center text-muted-foreground text-sm">No collections created yet.</p>}
-                    </div>
-                  </DialogContent>
-                </Dialog>
-
-                <Button variant="outline" className="w-full justify-start" disabled={!data} onClick={() => window.print()}>
-                  <Printer className="w-4 h-4 mr-2" /> {t("studio.print")}
-                </Button>
-
-              </div>
-            )}
-          </div>
-
-          <div className="flex-1 bg-[#0D0D0F] overflow-y-auto p-8 lg:p-16">
-            {isAnalyzing ? (
-              <div className="h-full flex flex-col items-center justify-center space-y-8 opacity-20">
-                <Loader2 className="w-16 h-16 animate-spin text-white" />
-                <div className="text-center">
-                  <h3 className="text-3xl font-black uppercase italic tracking-tighter text-white mb-3">{t("studio.analyzing") || "Analyzing Garment..."}</h3>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 leading-relaxed">{t("studio.extracting") || "EXTRACTING FABRIC POINTS, MEASUREMENTS, AND PANTONE CODES."}</p>
-                </div>
-              </div>
-            ) : data ? (
-              <div id="tech-pack-content" className="max-w-4xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 bg-white text-black p-12 shadow-2xl rounded-3xl border border-gray-100">
-                {/* Title Block */}
-                <div className="border-b-4 border-black pb-8">
-                  <h1 className="text-5xl font-black tracking-tighter uppercase italic mb-2 text-black">{data.productName}</h1>
-                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400">{t("studio.techSpecSheet")} • {new Date().getFullYear()} COLLECTION</p>
-                </div>
-
-                <section>
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white">
-                      <FileText className="w-4 h-4" />
-                    </div>
-                    <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-black">{language === 'tr' ? 'KUMAŞ & YAPI' : 'FABRIC & CONSTRUCTION'}</h3>
-                  </div>
-                  <Card className="bg-transparent border-gray-200 shadow-none rounded-2xl overflow-hidden">
-                    <Table>
-                      <TableBody>
-                        <TableRow className="border-gray-100 hover:bg-gray-50/50">
-                          <TableCell className="font-black text-[10px] uppercase tracking-widest w-[180px] text-gray-400 border-r border-gray-100">{language === 'tr' ? 'ANA KUMAŞ' : 'MAIN FABRIC'}</TableCell>
-                          <TableCell className="p-4">
-                            <Input
-                              value={data.fabric.main}
-                              onChange={(e) => handleFabricChange('main', e.target.value)}
-                              className="h-9 border-transparent hover:bg-gray-50 focus:bg-gray-50 focus:border-black font-bold text-sm shadow-none px-3 w-full transition-all"
-                            />
-                          </TableCell>
-                        </TableRow>
-                        <TableRow className="border-gray-100 hover:bg-gray-50/50">
-                          <TableCell className="font-black text-[10px] uppercase tracking-widest text-gray-400 border-r border-gray-100">{language === 'tr' ? 'İÇERİK' : 'COMPOSITION'}</TableCell>
-                          <TableCell className="p-4">
-                            <Input
-                              value={data.fabric.composition}
-                              onChange={(e) => handleFabricChange('composition', e.target.value)}
-                              className="h-9 border-transparent hover:bg-gray-50 focus:bg-gray-50 focus:border-black font-bold text-sm shadow-none px-3 w-full transition-all"
-                            />
-                          </TableCell>
-                        </TableRow>
-                        <TableRow className="border-gray-100 hover:bg-gray-50/50">
-                          <TableCell className="font-black text-[10px] uppercase tracking-widest text-gray-400 border-r border-gray-100">{language === 'tr' ? 'GRAMAJ' : 'WEIGHT'}</TableCell>
-                          <TableCell className="p-4">
-                            <Input
-                              value={data.fabric.weight}
-                              onChange={(e) => handleFabricChange('weight', e.target.value)}
-                              className="h-9 border-transparent hover:bg-gray-50 focus:bg-gray-50 focus:border-black font-bold text-sm shadow-none px-3 w-full transition-all"
-                            />
-                          </TableCell>
-                        </TableRow>
-                        <TableRow className="border-gray-100 hover:bg-gray-50/50">
-                          <TableCell className="font-black text-[10px] uppercase tracking-widest text-gray-400 border-r border-gray-100">{language === 'tr' ? 'KALIP' : 'FIT TYPE'}</TableCell>
-                          <TableCell className="p-4">
-                            <Input
-                              value={data?.fit || ""}
-                              onChange={(e) => handleFitChange(e.target.value)}
-                              className="h-9 border-transparent hover:bg-gray-50 focus:bg-gray-50 focus:border-black font-bold text-sm shadow-none px-3 w-full transition-all"
-                            />
-                          </TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
-                  </Card>
-                </section>
-
-                <section>
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white">
-                      <Ruler className="w-4 h-4" />
-                    </div>
-                    <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-black">{language === 'tr' ? 'ÖLÇÜ TABLOSU (36 BEDEN)' : 'KEY MEASUREMENTS (SAMPLE 36)'}</h3>
-                  </div>
-                  <Card className="bg-transparent border-gray-200 shadow-none rounded-2xl overflow-hidden">
-                    <Table>
-                      <TableHeader className="bg-gray-50/50">
-                        <TableRow className="border-gray-100 hover:bg-transparent">
-                          <TableHead className="font-black text-[9px] uppercase tracking-widest text-gray-400 h-10">{language === 'tr' ? 'ÖLÇÜM NOKTASI' : 'POINT OF MEASURE (POM)'}</TableHead>
-                          <TableHead className="text-right font-black text-[9px] uppercase tracking-widest text-gray-400 h-10">{language === 'tr' ? 'DEĞER (CM)' : 'VALUE (CM)'}</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {data?.measurements?.points ? (
-                          data.measurements.points.map((m: any, i: number) => (
-                            <TableRow key={i} className="border-gray-100 hover:bg-gray-50/50">
-                              <TableCell className="p-4">
-                                <Input
-                                  value={m.label}
-                                  onChange={(e) => handleMeasurementChange(i, 'label', e.target.value)}
-                                  className="h-9 border-transparent hover:bg-gray-50 focus:bg-gray-50 focus:border-black font-bold text-sm shadow-none px-3 w-full transition-all"
-                                />
-                              </TableCell>
-                              <TableCell className="text-right p-4">
-                                <Input
-                                  value={m.value}
-                                  onChange={(e) => handleMeasurementChange(i, 'value', e.target.value)}
-                                  className="h-9 text-right border-transparent hover:bg-gray-50 focus:bg-gray-50 focus:border-black font-mono font-black text-sm shadow-none px-3 w-full transition-all"
-                                />
-                              </TableCell>
-                            </TableRow>
-                          ))
-                        ) : (
-                          <TableRow>
-                            <TableCell colSpan={2} className="text-center py-12 text-gray-400 text-[10px] font-black uppercase tracking-widest italic">
-                              {language === 'tr' ? 'Ölçü verisi bulunamadı' : 'No measurement data found'}
-                            </TableCell>
-                          </TableRow>
-                        )}
-                      </TableBody>
-                    </Table>
-                  </Card>
-                </section>
-
-                {/* Colors */}
-                <section>
-                  <div className="flex items-center gap-2 mb-4">
-                    <Palette className="w-5 h-5 text-black" />
-                    <h3 className="text-lg font-semibold text-black">{language === 'tr' ? 'Renkler & Pantone' : 'Colorway & Pantone'}</h3>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    {data?.colors ? (
-                      data.colors.map((c: any, i: number) => (
-                        <Card key={i} className="p-3 flex items-center gap-4 bg-white border-gray-200 shadow-none">
-                          <div
-                            className="w-12 h-12 rounded-full border border-gray-200 shadow-sm"
-                            style={{ backgroundColor: c.hex }}
-                          />
-                          <div>
-                            <div className="font-bold text-sm text-black">{c.name}</div>
-                            <div className="text-xs text-gray-500 font-mono">{c.pantone}</div>
-                          </div>
-                        </Card>
-                      ))
-                    ) : (
-                      <p className="text-sm text-muted-foreground italic col-span-2">
-                        {language === 'tr' ? 'Renk verisi bulunamadı' : 'No color data found'}
-                      </p>
-                    )}
-                  </div>
-                </section>
-
-                {/* Construction Notes */}
-                <section>
-                  <h3 className="text-lg font-semibold mb-4 text-black">{language === 'tr' ? 'Üretim Notları' : 'Assembly Notes'}</h3>
-                  <ul className="list-disc list-inside space-y-1 text-sm text-gray-600 border-l-2 border-gray-200 pl-4">
-                    {data?.constructionDetails ? (
-                      data.constructionDetails.map((note: string, i: number) => (
-                        <li key={i}>{note}</li>
-                      ))
-                    ) : (
-                      <li className="italic text-muted-foreground">{language === 'tr' ? 'Üretim notu bulunamadı' : 'No construction notes found'}</li>
-                    )}
-                  </ul>
-                </section>
-
-                {/* Design Notes (User Input) */}
-                <section className="print:block">
-                  <h3 className="text-lg font-semibold mb-4 text-black">{t("studio.designerNotes")}</h3>
-                  <Textarea
-                    placeholder={t("studio.notesPlaceholder")}
-                    className="min-h-[100px] bg-white border-gray-200 text-black placeholder:text-gray-400"
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    onBlur={handleNotesBlur}
-                  />
-                  <p className="text-xs text-gray-400 mt-2">{language === 'tr' ? 'Notlar otomatik olarak PDF dosyasına eklenir.' : 'Notes are automatically included in the Tech Pack PDF.'}</p>
-                </section>
-
-                <div className="h-12" /> {/* Spacer */}
-              </div>
-            ) : (
-              <div className="h-full flex flex-col items-center justify-center text-muted-foreground opacity-50">
-                <FileText className="w-16 h-16 mb-4 stroke-1" />
-                <p>{t("studio.uploadToAnalyze") || "Upload a design to generate Technical Analysis"}</p>
-              </div>
-            )}
+            </div>
           </div>
         </div>
       </div >

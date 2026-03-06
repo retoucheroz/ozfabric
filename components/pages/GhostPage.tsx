@@ -21,7 +21,8 @@ import {
   Edit2,
   Trash2,
   Shirt,
-  Camera
+  Camera,
+  ScanLine
 } from "lucide-react"
 import {
   TbHanger,
@@ -258,15 +259,29 @@ function GhostPageContent() {
         <div className="max-w-[1180px] mx-auto w-full flex flex-col lg:flex-row gap-8">
           {/* Left: Input */}
           <div className="w-full lg:w-[420px] flex flex-col space-y-6 shrink-0">
-
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 rounded-md bg-[#18181B] border border-white/10 text-white shadow-lg">
+                <ScanLine className="w-5 h-5" />
+              </div>
+              <div className="flex flex-col">
+                <label className="text-[13px] font-black uppercase tracking-[0.2em] text-white leading-none">
+                  {language === "tr" ? "HAYALET MODEL" : "GHOST MODEL"}
+                </label>
+                <span className="text-[11px] font-bold text-zinc-400 mt-1.5 leading-none">
+                  {language === "tr"
+                    ? "Görünmez manken çekimleri oluşturun."
+                    : "Create invisible mannequin shots."}
+                </span>
+              </div>
+            </div>
 
             {/* Main Garment Upload */}
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-2 px-1">
-                <TbShirt className="w-4 h-4 text-white" />
+              <label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 flex items-center gap-2 px-1">
+                <TbShirt className="w-4 h-4 text-zinc-500" />
                 {language === "tr" ? "ANA GİYSİ GÖRSELİ" : "MAIN GARMENT IMAGE"} *
               </label>
-              <div className="h-40 border-2 border-dashed border-white/5 rounded-2xl bg-[#18181b] relative group hover:border-white transition-all cursor-pointer overflow-hidden">
+              <div className="h-40 border border-dashed border-white/20 rounded-2xl bg-[#121214] relative group hover:border-white/40 transition-all cursor-pointer overflow-hidden">
                 <input
                   type="file"
                   accept="image/*"
@@ -286,7 +301,7 @@ function GhostPageContent() {
                 ) : (
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground gap-2">
                     <Shirt className="w-8 h-8 opacity-50" />
-                    <span className="text-xs">{t("ghost.uploadFlatLay")}</span>
+                    <span className="text-[11px] font-bold italic text-zinc-400">{t("ghost.uploadFlatLay") || (language === "tr" ? "Yükle veya Sürükle" : "Upload or Drag")}</span>
                   </div>
                 )}
               </div>
@@ -296,11 +311,11 @@ function GhostPageContent() {
             <div className="grid grid-cols-2 gap-3">
               {/* Logo/Detail Image */}
               <div className="space-y-3">
-                <label className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-1.5 px-1">
-                  <TbSignature className="w-3.5 h-3.5 text-white" />
+                <label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 flex items-center gap-1.5 px-1">
+                  <TbSignature className="w-3.5 h-3.5 text-zinc-500" />
                   {language === "tr" ? "LOGO / DETAY" : "LOGO / DETAIL"}
                 </label>
-                <div className="h-32 border-2 border-dashed border-white/5 rounded-2xl bg-[#18181b] relative group hover:bg-white/[0.05] transition-all cursor-pointer overflow-hidden">
+                <div className="h-32 border border-dashed border-white/20 rounded-2xl bg-[#121214] relative group hover:border-white/40 transition-all cursor-pointer overflow-hidden">
                   <input
                     type="file"
                     accept="image/*"
@@ -320,7 +335,7 @@ function GhostPageContent() {
                   ) : (
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground gap-1">
                       <Tag className="w-5 h-5 opacity-50" />
-                      <span className="text-[10px]">{language === "tr" ? "İsteğe Bağlı" : "Optional"}</span>
+                      <span className="text-[11px] font-bold italic text-zinc-400">{language === "tr" ? "İsteğe Bağlı" : "Optional"}</span>
                     </div>
                   )}
                 </div>
@@ -328,11 +343,11 @@ function GhostPageContent() {
 
               {/* Fabric Image */}
               <div className="space-y-3">
-                <label className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-1.5 px-1">
-                  <TbPalette className="w-3.5 h-3.5 text-white" />
+                <label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 flex items-center gap-1.5 px-1">
+                  <TbPalette className="w-3.5 h-3.5 text-zinc-500" />
                   {language === "tr" ? "KUMAŞ / DOKU" : "FABRIC / TEXTURE"}
                 </label>
-                <div className="h-32 border-2 border-dashed border-white/5 rounded-2xl bg-[#18181b] relative group hover:bg-white/[0.05] transition-all cursor-pointer overflow-hidden">
+                <div className="h-32 border border-dashed border-white/20 rounded-2xl bg-[#121214] relative group hover:border-white/40 transition-all cursor-pointer overflow-hidden">
                   <input
                     type="file"
                     accept="image/*"
@@ -352,23 +367,19 @@ function GhostPageContent() {
                   ) : (
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground gap-1">
                       <Palette className="w-5 h-5 opacity-50" />
-                      <span className="text-[10px]">{language === "tr" ? "İsteğe Bağlı" : "Optional"}</span>
+                      <span className="text-[11px] font-bold italic text-zinc-400">{language === "tr" ? "İsteğe Bağlı" : "Optional"}</span>
                     </div>
                   )}
                 </div>
               </div>
             </div>
 
-            <p className="text-[10px] text-muted-foreground">
-              {language === "tr"
-                ? "• Görsel 1: Ana giysi referansı (zorunlu)\n• Görsel 2: Logo/yazı/detay kilidi\n• Görsel 3: Kumaş/malzeme kilidi"
-                : "• Image 1: Main garment reference (required)\n• Image 2: Logo/text/detail lock\n• Image 3: Fabric/material lock"}
-            </p>
+
 
             {/* Angle Grid Section */}
             <div className="space-y-4 pt-4">
-              <label className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-2 px-1">
-                <TbAdjustmentsHorizontal className="w-4 h-4 text-white" />
+              <label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 flex items-center gap-2 px-1">
+                <TbAdjustmentsHorizontal className="w-4 h-4 text-zinc-500" />
                 {language === "tr" ? "GÖRÜNÜM AÇILARI" : "VIEW ANGLES"}
               </label>
               <div className="grid grid-cols-5 gap-1.5">
@@ -377,15 +388,15 @@ function GhostPageContent() {
                     key={angle.id}
                     variant={selectedAngle === angle.id ? "default" : "outline"}
                     className={cn(
-                      "h-16 flex-col gap-1 transition-all duration-300 rounded-md border-white/5 p-1",
+                      "h-16 flex-col gap-1 transition-all duration-200 rounded-md border p-1",
                       selectedAngle === angle.id
-                        ? "bg-white text-black shadow-2xl border-white ring-2 ring-white/20"
-                        : "bg-[#18181b] hover:border-white/20 text-[#f5f5f5] hover:text-white"
+                        ? "bg-[#F5F5F5] text-black border-[#F5F5F5] shadow-lg"
+                        : "bg-[#18181B] border-white/10 hover:border-white/20 hover:bg-[#1F1F23] text-zinc-400 hover:text-white"
                     )}
                     onClick={() => setSelectedAngle(angle.id)}
                   >
-                    <angle.icon className={cn("w-5 h-5", selectedAngle === angle.id ? "text-black" : "text-[#f5f5f5]/50")} />
-                    <span className="font-black text-[9px] uppercase tracking-tighter leading-none text-center h-4 flex items-center justify-center">
+                    <angle.icon className={cn("w-5 h-5", selectedAngle === angle.id ? "text-black" : "text-zinc-500")} />
+                    <span className="font-black text-[10px] uppercase tracking-[0.1em] leading-none text-center h-4 flex items-center justify-center">
                       {language === "tr" ? angle.labelTr : angle.label}
                     </span>
                   </Button>
@@ -396,39 +407,45 @@ function GhostPageContent() {
             {/* Resolution and Aspect Ratio Selectors */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-3">
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                  <TbAspectRatio className="w-4 h-4 text-white" />
+                <label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 flex items-center gap-2 px-1">
+                  <TbAspectRatio className="w-4 h-4 text-zinc-500" />
                   {language === "tr" ? "ORAN" : "RATIO"}
                 </label>
-                <select
-                  value={selectedAspectRatio}
-                  onChange={(e) => setSelectedAspectRatio(e.target.value)}
-                  className="w-full h-11 bg-white/5 border border-white/10 rounded-md px-4 text-[10px] font-bold text-white uppercase tracking-tight focus:outline-none"
-                >
-                  {ASPECT_RATIO_OPTIONS.map(ratio => (
-                    <option key={ratio.id} value={ratio.id} className="bg-zinc-900">
-                      {ratio.id} ({language === 'tr' ? ratio.labelTr : ratio.label})
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    value={selectedAspectRatio}
+                    onChange={(e) => setSelectedAspectRatio(e.target.value)}
+                    className="w-full bg-[#121214] rounded-md border border-white/10 text-white text-[13px] font-medium pl-4 pr-10 py-3 focus:border-white/25 focus:outline-none transition-colors duration-150 appearance-none shadow-sm"
+                  >
+                    {ASPECT_RATIO_OPTIONS.map(ratio => (
+                      <option key={ratio.id} value={ratio.id} className="bg-[#121214]">
+                        {language === 'tr' ? ratio.labelTr : ratio.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none rotate-90" />
+                </div>
               </div>
 
               <div className="space-y-3">
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                  <Maximize2 className="w-4 h-4 text-white" />
+                <label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 flex items-center gap-2 px-1">
+                  <Maximize2 className="w-4 h-4 text-zinc-500" />
                   {language === "tr" ? "KALİTE" : "QUALITY"}
                 </label>
-                <select
-                  value={selectedResolution}
-                  onChange={(e) => setSelectedResolution(e.target.value)}
-                  className="w-full h-11 bg-white/5 border border-white/10 rounded-md px-4 text-[10px] font-bold text-white uppercase tracking-tight focus:outline-none"
-                >
-                  {RESOLUTION_OPTIONS.map(res => (
-                    <option key={res.id} value={res.id} className="bg-zinc-900">
-                      {res.id} {language === 'tr' ? res.labelTr : res.label}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    value={selectedResolution}
+                    onChange={(e) => setSelectedResolution(e.target.value)}
+                    className="w-full bg-[#121214] rounded-md border border-white/10 text-white text-[13px] font-medium pl-4 pr-10 py-3 focus:border-white/25 focus:outline-none transition-colors duration-150 appearance-none shadow-sm"
+                  >
+                    {RESOLUTION_OPTIONS.map(res => (
+                      <option key={res.id} value={res.id} className="bg-[#121214]">
+                        {language === 'tr' ? res.labelTr : res.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none rotate-90" />
+                </div>
               </div>
             </div>
 
@@ -453,7 +470,7 @@ function GhostPageContent() {
               <Button
                 variant="hot-coral"
                 size="lg"
-                className="h-12 w-full overflow-hidden"
+                className="h-12 w-full overflow-hidden bg-[#FF3D5A] hover:bg-[#FF3D5A]/90 text-white rounded-md"
                 disabled={isProcessing}
                 onClick={handleGenerate}
               >
@@ -491,12 +508,12 @@ function GhostPageContent() {
 
           {/* Right Side: Result Section */}
           <div className="flex-1 flex flex-col space-y-2">
-            <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest px-1 flex items-center gap-1.5 mb-1.5">
-              <Sparkles className="w-4 h-4 text-[var(--accent-primary)]" />
+            <Label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 px-1 flex items-center gap-1.5 mb-1.5">
+              <Sparkles className="w-4 h-4 text-zinc-500" />
               {language === 'tr' ? 'SONUÇ' : 'RESULT'}
             </Label>
 
-            <Card className="relative flex-1 min-h-[500px] lg:min-h-0 bg-[#18181b] border-2 border-dashed border-border dark:border-white/10 overflow-hidden flex items-center justify-center group rounded-3xl shadow-none hover:border-border/80 dark:hover:border-white/20 transition-colors">
+            <Card className="relative flex-1 min-h-[500px] lg:min-h-0 bg-[#121214] border border-dashed border-white/20 overflow-hidden flex items-center justify-center group rounded-2xl shadow-none hover:border-white/40 transition-colors">
               {isProcessing ? (
                 <div className="absolute inset-0 bg-black/80 backdrop-blur-xl z-20 flex flex-col items-center justify-center p-8 text-center space-y-6">
                   <div className="relative">
@@ -506,14 +523,14 @@ function GhostPageContent() {
                     </div>
                   </div>
                   <div className="space-y-3">
-                    <h3 className="text-xl font-black uppercase italic tracking-tighter text-white">{t("styles.generating")}</h3>
-                    <p className="text-[10px] uppercase font-black tracking-[0.2em] text-zinc-500 transition-all duration-300 min-h-[1.5em] max-w-[240px] mx-auto">
+                    <h3 className="text-xl font-black uppercase tracking-tighter text-white">{t("styles.generating")}</h3>
+                    <p className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 transition-all duration-300 min-h-[1.5em] max-w-[240px] mx-auto">
                       {language === 'tr' ? LOADING_MESSAGES[currentMessageIndex].tr : LOADING_MESSAGES[currentMessageIndex].en}
                     </p>
                   </div>
                   <div className="w-full max-w-[280px] space-y-4">
                     <Progress value={generationProgress} className="h-1.5 w-full bg-white/5" />
-                    <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                    <div className="flex justify-between text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500">
                       <span>{generationProgress}%</span>
                       <span>{language === 'tr' ? 'Tahmini süre: 10-15sn' : 'Est. time: 10-15s'}</span>
                     </div>
@@ -524,8 +541,8 @@ function GhostPageContent() {
                   <div className="relative flex-1 overflow-hidden rounded-2xl shadow-inner bg-black/5">
                     <img src={resultImage} className="w-full h-full object-contain" alt="Result" />
                     <div className="absolute top-4 right-4 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button variant="secondary" className="bg-white text-black hover:bg-zinc-200 font-black h-10 px-5 rounded-md uppercase tracking-widest text-[10px]" onClick={() => router.push(`/studio?image=${encodeURIComponent(resultImage)}`)}>{t("common.getSpecs")}</Button>
-                      <Button variant="secondary" size="icon" className="bg-white text-black hover:bg-zinc-200 h-10 w-10 rounded-md" onClick={handleDownload}>
+                      <Button variant="secondary" className="bg-[#F5F5F5] text-black hover:bg-zinc-200 font-black h-10 px-5 rounded-md uppercase tracking-[0.18em] text-[11px]" onClick={() => router.push(`/studio?image=${encodeURIComponent(resultImage)}`)}>{t("common.getSpecs")}</Button>
+                      <Button variant="secondary" size="icon" className="bg-[#F5F5F5] text-black hover:bg-zinc-200 h-10 w-10 rounded-md" onClick={handleDownload}>
                         <Download className="w-5 h-5" />
                       </Button>
                     </div>
@@ -533,14 +550,14 @@ function GhostPageContent() {
                   <div className="flex items-center justify-between px-2">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase">{language === 'tr' ? 'BAŞARIYLA ÜRETİLDİ' : 'SUCCESSFULLY GENERATED'}</span>
+                      <span className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500">{language === 'tr' ? 'BAŞARIYLA ÜRETİLDİ' : 'SUCCESSFULLY GENERATED'}</span>
                     </div>
                     <div className="flex gap-3">
-                      <Button variant="ghost" size="sm" onClick={() => setResultImage(null)} className="h-10 text-[11px] font-black uppercase tracking-widest rounded-md px-5 border border-white/5 bg-white/5 hover:bg-white hover:text-black transition-all">
+                      <Button variant="ghost" size="sm" onClick={() => setResultImage(null)} className="h-10 text-[11px] font-black uppercase tracking-[0.18em] rounded-md px-5 border border-white/10 bg-[#18181B] text-zinc-400 hover:bg-white hover:text-black hover:border-white transition-all">
                         <TbRefresh className="w-4 h-4 mr-2" />
                         {language === 'tr' ? 'YENİ' : 'NEW'}
                       </Button>
-                      <Button size="sm" onClick={handleDownload} className="h-10 bg-white text-black text-[11px] font-black uppercase tracking-widest rounded-md px-5 hover:bg-zinc-200 shadow-xl transition-all">
+                      <Button size="sm" onClick={handleDownload} className="h-10 bg-[#FF3D5A] text-white text-[11px] font-black uppercase tracking-[0.18em] rounded-md px-5 hover:bg-[#FF3D5A]/90 shadow-xl transition-all">
                         <Download className="w-4 h-4 mr-2" />
                         {language === 'tr' ? 'İNDİR' : 'DOWNLOAD'}
                       </Button>
@@ -554,7 +571,7 @@ function GhostPageContent() {
                   </div>
                   <div className="space-y-1">
                     <h4 className="font-black text-2xl uppercase tracking-[0.2em] text-[#f5f5f5]">{t("ghost.title")}</h4>
-                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em] max-w-[280px] mx-auto">
+                    <p className="text-[11px] font-bold text-zinc-400 max-w-[280px] mx-auto">
                       {t("ghost.subtitle")}
                     </p>
                   </div>
@@ -564,7 +581,7 @@ function GhostPageContent() {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   )
 }
 

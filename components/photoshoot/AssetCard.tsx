@@ -99,39 +99,39 @@ export function AssetCard({
     };
 
     const renderEmptyState = () => (
-        <div className="flex flex-col items-center gap-2.5 p-3 text-center">
-            <div className="p-3.5 rounded-2xl bg-zinc-800/80 text-white border border-white/5 shadow-inner">
+        <div className="flex flex-col items-center gap-3 p-3 text-center">
+            <div className="p-3.5 rounded-2xl bg-[#1F1F23]/50 text-white border border-white/5 shadow-inner">
                 {Icon ? <Icon size={24} /> : <Upload size={24} />}
             </div>
             <div className="space-y-0.5">
-                <span className="text-[11px] font-black uppercase tracking-wide text-black dark:text-white block leading-tight">
+                <span className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 block leading-tight">
                     {label}
                 </span>
-                <span className="text-[9px] font-black text-[var(--accent-primary)] uppercase tracking-tighter block opacity-80 group-hover/card:opacity-100 transition-opacity">
-                    {description || (language === "tr" ? "YÜKLE VEYA SÜRÜKLE" : "UPLOAD OR DRAG")}
+                <span className="text-[11px] font-bold italic text-zinc-400 block opacity-80 group-hover/card:opacity-100 transition-opacity">
+                    {description || (language === "tr" ? "Yükle veya Sürükle" : "Upload or Drag")}
                 </span>
             </div>
         </div>
     );
 
     const renderMultipleThumbnails = (itemImages: string[]) => (
-        <div className="relative w-full h-full bg-[var(--bg-elevated)] flex flex-col min-h-[220px]">
+        <div className="relative w-full h-full bg-transparent flex flex-col min-h-[220px]">
             {itemImages.length === 0 ? (
                 <div
                     className="flex-1 flex flex-col items-center justify-center p-6 pb-20 cursor-pointer group/empty"
                     onClick={handleDirectUploadClick}
                 >
-                    <div className="w-24 h-24 rounded-3xl border-2 border-dashed border-white/10 flex items-center justify-center bg-zinc-900/50 group-hover/empty:bg-zinc-800 transition-all mb-4 group-hover/empty:scale-[1.05] group-hover/empty:border-white/20">
-                        <Plus size={32} className="text-zinc-500 group-hover/empty:text-white transition-colors" />
+                    <div className="w-24 h-24 rounded-3xl border-2 border-dashed border-white/20 flex items-center justify-center transition-all mb-4 group-hover/empty:scale-[1.05] group-hover/empty:border-white/40">
+                        <Plus size={32} className="text-zinc-600 group-hover/empty:text-zinc-400 transition-colors" />
                     </div>
-                    <p className="text-[10px] font-black uppercase text-zinc-500 tracking-widest text-center px-4 leading-relaxed group-hover/empty:text-zinc-400 transition-colors">
-                        {language === "tr" ? "TÜM GÖRSELLERİ BURAYA SÜRÜKLEYEBİLİRSİNİZ." : "YOU CAN DRAG ALL IMAGES HERE."}
+                    <p className="text-[11px] font-bold italic text-zinc-400 text-center px-4 leading-relaxed group-hover/empty:text-zinc-300 transition-colors">
+                        {language === "tr" ? "Tüm görselleri buraya sürükleyebilirsiniz." : "You can drag all images here."}
                     </p>
                 </div>
             ) : (
                 <div className="grid grid-cols-3 gap-3 overflow-y-auto flex-1 scrollbar-none p-3 pb-16">
                     {itemImages.map((img, idx) => (
-                        <div key={idx} className="relative aspect-square rounded-2xl border border-white/5 overflow-hidden group/thumb bg-zinc-900 shadow-inner">
+                        <div key={idx} className="relative aspect-square rounded-2xl border border-white/10 overflow-hidden group/thumb bg-[#121214] shadow-inner">
                             <img src={img} className="w-full h-full object-cover transition-all duration-700 group-hover/thumb:scale-110 group-hover/thumb:rotate-1" />
                             <div className="absolute inset-x-0 bottom-0 top-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center">
                                 <button
@@ -146,14 +146,14 @@ export function AssetCard({
                     {itemImages.length < 10 && (
                         <button
                             onClick={handleDirectUploadClick}
-                            className="relative aspect-square rounded-2xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center hover:bg-white/5 hover:border-[var(--accent-primary)]/40 transition-all group/add hover:scale-[0.98] active:scale-95"
+                            className="relative aspect-square rounded-2xl border-2 border-dashed border-white/20 flex flex-col items-center justify-center hover:bg-white/5 hover:border-white/40 transition-all group/add hover:scale-[0.98] active:scale-95"
                         >
-                            <div className="p-3 rounded-full bg-white/5 group-hover/add:bg-[var(--accent-primary)]/10 transition-colors">
+                            <div className="p-3 rounded-full bg-white/5 group-hover/add:bg-white/10 transition-colors">
                                 <Plus size={24} className="text-zinc-600 group-hover/add:text-[var(--accent-primary)] transition-colors" />
                             </div>
                         </button>
                     )}
-                </div>
+                </div >
             )}
 
             <div className="absolute bottom-3 inset-x-3 bg-zinc-900/95 backdrop-blur-2xl px-4 py-3 rounded-2xl border border-white/10 z-20 flex justify-between items-center shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
@@ -164,8 +164,8 @@ export function AssetCard({
                             {itemImages.length}/10 {label}
                         </span>
                     </div>
-                    <span className="text-[8px] font-bold text-zinc-500 uppercase tracking-tighter">
-                        {language === "tr" ? "YÜKLENEN KOMBİNLER" : "UPLOADED OUTFITS"}
+                    <span className="text-[11px] font-bold italic text-zinc-400">
+                        {language === "tr" ? "Yüklenen Kombinler" : "Uploaded Outfits"}
                     </span>
                 </div>
                 <button
@@ -175,7 +175,7 @@ export function AssetCard({
                     <Trash2 size={14} />
                 </button>
             </div>
-        </div>
+        </div >
     );
 
     if (variant === 'portrait') {
@@ -189,12 +189,12 @@ export function AssetCard({
 
                 <div
                     className={cn(
-                        "relative h-full rounded-3xl border-2 overflow-hidden transition-all duration-500 shadow-sm",
-                        currentAsset
-                            ? (isHorizontal ? "bg-[var(--bg-elevated)] border-[var(--border-subtle)] flex flex-row items-stretch" : "bg-[var(--bg-elevated)] border-[var(--border-subtle)]")
-                            : "bg-[var(--bg-elevated)] border-dashed border-[var(--accent-primary)]/40 hover:border-[var(--accent-primary)] flex flex-col items-center justify-center cursor-pointer hover:shadow-md",
-                        required && !currentAsset && "border-red-500/40 bg-red-500/[0.02]",
-                        isDragOver && "scale-[1.02] ring-4 ring-[var(--accent-primary)]/20 border-[var(--accent-primary)] bg-[var(--accent-soft)]"
+                        "relative h-full rounded-2xl border transition-all duration-200 shadow-sm",
+                        currentAsset && (!allowMultiple || (Array.isArray(currentAsset) && currentAsset.length > 0))
+                            ? (isHorizontal ? "bg-[#121214] border-white/10 flex flex-row items-stretch hover:border-white/25" : "bg-[#121214] border-white/10 hover:border-white/25")
+                            : "bg-[#121214] border-dashed border-white/20 hover:border-white/40 hover:bg-white/[0.02] flex flex-col items-center justify-center cursor-pointer",
+                        required && !currentAsset && "border-white/20 bg-white/[0.02]",
+                        isDragOver && "scale-[1.01] ring-2 ring-white/10 border-white/40 bg-white/5"
                     )}
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
@@ -227,8 +227,8 @@ export function AssetCard({
                                             <span className="text-[10px] font-black uppercase tracking-[0.15em] text-[var(--text-primary)] truncate">
                                                 {label}
                                             </span>
-                                            <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest opacity-80">
-                                                {language === "tr" ? "SEÇİLDİ" : "SELECTED"}
+                                            <span className="text-[11px] font-bold italic text-zinc-400 opacity-80">
+                                                {language === "tr" ? "Seçildi" : "Selected"}
                                             </span>
                                         </div>
                                         <div className="flex flex-col items-center gap-2 shrink-0">
@@ -308,11 +308,11 @@ export function AssetCard({
                                 "space-y-1 overflow-hidden",
                                 isHorizontal ? "flex-1" : "space-y-0.5"
                             )}>
-                                <span className="text-[11px] font-black uppercase tracking-widest text-black dark:text-white block leading-tight truncate">
+                                <span className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 block leading-tight truncate">
                                     {label}
                                 </span>
-                                <span className="text-[9px] font-black text-zinc-500 uppercase tracking-tighter block opacity-60 group-hover/card:opacity-100 transition-opacity">
-                                    {description || (language === "tr" ? "YÜKLE VEYA SÜRÜKLE" : "UPLOAD OR DRAG")}
+                                <span className="text-[11px] font-bold italic text-zinc-400 block opacity-60 group-hover/card:opacity-100 transition-opacity">
+                                    {description || (language === "tr" ? "Yükle veya Sürükle" : "Upload or Drag")}
                                 </span>
                             </div>
 
@@ -351,11 +351,11 @@ export function AssetCard({
                 {/* Main Card Area: Click to Upload / Drag & Drop */}
                 <div
                     className={cn(
-                        "relative aspect-square rounded-xl border-2 flex flex-col items-center justify-center overflow-hidden transition-all duration-500 cursor-pointer shadow-sm hover:shadow-md",
-                        assets[id] ? "bg-[var(--bg-elevated)] border-[var(--border-subtle)]"
-                            : "bg-[var(--bg-elevated)] border-[var(--border-subtle)] border-dashed hover:border-[var(--accent-primary)]",
+                        "relative aspect-square rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all duration-200 cursor-pointer shadow-sm",
+                        assets[id] ? "bg-[#121214] border border-white/10 hover:border-white/25"
+                            : "bg-[#121214] border border-dashed border-white/20 hover:border-white/40 hover:bg-white/[0.02]",
                         required && !assets[id] && "border-red-500/40 bg-red-500/[0.02]",
-                        isDragOver && "scale-[1.02] ring-4 ring-[var(--accent-primary)]/20 border-[var(--accent-primary)] bg-[var(--accent-soft)]"
+                        isDragOver && "scale-[1.01] ring-2 ring-white/10 border-white/40 bg-white/5"
                     )}
                     onClick={handleDirectUploadClick}
                     onDragOver={handleDragOver}
@@ -389,30 +389,25 @@ export function AssetCard({
                             </div>
                         </div>
                     ) : assets[id] === "LIGHTING_SET" ? (
-                        <div className="flex flex-col items-center gap-2 p-2.5 text-center transition-all group-hover/card:scale-105">
-                            <div className="p-2.5 rounded-xl bg-zinc-800/80 text-white border border-white/5 shadow-inner">
+                        <div className="flex flex-col items-center gap-2 p-2.5 text-center transition-all group-hover/card:scale-[1.01]">
+                            <div className="p-2.5 rounded-lg bg-zinc-800/80 text-white border border-white/5 shadow-inner">
                                 {Icon ? <Icon size={20} /> : <Upload size={20} />}
                             </div>
                             <div className="space-y-0.5">
-                                <span className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-primary)] block leading-tight">
+                                <span className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 block leading-tight">
                                     {label}
                                 </span>
-                                <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-tighter opacity-80 block">
-                                    {language === "tr" ? "PRESET AKTİF" : "PRESET ACTIVE"}
+                                <span className="text-[11px] font-bold italic text-zinc-400 opacity-80 block">
+                                    {language === "tr" ? "Preset Aktif" : "Preset Active"}
                                 </span>
                             </div>
                         </div>
                     ) : (
-                        <div className="flex flex-col items-center gap-2 p-2.5 text-center transition-all group-hover/card:scale-105">
-                            <div className="p-2.5 rounded-xl bg-zinc-800/80 text-white border border-white/5 shadow-inner">
-                                {Icon ? <Icon size={20} /> : <Upload size={20} />}
-                            </div>
-                            <div className="space-y-0.5">
-                                <span className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-primary)] block leading-tight">
+                        <div className="flex flex-col items-center gap-2 p-2.5 text-center transition-all group-hover/card:scale-[1.01]">
+                            <Icon className="w-8 h-8 text-zinc-600 mb-1" />
+                            <div className="space-y-1">
+                                <span className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 block leading-tight">
                                     {label}
-                                </span>
-                                <span className="text-[8px] font-bold text-[var(--accent-primary)] uppercase tracking-tighter opacity-80 block group-hover/card:text-[var(--accent-primary)] transition-colors">
-                                    {language === "tr" ? "YÜKLE VEYA SÜRÜKLE" : "UPLOAD OR DROP"}
                                 </span>
                             </div>
                         </div>
@@ -517,15 +512,15 @@ export function AssetCard({
                 >
                     <div className="flex flex-col flex-1 min-w-0">
                         <span className={cn(
-                            "text-xs font-black uppercase tracking-tight truncate transition-colors",
-                            assets[id] ? "text-[var(--text-primary)]" : (!hideLibrary ? "text-[var(--text-muted)] group-hover/content:text-[var(--accent-primary)]" : "text-[var(--text-muted)]")
+                            "text-[11px] font-black uppercase tracking-[0.18em] truncate transition-colors",
+                            assets[id] ? "text-white" : (!hideLibrary ? "text-zinc-500 group-hover/content:text-white" : "text-zinc-500")
                         )}>
                             {assets[id] ? (language === "tr" ? "GÖRSEL SEÇİLDİ" : "IMAGE SELECTED") : (language === "tr" ? "YÜKLE" : "UPLOAD")}
                         </span>
                         {!hideLibrary && (
                             <div className="flex items-center gap-1.5 mt-0.5">
-                                <span className="text-[9px] text-[var(--accent-primary)] font-black uppercase tracking-widest opacity-70">
-                                    {assets[id] ? (language === "tr" ? "DEĞİŞTİR" : "CHANGE") : (language === "tr" ? "SEÇİM YAP" : "SELECT")}
+                                <span className="text-[11px] font-bold italic text-zinc-400 opacity-80 group-hover/content:opacity-100 transition-opacity">
+                                    {assets[id] ? (language === "tr" ? "Değiştir" : "Change") : (language === "tr" ? "Kütüphaneden Seç" : "Select from Library")}
                                 </span>
                             </div>
                         )}

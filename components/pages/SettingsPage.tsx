@@ -106,12 +106,27 @@ function SettingsContent() {
             {/* Content */}
             <div className="flex-1 overflow-y-auto p-4 md:p-12 scrollbar-thin scrollbar-thumb-[var(--border-subtle)] scrollbar-track-transparent">
                 <div className="max-w-4xl mx-auto space-y-10">
+                    <div className="flex items-center gap-3 mb-10">
+                        <div className="p-2 rounded-md bg-[#18181B] border border-white/10 text-white shadow-lg">
+                            <Bot className="w-5 h-5" />
+                        </div>
+                        <div className="flex flex-col">
+                            <label className="text-[13px] font-black uppercase tracking-[0.2em] text-white leading-none">
+                                {language === "tr" ? "AYARLAR" : "SETTINGS"}
+                            </label>
+                            <span className="text-[11px] font-bold text-zinc-400 mt-1.5 leading-none">
+                                {language === "tr"
+                                    ? "Hesap ve uygulama ayarlarınızı yönetin."
+                                    : "Manage your account and app settings."}
+                            </span>
+                        </div>
+                    </div>
 
                     {/* Profile Section */}
                     {activeSection === "profile" && (
                         <section className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <div className="space-y-1">
-                                <h2 className="text-2xl font-black uppercase italic tracking-tight text-[var(--text-primary)] flex items-center gap-3">
+                                <h2 className="text-2xl font-black uppercase tracking-tight text-[var(--text-primary)] flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-xl bg-[var(--accent-soft)] flex items-center justify-center text-[var(--accent-primary)] shadow-lg shadow-[var(--accent-primary)]/10">
                                         <User className="w-6 h-6" />
                                     </div>
@@ -155,7 +170,7 @@ function SettingsContent() {
                                         </label>
                                     </div>
                                     <div className="flex-1 text-center sm:text-left">
-                                        <div className="text-xl font-black uppercase italic tracking-tight text-[var(--text-primary)]">
+                                        <div className="text-xl font-black uppercase tracking-tight text-[var(--text-primary)]">
                                             {user?.name || user?.email || t("common.user")}
                                         </div>
                                         <div className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest">
@@ -275,7 +290,7 @@ function SettingsContent() {
                     {activeSection === "billing" && (
                         <section className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <div className="space-y-1">
-                                <h2 className="text-2xl font-black uppercase italic tracking-tight text-[var(--text-primary)] flex items-center gap-3">
+                                <h2 className="text-2xl font-black uppercase tracking-tight text-[var(--text-primary)] flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-xl bg-[var(--accent-soft)] flex items-center justify-center text-[var(--accent-primary)] shadow-lg shadow-[var(--accent-primary)]/10">
                                         <CreditCard className="w-6 h-6" />
                                     </div>
@@ -297,7 +312,7 @@ function SettingsContent() {
                                         </div>
                                         <Badge className="bg-[var(--accent-primary)] text-white px-4 py-1 rounded-lg text-[9px] font-black tracking-widest uppercase">{t("settings.active")}</Badge>
                                     </div>
-                                    <p className="text-[10px] text-center sm:text-left font-black text-[var(--text-muted)] uppercase tracking-widest px-2 italic">
+                                    <p className="text-[10px] text-center sm:text-left font-black text-[var(--text-muted)] uppercase tracking-widest px-2">
                                         {t("settings.nextBilling")}: Feb 14, 2026
                                     </p>
                                 </div>
@@ -325,7 +340,7 @@ function SettingsContent() {
                     {activeSection === "notifications" && (
                         <section className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <div className="space-y-1">
-                                <h2 className="text-2xl font-black uppercase italic tracking-tight text-[var(--text-primary)] flex items-center gap-3">
+                                <h2 className="text-2xl font-black uppercase tracking-tight text-[var(--text-primary)] flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-xl bg-[var(--accent-soft)] flex items-center justify-center text-[var(--accent-primary)] shadow-lg shadow-[var(--accent-primary)]/10">
                                         <Bell className="w-6 h-6" />
                                     </div>
@@ -382,7 +397,7 @@ function SettingsContent() {
                     {activeSection === "security" && (
                         <section className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <div className="space-y-1">
-                                <h2 className="text-2xl font-black uppercase italic tracking-tight text-[var(--text-primary)] flex items-center gap-3">
+                                <h2 className="text-2xl font-black uppercase tracking-tight text-[var(--text-primary)] flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-xl bg-[var(--accent-soft)] flex items-center justify-center text-[var(--accent-primary)] shadow-lg shadow-[var(--accent-primary)]/10">
                                         <Shield className="w-6 h-6" />
                                     </div>

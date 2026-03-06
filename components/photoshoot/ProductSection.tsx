@@ -41,7 +41,7 @@ export function ProductSection({
         <div className="flex flex-col gap-4 py-1">
             {/* Product Type Selector */}
             <div className="space-y-2">
-                <label className="text-[11px] uppercase font-black text-[var(--text-muted)] tracking-[0.2em] px-1">
+                <label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 mb-1 block px-1">
                     {language === "tr" ? "Ürün Tipi" : "Product Type"}
                 </label>
                 <div className="relative group">
@@ -49,22 +49,22 @@ export function ProductSection({
                         <TypeIcon className="w-5 h-5 text-[var(--accent-primary)] group-focus-within:scale-110 transition-transform" />
                     </div>
                     <select
-                        className="w-full text-sm pl-12 pr-4 py-4 rounded-md bg-[#18181b] border-2 border-white/5 text-zinc-100 focus:ring-2 focus:ring-white/10 focus:border-white/20 appearance-none transition-all shadow-sm hover:shadow-md font-black uppercase tracking-tight"
+                        className="w-full bg-[#121214] rounded-md border border-white/10 text-white text-[13px] font-medium pl-12 pr-4 py-3 focus:border-white/25 focus:outline-none transition-colors duration-150 appearance-none shadow-sm"
                         value={workflowType}
                         onChange={(e) => setWorkflowType(e.target.value as any)}
                     >
-                        <option value="upper" className="bg-[#18181b]">{language === "tr" ? "Üst Giyim" : "Upper Body"}</option>
-                        <option value="lower" className="bg-[#18181b]">{language === "tr" ? "Alt Giyim" : "Lower Body"}</option>
-                        <option value="dress" className="bg-[#18181b]">{language === "tr" ? "Elbise / Tulum" : "Dress / Jumpsuit"}</option>
-                        <option value="set" className="bg-[#18181b]">{language === "tr" ? "Takım" : "Set"}</option>
+                        <option value="upper" className="bg-[#121214]">{language === "tr" ? "Üst Giyim" : "Upper Body"}</option>
+                        <option value="lower" className="bg-[#121214]">{language === "tr" ? "Alt Giyim" : "Lower Body"}</option>
+                        <option value="dress" className="bg-[#121214]">{language === "tr" ? "Elbise / Tulum" : "Dress / Jumpsuit"}</option>
+                        <option value="set" className="bg-[#121214]">{language === "tr" ? "Takım" : "Set"}</option>
                     </select>
-                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none" />
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none" />
                 </div>
             </div>
 
             {/* Product Name Input */}
             <div className="space-y-2">
-                <label className="text-[11px] uppercase font-black text-[var(--text-muted)] tracking-[0.2em] px-1">
+                <label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 mb-1 block px-1">
                     {language === "tr" ? "Ürün Adı" : "Product Name"}
                 </label>
                 <div className="relative group">
@@ -109,7 +109,7 @@ export function ProductSection({
                             }
                         }}
                         placeholder={language === "tr" ? "Gömlek, Pantolon..." : "Enter name..."}
-                        className="w-full bg-[#18181b] border-2 border-white/5 text-zinc-100 text-sm font-black placeholder:text-zinc-500 rounded-md pl-12 pr-4 py-4 focus:ring-2 focus:ring-white/10 focus:border-white/20 outline-none transition-all shadow-sm hover:shadow-md"
+                        className="w-full bg-[#121214] rounded-md border border-white/10 text-white text-[13px] font-medium placeholder:text-zinc-600 pl-12 pr-4 py-3 focus:border-white/25 focus:outline-none transition-colors duration-150 shadow-sm"
                     />
                 </div>
             </div>

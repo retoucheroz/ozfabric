@@ -183,250 +183,255 @@ export default function FaceHeadSwapPage() {
     }
 
     return (
-        <div className="max-w-[1240px] mx-auto p-4 md:p-8 space-y-8 min-h-screen pb-24">
-
-
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-2">
-                {/* Left Side: Inputs & Config */}
-                <div className="lg:col-span-5 space-y-6">
-                    {/* 1. Upload Section */}
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest px-1 flex items-center gap-1.5 mb-1.5">
-                                <TbUserCircle className="w-4 h-4 text-[var(--accent-primary)]" />
-                                {t("faceSwap.identitySource")}
-                            </Label>
-                            <Card className="relative h-[240px] overflow-hidden border-2 border-dashed border-white/5 hover:border-white/20 hover:bg-white/[0.02] transition-all bg-[#18181b] p-2 flex items-center justify-center group cursor-pointer rounded-2xl" onClick={() => identityInputRef.current?.click()}>
-                                <input type="file" ref={identityInputRef} className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'identity')} />
-                                {identityImage ? (
-                                    <div className="relative w-full h-full">
-                                        <img src={identityImage} className="w-full h-full object-cover rounded-xl" alt="Identity" />
-                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
-                                            <RefreshCw className="w-6 h-6 text-white animate-spin-slow" />
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-col items-center gap-3 text-center p-4">
-                                        <div className="w-12 h-12 rounded-md bg-[#18181b] border border-white/5 flex items-center justify-center group-hover:bg-white text-zinc-500 group-hover:text-black transition-all">
-                                            <UserCircle2 className="w-6 h-6" />
-                                        </div>
-                                        <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">{t("faceSwap.uploadReference")}</span>
-                                    </div>
-                                )}
-                            </Card>
+        <div className="flex flex-col h-full bg-[#0D0D0F]">
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8 min-h-screen pb-24">
+                <div className="max-w-[1180px] mx-auto w-full flex flex-col lg:flex-row gap-8">
+                    {/* Left: Input */}
+                    <div className="w-full lg:w-[420px] flex flex-col space-y-6 shrink-0">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 rounded-md bg-[#18181B] border border-white/10 text-white shadow-lg">
+                                <UserCircle2 className="w-5 h-5" />
+                            </div>
+                            <div className="flex flex-col">
+                                <label className="text-[13px] font-black uppercase tracking-[0.2em] text-white leading-none">
+                                    {language === "tr" ? "FACE SWAP" : "FACE SWAP"}
+                                </label>
+                                <span className="text-[11px] font-bold text-zinc-400 mt-1.5 leading-none">
+                                    {language === "tr"
+                                        ? "Modelinizin yüzünü kolayca değiştirin."
+                                        : "Easily swap your model's face."}
+                                </span>
+                            </div>
                         </div>
-
-                        <div className="space-y-2">
-                            <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest px-1 flex items-center gap-1.5 mb-1.5">
-                                <TbPhoto className="w-4 h-4 text-[var(--accent-primary)]" />
-                                {t("faceSwap.baseImage")}
-                            </Label>
-                            <Card className="relative h-[240px] overflow-hidden border-2 border-dashed border-white/5 hover:border-white/20 hover:bg-white/[0.02] transition-all bg-[#18181b] p-2 flex items-center justify-center group cursor-pointer rounded-2xl" onClick={() => baseInputRef.current?.click()}>
-                                <input type="file" ref={baseInputRef} className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'base')} />
-                                {baseImage ? (
-                                    <div className="relative w-full h-full">
-                                        <img src={baseImage} className="w-full h-full object-cover rounded-xl" alt="Base" />
-                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
-                                            <RefreshCw className="w-6 h-6 text-white animate-spin-slow" />
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-col items-center gap-3 text-center p-4">
-                                        <div className="w-12 h-12 rounded-md bg-[#18181b] border border-white/5 flex items-center justify-center group-hover:bg-white text-zinc-500 group-hover:text-black transition-all">
-                                            <ImageIcon className="w-6 h-6" />
-                                        </div>
-                                        <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">{t("faceSwap.uploadBase")}</span>
-                                    </div>
-                                )}
-                            </Card>
-                        </div>
-                    </div>
-
-                    {/* 2. Mode & Parameters Panel */}
-                    <Card className="p-5 space-y-6 bg-[#18181b] border border-white/5 shadow-sm rounded-2xl">
-                        <div className="space-y-3">
-                            <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 mb-1">
-                                <TbAdjustmentsHorizontal className="w-4 h-4 text-[var(--accent-primary)]" />
-                                {t("faceSwap.mode")}
-                            </Label>
-                            <Tabs value={swapMode} onValueChange={(v) => setSwapMode(v as any)} className="w-full">
-                                <TabsList className="grid grid-cols-2 w-full h-11 p-1 bg-white/5 rounded-md border border-white/5">
-                                    <TabsTrigger value="head_swap" className="text-[11px] font-black uppercase tracking-widest rounded-md data-[state=active]:bg-white data-[state=active]:text-black transition-all duration-300">
-                                        {t("faceSwap.headSwap")}
-                                    </TabsTrigger>
-                                    <TabsTrigger value="face_swap" className="text-[11px] font-black uppercase tracking-widest rounded-md data-[state=active]:bg-white data-[state=active]:text-black transition-all duration-300">
-                                        {t("faceSwap.faceSwap")}
-                                    </TabsTrigger>
-                                </TabsList>
-                            </Tabs>
-                        </div>
-
+                        {/* 1. Upload Section */}
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-3">
-                                <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                                    <TbAspectRatio className="w-4 h-4 text-[var(--accent-primary)]" />
-                                    {language === 'tr' ? 'EN BOY' : 'RATIO'}
-                                </Label>
-                                <Select value={aspectRatio} onValueChange={setAspectRatio}>
-                                    <SelectTrigger className="h-10 text-[11px] font-black uppercase bg-white/5 border-white/5 rounded-md focus:ring-1 focus:ring-white/20">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-zinc-900 border-white/10">
-                                        {ASPECT_RATIOS.map(r => (
-                                            <SelectItem key={r.value} value={r.value} className="text-[11px] font-bold uppercase">{r.label}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 px-1 flex items-center gap-1.5 mb-0">
+                                    <TbUserCircle className="w-4 h-4 text-zinc-500" />
+                                    {t("faceSwap.identitySource")}
+                                </label>
+                                <Card className="relative h-56 overflow-hidden border border-dashed border-white/20 hover:border-white/40 transition-all bg-[#121214] flex items-center justify-center group cursor-pointer rounded-2xl shadow-none" onClick={() => identityInputRef.current?.click()}>
+                                    <input type="file" ref={identityInputRef} className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'identity')} />
+                                    {identityImage ? (
+                                        <div className="relative w-full h-full">
+                                            <img src={identityImage} className="w-full h-full object-cover rounded-xl p-2" alt="Identity" />
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); setIdentityImage(null); }}
+                                                className="absolute top-4 right-4 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center z-20"
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col items-center gap-3 text-center p-4">
+                                            <div className="w-12 h-12 rounded-lg bg-[#18181B] border border-white/10 flex items-center justify-center group-hover:bg-white text-zinc-500 group-hover:text-black transition-all">
+                                                <UserCircle2 className="w-6 h-6" />
+                                            </div>
+                                            <span className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.18em]">{t("faceSwap.uploadReference")}</span>
+                                        </div>
+                                    )}
+                                </Card>
                             </div>
 
                             <div className="space-y-3">
-                                <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                                    <TbHdr className="w-4 h-4 text-white" />
-                                    {language === 'tr' ? 'KALİTE' : 'QUALITY'}
-                                </Label>
-                                <Select value={resolution} onValueChange={setResolution}>
-                                    <SelectTrigger className="h-10 text-[11px] font-black uppercase bg-white/5 border-white/5 rounded-md focus:ring-1 focus:ring-white/20">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-zinc-900 border-white/10">
-                                        <SelectItem value="1K" className="text-[11px] font-bold">1K - STANDARD</SelectItem>
-                                        <SelectItem value="2K" className="text-[11px] font-bold">2K - HIGH</SelectItem>
-                                        <SelectItem value="4K" className="text-[11px] font-bold">4K - ULTRA</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                <label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 px-1 flex items-center gap-1.5 mb-0">
+                                    <TbPhoto className="w-4 h-4 text-zinc-500" />
+                                    {t("faceSwap.baseImage")}
+                                </label>
+                                <Card className="relative h-56 overflow-hidden border border-dashed border-white/20 hover:border-white/40 transition-all bg-[#121214] flex items-center justify-center group cursor-pointer rounded-2xl shadow-none" onClick={() => baseInputRef.current?.click()}>
+                                    <input type="file" ref={baseInputRef} className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'base')} />
+                                    {baseImage ? (
+                                        <div className="relative w-full h-full">
+                                            <img src={baseImage} className="w-full h-full object-cover rounded-xl p-2" alt="Base" />
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); setBaseImage(null); }}
+                                                className="absolute top-4 right-4 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center z-20"
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col items-center gap-3 text-center p-4">
+                                            <div className="w-12 h-12 rounded-lg bg-[#18181B] border border-white/10 flex items-center justify-center group-hover:bg-white text-zinc-500 group-hover:text-black transition-all">
+                                                <ImageIcon className="w-6 h-6" />
+                                            </div>
+                                            <span className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.18em]">{t("faceSwap.uploadBase")}</span>
+                                        </div>
+                                    )}
+                                </Card>
                             </div>
                         </div>
 
-                        <div className="space-y-3">
-                            <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 px-1">
-                                <RefreshCw className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
-                                {language === 'tr' ? 'SEED (OPSİYONEL)' : 'SEED (OPTIONAL)'}
-                            </Label>
-                            <input
-                                type="number"
-                                value={seed}
-                                onChange={(e) => setSeed(e.target.value)}
-                                placeholder={language === 'tr' ? 'Rastgele için boş bırakın' : 'Leave empty for random'}
-                                className="w-full h-11 bg-[#0D0D0F] border border-white/5 rounded-md px-4 text-[11px] font-medium focus:ring-1 focus:ring-white/20 outline-none transition-all"
-                            />
-                        </div>
+                        {/* 2. Mode & Parameters Panel */}
+                        <div className="space-y-6">
+                            <div className="p-5 space-y-6 bg-[#18181B] border border-white/10 shadow-sm rounded-2xl">
+                                <div className="space-y-3">
+                                    <label className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.18em] flex items-center gap-1.5 mb-1">
+                                        <TbAdjustmentsHorizontal className="w-4 h-4 text-zinc-500" />
+                                        {t("faceSwap.mode")}
+                                    </label>
+                                    <Tabs value={swapMode} onValueChange={(v) => setSwapMode(v as any)} className="w-full">
+                                        <TabsList className="grid grid-cols-2 w-full h-12 p-1 bg-[#121214] rounded-md border border-white/10">
+                                            <TabsTrigger value="head_swap" className="text-[11px] font-black uppercase tracking-[0.18em] rounded-sm data-[state=active]:bg-white data-[state=active]:text-black transition-all py-2">
+                                                {t("faceSwap.headSwap")}
+                                            </TabsTrigger>
+                                            <TabsTrigger value="face_swap" className="text-[11px] font-black uppercase tracking-[0.18em] rounded-sm data-[state=active]:bg-white data-[state=active]:text-black transition-all py-2">
+                                                {t("faceSwap.faceSwap")}
+                                            </TabsTrigger>
+                                        </TabsList>
+                                    </Tabs>
+                                </div>
 
-                        <Button
-                            variant="hot-coral"
-                            size="lg"
-                            className="h-12 w-full overflow-hidden mt-4"
-                            disabled={isGenerating}
-                            onClick={handleGenerate}
-                        >
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-3">
+                                        <label className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.18em] flex items-center gap-1.5">
+                                            <TbAspectRatio className="w-4 h-4 text-zinc-500" />
+                                            {language === 'tr' ? 'EN BOY' : 'RATIO'}
+                                        </label>
+                                        <Select value={aspectRatio} onValueChange={setAspectRatio}>
+                                            <SelectTrigger className="h-12 text-[11px] font-black uppercase bg-[#121214] border-white/10 text-white rounded-md focus:ring-1 focus:ring-white/20 shadow-sm">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent className="bg-[#121214] border-white/10 text-white">
+                                                {ASPECT_RATIOS.map(r => (
+                                                    <SelectItem key={r.value} value={r.value} className="text-[11px] font-bold uppercase focus:bg-white/5 focus:text-white">{r.label}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <label className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.18em] flex items-center gap-1.5">
+                                            <TbHdr className="w-4 h-4 text-zinc-500" />
+                                            {language === 'tr' ? 'KALİTE' : 'QUALITY'}
+                                        </label>
+                                        <Select value={resolution} onValueChange={setResolution}>
+                                            <SelectTrigger className="h-12 text-[11px] font-black uppercase bg-[#121214] border-white/10 text-white rounded-md focus:ring-1 focus:ring-white/20 shadow-sm">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent className="bg-[#121214] border-white/10 text-white">
+                                                <SelectItem value="1K" className="text-[11px] font-bold focus:bg-white/5 focus:text-white">1K - STANDARD</SelectItem>
+                                                <SelectItem value="2K" className="text-[11px] font-bold focus:bg-white/5 focus:text-white">2K - HIGH</SelectItem>
+                                                <SelectItem value="4K" className="text-[11px] font-bold focus:bg-white/5 focus:text-white">4K - ULTRA</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-3">
+                                    <label className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.18em] flex items-center gap-1.5 px-1">
+                                        <RefreshCw className="w-3.5 h-3.5 text-zinc-500" />
+                                        {language === 'tr' ? 'SEED (OPSİYONEL)' : 'SEED (OPTIONAL)'}
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={seed}
+                                        onChange={(e) => setSeed(e.target.value)}
+                                        placeholder={language === 'tr' ? 'Rastgele için boş bırakın' : 'Leave empty for random'}
+                                        className="w-full h-12 bg-[#121214] border border-white/10 rounded-md px-4 text-white text-[13px] font-medium focus:ring-1 focus:border-white/25 focus:ring-white/10 outline-none transition-all shadow-sm"
+                                    />
+                                </div>
+
+                                <Button
+                                    variant="default"
+                                    className="w-full h-12 mt-4 bg-[#FF3D5A] hover:bg-[#FF3D5A]/90 text-white rounded-md flex items-center justify-center font-black"
+                                    disabled={isGenerating}
+                                    onClick={handleGenerate}
+                                >
+                                    {isGenerating ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 animate-spin mr-3" />
+                                            <span className="text-[11px] uppercase tracking-[0.18em]">{t("faceSwap.generating")}</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Camera className="w-4 h-4 mr-2 flex-none" />
+                                            <div className="flex items-center gap-1.5 whitespace-nowrap text-[11px] uppercase tracking-[0.18em]">
+                                                <span>{t("faceSwap.generate")}</span>
+                                                <div className="h-4 w-px bg-white/30 mx-2 shrink-0" />
+                                                <div className="flex items-center gap-1">
+                                                    <TbCoins className="w-4 h-4" />
+                                                    <span className="font-black tracking-tighter">
+                                                        {estimatedCost}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Right Side: Result Section */}
+                    <div className="flex-1 flex flex-col space-y-2">
+                        <label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 px-1 flex items-center gap-1.5 mb-1.5">
+                            <Sparkles className="w-4 h-4 text-zinc-500" />
+                            {language === 'tr' ? 'SONUÇ' : 'RESULT'}
+                        </label>
+                        <div className="relative flex-1 min-h-[500px] lg:min-h-0 bg-[#121214] border border-dashed border-white/20 overflow-hidden flex items-center justify-center group rounded-2xl shadow-none hover:border-white/40 transition-colors">
                             {isGenerating ? (
-                                <>
-                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                    <span>{t("faceSwap.generating")}</span>
-                                </>
-                            ) : (
-                                <>
-                                    <Camera className="w-4 h-4 flex-none" />
-                                    <div className="flex items-center gap-1.5 whitespace-nowrap">
-                                        <span>{t("faceSwap.generate")}</span>
-                                        <div className="h-4 w-px bg-white/20 mx-1 shrink-0" />
-                                        <div className="flex items-center gap-1 opacity-90">
-                                            <TbCoins className="w-4 h-4" />
-                                            <span className="text-[10px] font-black">
-                                                {estimatedCost}
-                                            </span>
+                                <div className="absolute inset-0 bg-black/80 backdrop-blur-xl z-20 flex flex-col items-center justify-center p-8 text-center space-y-6">
+                                    <div className="relative">
+                                        <div className="w-24 h-24 border-2 border-white/5 border-t-white rounded-full animate-spin" />
+                                        <div className="absolute inset-0 m-auto w-12 h-12 flex items-center justify-center">
+                                            <Sparkles className="w-6 h-6 text-white animate-pulse" />
                                         </div>
                                     </div>
-                                </>
+                                    <div className="space-y-3">
+                                        <h3 className="text-xl font-black uppercase tracking-tighter text-white">{language === 'tr' ? 'Oluşturuluyor...' : 'Generating...'}</h3>
+                                        <p className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 max-w-[240px] mx-auto">{language === 'tr' ? 'Nano Banana Pro pikselleri yeniden örüyor.' : 'Nano Banana Pro is weaving the pixels.'}</p>
+                                    </div>
+                                </div>
+                            ) : null}
+
+                            {resultImage ? (
+                                <div className="w-full h-full flex flex-col p-4 space-y-4 animate-in fade-in zoom-in duration-500">
+                                    <div className="relative flex-1 overflow-hidden rounded-2xl shadow-inner bg-black/5">
+                                        <img src={resultImage} className="w-full h-full object-contain" alt="Result" />
+                                        <div className="absolute top-4 right-4 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Button variant="secondary" className="bg-[#F5F5F5] text-black hover:bg-zinc-200 font-black h-10 px-5 rounded-md uppercase tracking-[0.18em] text-[11px]" onClick={() => window.open(resultImage, '_blank')}>{language === "tr" ? "TAM BOYUT" : "FULL SIZE"}</Button>
+                                            <Button variant="secondary" size="icon" className="bg-[#F5F5F5] text-black hover:bg-zinc-200 h-10 w-10 rounded-md" onClick={handleDownload}>
+                                                <Download className="w-5 h-5" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center justify-between px-2">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                                            <span className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500">{language === 'tr' ? 'BAŞARIYLA ÜRETİLDİ' : 'SUCCESSFULLY GENERATED'}</span>
+                                        </div>
+                                        <div className="flex gap-3">
+                                            <Button variant="secondary" size="sm" onClick={() => setResultImage(null)} className="h-10 text-[11px] font-black uppercase tracking-[0.18em] rounded-md px-5 bg-[#F5F5F5] text-black hover:bg-zinc-200 transition-all">
+                                                <TbRefresh className="w-4 h-4 mr-2" />
+                                                {language === 'tr' ? 'YENİ' : 'NEW'}
+                                            </Button>
+                                            <Button size="sm" onClick={handleDownload} className="h-10 bg-[#FF3D5A] text-white text-[11px] font-black uppercase tracking-[0.18em] rounded-md px-5 hover:bg-[#FF3D5A]/90 shadow-xl transition-all">
+                                                <Download className="w-4 h-4 mr-2" />
+                                                {language === 'tr' ? 'İNDİR' : 'DOWNLOAD'}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col items-center gap-4 text-center p-12">
+                                    <div className="w-20 h-20 rounded-full bg-[#18181b] border border-white/5 flex items-center justify-center">
+                                        <ImageIcon className="w-10 h-10 text-white/50" />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <h4 className="font-black text-2xl uppercase tracking-[0.2em] text-[#f5f5f5]">{language === 'tr' ? 'FACE SWAP' : 'FACE SWAP'}</h4>
+                                        <p className="text-[11px] font-bold text-zinc-400 max-w-[280px] mx-auto">
+                                            {language === 'tr'
+                                                ? 'Kimlik kaynağı ve hedef görseli yükledikten sonra "Oluştur" butonuna basın.'
+                                                : 'Upload your images and click Generate to see the result here.'}
+                                        </p>
+                                    </div>
+                                </div>
                             )}
-                        </Button>
-                    </Card>
-
-                    <div className="p-5 bg-white/[0.03] rounded-2xl border border-white/5 hidden lg:block">
-                        <p className="text-[10px] text-zinc-500 font-bold leading-relaxed uppercase tracking-tighter">
-                            <strong className="text-white mr-2">{language === 'tr' ? 'PRO İPUCU:' : 'PRO TIP:'}</strong>
-                            {language === 'tr'
-                                ? 'Işık ve gölge ayarları hedef görsele (Base) göre otomatik yapılır. Kimlik görselinin sadece yüz hatları alınır.'
-                                : 'Lighting and shadows are matched to the base image. Only facial identity features are taken from the source.'}
-                        </p>
+                        </div>
                     </div>
-                </div>
-
-                {/* Right Side: Result Section */}
-                <div className="lg:col-span-7 flex flex-col h-full space-y-2">
-                    <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest px-1 flex items-center gap-1.5 mb-1.5">
-                        <Sparkles className="w-4 h-4 text-[var(--accent-primary)]" />
-                        {language === 'tr' ? 'SONUÇ' : 'RESULT'}
-                    </Label>
-                    <Card className="relative flex-1 min-h-[500px] lg:min-h-0 bg-[#18181b] border-2 border-dashed border-border dark:border-white/10 overflow-hidden flex items-center justify-center group rounded-3xl shadow-none hover:border-border/80 dark:hover:border-white/20 transition-colors">
-                        {isGenerating ? (
-                            <div className="absolute inset-0 bg-black/80 backdrop-blur-xl z-20 flex flex-col items-center justify-center p-8 text-center space-y-6">
-                                <div className="relative">
-                                    <div className="w-24 h-24 border-2 border-white/5 border-t-white rounded-full animate-spin" />
-                                    <div className="absolute inset-0 m-auto w-12 h-12 flex items-center justify-center">
-                                        <Sparkles className="w-6 h-6 text-white animate-pulse" />
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <h3 className="text-xl font-black uppercase tracking-widest text-white">{language === 'tr' ? 'İşleniyor...' : 'Processing...'}</h3>
-                                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em] max-w-[240px] mx-auto">{language === 'tr' ? 'Nano Banana Pro pikselleri yeniden örüyor.' : 'Nano Banana Pro is weaving the pixels.'}</p>
-                                </div>
-                            </div>
-                        ) : null}
-
-                        {resultImage ? (
-                            <div className="w-full h-full flex flex-col p-4 space-y-4 animate-in fade-in zoom-in duration-500">
-                                <div className="relative flex-1 overflow-hidden rounded-2xl shadow-inner bg-black/5">
-                                    <img src={resultImage} className="w-full h-full object-contain" alt="Result" />
-                                    <Button
-                                        variant="secondary"
-                                        size="icon"
-                                        onClick={handleDownload}
-                                        className="absolute top-4 right-4 w-10 h-10 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                                    >
-                                        <Download className="w-5 h-5" />
-                                    </Button>
-                                </div>
-                                <div className="flex items-center justify-between px-2">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                        <span className="text-[10px] font-bold text-muted-foreground uppercase">{language === 'tr' ? 'BAŞARIYLA ÜRETİLDİ' : 'SUCCESSFULLY GENERATED'}</span>
-                                        {lastUsedSeed && (
-                                            <span className="text-[10px] bg-muted px-2 py-0.5 rounded-full font-mono text-muted-foreground ml-2">
-                                                Seed: {lastUsedSeed}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <div className="flex gap-3">
-                                        <Button variant="ghost" size="sm" onClick={() => setResultImage(null)} className="h-10 text-[11px] font-black uppercase tracking-widest rounded-md px-5 border border-white/5 bg-white/5 hover:bg-white hover:text-black transition-all">
-                                            <RefreshCw className="w-4 h-4 mr-2" />
-                                            {language === 'tr' ? 'YENİ' : 'NEW'}
-                                        </Button>
-                                        <Button size="sm" onClick={handleDownload} className="h-10 bg-white text-black text-[11px] font-black uppercase tracking-widest rounded-md px-5 hover:bg-zinc-200 shadow-xl transition-all">
-                                            <Download className="w-4 h-4 mr-2" />
-                                            {language === 'tr' ? 'İNDİR' : 'DOWNLOAD'}
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="flex flex-col items-center gap-4 text-center opacity-40 p-12">
-                                <div className="w-20 h-20 rounded-full bg-[#18181b] border border-white/5 flex items-center justify-center">
-                                    <ImageIcon className="w-10 h-10 text-muted-foreground/30" />
-                                </div>
-                                <div className="space-y-1">
-                                    <h4 className="font-bold text-muted-foreground">{language === 'tr' ? 'Sonuç Bekleniyor' : 'Awaiting Result'}</h4>
-                                    <p className="text-[11px] text-muted-foreground max-w-[240px]">
-                                        {language === 'tr'
-                                            ? 'Kimlik kaynağı ve hedef görseli yükledikten sonra "Oluştur" butonuna basın.'
-                                            : 'Upload your images and click Generate to see the result here.'}
-                                    </p>
-                                </div>
-                            </div>
-                        )}
-                    </Card>
                 </div>
             </div>
         </div>
     )
 }
-

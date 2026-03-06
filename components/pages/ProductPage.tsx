@@ -13,7 +13,8 @@ import {
     Camera,
     Package,
     Box,
-    Image as ImageIcon
+    Image as ImageIcon,
+    ChevronRight
 } from "lucide-react"
 import {
     TbCoins,
@@ -169,14 +170,29 @@ function ProductPageContent() {
 
                     {/* Left: Input Panel */}
                     <div className="w-full lg:w-[420px] flex flex-col space-y-6 shrink-0">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 rounded-md bg-[#18181B] border border-white/10 text-white shadow-lg">
+                                <Package className="w-5 h-5" />
+                            </div>
+                            <div className="flex flex-col">
+                                <label className="text-[13px] font-black uppercase tracking-[0.2em] text-white leading-none">
+                                    {language === "tr" ? "ÜRÜN ÇEKİMİ" : "PRODUCT SHOT"}
+                                </label>
+                                <span className="text-[11px] font-bold text-zinc-400 mt-1.5 leading-none">
+                                    {language === "tr"
+                                        ? "Ürünleriniz için sanatsal çekimler yapın."
+                                        : "Create artistic shots for your products."}
+                                </span>
+                            </div>
+                        </div>
 
                         {/* Main Product Image */}
                         <div className="space-y-3">
-                            <label className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-2 px-1">
-                                <Package className="w-4 h-4 text-white" />
+                            <label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 flex items-center gap-2 px-1">
+                                <Package className="w-4 h-4 text-zinc-500" />
                                 {t("product.mainImage")} *
                             </label>
-                            <div className="h-48 border-2 border-dashed border-white/5 rounded-2xl bg-[#18181b] relative group hover:border-white transition-all cursor-pointer overflow-hidden">
+                            <div className="h-40 border border-dashed border-white/20 rounded-2xl bg-[#121214] relative group hover:border-white/40 transition-all cursor-pointer overflow-hidden shadow-none">
                                 <input
                                     type="file"
                                     accept="image/*"
@@ -194,9 +210,11 @@ function ProductPageContent() {
                                         </button>
                                     </div>
                                 ) : (
-                                    <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground gap-2">
-                                        <Box className="w-8 h-8 opacity-50" />
-                                        <span className="text-xs uppercase font-black tracking-widest">{language === 'tr' ? 'ANA GÖRSEL YÜKLE' : 'UPLOAD MAIN IMAGE'}</span>
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground gap-3">
+                                        <div className="w-12 h-12 rounded-lg bg-[#18181B] border border-white/10 flex items-center justify-center group-hover:bg-white text-zinc-500 group-hover:text-black transition-all">
+                                            <Box className="w-6 h-6" />
+                                        </div>
+                                        <span className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.18em]">{language === 'tr' ? 'ANA GÖRSEL YÜKLE' : 'UPLOAD MAIN IMAGE'}</span>
                                     </div>
                                 )}
                             </div>
@@ -204,13 +222,13 @@ function ProductPageContent() {
 
                         {/* Optional Detail Images */}
                         <div className="space-y-3">
-                            <label className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-2 px-1">
-                                <TbPhoto className="w-4 h-4 text-white" />
+                            <label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 flex items-center gap-2 px-1">
+                                <TbPhoto className="w-4 h-4 text-zinc-500" />
                                 {t("product.detailImages")}
                             </label>
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-2 gap-4">
                                 {/* Detail 1 */}
-                                <div className="h-32 border-2 border-dashed border-white/5 rounded-2xl bg-[#18181b] relative group hover:bg-white/[0.05] transition-all cursor-pointer overflow-hidden text-center">
+                                <div className="h-32 border border-dashed border-white/20 rounded-2xl bg-[#121214] relative group hover:border-white/40 transition-all cursor-pointer overflow-hidden text-center shadow-none">
                                     <input
                                         type="file"
                                         accept="image/*"
@@ -228,15 +246,20 @@ function ProductPageContent() {
                                             </button>
                                         </div>
                                     ) : (
-                                        <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground gap-1">
-                                            <span className="text-[10px] font-black uppercase tracking-widest">{t("product.detail1")}</span>
-                                            <span className="text-[8px] opacity-50">{language === 'tr' ? '(OPSİYONEL)' : '(OPTIONAL)'}</span>
+                                        <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground gap-2">
+                                            <div className="w-10 h-10 rounded-lg bg-[#18181B] border border-white/10 flex items-center justify-center group-hover:bg-white text-zinc-500 group-hover:text-black transition-all">
+                                                <TbPhoto className="w-5 h-5" />
+                                            </div>
+                                            <div className="flex flex-col items-center gap-0.5">
+                                                <span className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.18em]">{t("product.detail1")}</span>
+                                                <span className="text-[9px] font-black uppercase tracking-[0.18em] opacity-40">{language === 'tr' ? '(OPSİYONEL)' : '(OPTIONAL)'}</span>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
 
                                 {/* Detail 2 */}
-                                <div className="h-32 border-2 border-dashed border-white/5 rounded-2xl bg-[#18181b] relative group hover:bg-white/[0.05] transition-all cursor-pointer overflow-hidden text-center">
+                                <div className="h-32 border border-dashed border-white/20 rounded-2xl bg-[#121214] relative group hover:border-white/40 transition-all cursor-pointer overflow-hidden text-center shadow-none">
                                     <input
                                         type="file"
                                         accept="image/*"
@@ -254,9 +277,14 @@ function ProductPageContent() {
                                             </button>
                                         </div>
                                     ) : (
-                                        <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground gap-1">
-                                            <span className="text-[10px] font-black uppercase tracking-widest">{t("product.detail2")}</span>
-                                            <span className="text-[8px] opacity-50">{language === 'tr' ? '(OPSİYONEL)' : '(OPTIONAL)'}</span>
+                                        <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground gap-2">
+                                            <div className="w-10 h-10 rounded-lg bg-[#18181B] border border-white/10 flex items-center justify-center group-hover:bg-white text-zinc-500 group-hover:text-black transition-all">
+                                                <TbPhoto className="w-5 h-5" />
+                                            </div>
+                                            <div className="flex flex-col items-center gap-0.5">
+                                                <span className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.18em]">{t("product.detail2")}</span>
+                                                <span className="text-[9px] font-black uppercase tracking-[0.18em] opacity-40">{language === 'tr' ? '(OPSİYONEL)' : '(OPTIONAL)'}</span>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -265,80 +293,84 @@ function ProductPageContent() {
 
                         {/* Prompt Area */}
                         <div className="space-y-3">
-                            <label className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-2 px-1">
-                                <TbMessageDots className="w-4 h-4 text-white" />
+                            <label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 flex items-center gap-2 px-1">
+                                <TbMessageDots className="w-4 h-4 text-zinc-500" />
                                 {t("product.prompt")}
                             </label>
                             <textarea
                                 value={prompt}
                                 onChange={(e) => setPrompt(e.target.value)}
                                 placeholder={t("product.promptPlaceholder")}
-                                className="w-full h-32 bg-[#18181b] border border-white/5 rounded-2xl p-4 text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-white/20 transition-all resize-none overflow-y-auto custom-scrollbar"
+                                className="w-full h-32 bg-[#121214] border border-white/10 rounded-2xl p-4 text-[13px] font-medium text-white shadow-none placeholder:text-zinc-600 focus:outline-none focus:border-white/30 transition-all resize-none overflow-y-auto custom-scrollbar"
                             />
                         </div>
 
                         {/* Settings */}
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-3">
-                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                                    <TbAspectRatio className="w-4 h-4 text-white" />
+                                <label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 flex items-center gap-2 px-1">
+                                    <TbAspectRatio className="w-4 h-4 text-zinc-500" />
                                     {language === "tr" ? "ORAN" : "RATIO"}
                                 </label>
-                                <select
-                                    value={selectedAspectRatio}
-                                    onChange={(e) => setSelectedAspectRatio(e.target.value)}
-                                    className="w-full h-11 bg-white/5 border border-white/10 rounded-md px-4 text-[10px] font-bold text-white uppercase tracking-tight focus:outline-none"
-                                >
-                                    {ASPECT_RATIO_OPTIONS.map(ratio => (
-                                        <option key={ratio.id} value={ratio.id} className="bg-zinc-900">
-                                            {ratio.id} ({language === 'tr' ? ratio.labelTr : ratio.label})
-                                        </option>
-                                    ))}
-                                </select>
+                                <div className="relative">
+                                    <select
+                                        value={selectedAspectRatio}
+                                        onChange={(e) => setSelectedAspectRatio(e.target.value)}
+                                        className="w-full h-12 bg-[#121214] border border-white/10 rounded-xl px-4 pr-10 text-[11px] font-black text-white shadow-none uppercase tracking-[0.18em] focus:outline-none focus:border-white/30 transition-all appearance-none"
+                                    >
+                                        {ASPECT_RATIO_OPTIONS.map(ratio => (
+                                            <option key={ratio.id} value={ratio.id} className="bg-[#121214]">
+                                                {ratio.id} ({language === 'tr' ? ratio.labelTr : ratio.label})
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none rotate-90" />
+                                </div>
                             </div>
 
                             <div className="space-y-3">
-                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                                    <Maximize2 className="w-4 h-4 text-white" />
+                                <label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 flex items-center gap-2 px-1">
+                                    <Maximize2 className="w-4 h-4 text-zinc-500" />
                                     {language === "tr" ? "KALİTE" : "QUALITY"}
                                 </label>
-                                <select
-                                    value={selectedResolution}
-                                    onChange={(e) => setSelectedResolution(e.target.value)}
-                                    className="w-full h-11 bg-white/5 border border-white/10 rounded-md px-4 text-[10px] font-bold text-white uppercase tracking-tight focus:outline-none"
-                                >
-                                    {RESOLUTION_OPTIONS.map(res => (
-                                        <option key={res.id} value={res.id} className="bg-zinc-900">
-                                            {res.id} {language === 'tr' ? res.labelTr : res.label}
-                                        </option>
-                                    ))}
-                                </select>
+                                <div className="relative">
+                                    <select
+                                        value={selectedResolution}
+                                        onChange={(e) => setSelectedResolution(e.target.value)}
+                                        className="w-full h-12 bg-[#121214] border border-white/10 rounded-xl px-4 pr-10 text-[11px] font-black text-white shadow-none uppercase tracking-[0.18em] focus:outline-none focus:border-white/30 transition-all appearance-none"
+                                    >
+                                        {RESOLUTION_OPTIONS.map(res => (
+                                            <option key={res.id} value={res.id} className="bg-[#121214]">
+                                                {res.id} {language === 'tr' ? res.labelTr : res.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none rotate-90" />
+                                </div>
                             </div>
                         </div>
 
                         {/* Generate Button */}
                         <div className="pt-4">
                             <Button
-                                variant="hot-coral"
-                                size="lg"
-                                className="h-12 w-full overflow-hidden"
+                                className="h-12 w-full overflow-hidden bg-[#FF3D5A] hover:bg-[#FF3D5A]/90 text-white rounded-md shadow-xl transition-all font-black text-[11px] uppercase tracking-[0.18em]"
                                 disabled={isProcessing}
                                 onClick={handleGenerate}
                             >
                                 {isProcessing ? (
                                     <>
-                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
                                         <span>{t("product.generating")}</span>
                                     </>
                                 ) : (
                                     <>
-                                        <Camera className="w-4 h-4 flex-none" />
+                                        <Camera className="w-4 h-4 flex-none mr-2" />
                                         <div className="flex items-center gap-1.5 whitespace-nowrap">
                                             <span>{language === "tr" ? "OLUŞTUR" : "GENERATE"}</span>
-                                            <div className="h-4 w-px bg-white/20 mx-1 shrink-0" />
+                                            <div className="h-4 w-px bg-white/30 mx-1 shrink-0" />
                                             <div className="flex items-center gap-1 opacity-90">
                                                 <TbCoins className="w-4 h-4" />
-                                                <span className="text-[10px] font-black">
+                                                <span className="text-[11px] font-black tracking-tighter">
                                                     {selectedResolution === "4K" ? SERVICE_COSTS.IMAGE_GENERATION.PRODUCT_MODEL_4K : SERVICE_COSTS.IMAGE_GENERATION.PRODUCT_MODEL_1_2K}
                                                 </span>
                                             </div>
@@ -351,12 +383,12 @@ function ProductPageContent() {
 
                     {/* Right Area: Result */}
                     <div className="flex-1 flex flex-col space-y-2">
-                        <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest px-1 flex items-center gap-1.5 mb-1.5">
-                            <Sparkles className="w-4 h-4 text-[var(--accent-primary)]" />
+                        <Label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 px-1 flex items-center gap-1.5 mb-1.5">
+                            <Sparkles className="w-4 h-4 text-zinc-500" />
                             {language === 'tr' ? 'SONUÇ' : 'RESULT'}
                         </Label>
 
-                        <Card className="relative flex-1 min-h-[500px] lg:min-h-0 bg-[#18181b] border-2 border-dashed border-border dark:border-white/10 overflow-hidden flex items-center justify-center group rounded-3xl shadow-none hover:border-border/80 dark:hover:border-white/20 transition-colors">
+                        <div className="relative flex-1 min-h-[500px] lg:min-h-0 bg-[#121214] border border-dashed border-white/20 overflow-hidden flex items-center justify-center group rounded-2xl shadow-none hover:border-white/40 transition-colors">
                             {isProcessing ? (
                                 <div className="absolute inset-0 bg-black/80 backdrop-blur-xl z-20 flex flex-col items-center justify-center p-8 text-center space-y-6">
                                     <div className="relative">
@@ -366,16 +398,16 @@ function ProductPageContent() {
                                         </div>
                                     </div>
                                     <div className="space-y-3">
-                                        <h3 className="text-xl font-black uppercase italic tracking-tighter text-white">{language === 'tr' ? 'ÜRETİLİYOR' : 'GENERATING'}</h3>
-                                        <p className="text-[10px] uppercase font-black tracking-[0.2em] text-zinc-500 transition-all duration-300 min-h-[1.5em] max-w-[240px] mx-auto">
+                                        <h3 className="text-xl font-black uppercase tracking-tighter text-white">{language === 'tr' ? 'ÜRETİLİYOR...' : 'GENERATING...'}</h3>
+                                        <p className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 max-w-[240px] mx-auto transition-all duration-300 min-h-[1.5em] text-balance">
                                             {language === 'tr' ? LOADING_MESSAGES[currentMessageIndex].tr : LOADING_MESSAGES[currentMessageIndex].en}
                                         </p>
                                     </div>
                                     <div className="w-full max-w-[280px] space-y-4">
                                         <Progress value={generationProgress} className="h-1.5 w-full bg-white/5" />
-                                        <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                                        <div className="flex justify-between text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500">
                                             <span>{generationProgress}%</span>
-                                            <span>{language === 'tr' ? 'Tahmini süre: 15-20sn' : 'Est. time: 15-20s'}</span>
+                                            <span>{language === 'tr' ? 'TAHMİNİ: 15-20SN' : 'EST. TIME: 15-20S'}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -384,7 +416,7 @@ function ProductPageContent() {
                                     <div className="relative flex-1 overflow-hidden rounded-2xl shadow-inner bg-black/5">
                                         <img src={resultImage} className="w-full h-full object-contain" alt="Result" />
                                         <div className="absolute top-4 right-4 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <Button variant="secondary" size="icon" className="bg-white text-black hover:bg-zinc-200 h-10 w-10 rounded-md" onClick={() => downloadImage(resultImage, `product_${Date.now()}.png`)}>
+                                            <Button variant="secondary" size="icon" className="bg-white text-black hover:bg-zinc-200 h-10 w-10 rounded-md" onClick={() => downloadImage(resultImage!, `product_${Date.now()}.png`)}>
                                                 <Download className="w-5 h-5" />
                                             </Button>
                                         </div>
@@ -392,14 +424,14 @@ function ProductPageContent() {
                                     <div className="flex items-center justify-between px-2">
                                         <div className="flex items-center gap-2">
                                             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                            <span className="text-[10px] font-bold text-muted-foreground uppercase">{language === 'tr' ? 'BAŞARIYLA ÜRETİLDİ' : 'SUCCESSFULLY GENERATED'}</span>
+                                            <span className="text-[11px] font-black text-zinc-500 tracking-[0.18em] uppercase">{language === 'tr' ? 'BAŞARIYLA ÜRETİLDİ' : 'SUCCESSFULLY GENERATED'}</span>
                                         </div>
                                         <div className="flex gap-3">
-                                            <Button variant="ghost" size="sm" onClick={() => setResultImage(null)} className="h-10 text-[11px] font-black uppercase tracking-widest rounded-md px-5 border border-white/5 bg-white/5 hover:bg-white hover:text-black transition-all">
+                                            <Button variant="secondary" size="sm" onClick={() => setResultImage(null)} className="h-10 text-[11px] font-black uppercase tracking-[0.18em] rounded-md px-5 bg-[#F5F5F5] text-black hover:bg-zinc-200 shadow-none transition-all">
                                                 <TbRefresh className="w-4 h-4 mr-2" />
                                                 {language === 'tr' ? 'YENİ' : 'NEW'}
                                             </Button>
-                                            <Button size="sm" onClick={() => downloadImage(resultImage, `product_${Date.now()}.png`)} className="h-10 bg-white text-black text-[11px] font-black uppercase tracking-widest rounded-md px-5 hover:bg-zinc-200 shadow-xl transition-all">
+                                            <Button size="sm" onClick={() => downloadImage(resultImage!, `product_${Date.now()}.png`)} className="h-10 bg-[#FF3D5A] text-white text-[11px] font-black uppercase tracking-[0.18em] rounded-md px-5 hover:bg-[#FF3D5A]/90 shadow-xl transition-all">
                                                 <Download className="w-4 h-4 mr-2" />
                                                 {language === 'tr' ? 'İNDİR' : 'DOWNLOAD'}
                                             </Button>
@@ -408,18 +440,18 @@ function ProductPageContent() {
                                 </div>
                             ) : (
                                 <div className="flex flex-col items-center gap-4 text-center p-12">
-                                    <div className="w-20 h-20 rounded-full bg-[#18181b] border border-white/5 flex items-center justify-center">
+                                    <div className="w-20 h-20 rounded-full bg-[#18181B] border border-white/10 flex items-center justify-center shadow-none">
                                         <Package className="w-10 h-10 text-white/50" />
                                     </div>
                                     <div className="space-y-1">
                                         <h4 className="font-black text-2xl uppercase tracking-[0.2em] text-[#f5f5f5]">{t("product.title")}</h4>
-                                        <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em] max-w-[280px] mx-auto text-balance">
+                                        <p className="text-[11px] text-zinc-500 font-bold uppercase tracking-[0.18em] max-w-[280px] mx-auto text-balance mt-2">
                                             {t("product.subtitle")}
                                         </p>
                                     </div>
                                 </div>
                             )}
-                        </Card>
+                        </div>
                     </div>
                 </div>
             </div>

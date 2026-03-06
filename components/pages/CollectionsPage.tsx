@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation"
 
 export default function CollectionsPage() {
     const { collections, addCollection, projects } = useProjects();
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const router = useRouter();
     const [newTitle, setNewTitle] = useState("");
     const [isCreating, setIsCreating] = useState(false);
@@ -26,11 +26,22 @@ export default function CollectionsPage() {
     return (
         <div className="p-8 space-y-8 max-w-7xl mx-auto">
             <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight">{t("collections.title")}</h1>
-                    <p className="text-muted-foreground mt-1">{t("collections.subtitle")}</p>
+                <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-md bg-[#18181B] border border-white/10 text-white shadow-lg">
+                        <Folder className="w-5 h-5" />
+                    </div>
+                    <div className="flex flex-col">
+                        <label className="text-[13px] font-black uppercase tracking-[0.2em] text-white leading-none">
+                            {language === "tr" ? "KOLEKSİYONLAR" : "COLLECTIONS"}
+                        </label>
+                        <span className="text-[11px] font-bold text-zinc-400 mt-1.5 leading-none">
+                            {language === "tr"
+                                ? "Görsellerinizi düzenlemek için klasörler oluşturun."
+                                : "Create folders to organize your generations."}
+                        </span>
+                    </div>
                 </div>
-                <Button size="lg" onClick={() => setIsCreating(!isCreating)} className="shadow-lg bg-violet-500 text-white hover:bg-violet-600">
+                <Button size="lg" onClick={() => setIsCreating(!isCreating)} className="shadow-lg bg-white/5 border border-white/10 text-white hover:bg-white/10 rounded-xl h-11 px-6">
                     <Plus className="w-5 h-5 mr-2" /> {t("collections.newCollection")}
                 </Button>
             </div>

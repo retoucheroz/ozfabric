@@ -114,243 +114,292 @@ export default function TrainPage() {
     };
 
     return (
-        <div className="p-8 max-w-6xl mx-auto space-y-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-8 py-8 border-b border-white/5 bg-[#0D0D0F]">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-white/10 text-white flex items-center justify-center shadow-xl">
-                        <TbSparkles className="w-6 h-6" />
-                    </div>
-                    <div className="flex flex-col">
-                        <h1 className="text-3xl font-black tracking-tighter uppercase italic text-white leading-none">{t("train.title")}</h1>
-                        <p className="text-[11px] text-zinc-500 uppercase font-black tracking-[0.2em] mt-1.5">{t("train.subtitle")}</p>
-                    </div>
-                </div>
-                <div className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                    <Zap className="w-3.5 h-3.5" />
-                    {models.filter(m => m.status === "ready").length} {t("train.modelsReady")}
-                </div>
-            </div>
-
-            <div className="p-8">
-                <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "create" | "models")}>
-                    <TabsList className="bg-white/5 border border-white/5 p-1 h-11 rounded-xl max-w-md">
-                        <TabsTrigger value="create" className="text-[10px] font-black uppercase tracking-widest rounded-lg data-[state=active]:bg-white data-[state=active]:text-black transition-all gap-2">
-                            <Plus className="w-4 h-4" />
-                            {t("train.createNew")}
-                        </TabsTrigger>
-                        <TabsTrigger value="models" className="text-[10px] font-black uppercase tracking-widest rounded-lg data-[state=active]:bg-white data-[state=active]:text-black transition-all gap-2">
-                            <Sparkles className="w-4 h-4" />
-                            {t("train.myModels")}
-                        </TabsTrigger>
-                    </TabsList>
-
-                    {/* Create New Training */}
-                    <TabsContent value="create" className="space-y-6 mt-6">
-                        {/* Step 1: Select Type */}
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-3">
-                                <div className="w-7 h-7 rounded-full bg-white text-black flex items-center justify-center text-[11px] font-black italic shadow-xl">1</div>
-                                <h2 className="text-xl font-black uppercase italic tracking-tighter text-white">{t("train.selectType")}</h2>
+        <div className="flex flex-col h-full bg-[#0D0D0F]">
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8 min-h-screen pb-24">
+                <div className="max-w-[1180px] mx-auto w-full space-y-8">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b border-white/5">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-md bg-[#18181B] border border-white/10 text-white shadow-lg">
+                                <TbSparkles className="w-5 h-5" />
                             </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                {TRAINING_TYPES.map((type) => (
-                                    <Card
-                                        key={type.id}
-                                        className={`cursor-pointer transition-all duration-300 rounded-2xl border-white/5 hover:border-white/20 overflow-hidden ${selectedType === type.id
-                                            ? "bg-white text-black shadow-2xl ring-2 ring-white/20"
-                                            : "bg-zinc-900 text-white"
-                                            }`}
-                                        onClick={() => setSelectedType(type.id)}
-                                    >
-                                        <CardContent className="p-8 text-center">
-                                            <div className={`w-16 h-16 rounded-2xl ${selectedType === type.id ? 'bg-black/5' : 'bg-white/5'} mx-auto mb-5 flex items-center justify-center shadow-inner`}>
-                                                <type.icon className={`w-8 h-8 ${selectedType === type.id ? 'text-black' : 'text-white'}`} />
-                                            </div>
-                                            <h3 className="font-black uppercase tracking-widest text-[11px] mb-2">{t(type.titleKey)}</h3>
-                                            <p className={`text-[10px] font-bold uppercase tracking-tight leading-relaxed ${selectedType === type.id ? 'text-black/60' : 'text-zinc-500'}`}>{t(type.descKey)}</p>
-                                        </CardContent>
-                                    </Card>
-                                ))}
+                            <div className="flex flex-col">
+                                <label className="text-[13px] font-black uppercase tracking-[0.2em] text-white leading-none">
+                                    {t("train.title")}
+                                </label>
+                                <span className="text-[11px] font-bold text-zinc-400 mt-1.5 leading-none">
+                                    {t("train.subtitle")}
+                                </span>
                             </div>
                         </div>
+                        <div className="px-5 py-2.5 rounded-xl bg-[#121214] border border-white/10 text-white text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-none">
+                            <Zap className="w-3.5 h-3.5 text-[#FF3D5A]" />
+                            {models.filter(m => m.status === "ready").length} {t("train.modelsReady")}
+                        </div>
+                    </div>
 
-                        {/* Step 2: Model Details */}
-                        {selectedType && (
-                            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-8 h-8 rounded-full bg-violet-500 text-white flex items-center justify-center text-sm font-bold">2</div>
-                                    <h2 className="text-xl font-semibold">{t("train.modelDetails")}</h2>
-                                </div>
+                    <div className="">
+                        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "create" | "models")}>
+                            <TabsList className="bg-[#121214] border border-white/5 p-1 h-12 rounded-xl max-w-md">
+                                <TabsTrigger value="create" className="text-[10px] font-black uppercase tracking-widest rounded-lg data-[state=active]:bg-white data-[state=active]:text-black transition-all gap-2 px-6">
+                                    <Plus className="w-3.5 h-3.5" />
+                                    {t("train.createNew")}
+                                </TabsTrigger>
+                                <TabsTrigger value="models" className="text-[10px] font-black uppercase tracking-widest rounded-lg data-[state=active]:bg-white data-[state=active]:text-black transition-all gap-2 px-6">
+                                    <Sparkles className="w-3.5 h-3.5" />
+                                    {t("train.myModels")}
+                                </TabsTrigger>
+                            </TabsList>
 
-                                <div className="grid md:grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label>{t("train.modelName")}</Label>
-                                        <Input
-                                            placeholder={t("train.modelNamePlaceholder")}
-                                            value={modelName}
-                                            onChange={(e) => setModelName(e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>{t("train.modelDescriptionLabel")}</Label>
-                                        <Input
-                                            placeholder={t("train.modelDescriptionPlaceholder")}
-                                            value={modelDescription}
-                                            onChange={(e) => setModelDescription(e.target.value)}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Step 3: Upload Images */}
-                        {selectedType && modelName && (
-                            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-8 h-8 rounded-full bg-violet-500 text-white flex items-center justify-center text-sm font-bold">3</div>
-                                    <h2 className="text-xl font-semibold">{t("train.uploadImages")}</h2>
-                                </div>
-
-                                <Card className="border-dashed border-2 p-8">
-                                    <div className="text-center">
-                                        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <Upload className="w-8 h-8 text-muted-foreground" />
+                            {/* Create New Training */}
+                            <TabsContent value="create" className="space-y-12 mt-10 animate-in fade-in duration-500">
+                                {/* Step 1: Select Type */}
+                                <div className="space-y-6">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-9 h-9 rounded-2xl bg-white text-black flex items-center justify-center text-[12px] font-black shadow-xl shrink-0">1</div>
+                                        <div>
+                                            <h2 className="text-xl font-black uppercase tracking-tighter text-white">{t("train.selectType")}</h2>
+                                            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-0.5">CHOOSE YOUR TRAINING CATEGORY</p>
                                         </div>
-                                        <h3 className="font-semibold mb-2">{t("train.dropImages")}</h3>
-                                        <p className="text-sm text-muted-foreground mb-4">{t("train.imageRequirements")}</p>
-                                        <Button className="bg-violet-500 text-white hover:bg-violet-600" asChild>
-                                            <label>
-                                                <ImageIcon className="w-4 h-4 mr-2" />
-                                                {t("train.selectImages")}
-                                                <input
-                                                    type="file"
-                                                    accept="image/*"
-                                                    multiple
-                                                    className="hidden"
-                                                    onChange={handleImageUpload}
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                        {TRAINING_TYPES.map((type) => (
+                                            <div
+                                                key={type.id}
+                                                className={`cursor-pointer transition-all duration-300 rounded-3xl border border-white/5 hover:border-white/20 group relative overflow-hidden ${selectedType === type.id
+                                                    ? "bg-white text-black shadow-2xl"
+                                                    : "bg-[#121214] text-white"
+                                                    }`}
+                                                onClick={() => setSelectedType(type.id)}
+                                            >
+                                                <div className="p-8 text-center flex flex-col items-center">
+                                                    <div className={`w-14 h-14 rounded-2xl ${selectedType === type.id ? 'bg-black/5' : 'bg-white/5'} flex items-center justify-center shadow-none mb-6 group-hover:scale-110 transition-transform`}>
+                                                        <type.icon className={`w-6 h-6 ${selectedType === type.id ? 'text-black' : 'text-zinc-400 group-hover:text-white'}`} />
+                                                    </div>
+                                                    <h3 className="font-black uppercase tracking-widest text-[11px] mb-2">{t(type.titleKey)}</h3>
+                                                    <p className={`text-[10px] font-bold uppercase tracking-tight leading-relaxed max-w-[140px] ${selectedType === type.id ? 'text-black/60' : 'text-zinc-500'}`}>{t(type.descKey)}</p>
+                                                </div>
+                                                {selectedType === type.id && (
+                                                    <div className="absolute top-4 right-4 text-black">
+                                                        <CheckCircle2 className="w-5 h-5" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Step 2: Model Details */}
+                                {selectedType && (
+                                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-6 duration-500">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-9 h-9 rounded-2xl bg-white text-black flex items-center justify-center text-[12px] font-black shadow-xl shrink-0">2</div>
+                                            <div>
+                                                <h2 className="text-xl font-black uppercase tracking-tighter text-white">{t("train.modelDetails")}</h2>
+                                                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-0.5">NAME AND DESCRIBE YOUR AI ENTITY</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="grid md:grid-cols-2 gap-6 bg-[#121214] p-8 rounded-3xl border border-white/5">
+                                            <div className="space-y-3">
+                                                <Label className="text-[11px] font-black uppercase tracking-widest text-zinc-500 px-1">{t("train.modelName")}</Label>
+                                                <Input
+                                                    className="h-12 bg-black/40 border-white/5 focus:border-white/20 text-white rounded-xl placeholder:text-zinc-700 font-bold px-4"
+                                                    placeholder={t("train.modelNamePlaceholder")}
+                                                    value={modelName}
+                                                    onChange={(e) => setModelName(e.target.value)}
                                                 />
-                                            </label>
+                                            </div>
+                                            <div className="space-y-3">
+                                                <Label className="text-[11px] font-black uppercase tracking-widest text-zinc-500 px-1">{t("train.modelDescriptionLabel")}</Label>
+                                                <Input
+                                                    className="h-12 bg-black/40 border-white/5 focus:border-white/20 text-white rounded-xl placeholder:text-zinc-700 font-bold px-4"
+                                                    placeholder={t("train.modelDescriptionPlaceholder")}
+                                                    value={modelDescription}
+                                                    onChange={(e) => setModelDescription(e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Step 3: Upload Images */}
+                                {selectedType && modelName && (
+                                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-6 duration-500">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-9 h-9 rounded-2xl bg-white text-black flex items-center justify-center text-[12px] font-black shadow-xl shrink-0">3</div>
+                                            <div>
+                                                <h2 className="text-xl font-black uppercase tracking-tighter text-white">{t("train.uploadImages")}</h2>
+                                                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-0.5">UPLOAD PHOTO DATASET (MIN 5 IMAGES)</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="border border-dashed border-white/10 rounded-3xl p-12 bg-[#121214] hover:border-white/20 transition-colors">
+                                            <div className="text-center flex flex-col items-center">
+                                                <div className="w-20 h-20 bg-black/40 border border-white/5 rounded-3xl flex items-center justify-center mb-6 shadow-inner">
+                                                    <Upload className="w-10 h-10 text-zinc-600" />
+                                                </div>
+                                                <h3 className="font-black text-xl uppercase tracking-tighter text-white mb-2">{t("train.dropImages")}</h3>
+                                                <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-8 max-w-[280px] mx-auto opacity-70 leading-relaxed">{t("train.imageRequirements")}</p>
+                                                <Button className="h-12 bg-white text-black hover:bg-zinc-200 font-black text-[10px] uppercase tracking-widest px-8 rounded-xl shadow-xl transition-all" asChild>
+                                                    <label className="cursor-pointer">
+                                                        <ImageIcon className="w-4 h-4 mr-2" />
+                                                        {t("train.selectImages")}
+                                                        <input
+                                                            type="file"
+                                                            accept="image/*"
+                                                            multiple
+                                                            className="hidden"
+                                                            onChange={handleImageUpload}
+                                                        />
+                                                    </label>
+                                                </Button>
+                                            </div>
+                                        </div>
+
+                                        {/* Uploaded Images Grid */}
+                                        {uploadedImages.length > 0 && (
+                                            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 pt-4">
+                                                {uploadedImages.map((img, i) => (
+                                                    <div key={i} className="relative group aspect-square rounded-2xl overflow-hidden border border-white/5 bg-[#121214]">
+                                                        <img
+                                                            src={img}
+                                                            className="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300"
+                                                        />
+                                                        <button
+                                                            onClick={() => removeImage(i)}
+                                                            className="absolute top-2 right-2 w-7 h-7 bg-black/80 text-white rounded-xl border border-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:border-red-500"
+                                                        >
+                                                            <X className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        <div className="flex items-center justify-between px-2 pt-2">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-48 h-2 bg-[#121214] rounded-full overflow-hidden border border-white/5">
+                                                    <div
+                                                        className="h-full bg-[#FF3D5A] transition-all duration-500"
+                                                        style={{ width: `${Math.min(100, (uploadedImages.length / 5) * 100)}%` }}
+                                                    />
+                                                </div>
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                                                    {uploadedImages.length} / 5 MIN
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Start Training Button */}
+                                {selectedType && modelName && uploadedImages.length >= 5 && (
+                                    <div className="pt-12 pb-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
+                                        <Button
+                                            className="w-full h-16 text-[11px] font-black uppercase tracking-[0.2em] bg-[#FF3D5A] text-white hover:bg-[#FF3D5A]/90 shadow-2xl rounded-2xl border-none transition-all hover:scale-[1.01]"
+                                            onClick={handleStartTraining}
+                                            disabled={isTraining}
+                                        >
+                                            {isTraining ? (
+                                                <><Clock className="w-5 h-5 mr-3 animate-spin" /> {t("train.starting")}</>
+                                            ) : (
+                                                <><Play className="w-5 h-5 mr-3" /> {t("train.startTraining")}</>
+                                            )}
+                                        </Button>
+                                        <p className="text-center text-[10px] font-bold uppercase tracking-widest text-zinc-500 mt-6 opacity-60">
+                                            {t("train.trainingTime")}
+                                        </p>
+                                    </div>
+                                )}
+                            </TabsContent>
+
+                            {/* My Models */}
+                            <TabsContent value="models" className="mt-10 animate-in fade-in duration-500">
+                                {models.length === 0 ? (
+                                    <div className="py-24 text-center flex flex-col items-center">
+                                        <div className="w-24 h-24 rounded-full bg-[#121214] border border-white/5 flex items-center justify-center mb-8 shadow-inner">
+                                            <TbSparkles className="w-10 h-10 text-white opacity-20" />
+                                        </div>
+                                        <h3 className="text-2xl font-black uppercase tracking-tighter text-white mb-3">{t("train.noModels")}</h3>
+                                        <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-10 max-w-[320px] mx-auto leading-relaxed">{t("train.noModelsDesc")}</p>
+                                        <Button onClick={() => setActiveTab("create")} className="h-12 bg-white text-black hover:bg-zinc-200 font-black px-10 rounded-xl uppercase tracking-widest text-[10px] shadow-2xl transition-all">
+                                            <Plus className="w-4 h-4 mr-2" />
+                                            {t("train.createFirst")}
                                         </Button>
                                     </div>
-                                </Card>
-
-                                {/* Uploaded Images Grid */}
-                                {uploadedImages.length > 0 && (
-                                    <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
-                                        {uploadedImages.map((img, i) => (
-                                            <div key={i} className="relative group aspect-square">
-                                                <img
-                                                    src={img}
-                                                    className="w-full h-full object-cover rounded-lg"
-                                                />
-                                                <button
-                                                    onClick={() => removeImage(i)}
-                                                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                                                >
-                                                    <X className="w-4 h-4" />
-                                                </button>
+                                ) : (
+                                    <div className="grid gap-6">
+                                        {models.map((model) => (
+                                            <div key={model.id} className="bg-[#121214] border border-white/5 p-6 rounded-3xl hover:border-white/20 transition-all group shadow-none">
+                                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+                                                    <div className="flex items-center gap-5">
+                                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner ${model.status === "ready"
+                                                            ? "bg-green-500/10"
+                                                            : "bg-amber-500/10 animate-pulse"
+                                                            }`}>
+                                                            {model.status === "ready" ? (
+                                                                <CheckCircle2 className="w-7 h-7 text-green-500" />
+                                                            ) : (
+                                                                <Clock className="w-7 h-7 text-amber-500" />
+                                                            )}
+                                                        </div>
+                                                        <div>
+                                                            <div className="flex items-center gap-3">
+                                                                <h3 className="font-black uppercase tracking-tighter text-white text-lg leading-none pt-1">{model.name}</h3>
+                                                                <div className="bg-white/5 px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest text-zinc-500 border border-white/5">
+                                                                    {getTypeLabel(model.type)}
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex items-center gap-3 mt-3">
+                                                                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 flex items-center gap-1.5">
+                                                                    <ImageIcon className="w-3.5 h-3.5" />
+                                                                    {model.images} PHOTOS
+                                                                </span>
+                                                                <span className="text-zinc-800">•</span>
+                                                                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 flex items-center gap-1.5">
+                                                                    <Clock className="w-3.5 h-3.5" />
+                                                                    {new Date(model.createdAt).toLocaleDateString()}
+                                                                </span>
+                                                            </div>
+                                                            {model.status === "training" && model.progress !== undefined && (
+                                                                <div className="flex items-center gap-3 mt-4">
+                                                                    <div className="w-32 h-1.5 bg-black/40 rounded-full overflow-hidden border border-white/5">
+                                                                        <div
+                                                                            className="h-full bg-[#FF3D5A]"
+                                                                            style={{ width: `${model.progress}%` }}
+                                                                        />
+                                                                    </div>
+                                                                    <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">{model.progress}%</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-3 self-end sm:self-center">
+                                                        {model.status === "ready" && (
+                                                            <Button size="sm" className="h-10 bg-white text-black hover:bg-zinc-200 rounded-xl px-6 font-black text-[10px] uppercase tracking-widest shadow-xl transition-all" onClick={() => handleUseModel(model)}>
+                                                                {t("train.useModel")}
+                                                                <TbChevronRight className="w-4 h-4 ml-1" />
+                                                            </Button>
+                                                        )}
+                                                        <Button
+                                                            size="icon"
+                                                            variant="ghost"
+                                                            className="w-10 h-10 text-zinc-700 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+                                                            onClick={() => handleDeleteModel(model.id)}
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </Button>
+                                                    </div>
+                                                </div>
                                             </div>
                                         ))}
                                     </div>
                                 )}
-
-                                <p className="text-sm text-muted-foreground">
-                                    {uploadedImages.length} / {t("train.minImages")}
-                                </p>
-                            </div>
-                        )}
-
-                        {/* Start Training Button */}
-                        {selectedType && modelName && uploadedImages.length >= 5 && (
-                            <div className="pt-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                                <Button
-                                    size="lg"
-                                    className="w-full h-16 text-[11px] font-black uppercase tracking-[0.2em] bg-white text-black hover:bg-zinc-200 shadow-2xl rounded-2xl"
-                                    onClick={handleStartTraining}
-                                    disabled={isTraining}
-                                >
-                                    {isTraining ? (
-                                        <><Clock className="w-5 h-5 mr-3 animate-spin" /> {t("train.starting")}</>
-                                    ) : (
-                                        <><Play className="w-5 h-5 mr-3 opacity-50" /> {t("train.startTraining")}</>
-                                    )}
-                                </Button>
-                                <p className="text-center text-[10px] font-bold uppercase tracking-widest text-zinc-500 mt-4">
-                                    {t("train.trainingTime")}
-                                </p>
-                            </div>
-                        )}
-                    </TabsContent>
-
-                    {/* My Models */}
-                    <TabsContent value="models" className="space-y-4 mt-6">
-                        {models.length === 0 ? (
-                            <Card className="p-12 text-center border-dashed">
-                                <Sparkles className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-                                <h3 className="text-xl font-semibold mb-2">{t("train.noModels")}</h3>
-                                <p className="text-muted-foreground mb-4">{t("train.noModelsDesc")}</p>
-                                <Button onClick={() => setActiveTab("create")} className="bg-white text-black hover:bg-zinc-200 font-black h-12 px-8 rounded-xl uppercase tracking-widest text-[11px]">
-                                    <Plus className="w-4 h-4 mr-2" />
-                                    {t("train.createFirst")}
-                                </Button>
-                            </Card>
-                        ) : (
-                            <div className="grid gap-4">
-                                {models.map((model) => (
-                                    <Card key={model.id} className="p-4">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-4">
-                                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${model.status === "ready"
-                                                    ? "bg-green-100 dark:bg-green-900/30"
-                                                    : "bg-amber-100 dark:bg-amber-900/30"
-                                                    }`}>
-                                                    {model.status === "ready" ? (
-                                                        <CheckCircle2 className="w-6 h-6 text-green-600" />
-                                                    ) : (
-                                                        <Clock className="w-6 h-6 text-amber-600 animate-pulse" />
-                                                    )}
-                                                </div>
-                                                <div>
-                                                    <div className="flex items-center gap-2">
-                                                        <h3 className="font-semibold">{model.name}</h3>
-                                                        <Badge variant="outline" className="text-xs">
-                                                            {getTypeLabel(model.type)}
-                                                        </Badge>
-                                                    </div>
-                                                    <p className="text-sm text-muted-foreground">
-                                                        {model.images} {t("train.images")} • {new Date(model.createdAt).toLocaleDateString()}
-                                                    </p>
-                                                    {model.status === "training" && model.progress !== undefined && (
-                                                        <div className="flex items-center gap-2 mt-2">
-                                                            <Progress value={model.progress} className="h-2 w-32" />
-                                                            <span className="text-xs text-muted-foreground">{model.progress}%</span>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                {model.status === "ready" && (
-                                                    <Button size="sm" className="bg-violet-500 text-white hover:bg-violet-600" onClick={() => handleUseModel(model)}>
-                                                        {t("train.useModel")}
-                                                    </Button>
-                                                )}
-                                                <Button
-                                                    size="sm"
-                                                    variant="ghost"
-                                                    className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                                                    onClick={() => handleDeleteModel(model.id)}
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    </Card>
-                                ))}
-                            </div>
-                        )}
-                    </TabsContent>
-                </Tabs>
+                            </TabsContent>
+                        </Tabs>
+                    </div>
+                </div>
             </div>
         </div>
     )

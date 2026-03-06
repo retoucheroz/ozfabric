@@ -63,7 +63,7 @@ export function ModelSection({
                             <div className="aspect-[2/3] shrink-0">
                                 <AssetCard
                                     id="model"
-                                    label={language === "tr" ? "YENİ" : "NEW"}
+                                    label={language === "tr" ? "Yeni" : "New"}
                                     icon={TbUserCircle}
                                     assets={{}}
                                     activeLibraryAsset={null}
@@ -75,7 +75,7 @@ export function ModelSection({
                                     handleAssetRemove={() => { }}
                                     language={language}
                                     variant="portrait"
-                                    description={language === "tr" ? "EKLE" : "ADD"}
+                                    description={language === "tr" ? "Ekle" : "Add"}
                                     hideLibrary={true}
                                 />
                             </div>
@@ -132,20 +132,20 @@ export function ModelSection({
 
     return (
         <div className="w-full space-y-2">
-            <label className="text-[11px] uppercase font-black text-[var(--text-muted)] tracking-[0.2em] px-1">
+            <label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 mb-1 block px-1">
                 {language === "tr" ? "MODEL SEÇİMİ" : "MODEL SELECTION"}
             </label>
-            <div className="relative rounded-md border-2 overflow-hidden transition-all duration-500 bg-[#18181b] border-[var(--border-subtle)] shadow-sm h-[125px] flex flex-col">
+            <div className="relative rounded-2xl border overflow-hidden transition-all duration-200 bg-[#121214] border-white/10 shadow-sm h-[125px] flex flex-col hover:border-white/20">
 
                 {/* Gender Toggle Tabs */}
-                <div className="flex border-b border-white/5">
+                <div className="flex border-b border-white/10">
                     <button
                         onClick={() => setGender("female")}
                         className={cn(
-                            "flex-1 flex items-center justify-center gap-2 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] transition-all",
+                            "flex-1 flex items-center justify-center gap-2 py-2.5 text-[11px] font-black uppercase tracking-[0.18em] transition-all",
                             gender === 'female'
                                 ? "bg-white text-black"
-                                : "bg-zinc-900 text-zinc-500 hover:text-white"
+                                : "bg-transparent text-zinc-500 hover:text-white"
                         )}
                     >
                         <TbGenderFemale size={16} />
@@ -155,10 +155,10 @@ export function ModelSection({
                     <button
                         onClick={() => setGender("male")}
                         className={cn(
-                            "flex-1 flex items-center justify-center gap-2 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] transition-all",
+                            "flex-1 flex items-center justify-center gap-2 py-2.5 text-[11px] font-black uppercase tracking-[0.18em] transition-all",
                             gender === 'male'
                                 ? "bg-white text-black"
-                                : "bg-zinc-900 text-zinc-500 hover:text-white"
+                                : "bg-transparent text-zinc-500 hover:text-white"
                         )}
                     >
                         <TbGenderMale size={16} />
@@ -181,7 +181,7 @@ export function ModelSection({
                         language={language}
                         variant="portrait"
                         orientation="horizontal"
-                        description={language === "tr" ? "YÜKLE VEYA SÜRÜKLE" : "UPLOAD OR DRAG"}
+                        description={language === "tr" ? "Yükle veya Sürükle" : "Upload or Drag"}
                         hideLibrary={false}
                     />
                 </div>

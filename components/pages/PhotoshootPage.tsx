@@ -88,6 +88,8 @@ import { EditItemDialog } from "@/components/photoshoot/dialogs/EditItemDialog";
 // Shared Types & Constants
 import { ASPECT_RATIOS, RESOLUTION_OPTIONS } from "@/lib/photoshoot-constants";
 import { usePhotoshootWorkflow } from "@/hooks/photoshoot/usePhotoshootWorkflow";
+import { processSmartUpload, AnalysisStatus } from "@/lib/photoshoot/smart-upload-utils";
+import { SmartAnalysisOverlay } from "@/components/photoshoot/SmartAnalysisOverlay";
 
 export default function PhotoshootPage() {
   const { t } = useLanguage();
@@ -287,6 +289,11 @@ export default function PhotoshootPage() {
   const [targetPoseShot, setTargetPoseShot] = useState<string | null>(null);
   const [showProductManager, setShowProductManager] = useState(false);
   const [isDraggingSocks, setIsDraggingSocks] = useState(false);
+
+  // Smart Analysis State
+  const [analysisStatuses, setAnalysisStatuses] = useState<AnalysisStatus[]>([]);
+  const [isSmartAnalyzing, setIsSmartAnalyzing] = useState(false);
+  const [isDraggingGlobal, setIsDraggingGlobal] = useState(false);
   // Once generation starts, LOCK the layout so cards never shift
   const [generationHasStarted, setGenerationHasStarted] = useState(false);
 
@@ -341,6 +348,27 @@ export default function PhotoshootPage() {
     };
   }, [isProcessing, language]);
 
+  const handleGlobalDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingGlobal(false);
+
+    // Only allow smart upload in step 1 or step 2 or when product manager is open
+    if (wizardStep > 2 && !showProductManager) return;
+
+    const files = Array.from(e.dataTransfer.files);
+    const imageFiles = files.filter(f => f.type.startsWith("image/"));
+
+    if (imageFiles.length === 0) return;
+
+    setIsSmartAnalyzing(true);
+    await processSmartUpload(
+      imageFiles,
+      (statuses: AnalysisStatus[]) => setAnalysisStatuses(statuses),
+      (id: string, file: File) => handleAssetUpload(id, file, true)
+    );
+  };
+
   if (!mounted) return null;
 
   if (!generationMode) {
@@ -385,13 +413,13 @@ export default function PhotoshootPage() {
                 key={option.id}
                 onClick={() => setGenerationMode(option.id as any)}
                 className={cn(
-                  "group relative overflow-hidden bg-[#121214] border-white/5 p-8 cursor-pointer transition-all duration-500",
-                  "hover:scale-[1.02] hover:shadow-2xl hover:shadow-black/50",
+                  "group relative overflow-hidden bg-[#18181B] border border-white/10 p-8 cursor-pointer transition-all duration-200 rounded-2xl",
+                  "hover:scale-[1.01] hover:bg-[#1F1F23] hover:border-white/20",
                   option.border
                 )}
               >
                 {/* Glow Effect */}
-                <div className="absolute -top-24 -right-24 w-48 h-48 rounded-full blur-[80px] opacity-0 group-hover:opacity-20 transition-opacity duration-500 bg-[#FF5A5F]" />
+                <div className="absolute -top-24 -right-24 w-48 h-48 rounded-full blur-[80px] opacity-0 group-hover:opacity-20 transition-opacity duration-200 bg-[#FF3D5A]" />
 
                 <div className="relative flex flex-col h-full space-y-6">
                   <div className={cn(
@@ -450,7 +478,20 @@ export default function PhotoshootPage() {
     );
   }
   return (
-    <div className="flex h-full overflow-hidden relative">
+    <div
+      className="flex h-full overflow-hidden relative"
+      onDragOver={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (wizardStep <= 2 || showProductManager) setIsDraggingGlobal(true);
+      }}
+      onDragLeave={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDraggingGlobal(false);
+      }}
+      onDrop={handleGlobalDrop}
+    >
       {/* LEFT COLUMN: Wizard Content */}
       <div
         className={cn(
@@ -488,18 +529,18 @@ export default function PhotoshootPage() {
                   <div className="flex flex-col h-full">
                     <div className="flex items-center gap-3 mb-4">
                       <div className="p-2 rounded-md bg-zinc-800 text-white border border-white/10 shadow-lg">
-                        <TbSettings2 className="w-5 h-5" />
+                        <Camera className="w-5 h-5" />
                       </div>
                       <div className="flex flex-col">
-                        <label className="text-xs uppercase font-black text-white tracking-[0.2em]">
+                        <label className="text-[13px] font-black uppercase tracking-[0.2em] text-white">
                           {language === "tr"
-                            ? "ÜRÜN SEÇİMİ"
-                            : "PRODUCT SELECTION"}
+                            ? "E-TİCARET"
+                            : "E-COMMERCE"}
                         </label>
-                        <span className="text-[10px] text-zinc-400 font-black uppercase tracking-tighter opacity-100 mt-0.5">
+                        <span className="text-[11px] font-bold italic text-zinc-400 mt-1">
                           {language === "tr"
-                            ? "ÇEKİLECEK ÜRÜNÜ BELİRLE"
-                            : "DEFINE PRODUCT TO SHOOT"}
+                            ? "Profesyonel e-ticaret görselleri oluşturun."
+                            : "Create professional e-commerce visuals."}
                         </span>
                       </div>
                     </div>
@@ -532,7 +573,7 @@ export default function PhotoshootPage() {
 
                           <div className="grid grid-cols-1 gap-6 pt-1">
                             <div className="space-y-2">
-                              <label className="text-[11px] uppercase font-black text-[var(--text-muted)] tracking-[0.2em] px-1">
+                              <label className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 px-1">
                                 {language === "tr" ? "ÜRÜN SEÇİMİ" : "PRODUCT SELECTION"}
                               </label>
 
@@ -544,24 +585,24 @@ export default function PhotoshootPage() {
                                     setActiveLibraryAsset(null);
                                 }}
                                 className={cn(
-                                  "group relative h-[100px] rounded-md border-2 border-dashed transition-all duration-300 shadow-sm hover:shadow-lg hover:scale-[1.01] overflow-hidden cursor-pointer flex items-center justify-center px-4 gap-4",
+                                  "group relative h-[100px] rounded-2xl border transition-all duration-200 cursor-pointer flex items-center justify-center px-4 gap-4",
                                   showProductManager
-                                    ? "bg-white/10 border-white/40 ring-2 ring-white/20"
-                                    : "bg-[#18181b] border-white/5 hover:bg-zinc-800/60 hover:border-white/20",
+                                    ? "bg-[#1F1F23] border-white/25 scale-[1.01]"
+                                    : "bg-[#18181B] border-white/10 hover:bg-[#1F1F23] hover:border-white/20 hover:scale-[1.01]"
                                 )}
                               >
                                 <div className="flex items-center gap-1.5 shrink-0">
-                                  <div className="p-2.5 rounded-md bg-zinc-800 text-white border border-white/5 shadow-md group-hover:scale-110 transition-transform">
+                                  <div className="p-2.5 rounded-lg bg-zinc-800 text-white shadow-md group-hover:scale-[1.01] transition-transform">
                                     <TbShirt className="w-5 h-5" />
                                   </div>
                                 </div>
                                 <div className="flex flex-col">
-                                  <span className="text-xs font-black text-white uppercase tracking-widest leading-none">
+                                  <span className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.18em] leading-none">
                                     {language === "tr"
                                       ? "Ürün Yönetimi"
                                       : "Products"}
                                   </span>
-                                  <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-tighter mt-1.5 opacity-60">
+                                  <span className="text-[11px] font-bold italic text-zinc-400 mt-1.5 opacity-60">
                                     {language === "tr"
                                       ? showProductManager
                                         ? "Gizle"
@@ -573,10 +614,10 @@ export default function PhotoshootPage() {
                                 </div>
                                 <ChevronRight
                                   className={cn(
-                                    "w-4 h-4 transition-transform ml-auto",
+                                    "w-4 h-4 transition-transform ml-auto text-zinc-500",
                                     showProductManager
                                       ? "rotate-90 text-white"
-                                      : "text-zinc-600 group-hover:translate-x-1",
+                                      : "group-hover:translate-x-1",
                                   )}
                                 />
                               </div>
@@ -586,7 +627,7 @@ export default function PhotoshootPage() {
                               onClick={() =>
                                 canMoveToStep(2) && setWizardStep(2)
                               }
-                              className="w-full h-12 rounded-md bg-[#F5F5F5] hover:bg-white text-black font-black text-[11px] uppercase tracking-widest shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] group flex justify-center items-center gap-2"
+                              className="w-full h-12 bg-[#F5F5F5] hover:bg-white text-black font-black text-[13px] uppercase tracking-[0.15em] rounded-md transition-all duration-150 flex justify-center items-center gap-2 group"
                             >
                               {language === "tr" ? "İLERLE" : "NEXT"}{" "}
                               <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -600,7 +641,7 @@ export default function PhotoshootPage() {
 
                 {/* Right: Tutorial Area / Product Manager / Model Library */}
                 <div className="lg:col-span-8 hidden lg:block relative min-h-0">
-                  <div className="absolute inset-0 grid grid-cols-1 grid-rows-1 overflow-hidden h-full bg-white/40 dark:bg-[#18181b] backdrop-blur-md rounded-[32px] border border-white/20 dark:border-white/5 shadow-2xl">
+                  <div className="absolute inset-0 grid grid-cols-1 grid-rows-1 overflow-hidden h-full bg-[#18181B] rounded-3xl border border-white/8">
                     <AnimatePresence>
                       {activeLibraryAsset === "model" ? (
                         <motion.div
@@ -665,7 +706,7 @@ export default function PhotoshootPage() {
                                   <div className="w-8 h-8 rounded-md bg-zinc-800 flex items-center justify-center border border-white/5 text-white shadow-sm">
                                     <TbShirt className="w-4 h-4" />
                                   </div>
-                                  <h4 className="text-[10px] font-black text-white uppercase tracking-[0.2em]">
+                                  <h4 className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 mt-1">
                                     {language === "tr"
                                       ? "TEMEL ÜRÜNLER"
                                       : "PRIMARY PRODUCTS"}
@@ -768,7 +809,7 @@ export default function PhotoshootPage() {
                                     <div className="w-7 h-7 rounded-md bg-blue-500/10 flex items-center justify-center border border-blue-500/20 text-blue-400">
                                       <ScanLine className="w-3.5 h-3.5" />
                                     </div>
-                                    <h4 className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">
+                                    <h4 className="text-[11px] font-black uppercase tracking-[0.18em] text-blue-400 mt-1">
                                       {language === "tr"
                                         ? "ÜST DETAYLAR"
                                         : "UPPER DETAILS"}
@@ -832,7 +873,7 @@ export default function PhotoshootPage() {
                                     <div className="w-7 h-7 rounded-md bg-amber-500/10 flex items-center justify-center border border-amber-500/20 text-amber-400">
                                       <ScanLine className="w-3.5 h-3.5" />
                                     </div>
-                                    <h4 className="text-[10px] font-black text-amber-400 uppercase tracking-[0.2em]">
+                                    <h4 className="text-[11px] font-black uppercase tracking-[0.18em] text-amber-500 mt-1">
                                       {language === "tr"
                                         ? "ALT DETAYLAR"
                                         : "LOWER DETAILS"}
@@ -919,7 +960,7 @@ export default function PhotoshootPage() {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-stretch">
                 {/* Left Column: Studio Assets (The 2x2 Grid) */}
                 <div className="lg:col-span-7 flex flex-col space-y-8">
-                  <h4 className="text-[10px] font-black text-white uppercase tracking-[0.2em] px-1 opacity-70">
+                  <h4 className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 px-1">
                     {language === "tr" ? "ÇEKİM AYARLARI" : "SHOOT SETTINGS"}
                   </h4>
 
@@ -1006,7 +1047,7 @@ export default function PhotoshootPage() {
 
               {/* Section 3: Accessories */}
               <div className="space-y-4 pt-6 border-t border-white/5">
-                <h4 className="text-[10px] font-bold text-white uppercase tracking-[0.2em] px-1 opacity-70">
+                <h4 className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 px-1">
                   {language === "tr"
                     ? "DİĞER AKSESUARLAR"
                     : "OTHER ACCESSORIES"}
@@ -1409,18 +1450,18 @@ export default function PhotoshootPage() {
                 </div>
               </div>
 
-              <div className="flex justify-between mt-16 pt-8 border-t border-white/5">
+              <div className="flex justify-between mt-16 pt-8 border-t border-white/10">
                 <Button
                   variant="outline"
                   onClick={() => setWizardStep(1)}
-                  className="px-4 py-2 h-auto rounded-md border border-white/10 bg-white/5 text-white font-black text-[10px] uppercase tracking-widest hover:bg-white hover:text-black transition-all active:scale-[0.98] group"
+                  className="px-6 py-3 h-auto rounded-md bg-transparent border border-white/15 text-zinc-300 font-black text-[13px] uppercase tracking-[0.15em] hover:border-white/30 hover:text-white transition-all duration-150 group"
                 >
-                  <ChevronLeft className="mr-2 w-3.5 h-3.5 opacity-50" />{" "}
+                  <ChevronLeft className="mr-2 w-4 h-4 opacity-50 transition-transform group-hover:-translate-x-1" />{" "}
                   {language === "tr" ? "GERİ" : "BACK"}
                 </Button>
                 <Button
                   onClick={() => canMoveToStep(3) && setWizardStep(3)}
-                  className="px-8 h-12 rounded-md bg-[#F5F5F5] hover:bg-white text-black font-black text-[11px] uppercase tracking-widest shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] group flex items-center gap-2"
+                  className="px-6 h-12 rounded-md bg-[#F5F5F5] hover:bg-white text-black font-black text-[13px] uppercase tracking-[0.15em] transition-all duration-150 group flex items-center gap-2"
                 >
                   {language === "tr" ? "İLERLE" : "NEXT"}{" "}
                   <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -2203,6 +2244,45 @@ export default function PhotoshootPage() {
           }
         />
       </div >
+
+      {/* Smart Analysis Overlay */}
+      {isSmartAnalyzing && (
+        <SmartAnalysisOverlay
+          language={language}
+          statuses={analysisStatuses}
+          onClose={() => {
+            setIsSmartAnalyzing(false);
+            setAnalysisStatuses([]);
+          }}
+          isAllDone={analysisStatuses.every(s => s.status !== 'processing')}
+        />
+      )}
+
+      {/* Global Drag Overlay */}
+      <AnimatePresence>
+        {isDraggingGlobal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] bg-[var(--accent-primary)]/10 backdrop-blur-sm flex items-center justify-center pointer-events-none"
+          >
+            <div className="p-12 rounded-[40px] border-4 border-dashed border-[var(--accent-primary)] bg-black/40 flex flex-col items-center gap-6">
+              <div className="w-24 h-24 rounded-3xl bg-[var(--accent-primary)] flex items-center justify-center shadow-2xl shadow-[var(--accent-primary)]/40">
+                <Sparkles className="w-12 h-12 text-white" />
+              </div>
+              <div className="text-center">
+                <h2 className="text-3xl font-black text-white uppercase tracking-tighter">
+                  {language === "tr" ? "GÖRSELLERİ BURAYA BIRAKIN" : "DROP IMAGES HERE"}
+                </h2>
+                <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-[0.2em] mt-2">
+                  {language === "tr" ? "AI OTOMATİK OLARAK SINIFLANDIRACAK" : "AI WILL AUTOMATICALLY CLASSIFY THEM"}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div >
   );
 }

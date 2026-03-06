@@ -125,10 +125,10 @@ export function BehaviorToggles({
                 <TooltipTrigger asChild>
                     <div
                         className={cn(
-                            "flex flex-col items-center justify-between p-2.5 h-[130px] rounded-md border-2 transition-all cursor-pointer group select-none",
+                            "flex flex-col items-center justify-between p-2.5 h-[130px] rounded-2xl border transition-all cursor-pointer group select-none",
                             active
-                                ? "bg-zinc-800 border-white shadow-xl"
-                                : "bg-zinc-900/40 border-white/5 hover:border-white/20"
+                                ? "bg-[#1F1F23] border-white/25 scale-[1.01] shadow-xl"
+                                : "bg-[#18181B] border-white/10 hover:border-white/20 hover:scale-[1.01]"
                         )}
                         onClick={onClick}
                     >
@@ -140,7 +140,7 @@ export function BehaviorToggles({
                             )}>
                                 {label}
                             </span>
-                            <span className="text-[8px] text-zinc-500 font-bold uppercase tracking-tighter text-center leading-tight mt-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                            <span className="text-[11px] font-bold italic text-zinc-400 text-center mt-1 opacity-80 group-hover:opacity-100 transition-opacity">
                                 {brief}
                             </span>
                         </div>
@@ -167,7 +167,7 @@ export function BehaviorToggles({
 
     return (
         <div className="flex flex-col space-y-4">
-            <h4 className="text-[10px] font-bold text-[var(--accent-primary)] uppercase tracking-[0.15em] px-1">
+            <h4 className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500 px-1">
                 {language === "tr" ? "DETAY AYARLARI" : "DETAIL SETTINGS"}
             </h4>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -252,10 +252,10 @@ export function BehaviorToggles({
                         <TooltipTrigger asChild>
                             <div
                                 className={cn(
-                                    "flex flex-col items-center justify-between p-2.5 h-[130px] rounded-md border-2 transition-all cursor-pointer group select-none shadow-sm",
+                                    "flex flex-col items-center justify-between p-2.5 h-[130px] rounded-2xl border transition-all cursor-pointer group select-none shadow-sm",
                                     selectedMoodId && selectedMoodId !== 'natural'
-                                        ? "bg-zinc-800 border-white shadow-xl"
-                                        : "bg-zinc-900/40 border-white/5 hover:border-white/20"
+                                        ? "bg-[#1F1F23] border-white/25 scale-[1.01] shadow-xl"
+                                        : "bg-[#18181B] border-white/10 hover:border-white/20 hover:scale-[1.01]"
                                 )}
                                 onClick={() => {
                                     const moods = ['natural', 'warm', 'powerful', 'relaxed', 'professional', 'subtle'];
@@ -310,11 +310,11 @@ export function BehaviorToggles({
                 {/* 8. Pant Length (Box 8) */}
                 <div
                     className={cn(
-                        "flex flex-col items-center justify-between p-2.5 h-[130px] rounded-md border-2 transition-all cursor-pointer group select-none shadow-sm",
-                        !canShowLegHem ? "opacity-30 cursor-not-allowed bg-zinc-900/10 grayscale" :
+                        "flex flex-col items-center justify-between p-2.5 h-[130px] rounded-2xl border transition-all cursor-pointer group select-none shadow-sm",
+                        !canShowLegHem ? "opacity-30 cursor-not-allowed bg-[#18181B] border-white/5 grayscale" :
                             (pantLength !== 'none'
-                                ? "bg-zinc-800 border-white shadow-xl"
-                                : "bg-zinc-900/40 border-white/5 hover:border-white/20")
+                                ? "bg-[#1F1F23] border-white/25 scale-[1.01] shadow-xl"
+                                : "bg-[#18181B] border-white/10 hover:border-white/20 hover:scale-[1.01]")
                     )}
                     onClick={() => {
                         if (!canShowLegHem) return;

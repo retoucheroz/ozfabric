@@ -287,7 +287,7 @@ export default function AdminPanel() {
                             const formData = new FormData(e.currentTarget);
                             const username = formData.get('username') as string;
                             const password = formData.get('password') as string;
-                            const role = formData.get('role') as string;
+                            const role = 'user'; // Artık herkes default 'user'
                             const customTitle = formData.get('customTitle') as string;
 
                             if (!username || !password) return toast.error(t('login.errorBothImages'));
@@ -322,17 +322,7 @@ export default function AdminPanel() {
                                 <Label htmlFor="customTitle">{t('admin.brandedTitle')}</Label>
                                 <Input id="customTitle" name="customTitle" placeholder="örn: Autography" />
                             </div>
-                            <div className="space-y-1.5 w-[140px]">
-                                <Label htmlFor="role">{t('admin.role')}</Label>
-                                <select
-                                    id="role"
-                                    name="role"
-                                    className="w-full h-10 px-3 rounded-md border border-white/10 bg-black text-sm focus:ring-1 ring-white/20 outline-none"
-                                >
-                                    <option value="user">User</option>
-                                    <option value="admin">Admin</option>
-                                </select>
-                            </div>
+                            {/* Rol seçimi kaldırıldı */}
                             <Button type="submit" className="bg-zinc-100 text-black hover:bg-white font-bold transition-all px-8">
                                 {t('admin.addUser')}
                             </Button>
@@ -422,16 +412,6 @@ export default function AdminPanel() {
                                         >
                                             {user.status === 'active' ? <UserMinus className="w-4 h-4 mr-2 shrink-0" /> : <UserCheck className="w-4 h-4 mr-2 shrink-0" />}
                                             <span className="truncate">{user.status === 'active' ? t('admin.disable') : t('admin.enable')}</span>
-                                        </Button>
-                                        <Button
-                                            size="sm"
-                                            variant="outline"
-                                            className="w-full font-bold"
-                                            onClick={() => updateUser(user.username, { role: user.role === 'admin' ? 'user' : 'admin' })}
-                                            disabled={user.username === 'admin'}
-                                        >
-                                            <Shield className={`w-4 h-4 mr-2 shrink-0 ${user.role === 'admin' ? 'text-violet-500' : ''}`} />
-                                            <span className="truncate">{user.role === 'admin' ? t('admin.revokeAdmin') : t('admin.makeAdmin')}</span>
                                         </Button>
                                     </>
                                 )}

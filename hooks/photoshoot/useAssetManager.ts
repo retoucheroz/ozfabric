@@ -115,7 +115,7 @@ export const useAssetManager = (
         return { lowRes, highRes };
     };
 
-    const handleAssetUpload = async (key: string, file: File | File[]) => {
+    const handleAssetUpload = async (key: string, file: File | File[], silent: boolean = false) => {
         try {
             const actualFile = Array.isArray(file) ? file[0] : file;
             if (!actualFile) return;
@@ -124,18 +124,18 @@ export const useAssetManager = (
             setAssets((prev: Record<string, string | null>) => ({ ...prev, [key]: lowRes }));
             setAssetsHighRes((prev: Record<string, string | null>) => ({ ...prev, [key]: highRes }));
 
-            if (key === 'pose' || key.startsWith('pose_')) {
+            if ((key === 'pose' || key.startsWith('pose_')) && !silent) {
                 setPoseDescription(null);
                 setTempPoseData({ original: highRes, stickman: "" });
                 setShowSavePoseDialog(true);
             }
 
-            if (key === 'model') {
+            if (key === 'model' && !silent) {
                 setTempModelData({ url: lowRes, name: "", gender: 'female' });
                 setShowSaveModelDialog(true);
             }
 
-            if (key === 'lighting') {
+            if (key === 'lighting' && !silent) {
                 setTempLightingData({
                     url: highRes,
                     name: "",
@@ -146,7 +146,7 @@ export const useAssetManager = (
                 setShowSaveLightingDialog(true);
             }
 
-            if (['background', 'fit_pattern', 'shoes', 'jacket', 'bag', 'glasses', 'hat', 'jewelry', 'belt', 'inner_wear', 'socks'].includes(key)) {
+            if (['background', 'fit_pattern', 'shoes', 'jacket', 'bag', 'glasses', 'hat', 'jewelry', 'belt', 'inner_wear', 'socks'].includes(key) && !silent) {
                 setTempAssetData({ key, url: lowRes, name: "" });
                 setShowSaveAssetDialog(true);
             }
